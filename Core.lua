@@ -139,7 +139,6 @@ local function SendAppreciation(sourceGUID, sourceName, spellLink, spellName, ca
     if messagingType == "PRINT" then
         local coloredName = sourceName
 
-        -- Attempt to fetch the English Class name via GUID and match it to Data.COLORS
         if sourceGUID then
             local _, englishClass = GetPlayerInfoByGUID(sourceGUID)
             if englishClass and Data.COLORS[englishClass] then
@@ -165,9 +164,27 @@ local function HandleStrangersBuff(sourceGUID, sourceName, spellID)
         return
     end
 
+    -- NEW: Check if the buff meets the minimum duration requirement
+    if db.minBuffDuration and db.minBuffDuration > 0 then
+        local duration = 0
+        for i = 1, 40 do
+            local aura = C_UnitAuras.GetAuraDataByIndex("player", i, "HELPFUL")
+            if not aura then
+                break
+            end
+            if aura.spellId == spellID then
+                duration = aura.duration
+                break
+            end
+        end
+
+        if duration > 0 and duration < db.minBuffDuration then
+            return
+        end
+    end
+
     local spellLink = GetSpellLink(spellID) or "Unknown Spell"
 
-    -- Pass sourceGUID into SendAppreciation so it can look up the class color
     SendAppreciation(sourceGUID, sourceName, spellLink, spellLink, "STRANGER", db.messaging)
 
     if not IsOnCooldown(sourceGUID) then

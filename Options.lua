@@ -139,7 +139,22 @@ function ns.SetupOptions()
                     TFTB.db.profile.strangers.cooldown = val
                 end
             },
-            spaceSt3 = GetSpacer(26),
+            minDurationStrangers = {
+                order = 26.1,
+                type = "range",
+                name = "Minimum Buff Duration (Seconds)",
+                desc = "Minimum duration (in seconds) the buff must last to trigger a thank you.\n\nFilters out short heals over time like Renew or Rejuvenation.",
+                min = 0,
+                max = 120,
+                step = 1,
+                get = function()
+                    return TFTB.db.profile.strangers.minBuffDuration
+                end,
+                set = function(_, val)
+                    TFTB.db.profile.strangers.minBuffDuration = val
+                end
+            },
+            spaceSt3_5 = GetSpacer(26.2),
             messagingStrangers = {
                 order = 27,
                 type = "select",

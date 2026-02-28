@@ -159,6 +159,7 @@ ns.Data.DEFAULTS = {
             enabled = true,
             messaging = "NONE",
             cooldown = 3,
+            minBuffDuration = 25,
             emotesEnabled = true,
             emotes = GetDefaultEmoteSettings()
         },
