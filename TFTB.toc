@@ -6,7 +6,7 @@
 ## Category-enUS: Buffs & Debuffs
 ## X-License: MIT
 
-## Interface: 11508, 20505, 50503, 110207
+## Interface: 11508, 20505, 50503
 ## Version: @project-version@
 ## X-Curse-Project-ID: 1140285
 
@@ -26,6 +26,9 @@ Includes\AceConfig-3.0\AceConfig-3.0.xml
 # Thanks for the Buff!
 Data.lua
 Core.lua
+Options-Buffs-from-Strangers.lua
+Options-Combat-Buffs.lua
+Options-Thank-You-Button.lua
 Options.lua
 
 # Feedback Welcome! (=

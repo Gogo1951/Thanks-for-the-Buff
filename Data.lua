@@ -1,33 +1,59 @@
 local addonName, ns = ...
 ns.Data = {}
 
+--------------------------------------------------------------------------------
+-- Colors
+--------------------------------------------------------------------------------
 ns.Data.COLORS = {
-    -- Identity
-    TITLE = "FFD700",
-    BRAND = "00BBFF",
-    SEP = "AAAAAA",
-    TEXT = "FFFFFF",
-    -- Classes
-    DEATHKNIGHT = "C41F3B",
-    DRUID = "FF7D0A",
-    HUNTER = "ABD473",
-    MAGE = "40C7EB",
-    PALADIN = "F58CBA",
-    PRIEST = "FFFFFF",
-    ROGUE = "FFF569",
-    SHAMAN = "0070DE",
-    WARLOCK = "9482C9",
-    WARRIOR = "C79C6E",
-    MONK = "00FF96",
+    -- UI Palette
+    TITLE    = "FFD100",
+    BRAND    = "00BBFF",
+    INFO     = "00BBFF",
+    DESC     = "CCCCCC",
+    TEXT     = "FFFFFF",
+    SUCCESS  = "33CC33",
+    DISABLED = "CC3333",
+    SEP      = "AAAAAA",
+    MUTED    = "808080",
+    -- Class Colors
+    DEATHKNIGHT = "C41E3A",
     DEMONHUNTER = "A330C9",
-    EVOKER = "33937F",
-    -- Other
-    ITEMS = "CCCCCC"
+    DRUID       = "FF7C0A",
+    EVOKER      = "33937F",
+    HUNTER      = "AAD372",
+    MAGE        = "3FC7EB",
+    MONK        = "00FF96",
+    PALADIN     = "F48CBA",
+    PRIEST      = "FFFFFF",
+    ROGUE       = "FFF468",
+    SHAMAN      = "0070DD",
+    WARLOCK     = "8788EE",
+    WARRIOR     = "C69B6D",
+    -- Special
+    ITEMS       = "A335EE"
 }
 
+--------------------------------------------------------------------------------
+-- Color Helper
+--------------------------------------------------------------------------------
+function ns.GetColor(key)
+    local hex = ns.Data.COLORS[key]
+    if hex then
+        return "|cff" .. hex
+    end
+    return "|cffFFFFFF"
+end
+
+--------------------------------------------------------------------------------
+-- Constants
+--------------------------------------------------------------------------------
 ns.Data.SAFETY_PAUSE = 3
-ns.Data.MACRO_NAME = "- Thank"
-ns.Data.ADDON_TITLE = "Thanks for the Buff"
+ns.Data.MACRO_NAME   = "- Thank"
+ns.Data.ADDON_TITLE  = "Thanks for the Buff"
+
+ns.Data.DISCORD_URL    = "https://discord.gg/eh8hKq992Q"
+ns.Data.GITHUB_URL     = "https://github.com/Gogo1951/Thanks-for-the-Buff"
+ns.Data.CURSEFORGE_URL = "https://www.curseforge.com/wow/addons/thanks-for-the-buff-revisited"
 
 --[[
     AURA ID VERIFICATION TASK LIST
@@ -41,9 +67,9 @@ ns.Data.ADDON_TITLE = "Thanks for the Buff"
 
     High-priority (known to sometimes differ between cast ID and aura ID):
       - Soulstone         : listed 20707,20710,20712,20714,20716,20718,47883
-      - Lay on Hands      : listed 633,2800,10310,27154,48788 (heals AND may apply a short buff; confirm the aura ID)
-      - Divine Intervention: listed 19752 (confirm the aura placed on the TARGET, not the cast)
-      - Misdirection      : listed 34477 (confirm this is the aura on the RECIPIENT, not the hunter)
+      - Lay on Hands      : listed 633,2800,10310,27154,48788
+      - Divine Intervention: listed 19752
+      - Misdirection      : listed 34477
       - Beacon of Light    : listed 53563
 
     Medium-priority (multi-rank spells — confirm highest rank aura IDs):
@@ -66,110 +92,125 @@ ns.Data.ADDON_TITLE = "Thanks for the Buff"
       - Rebirth       (resurrect — no aura)
       - Leap of Faith (grip — no persistent aura)
 ]]
+
+--------------------------------------------------------------------------------
+-- Spell List
+--------------------------------------------------------------------------------
 ns.Data.SPELL_LIST = {
     ["DEATHKNIGHT"] = {
         {name = "Unholy Frenzy", ids = {49016}}
     },
     ["DRUID"] = {
-        {name = "Innervate", ids = {29166}},
-        {name = "Ironbark", ids = {102342}},
-        {name = "Rebirth", ids = {20484, 20739, 20742, 20747, 20748, 26994, 48477}, noAura = true}
+        {name = "Innervate",  ids = {29166}},
+        {name = "Ironbark",   ids = {102342}},
+        {name = "Rebirth",    ids = {20484, 20739, 20742, 20747, 20748, 26994, 48477}, noAura = true}
     },
     ["HUNTER"] = {
-        {name = "Master's Call", ids = {53271}},
-        {name = "Misdirection", ids = {34477}},
+        {name = "Master's Call",     ids = {53271}},
+        {name = "Misdirection",      ids = {34477}},
         {name = "Roar of Sacrifice", ids = {53480}}
     },
     ["MAGE"] = {
         {name = "Amplify Magic", ids = {1008, 604, 8450, 8451, 10169, 10170, 27130, 43017}},
-        {name = "Dampen Magic", ids = {603, 1581, 10173, 10174, 27128, 43015}},
-        {name = "Focus Magic", ids = {54646}}
+        {name = "Dampen Magic",  ids = {603, 1581, 10173, 10174, 27128, 43015}},
+        {name = "Focus Magic",   ids = {54646}}
     },
     ["PALADIN"] = {
-        {name = "Beacon of Light", ids = {53563}},
-        {name = "Divine Intervention", ids = {19752}},
-        {name = "Hand of Freedom", ids = {1044}},
-        {name = "Hand of Protection", ids = {1022, 5599, 10278}},
-        {name = "Hand of Sacrifice", ids = {6940, 20729, 27147, 27148}},
-        {name = "Lay on Hands", ids = {633, 2800, 10310, 27154, 48788}}
+        {name = "Beacon of Light",     ids = {53563}},
+        {name = "Divine Intervention",  ids = {19752}},
+        {name = "Hand of Freedom",      ids = {1044}},
+        {name = "Hand of Protection",   ids = {1022, 5599, 10278}},
+        {name = "Hand of Sacrifice",    ids = {6940, 20729, 27147, 27148}},
+        {name = "Lay on Hands",         ids = {633, 2800, 10310, 27154, 48788}}
     },
     ["PRIEST"] = {
-        {name = "Fear Ward", ids = {6346}},
-        {name = "Guardian Spirit", ids = {47788}},
-        {name = "Leap of Faith", ids = {73325}, noAura = true},
+        {name = "Fear Ward",        ids = {6346}},
+        {name = "Guardian Spirit",  ids = {47788}},
+        {name = "Leap of Faith",    ids = {73325}, noAura = true},
         {name = "Pain Suppression", ids = {33206}},
-        {name = "Power Infusion", ids = {10060}}
+        {name = "Power Infusion",   ids = {10060}}
     },
     ["ROGUE"] = {
         {name = "Tricks of the Trade", ids = {57934}}
     },
     ["SHAMAN"] = {
-        {name = "Bloodlust", ids = {2825}},
-        {name = "Heroism", ids = {32182}},
+        {name = "Bloodlust",      ids = {2825}},
+        {name = "Heroism",        ids = {32182}},
         {name = "Water Breathing", ids = {131}},
-        {name = "Water Walking", ids = {546}}
+        {name = "Water Walking",   ids = {546}}
     },
     ["WARLOCK"] = {
-        {name = "Soulstone", ids = {20707, 20710, 20712, 20714, 20716, 20718, 47883}},
+        {name = "Soulstone",      ids = {20707, 20710, 20712, 20714, 20716, 20718, 47883}},
         {name = "Unending Breath", ids = {5697}}
     },
     ["WARRIOR"] = {
-        {name = "Intervene", ids = {3411}},
-        {name = "Vigilance", ids = {50720}}
+        {name = "Intervene",  ids = {3411}},
+        {name = "Vigilance",  ids = {50720}}
     },
     ["ITEMS"] = {
-        {name = "Drums of Restoration", ids = {35478}, category = "PARTY_ITEM"},
-        {name = "Drums of Speed", ids = {35477}, category = "PARTY_ITEM"},
-        {name = "Drums of War", ids = {35475}, category = "PARTY_ITEM"},
-        {name = "Greater Drums of Battle", ids = {351355}, category = "PARTY_ITEM"},
+        {name = "Drums of Restoration",         ids = {35478},  category = "PARTY_ITEM"},
+        {name = "Drums of Speed",               ids = {35477},  category = "PARTY_ITEM"},
+        {name = "Drums of War",                 ids = {35475},  category = "PARTY_ITEM"},
+        {name = "Greater Drums of Battle",      ids = {351355}, category = "PARTY_ITEM"},
         {name = "Greater Drums of Restoration", ids = {351358}, category = "PARTY_ITEM"},
-        {name = "Greater Drums of Speed", ids = {351359}, category = "PARTY_ITEM"},
-        {name = "Greater Drums of War", ids = {351360}, category = "PARTY_ITEM"}
+        {name = "Greater Drums of Speed",       ids = {351359}, category = "PARTY_ITEM"},
+        {name = "Greater Drums of War",         ids = {351360}, category = "PARTY_ITEM"}
     }
 }
 
+--------------------------------------------------------------------------------
+-- Emotes
+--------------------------------------------------------------------------------
 ns.Data.EMOTES = {
-    {cmd = "CHEER", desc = "You cheer at <Target>."},
-    {cmd = "DRINK", desc = "You raise a drink to <Target>."},
-    {cmd = "FLEX", desc = "You flex at <Target>."},
-    {cmd = "GRIN", desc = "You grin wickedly at <Target>."},
-    {cmd = "HIGHFIVE", desc = "You high-five <Target>."},
-    {cmd = "PRAISE", desc = "You praise <Target>."},
-    {cmd = "SALUTE", desc = "You salute <Target> with respect."},
-    {cmd = "SMILE", desc = "You smile at <Target>."},
-    {cmd = "THANK", desc = "You thank <Target>."},
-    {cmd = "WHOA", desc = "You look at <Target> and exclaim 'Whoa!'"},
-    {cmd = "WINK", desc = "You wink at <Target>."},
-    {cmd = "YES", desc = "You nod at <Target>."}
+    {cmd = "CHEER",    displayName = "/cheer",    desc = "You cheer at <Target>."},
+    {cmd = "DRINK",    displayName = "/drink",    desc = "You raise a drink to <Target>."},
+    {cmd = "FLEX",     displayName = "/flex",     desc = "You flex at <Target>."},
+    {cmd = "GRIN",     displayName = "/grin",     desc = "You grin wickedly at <Target>."},
+    {cmd = "HIGHFIVE", displayName = "/highfive", desc = "You high-five <Target>."},
+    {cmd = "PRAISE",   displayName = "/praise",   desc = "You praise <Target>."},
+    {cmd = "SALUTE",   displayName = "/salute",   desc = "You salute <Target> with respect."},
+    {cmd = "SMILE",    displayName = "/smile",    desc = "You smile at <Target>."},
+    {cmd = "THANK",    displayName = "/thank",    desc = "You thank <Target>."},
+    {cmd = "WHOA",     displayName = "/whoa",     desc = "You look at <Target> and exclaim 'Whoa!'"},
+    {cmd = "WINK",     displayName = "/wink",     desc = "You wink at <Target>."},
+    {cmd = "YES",      displayName = "/yes",      desc = "You nod at <Target>."}
 }
 
+--------------------------------------------------------------------------------
+-- Default Emote Settings
+--------------------------------------------------------------------------------
 local function GetDefaultEmoteSettings()
-    local e = {}
+    local emotes = {}
     for _, data in ipairs(ns.Data.EMOTES) do
-        e[data.cmd] = true
+        emotes[data.cmd] = true
     end
-    return e
+    return emotes
 end
 
+--------------------------------------------------------------------------------
+-- Saved Variable Defaults
+--------------------------------------------------------------------------------
 ns.Data.DEFAULTS = {
     profile = {
         lastRunVersion = "0.0.0",
-        global = {enabled = true, welcomeMessage = true},
+        global = {
+            welcomeMessage = true
+        },
         strangers = {
-            enabled = true,
-            messaging = "NONE",
-            cooldown = 3,
+            enabled        = true,
+            messaging      = "NONE",
+            cooldown       = 3,
             minBuffDuration = 25,
-            emotesEnabled = true,
-            emotes = GetDefaultEmoteSettings()
+            emotesEnabled  = true,
+            emotes         = GetDefaultEmoteSettings()
         },
         slash = {
             createMacro = true,
-            message = "Thanks, you're the best! (=",
-            emotes = GetDefaultEmoteSettings()
+            message     = "Thanks, you're the best! (=",
+            emotes      = GetDefaultEmoteSettings()
         },
         groupBuffs = {
-            messaging = "PRINT",
+            messaging    = "PRINT",
             watchedBuffs = {}
         }
     }
