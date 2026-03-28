@@ -170,23 +170,29 @@ local function HandleStrangersBuff(sourceGUID, sourceName, spellID)
         return
     end
 
-    -- Check if the buff meets the minimum duration requirement
-    if db.minBuffDuration and db.minBuffDuration > 0 then
-        local duration = 0
-        for i = 1, 40 do
-            local aura = C_UnitAuras.GetAuraDataByIndex("player", i, "HELPFUL")
-            if not aura then
-                break
-            end
-            if aura.spellId == spellID then
-                duration = aura.duration
-                break
-            end
+    -- Verify this is actually a helpful buff (not a debuff from an enemy)
+    local duration = 0
+    local foundAsBuff = false
+    for i = 1, 40 do
+        local aura = C_UnitAuras.GetAuraDataByIndex("player", i, "HELPFUL")
+        if not aura then
+            break
         end
+        if aura.spellId == spellID then
+            foundAsBuff = true
+            duration = aura.duration
+            break
+        end
+    end
 
-        if duration > 0 and duration < db.minBuffDuration then
-            return
-        end
+    if not foundAsBuff then
+        return
+    end
+
+    -- Check if the buff meets the minimum duration requirement
+    if db.minBuffDuration and db.minBuffDuration > 0
+        and duration > 0 and duration < db.minBuffDuration then
+        return
     end
 
     local spellLink = GetSpellLink(spellID) or "Unknown Spell"
@@ -259,7 +265,9 @@ function TFTB:COMBAT_LOG_EVENT_UNFILTERED()
 
     if UnitInParty(sourceName) or UnitInRaid(sourceName) then
         HandleGroupBuff(sourceGUID, sourceName, spellID, isAuraEvent)
-    elseif isAuraEvent and not InCombatLockdown() and bit.band(sourceFlags, COMBATLOG_OBJECT_TYPE_PLAYER) > 0 then
+    elseif isAuraEvent and not InCombatLockdown()
+        and bit.band(sourceFlags, COMBATLOG_OBJECT_TYPE_PLAYER) > 0
+        and bit.band(sourceFlags, COMBATLOG_OBJECT_REACTION_FRIENDLY) > 0 then
         HandleStrangersBuff(sourceGUID, sourceName, spellID)
     end
 end
