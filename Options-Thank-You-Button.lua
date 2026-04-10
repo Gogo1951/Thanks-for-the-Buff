@@ -1,42 +1,35 @@
 local addonName, ns = ...
 local Data = ns.Data
+local L = ns.L
 
 --------------------------------------------------------------------------------
 -- Helpers
 --------------------------------------------------------------------------------
+
 local function Desc(text, order)
-    return {
-        type     = "description",
-        name     = text,
-        fontSize = "medium",
-        order    = order
-    }
+    return {type = "description", name = text, fontSize = "medium", order = order}
 end
 
 local function Spacer(order)
-    return {
-        type  = "description",
-        name  = " ",
-        order = order
-    }
+    return {type = "description", name = " ", order = order}
 end
 
 --------------------------------------------------------------------------------
 -- Options Table
 --------------------------------------------------------------------------------
+
 function ns.GetThankYouButtonOptions()
     local TFTB = ns.TFTB
 
     local options = {
-        name = "Thank You Button",
+        name = L["BUTTON_TITLE"],
         type = "group",
         args = {
             createMacro = {
                 type  = "toggle",
-                name  = "Create Macro",
-                desc  = "A macro named "
-                     .. ns.GetColor("TITLE") .. Data.MACRO_NAME .. "|r"
-                     .. " will be automatically created for you on sign-in.",
+                name  = L["BUTTON_CREATE_MACRO"],
+                desc  = string.format(L["BUTTON_CREATE_MACRO_DESC"],
+                    ns.GetColor("TITLE") .. Data.MACRO_NAME .. "|r"),
                 width = "full",
                 order = 10,
                 get   = function() return TFTB.db.profile.slash.createMacro end,
@@ -46,7 +39,7 @@ function ns.GetThankYouButtonOptions()
 
             whisperMsg = {
                 type  = "input",
-                name  = "Whisper Message",
+                name  = L["BUTTON_WHISPER"],
                 width = "full",
                 order = 20,
                 get   = function() return TFTB.db.profile.slash.message end,
@@ -54,23 +47,23 @@ function ns.GetThankYouButtonOptions()
             },
             resetMsg = {
                 type  = "execute",
-                name  = "Reset",
-                desc  = "Reset the whisper message to the default text.",
+                name  = L["BUTTON_RESET"],
+                desc  = L["BUTTON_RESET_DESC"],
                 width = "half",
                 order = 21,
                 func  = function()
-                    TFTB.db.profile.slash.message = "Thanks, you're the best! (="
+                    TFTB.db.profile.slash.message = L["DEFAULT_WHISPER"]
                 end
             },
             space2 = Spacer(22),
 
             headerSlashEmotes = Desc(
-                "\n" .. ns.GetColor("TEXT") .. "Thank You Button Emotes:" .. "|r",
+                "\n" .. ns.GetColor("TEXT") .. L["BUTTON_EMOTES_HEADER"] .. "|r",
                 30
             ),
             slashEmoteGroup = {
                 type   = "group",
-                name   = "Select Emotes",
+                name   = L["BUTTON_EMOTES_SELECT"],
                 order  = 31,
                 inline = true,
                 args   = {}
@@ -78,7 +71,6 @@ function ns.GetThankYouButtonOptions()
         }
     }
 
-    -- Populate emote toggles
     for i, emoteData in ipairs(Data.EMOTES) do
         local emote = emoteData.cmd
         options.args.slashEmoteGroup.args[emote] = {

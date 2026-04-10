@@ -1,5 +1,6 @@
 local addonName, ns = ...
 local Data = ns.Data
+local L = ns.L
 
 local TFTB = LibStub("AceAddon-3.0"):NewAddon("TFTB", "AceConsole-3.0", "AceEvent-3.0")
 ns.TFTB = TFTB
@@ -7,6 +8,7 @@ ns.TFTB = TFTB
 --------------------------------------------------------------------------------
 -- State
 --------------------------------------------------------------------------------
+
 local sessionCooldowns = {}
 local welcomeMessageShown = false
 local spellLookup = {}
@@ -14,6 +16,7 @@ local spellLookup = {}
 --------------------------------------------------------------------------------
 -- Utility Functions
 --------------------------------------------------------------------------------
+
 function TFTB:PrintMsg(msg)
     local prefix = ns.GetColor("BRAND") .. Data.ADDON_TITLE .. "|r "
                 .. ns.GetColor("SEP") .. "//" .. "|r "
@@ -32,17 +35,15 @@ end
 
 function TFTB:StartSafetyTimer(duration)
     self.isReady = false
-    C_Timer.After(
-        duration or Data.SAFETY_PAUSE,
-        function()
-            self.isReady = true
-        end
-    )
+    C_Timer.After(duration or Data.SAFETY_PAUSE, function()
+        self.isReady = true
+    end)
 end
 
 --------------------------------------------------------------------------------
--- Spell Lookup (built once, avoids nested loops every combat log event)
+-- Spell Lookup
 --------------------------------------------------------------------------------
+
 function TFTB:BuildSpellLookup()
     wipe(spellLookup)
     if not Data.SPELL_LIST then
@@ -64,12 +65,14 @@ end
 --------------------------------------------------------------------------------
 -- Auto Macro
 --------------------------------------------------------------------------------
+
 function TFTB:CreateAutoMacro()
     if InCombatLockdown() then
         return
     end
 
-    if not self.db or not self.db.profile or not self.db.profile.slash or not self.db.profile.slash.createMacro then
+    if not self.db or not self.db.profile
+        or not self.db.profile.slash or not self.db.profile.slash.createMacro then
         return
     end
 
@@ -85,6 +88,7 @@ end
 --------------------------------------------------------------------------------
 -- Initialization
 --------------------------------------------------------------------------------
+
 function TFTB:OnInitialize()
     local currentVersion = C_AddOns.GetAddOnMetadata(addonName, "Version") or "0.0.0"
 
@@ -98,7 +102,7 @@ function TFTB:OnInitialize()
     self.db.profile.lastRunVersion = currentVersion
 
     if not self.db.profile.groupBuffs then
-        self:PrintMsg("Error: Database defaults failed to load. Please reset your profile via /tftb.")
+        self:PrintMsg(L["MSG_DB_ERROR"])
         return
     end
 
@@ -106,7 +110,6 @@ function TFTB:OnInitialize()
         ns.SetupOptions()
     end
 
-    -- Enable tracking for any spells the player hasn't explicitly toggled yet
     self:PopulateWatchedBuffs()
     self:BuildSpellLookup()
 end
@@ -119,7 +122,7 @@ function TFTB:PopulateWatchedBuffs()
     for class, spellGroups in pairs(Data.SPELL_LIST) do
         for _, spellData in ipairs(spellGroups) do
             for _, id in ipairs(spellData.ids) do
-                if C_Spell.DoesSpellExist(id) and watched[id] == nil then
+                if watched[id] == nil then
                     watched[id] = true
                 end
             end
@@ -138,39 +141,44 @@ end
 --------------------------------------------------------------------------------
 -- Notifications
 --------------------------------------------------------------------------------
+
+local function ColorPlayerName(sourceGUID, sourceName)
+    if not sourceGUID then
+        return sourceName
+    end
+    local _, englishClass = GetPlayerInfoByGUID(sourceGUID)
+    if englishClass and Data.COLORS[englishClass] then
+        return string.format("|cff%s%s|r", Data.COLORS[englishClass], sourceName)
+    end
+    return sourceName
+end
+
 local function SendAppreciation(sourceGUID, sourceName, spellLink, category, messagingType, noAura)
     if messagingType == "PRINT" then
-        local coloredName = sourceName
-
-        if sourceGUID then
-            local _, englishClass = GetPlayerInfoByGUID(sourceGUID)
-            if englishClass and Data.COLORS[englishClass] then
-                coloredName = string.format("|cff%s%s|r", Data.COLORS[englishClass], sourceName)
-            end
-        end
+        local coloredName = ColorPlayerName(sourceGUID, sourceName)
 
         if category == "PARTY_ITEM" then
-            TFTB:PrintMsg(coloredName .. " used " .. spellLink .. " for your party!")
+            TFTB:PrintMsg(string.format(L["MSG_PARTY_ITEM"], coloredName, spellLink))
         elseif noAura then
-            TFTB:PrintMsg(coloredName .. " hit you with " .. spellLink .. "!")
+            TFTB:PrintMsg(string.format(L["MSG_HIT"], coloredName, spellLink))
         else
-            TFTB:PrintMsg(coloredName .. " buffed you with " .. spellLink .. "!")
+            TFTB:PrintMsg(string.format(L["MSG_BUFFED"], coloredName, spellLink))
         end
     elseif messagingType == "WHISPER" then
-        SendChatMessage("Thanks for the " .. spellLink .. "!", "WHISPER", nil, sourceName)
+        SendChatMessage(string.format(L["MSG_WHISPER_THANKS"], spellLink), "WHISPER", nil, sourceName)
     end
 end
 
 --------------------------------------------------------------------------------
 -- Buff Handlers
 --------------------------------------------------------------------------------
+
 local function HandleStrangersBuff(sourceGUID, sourceName, spellID)
     local db = TFTB.db.profile.strangers
     if not db or not db.enabled then
         return
     end
 
-    -- Verify this is actually a helpful buff (not a debuff from an enemy)
     local duration = 0
     local foundAsBuff = false
     for i = 1, 40 do
@@ -189,7 +197,6 @@ local function HandleStrangersBuff(sourceGUID, sourceName, spellID)
         return
     end
 
-    -- Check if the buff meets the minimum duration requirement
     if db.minBuffDuration and db.minBuffDuration > 0
         and duration > 0 and duration < db.minBuffDuration then
         return
@@ -226,8 +233,8 @@ local function HandleGroupBuff(sourceGUID, sourceName, spellID, isAuraEvent)
         return
     end
 
-    -- Avoid double-firing: aura spells only fire on SPELL_AURA_APPLIED,
-    -- non-aura spells (resurrects, grips, etc.) only fire on SPELL_CAST_SUCCESS
+    -- Aura spells fire on SPELL_AURA_APPLIED only; noAura spells fire on
+    -- SPELL_CAST_SUCCESS only. Prevents double-firing.
     if info.noAura and isAuraEvent then
         return
     end
@@ -244,6 +251,7 @@ end
 --------------------------------------------------------------------------------
 -- Event Handling
 --------------------------------------------------------------------------------
+
 function TFTB:COMBAT_LOG_EVENT_UNFILTERED()
     if not self.isReady or not self.db then
         return
@@ -281,7 +289,7 @@ function TFTB:PLAYER_ENTERING_WORLD()
 
     if self.db and self.db.profile and self.db.profile.global
         and self.db.profile.global.welcomeMessage and not welcomeMessageShown then
-        TFTB:PrintMsg("Enabled. Use /tftb to adjust your settings; including turning off this message. (=")
+        TFTB:PrintMsg(L["MSG_ENABLED"])
         welcomeMessageShown = true
     end
 end
@@ -289,14 +297,15 @@ end
 --------------------------------------------------------------------------------
 -- Slash Commands (/thankyou)
 --------------------------------------------------------------------------------
+
 SLASH_THANKYOU1 = "/thankyou"
 SlashCmdList.THANKYOU = function(msg)
     if not UnitExists("target") or not UnitIsPlayer("target") then
-        TFTB:PrintMsg("Select a player to thank.")
+        TFTB:PrintMsg(L["MSG_SELECT_PLAYER"])
         return
     end
     if UnitIsUnit("target", "player") then
-        TFTB:PrintMsg("You can't thank yourself!")
+        TFTB:PrintMsg(L["MSG_CANT_THANK_SELF"])
         return
     end
 
@@ -315,7 +324,8 @@ SlashCmdList.THANKYOU = function(msg)
         DoEmote(availableEmotes[math.random(#availableEmotes)], "target")
     end
 
-    if UnitFactionGroup("player") == UnitFactionGroup("target") and db.message and db.message ~= "" then
+    if UnitFactionGroup("player") == UnitFactionGroup("target")
+        and db.message and db.message ~= "" then
         SendChatMessage(db.message, "WHISPER", nil, GetUnitName("target", true))
     end
 end

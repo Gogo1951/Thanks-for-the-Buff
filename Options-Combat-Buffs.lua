@@ -1,24 +1,17 @@
 local addonName, ns = ...
 local Data = ns.Data
+local L = ns.L
 
 --------------------------------------------------------------------------------
 -- Helpers
 --------------------------------------------------------------------------------
+
 local function Desc(text, order)
-    return {
-        type     = "description",
-        name     = text,
-        fontSize = "medium",
-        order    = order
-    }
+    return {type = "description", name = text, fontSize = "medium", order = order}
 end
 
 local function Spacer(order)
-    return {
-        type  = "description",
-        name  = " ",
-        order = order
-    }
+    return {type = "description", name = " ", order = order}
 end
 
 local function DefineSpellGroupToggle(spellData, order)
@@ -26,7 +19,7 @@ local function DefineSpellGroupToggle(spellData, order)
     local name = spellData.name
     local ids  = spellData.ids
 
-    local desc = "Toggle tracking for " .. name
+    local desc = string.format(L["COMBAT_TOGGLE_TRACKING"], name)
     if ids and ids[1] then
         local spellDesc = C_Spell.GetSpellDescription(ids[1])
         if spellDesc and spellDesc ~= "" then
@@ -59,23 +52,24 @@ end
 --------------------------------------------------------------------------------
 -- Options Table
 --------------------------------------------------------------------------------
+
 function ns.GetCombatBuffsOptions()
     local TFTB = ns.TFTB
 
     local options = {
-        name = "Combat Buffs",
+        name = L["COMBAT_TITLE"],
         type = "group",
         args = {
             messagingCombat = {
                 type   = "select",
-                name   = "Messaging",
+                name   = L["COMBAT_MESSAGING"],
                 style  = "dropdown",
                 width  = "double",
                 order  = 10,
                 values = {
-                    ["NONE"]    = "No Message",
-                    ["PRINT"]   = "Print-out Message (Self Only)",
-                    ["WHISPER"] = "Whisper Message"
+                    ["NONE"]    = L["MESSAGING_NONE"],
+                    ["PRINT"]   = L["MESSAGING_PRINT"],
+                    ["WHISPER"] = L["MESSAGING_WHISPER"]
                 },
                 get = function() return TFTB.db.profile.groupBuffs.messaging end,
                 set = function(_, val) TFTB.db.profile.groupBuffs.messaging = val end
@@ -83,14 +77,13 @@ function ns.GetCombatBuffsOptions()
             space1 = Spacer(11),
 
             headerTracked = Desc(
-                "\n" .. ns.GetColor("TEXT") .. "Tracked Abilities:" .. "|r",
+                "\n" .. ns.GetColor("TEXT") .. L["COMBAT_TRACKED"] .. "|r",
                 12
             ),
             space2 = Spacer(13)
         }
     }
 
-    -- Populate class/item spell toggles
     if Data.SPELL_LIST then
         local classOrder = 20
         local classList = {}
@@ -106,31 +99,31 @@ function ns.GetCombatBuffsOptions()
 
         table.sort(classList)
 
-        -- Append ITEMS at the bottom
         if hasItems then
             table.insert(classList, "ITEMS")
         end
 
         for _, class in ipairs(classList) do
             local spellGroups = Data.SPELL_LIST[class]
-            local hasBuffs = false
+            local hasVisibleSpells = false
 
             for _, spellData in ipairs(spellGroups) do
                 for _, id in ipairs(spellData.ids) do
                     if C_Spell.DoesSpellExist(id) then
-                        hasBuffs = true
+                        hasVisibleSpells = true
                         break
                     end
                 end
-                if hasBuffs then
+                if hasVisibleSpells then
                     break
                 end
             end
 
-            if hasBuffs then
-                -- Use title gold for the Items group instead of the class color
-                local color = (class == "ITEMS") and Data.COLORS.TITLE or (Data.COLORS[class] or "FFFFFF")
-                local groupName = "|cff" .. color .. class:sub(1, 1) .. class:sub(2):lower() .. "|r"
+            if hasVisibleSpells then
+                local color = (class == "ITEMS") and Data.COLORS.TITLE
+                    or (Data.COLORS[class] or "FFFFFF")
+                local groupName = "|cff" .. color
+                    .. class:sub(1, 1) .. class:sub(2):lower() .. "|r"
 
                 options.args["class_" .. class] = {
                     type   = "group",
@@ -142,16 +135,17 @@ function ns.GetCombatBuffsOptions()
 
                 local spellOrder = 1
                 for _, spellData in ipairs(spellGroups) do
-                    local groupExists = false
+                    local spellExists = false
                     for _, id in ipairs(spellData.ids) do
                         if C_Spell.DoesSpellExist(id) then
-                            groupExists = true
+                            spellExists = true
                             break
                         end
                     end
-                    if groupExists then
+                    if spellExists then
                         local key = "spell_" .. spellData.name:gsub(" ", "_")
-                        options.args["class_" .. class].args[key] = DefineSpellGroupToggle(spellData, spellOrder)
+                        options.args["class_" .. class].args[key] =
+                            DefineSpellGroupToggle(spellData, spellOrder)
                         spellOrder = spellOrder + 1
                     end
                 end

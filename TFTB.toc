@@ -1,8 +1,8 @@
 ## Title: Thanks for the Buff!
-## Notes: Automatically express happiness with an emote whenever you receive a new buff. 
+## Notes: Automatically express happiness with an emote whenever you receive a new buff.
 ## Author: Gogo1951
 
-## IconTexture: Interface\AddOns\TFTB\TFTB.tga
+## IconTexture: Interface/AddOns/TFTB/TFTB.tga
 ## Category-enUS: Buffs & Debuffs
 ## X-License: MIT
 
@@ -10,21 +10,40 @@
 ## Version: @project-version@
 ## X-Curse-Project-ID: 1140285
 
+## X-Discord: https://discord.gg/eh8hKq992Q
+
 ## SavedVariables: TFTB_DB
 
 # Includes
-Includes\LibStub\LibStub.lua
-Includes\CallbackHandler-1.0\CallbackHandler-1.0.xml
-Includes\AceAddon-3.0\AceAddon-3.0.xml
-Includes\AceEvent-3.0\AceEvent-3.0.xml
-Includes\AceDB-3.0\AceDB-3.0.xml
-Includes\AceDBOptions-3.0\AceDBOptions-3.0.xml
-Includes\AceConsole-3.0\AceConsole-3.0.xml
-Includes\AceGUI-3.0\AceGUI-3.0.xml
-Includes\AceConfig-3.0\AceConfig-3.0.xml
+Includes/LibStub/LibStub.lua
+Includes/CallbackHandler-1.0/CallbackHandler-1.0.xml
+Includes/AceAddon-3.0/AceAddon-3.0.xml
+Includes/AceEvent-3.0/AceEvent-3.0.xml
+Includes/AceDB-3.0/AceDB-3.0.xml
+Includes/AceDBOptions-3.0/AceDBOptions-3.0.xml
+Includes/AceConsole-3.0/AceConsole-3.0.xml
+Includes/AceLocale-3.0/AceLocale-3.0.lua
+Includes/AceGUI-3.0/AceGUI-3.0.xml
+Includes/AceConfig-3.0/AceConfigRegistry-3.0/AceConfigRegistry-3.0.lua
+Includes/AceConfig-3.0/AceConfigDialog-3.0/AceConfigDialog-3.0.lua
+Includes/AceConfig-3.0/AceConfig-3.0.lua
+
+# Localization
+Locales/enUS.lua
+Locales/deDE.lua
+Locales/esES.lua
+Locales/frFR.lua
+Locales/itIT.lua
+Locales/koKR.lua
+Locales/ptBR.lua
+Locales/ruRU.lua
+Locales/zhCN.lua
+Locales/zhTW.lua
+
+# Data
+Data.lua
 
 # Thanks for the Buff!
-Data.lua
 Core.lua
 Options-Buffs-from-Strangers.lua
 Options-Combat-Buffs.lua

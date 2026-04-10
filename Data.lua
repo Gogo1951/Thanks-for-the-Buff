@@ -1,10 +1,14 @@
 local addonName, ns = ...
+ns.L = LibStub("AceLocale-3.0"):GetLocale("TFTB")
 ns.Data = {}
+
+local Data = ns.Data
 
 --------------------------------------------------------------------------------
 -- Colors
 --------------------------------------------------------------------------------
-ns.Data.COLORS = {
+
+Data.COLORS = {
     -- UI Palette
     TITLE    = "FFD100",
     BRAND    = "00BBFF",
@@ -36,67 +40,42 @@ ns.Data.COLORS = {
 --------------------------------------------------------------------------------
 -- Color Helper
 --------------------------------------------------------------------------------
+
+local COLOR_PREFIX = "|cff"
+
 function ns.GetColor(key)
-    local hex = ns.Data.COLORS[key]
+    local hex = Data.COLORS[key]
     if hex then
-        return "|cff" .. hex
+        return COLOR_PREFIX .. hex
     end
-    return "|cffFFFFFF"
+    return COLOR_PREFIX .. "FFFFFF"
 end
 
 --------------------------------------------------------------------------------
 -- Constants
 --------------------------------------------------------------------------------
-ns.Data.SAFETY_PAUSE = 3
-ns.Data.MACRO_NAME   = "- Thank"
-ns.Data.ADDON_TITLE  = "Thanks for the Buff"
 
-ns.Data.DISCORD_URL    = "https://discord.gg/eh8hKq992Q"
-ns.Data.GITHUB_URL     = "https://github.com/Gogo1951/Thanks-for-the-Buff"
-ns.Data.CURSEFORGE_URL = "https://www.curseforge.com/wow/addons/thanks-for-the-buff-revisited"
+Data.SAFETY_PAUSE  = 3
+Data.MACRO_NAME    = "- Thank"
+Data.ADDON_TITLE   = "Thanks for the Buff"
 
---[[
-    AURA ID VERIFICATION TASK LIST
-    ===============================
-    Since we track SPELL_AURA_APPLIED, every ID here must be the BUFF/AURA
-    spell ID (what shows up on the target's buff bar), NOT the cast spell ID.
-    For most single-rank spells these are the same, but multi-rank and
-    item-based spells can differ.
-
-    VERIFY THESE IN-GAME (use: /dump C_UnitAuras.GetAuraDataBySpellName("player", "BuffName")):
-
-    High-priority (known to sometimes differ between cast ID and aura ID):
-      - Soulstone         : listed 20707,20710,20712,20714,20716,20718,47883
-      - Lay on Hands      : listed 633,2800,10310,27154,48788
-      - Divine Intervention: listed 19752
-      - Misdirection      : listed 34477
-      - Beacon of Light    : listed 53563
-
-    Medium-priority (multi-rank spells — confirm highest rank aura IDs):
-      - Amplify Magic      : listed 1008,604,8450,8451,10169,10170,27130,43017
-      - Dampen Magic       : listed 603,1581,10173,10174,27128,43015
-      - Hand of Protection : listed 1022,5599,10278
-      - Hand of Sacrifice  : listed 6940,20729,27147,27148
-
-    Item-based (confirm these are the BUFF aura IDs, not the item-use cast IDs):
-      - Greater Drums of Battle      : listed 351355
-      - Greater Drums of Restoration : listed 351358
-      - Greater Drums of Speed       : listed 351359
-      - Greater Drums of War         : listed 351360
-      - Drums of Restoration         : listed 35478
-      - Drums of Speed               : listed 35477
-      - Drums of War                 : listed 35475
-
-    Spells marked noAura = true track via SPELL_CAST_SUCCESS instead
-    (they don't place a buff on the target):
-      - Rebirth       (resurrect — no aura)
-      - Leap of Faith (grip — no persistent aura)
-]]
+Data.DISCORD_URL    = "https://discord.gg/eh8hKq992Q"
+Data.GITHUB_URL     = "https://github.com/Gogo1951/Thanks-for-the-Buff"
+Data.CURSEFORGE_URL = "https://www.curseforge.com/wow/addons/thanks-for-the-buff-revisited"
 
 --------------------------------------------------------------------------------
 -- Spell List
 --------------------------------------------------------------------------------
-ns.Data.SPELL_LIST = {
+
+-- { name, ids (aura IDs on the player), noAura, category, itemId }
+--
+-- ids        = the spell IDs that fire in SPELL_AURA_APPLIED on the player.
+-- noAura     = true means the spell has no buff aura on the target; track via
+--              SPELL_CAST_SUCCESS instead (resurrects, grips, direct heals).
+-- category   = "PARTY_ITEM" for item-use buffs. Defaults to "CLASS".
+-- itemId     = source item ID, used for tooltip lookups on item-based buffs.
+
+Data.SPELL_LIST = {
     ["DEATHKNIGHT"] = {
         {name = "Unholy Frenzy", ids = {49016}}
     },
@@ -107,7 +86,7 @@ ns.Data.SPELL_LIST = {
     },
     ["HUNTER"] = {
         {name = "Master's Call",     ids = {53271}},
-        {name = "Misdirection",      ids = {34477}},
+        {name = "Misdirection",      ids = {35079}},
         {name = "Roar of Sacrifice", ids = {53480}}
     },
     ["MAGE"] = {
@@ -116,12 +95,12 @@ ns.Data.SPELL_LIST = {
         {name = "Focus Magic",   ids = {54646}}
     },
     ["PALADIN"] = {
-        {name = "Beacon of Light",     ids = {53563}},
-        {name = "Divine Intervention",  ids = {19752}},
-        {name = "Hand of Freedom",      ids = {1044}},
-        {name = "Hand of Protection",   ids = {1022, 5599, 10278}},
-        {name = "Hand of Sacrifice",    ids = {6940, 20729, 27147, 27148}},
-        {name = "Lay on Hands",         ids = {633, 2800, 10310, 27154, 48788}}
+        {name = "Beacon of Light",    ids = {53563}},
+        {name = "Divine Intervention", ids = {19752}},
+        {name = "Hand of Freedom",    ids = {1044}},
+        {name = "Hand of Protection", ids = {1022, 5599, 10278}},
+        {name = "Hand of Sacrifice",  ids = {6940, 20729, 27147, 27148}},
+        {name = "Lay on Hands",       ids = {633, 2800, 10310, 27154, 48788}, noAura = true}
     },
     ["PRIEST"] = {
         {name = "Fear Ward",        ids = {6346}},
@@ -134,34 +113,37 @@ ns.Data.SPELL_LIST = {
         {name = "Tricks of the Trade", ids = {57934}}
     },
     ["SHAMAN"] = {
-        {name = "Bloodlust",      ids = {2825}},
-        {name = "Heroism",        ids = {32182}},
+        {name = "Bloodlust",       ids = {2825}},
+        {name = "Heroism",         ids = {32182}},
         {name = "Water Breathing", ids = {131}},
         {name = "Water Walking",   ids = {546}}
     },
     ["WARLOCK"] = {
-        {name = "Soulstone",      ids = {20707, 20710, 20712, 20714, 20716, 20718, 47883}},
+        {name = "Soulstone",       ids = {20707, 20762, 20763, 20764, 20765, 27239, 47883}},
         {name = "Unending Breath", ids = {5697}}
     },
     ["WARRIOR"] = {
         {name = "Intervene",  ids = {3411}},
         {name = "Vigilance",  ids = {50720}}
     },
+    -- itemId = source item; ids = buff aura on the player
     ["ITEMS"] = {
-        {name = "Drums of Restoration",         ids = {35478},  category = "PARTY_ITEM"},
-        {name = "Drums of Speed",               ids = {35477},  category = "PARTY_ITEM"},
-        {name = "Drums of War",                 ids = {35475},  category = "PARTY_ITEM"},
-        {name = "Greater Drums of Battle",      ids = {351355}, category = "PARTY_ITEM"},
-        {name = "Greater Drums of Restoration", ids = {351358}, category = "PARTY_ITEM"},
-        {name = "Greater Drums of Speed",       ids = {351359}, category = "PARTY_ITEM"},
-        {name = "Greater Drums of War",         ids = {351360}, category = "PARTY_ITEM"}
+        {name = "Drums of Battle",              itemId = 29529,  ids = {35476},  category = "PARTY_ITEM"},
+        {name = "Drums of Restoration",         itemId = 29531,  ids = {35478},  category = "PARTY_ITEM"},
+        {name = "Drums of Speed",               itemId = 29530,  ids = {35477},  category = "PARTY_ITEM"},
+        {name = "Drums of War",                 itemId = 29528,  ids = {35475},  category = "PARTY_ITEM"},
+        {name = "Greater Drums of Battle",      itemId = 185848, ids = {351355}, category = "PARTY_ITEM"},
+        {name = "Greater Drums of Restoration", itemId = 185850, ids = {351358}, category = "PARTY_ITEM"},
+        {name = "Greater Drums of Speed",       itemId = 185851, ids = {351359}, category = "PARTY_ITEM"},
+        {name = "Greater Drums of War",         itemId = 185852, ids = {351360}, category = "PARTY_ITEM"}
     }
 }
 
 --------------------------------------------------------------------------------
 -- Emotes
 --------------------------------------------------------------------------------
-ns.Data.EMOTES = {
+
+Data.EMOTES = {
     {cmd = "CHEER",    displayName = "/cheer",    desc = "You cheer at <Target>."},
     {cmd = "DRINK",    displayName = "/drink",    desc = "You raise a drink to <Target>."},
     {cmd = "FLEX",     displayName = "/flex",     desc = "You flex at <Target>."},
@@ -179,9 +161,10 @@ ns.Data.EMOTES = {
 --------------------------------------------------------------------------------
 -- Default Emote Settings
 --------------------------------------------------------------------------------
+
 local function GetDefaultEmoteSettings()
     local emotes = {}
-    for _, data in ipairs(ns.Data.EMOTES) do
+    for _, data in ipairs(Data.EMOTES) do
         emotes[data.cmd] = true
     end
     return emotes
@@ -190,19 +173,20 @@ end
 --------------------------------------------------------------------------------
 -- Saved Variable Defaults
 --------------------------------------------------------------------------------
-ns.Data.DEFAULTS = {
+
+Data.DEFAULTS = {
     profile = {
         lastRunVersion = "0.0.0",
         global = {
             welcomeMessage = true
         },
         strangers = {
-            enabled        = true,
-            messaging      = "NONE",
-            cooldown       = 3,
+            enabled         = true,
+            messaging       = "NONE",
+            cooldown        = 3,
             minBuffDuration = 25,
-            emotesEnabled  = true,
-            emotes         = GetDefaultEmoteSettings()
+            emotesEnabled   = true,
+            emotes          = GetDefaultEmoteSettings()
         },
         slash = {
             createMacro = true,
