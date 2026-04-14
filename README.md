@@ -16,6 +16,8 @@ In the heat of battle, it's easy to miss that clutch Power Infusion or a life-sa
 
 **Item Tracking** — Recognizes party items like Drums of Battle, Drums of Speed, and their Greater variants, notifying you when a group member uses one for the party.
 
+**Localized** — Works with all Classic WoW Locales (enUS, deDE, esES, esMX, frFR, itIT, koKR, ptBR, ruRU, zhCN, zhTW).
+
 ### Tracked Abilities
 
 | Class | Abilities |
