@@ -19,7 +19,6 @@ L["MSG_CANT_THANK_SELF"] = "您不能感謝自己！"
 -- Options: Main Panel
 --------------------------------------------------------------------------------
 
-L["OPTIONS_TITLE"] = "Thanks for the Buff!"
 L["OPTIONS_GENERAL"] = "一般設定"
 L["OPTIONS_WELCOME_TOGGLE"] = "啟用歡迎訊息"
 L["OPTIONS_WELCOME_DESC"] = "在您登入時向聊天視窗發送一則訊息。"
@@ -29,12 +28,7 @@ L["OPTIONS_RESET_ALL_DESC"] = "將每個選項恢復為其預設值。"
 L["OPTIONS_RESET_CONFIRM"] = "您確定要將所有設定重置為預設值嗎？"
 L["OPTIONS_DESCRIPTION"] = "每當收到新的增益效果時，自動使用表情來表達開心。"
 L["OPTIONS_SUPPORT"] = "回饋與支援"
-L["OPTIONS_CURSEFORGE"] = "CurseForge"
-L["OPTIONS_GITHUB"] = "GitHub"
-L["OPTIONS_DISCORD"] = "Discord"
-L["OPTIONS_CMD_TFTB"] = "/tftb"
 L["OPTIONS_CMD_TFTB_DESC"] = "打開 Thanks for the Buff 的選項介面。"
-L["OPTIONS_CMD_THANKYOU"] = "/thankyou"
 L["OPTIONS_CMD_THANKYOU_DESC"] = "對您的目標玩家發送表情和密語。"
 
 --------------------------------------------------------------------------------

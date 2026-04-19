@@ -32,84 +32,94 @@ local function GetMainOptions()
             -- Brief Description
             descIntro = Desc(L["OPTIONS_DESCRIPTION"], 1),
             space0 = Spacer(2),
-
             -- /Commands
             headerCommands = Header("/Commands", 3),
             spaceCommands1 = Spacer(4),
             descCommands = Desc(
-                ns.GetColor("INFO") .. "/tftb|r" .. "  " .. L["OPTIONS_CMD_TFTB_DESC"] .. "\n" ..
-                ns.GetColor("INFO") .. "/thankyou|r" .. "  " .. L["OPTIONS_CMD_THANKYOU_DESC"],
+                ns.GetColor("INFO") ..
+                    "/tftb|r" ..
+                        "  " ..
+                            L["OPTIONS_CMD_TFTB_DESC"] ..
+                                "\n\n" .. ns.GetColor("INFO") .. "/thankyou|r" .. "  " .. L["OPTIONS_CMD_THANKYOU_DESC"],
                 5
             ),
             spaceCommands2 = Spacer(6),
-
             -- General Settings
             headerGen = Header(L["OPTIONS_GENERAL"], 10),
             enableWelcome = {
-                type  = "toggle",
-                name  = L["OPTIONS_WELCOME_TOGGLE"],
-                desc  = L["OPTIONS_WELCOME_DESC"],
+                type = "toggle",
+                name = L["OPTIONS_WELCOME_TOGGLE"],
+                desc = L["OPTIONS_WELCOME_DESC"],
                 width = "full",
                 order = 11,
-                get   = function() return TFTB.db.profile.global.welcomeMessage end,
-                set   = function(_, val) TFTB.db.profile.global.welcomeMessage = val end
+                get = function()
+                    return TFTB.db.profile.global.welcomeMessage
+                end,
+                set = function(_, val)
+                    TFTB.db.profile.global.welcomeMessage = val
+                end
             },
-
             -- Reset
             spaceReset0 = Spacer(59),
             headerReset = Header(L["OPTIONS_RESET"], 60),
             spaceReset1 = Spacer(61),
             resetAll = {
-                type        = "execute",
-                name        = L["OPTIONS_RESET_ALL"],
-                desc        = L["OPTIONS_RESET_ALL_DESC"],
-                order       = 62,
-                width       = "normal",
-                confirm     = true,
-                confirmText = L["OPTIONS_RESET_CONFIRM"],
-                func        = function()
+                type = "execute",
+                name = L["OPTIONS_RESET_ALL"],
+                desc = L["OPTIONS_RESET_ALL_DESC"],
+                order = 62,
+                width = "normal",
+                confirm = function()
+                    return L["OPTIONS_RESET_CONFIRM"]
+                end,
+                func = function()
                     TFTB.db:ResetProfile()
                     TFTB:PopulateWatchedBuffs()
                     TFTB:BuildSpellLookup()
                     TFTB:PrintMsg(L["MSG_RESET"])
                 end
             },
-
             -- Feedback & Support
             spaceLinks0 = Spacer(69),
             headerLinks = Header(L["OPTIONS_SUPPORT"], 70),
             spaceLinks1 = Spacer(71),
-
             curseforgeLabel = Desc(ns.GetColor("TITLE") .. L["OPTIONS_CURSEFORGE"] .. "|r", 72),
             curseforgeURL = {
-                type  = "input",
-                name  = "",
+                type = "input",
+                name = "",
                 order = 73,
                 width = "double",
-                get   = function() return Data.CURSEFORGE_URL end,
-                set   = function() end
+                get = function()
+                    return Data.CURSEFORGE_URL
+                end,
+                set = function()
+                end
             },
             spaceLinks2 = Spacer(74),
-
             githubLabel = Desc(ns.GetColor("TITLE") .. L["OPTIONS_GITHUB"] .. "|r", 75),
             githubURL = {
-                type  = "input",
-                name  = "",
+                type = "input",
+                name = "",
                 order = 76,
                 width = "double",
-                get   = function() return Data.GITHUB_URL end,
-                set   = function() end
+                get = function()
+                    return Data.GITHUB_URL
+                end,
+                set = function()
+                end
             },
             spaceLinks3 = Spacer(77),
-
             discordLabel = Desc(ns.GetColor("TITLE") .. L["OPTIONS_DISCORD"] .. "|r", 78),
             discordURL = {
-                type  = "input",
-                name  = "",
+                type = "input",
+                name = "",
                 order = 79,
                 width = "double",
-                get   = function() return Data.DISCORD_URL end,
-                set   = function() end
+                get = function()
+                    return Data.DISCORD_URL
+                end,
+                set = function()
+                end
             }
         }
     }
@@ -121,8 +131,8 @@ end
 
 function ns.SetupOptions()
     local TFTB = ns.TFTB
-    local AC   = LibStub("AceConfig-3.0")
-    local ACD  = LibStub("AceConfigDialog-3.0")
+    local AC = LibStub("AceConfig-3.0")
+    local ACD = LibStub("AceConfigDialog-3.0")
 
     AC:RegisterOptionsTable("TFTB", GetMainOptions())
     ACD:AddToBlizOptions("TFTB", "Thanks for the Buff")

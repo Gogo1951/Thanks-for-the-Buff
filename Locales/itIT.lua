@@ -19,7 +19,6 @@ L["MSG_CANT_THANK_SELF"] = "Non puoi ringraziare te stesso!"
 -- Options: Main Panel
 --------------------------------------------------------------------------------
 
-L["OPTIONS_TITLE"] = "Thanks for the Buff!"
 L["OPTIONS_GENERAL"] = "Impostazioni Generali"
 L["OPTIONS_WELCOME_TOGGLE"] = "Abilita Messaggio di Benvenuto"
 L["OPTIONS_WELCOME_DESC"] = "Stampa un messaggio in chat quando accedi."
@@ -29,12 +28,7 @@ L["OPTIONS_RESET_ALL_DESC"] = "Ripristina ogni opzione al suo valore predefinito
 L["OPTIONS_RESET_CONFIRM"] = "Sei sicuro di voler ripristinare tutte le impostazioni ai valori predefiniti?"
 L["OPTIONS_DESCRIPTION"] = "Esprimi automaticamente felicità con un'emote ogni volta che ricevi un nuovo potenziamento."
 L["OPTIONS_SUPPORT"] = "Feedback e Supporto"
-L["OPTIONS_CURSEFORGE"] = "CurseForge"
-L["OPTIONS_GITHUB"] = "GitHub"
-L["OPTIONS_DISCORD"] = "Discord"
-L["OPTIONS_CMD_TFTB"] = "/tftb"
 L["OPTIONS_CMD_TFTB_DESC"] = "Apre l'interfaccia delle opzioni di Thanks for the Buff."
-L["OPTIONS_CMD_THANKYOU"] = "/thankyou"
 L["OPTIONS_CMD_THANKYOU_DESC"] = "Esegue un'emote e sussurra al giocatore che hai selezionato come bersaglio."
 
 --------------------------------------------------------------------------------

@@ -18,8 +18,7 @@ local spellLookup = {}
 --------------------------------------------------------------------------------
 
 function TFTB:PrintMsg(msg)
-    local prefix = ns.GetColor("BRAND") .. Data.ADDON_TITLE .. "|r "
-                .. ns.GetColor("SEP") .. "//" .. "|r "
+    local prefix = ns.GetColor("INFO") .. Data.ADDON_TITLE .. "|r " .. ns.GetColor("SEP") .. "//" .. "|r "
     DEFAULT_CHAT_FRAME:AddMessage(prefix .. msg)
 end
 
@@ -35,9 +34,26 @@ end
 
 function TFTB:StartSafetyTimer(duration)
     self.isReady = false
-    C_Timer.After(duration or Data.SAFETY_PAUSE, function()
-        self.isReady = true
-    end)
+    C_Timer.After(
+        duration or Data.SAFETY_PAUSE,
+        function()
+            self.isReady = true
+        end
+    )
+end
+
+--------------------------------------------------------------------------------
+-- Version
+--------------------------------------------------------------------------------
+
+local function GetVersion()
+    local version =
+        (C_AddOns and C_AddOns.GetAddOnMetadata and C_AddOns.GetAddOnMetadata(addonName, "Version")) or
+        (GetAddOnMetadata and GetAddOnMetadata(addonName, "Version"))
+    if not version or version:find("@") then
+        return "Dev"
+    end
+    return version
 end
 
 --------------------------------------------------------------------------------
@@ -53,9 +69,9 @@ function TFTB:BuildSpellLookup()
         for _, spellData in ipairs(spellGroups) do
             for _, id in ipairs(spellData.ids) do
                 spellLookup[id] = {
-                    name     = spellData.name,
+                    name = spellData.name,
                     category = spellData.category or "CLASS",
-                    noAura   = spellData.noAura or false
+                    noAura = spellData.noAura or false
                 }
             end
         end
@@ -71,8 +87,7 @@ function TFTB:CreateAutoMacro()
         return
     end
 
-    if not self.db or not self.db.profile
-        or not self.db.profile.slash or not self.db.profile.slash.createMacro then
+    if not self.db or not self.db.profile or not self.db.profile.slash or not self.db.profile.slash.createMacro then
         return
     end
 
@@ -90,16 +105,10 @@ end
 --------------------------------------------------------------------------------
 
 function TFTB:OnInitialize()
-    local currentVersion = C_AddOns.GetAddOnMetadata(addonName, "Version") or "0.0.0"
+    self.isReady = false
 
     self.db = LibStub("AceDB-3.0"):New("TFTB_DB", Data.DEFAULTS, "Default")
-
-    local lastVersion = self.db.profile.lastRunVersion
-    if not lastVersion or lastVersion < currentVersion then
-        self.db:ResetProfile()
-    end
-
-    self.db.profile.lastRunVersion = currentVersion
+    self.db.profile.lastRunVersion = GetVersion()
 
     if not self.db.profile.groupBuffs then
         self:PrintMsg(L["MSG_DB_ERROR"])
@@ -147,8 +156,8 @@ local function ColorPlayerName(sourceGUID, sourceName)
         return sourceName
     end
     local _, englishClass = GetPlayerInfoByGUID(sourceGUID)
-    if englishClass and Data.COLORS[englishClass] then
-        return string.format("|cff%s%s|r", Data.COLORS[englishClass], sourceName)
+    if englishClass and Data.CLASS_COLORS[englishClass] then
+        return string.format("|cff%s%s|r", Data.CLASS_COLORS[englishClass], sourceName)
     end
     return sourceName
 end
@@ -197,8 +206,7 @@ local function HandleStrangersBuff(sourceGUID, sourceName, spellID)
         return
     end
 
-    if db.minBuffDuration and db.minBuffDuration > 0
-        and duration > 0 and duration < db.minBuffDuration then
+    if db.minBuffDuration and db.minBuffDuration > 0 and duration > 0 and duration < db.minBuffDuration then
         return
     end
 
@@ -273,9 +281,10 @@ function TFTB:COMBAT_LOG_EVENT_UNFILTERED()
 
     if UnitInParty(sourceName) or UnitInRaid(sourceName) then
         HandleGroupBuff(sourceGUID, sourceName, spellID, isAuraEvent)
-    elseif isAuraEvent and not InCombatLockdown()
-        and bit.band(sourceFlags, COMBATLOG_OBJECT_TYPE_PLAYER) > 0
-        and bit.band(sourceFlags, COMBATLOG_OBJECT_REACTION_FRIENDLY) > 0 then
+    elseif
+        isAuraEvent and not InCombatLockdown() and bit.band(sourceFlags, COMBATLOG_OBJECT_TYPE_PLAYER) > 0 and
+            bit.band(sourceFlags, COMBATLOG_OBJECT_REACTION_FRIENDLY) > 0
+     then
         HandleStrangersBuff(sourceGUID, sourceName, spellID)
     end
 end
@@ -287,8 +296,10 @@ end
 function TFTB:PLAYER_ENTERING_WORLD()
     self:CreateAutoMacro()
 
-    if self.db and self.db.profile and self.db.profile.global
-        and self.db.profile.global.welcomeMessage and not welcomeMessageShown then
+    if
+        self.db and self.db.profile and self.db.profile.global and self.db.profile.global.welcomeMessage and
+            not welcomeMessageShown
+     then
         TFTB:PrintMsg(L["MSG_ENABLED"])
         welcomeMessageShown = true
     end
@@ -324,8 +335,7 @@ SlashCmdList.THANKYOU = function(msg)
         DoEmote(availableEmotes[math.random(#availableEmotes)], "target")
     end
 
-    if UnitFactionGroup("player") == UnitFactionGroup("target")
-        and db.message and db.message ~= "" then
+    if UnitFactionGroup("player") == UnitFactionGroup("target") and db.message and db.message ~= "" then
         SendChatMessage(db.message, "WHISPER", nil, GetUnitName("target", true))
     end
 end

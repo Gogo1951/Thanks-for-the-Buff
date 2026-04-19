@@ -19,7 +19,6 @@ L["MSG_CANT_THANK_SELF"] = "자신에게는 감사할 수 없습니다!"
 -- Options: Main Panel
 --------------------------------------------------------------------------------
 
-L["OPTIONS_TITLE"] = "Thanks for the Buff!"
 L["OPTIONS_GENERAL"] = "일반 설정"
 L["OPTIONS_WELCOME_TOGGLE"] = "환영 메시지 활성화"
 L["OPTIONS_WELCOME_DESC"] = "접속할 때 대화창에 메시지를 출력합니다."
@@ -29,12 +28,7 @@ L["OPTIONS_RESET_ALL_DESC"] = "모든 옵션을 기본값으로 복원합니다.
 L["OPTIONS_RESET_CONFIRM"] = "모든 설정을 기본값으로 초기화하시겠습니까?"
 L["OPTIONS_DESCRIPTION"] = "새로운 버프를 받을 때마다 감정표현으로 행복을 자동으로 표현합니다."
 L["OPTIONS_SUPPORT"] = "피드백 및 지원"
-L["OPTIONS_CURSEFORGE"] = "CurseForge"
-L["OPTIONS_GITHUB"] = "GitHub"
-L["OPTIONS_DISCORD"] = "Discord"
-L["OPTIONS_CMD_TFTB"] = "/tftb"
 L["OPTIONS_CMD_TFTB_DESC"] = "Thanks for the Buff 설정 인터페이스를 엽니다."
-L["OPTIONS_CMD_THANKYOU"] = "/thankyou"
 L["OPTIONS_CMD_THANKYOU_DESC"] = "대상의 플레이어에게 감정표현과 귓속말을 합니다."
 
 --------------------------------------------------------------------------------
