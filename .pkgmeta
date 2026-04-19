@@ -25,6 +25,7 @@ externals:
 
 ignore:
   - .git
+  - .gitattributes
   - .github
   - .gitignore
   - .idea
