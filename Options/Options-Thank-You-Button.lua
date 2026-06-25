@@ -1,54 +1,44 @@
-local addonName, ns = ...
+local _, ns = ...
 local Data = ns.Data
 local L = ns.L
 
---------------------------------------------------------------------------------
--- Helpers
---------------------------------------------------------------------------------
-
-local function Desc(text, order)
-    return {type = "description", name = text, fontSize = "medium", order = order}
-end
-
-local function Spacer(order)
-    return {type = "description", name = " ", order = order}
-end
+local GetColor = ns.GetColor
 
 --------------------------------------------------------------------------------
 -- Options Table
 --------------------------------------------------------------------------------
 
 function ns.GetThankYouButtonOptions()
-    local TFTB = ns.TFTB
-
     local options = {
         name = L["BUTTON_TITLE"],
         type = "group",
         args = {
+            descIntro = ns.OptionsDesc(L["BUTTON_DESC"], 1),
+            space0 = ns.OptionsSpacer(2),
             createMacro = {
                 type = "toggle",
                 name = L["BUTTON_CREATE_MACRO"],
-                desc = string.format(L["BUTTON_CREATE_MACRO_DESC"], ns.GetColor("TITLE") .. Data.MACRO_NAME .. "|r"),
+                desc = string.format(L["BUTTON_CREATE_MACRO_DESC"], GetColor("TITLE") .. Data.MACRO_NAME .. "|r"),
                 width = "full",
                 order = 10,
                 get = function()
-                    return TFTB.db.profile.slash.createMacro
+                    return ns.db.slash.createMacro
                 end,
                 set = function(_, val)
-                    TFTB.db.profile.slash.createMacro = val
+                    ns.db.slash.createMacro = val
                 end
             },
-            space1 = Spacer(11),
+            space1 = ns.OptionsSpacer(11),
             whisperMsg = {
                 type = "input",
                 name = L["BUTTON_WHISPER"],
                 width = "full",
                 order = 20,
                 get = function()
-                    return TFTB.db.profile.slash.message
+                    return ns.db.slash.message
                 end,
                 set = function(_, val)
-                    TFTB.db.profile.slash.message = val
+                    ns.db.slash.message = val
                 end
             },
             resetMsg = {
@@ -58,11 +48,10 @@ function ns.GetThankYouButtonOptions()
                 width = "half",
                 order = 21,
                 func = function()
-                    TFTB.db.profile.slash.message = L["DEFAULT_WHISPER"]
+                    ns.db.slash.message = L["DEFAULT_WHISPER"]
                 end
             },
-            space2 = Spacer(22),
-            headerSlashEmotes = Desc("\n" .. ns.GetColor("TEXT") .. L["BUTTON_EMOTES_HEADER"] .. "|r", 30),
+            space2 = ns.OptionsSpacer(22),
             slashEmoteGroup = {
                 type = "group",
                 name = L["BUTTON_EMOTES_SELECT"],
@@ -82,10 +71,10 @@ function ns.GetThankYouButtonOptions()
             order = i,
             width = "half",
             get = function()
-                return TFTB.db.profile.slash.emotes[emote]
+                return ns.db.slash.emotes[emote]
             end,
             set = function(_, val)
-                TFTB.db.profile.slash.emotes[emote] = val
+                ns.db.slash.emotes[emote] = val
             end
         }
     end

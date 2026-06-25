@@ -1,47 +1,72 @@
-local addonName, ns = ...
+local _, ns = ...
 local Data = ns.Data
 local L = ns.L
-
---------------------------------------------------------------------------------
--- Helpers
---------------------------------------------------------------------------------
-
-local function Spacer(order)
-    return {type = "description", name = " ", order = order}
-end
 
 --------------------------------------------------------------------------------
 -- Options Table
 --------------------------------------------------------------------------------
 
 function ns.GetStrangersOptions()
-    local TFTB = ns.TFTB
-
-    local function IsDisabled()
-        return not TFTB.db.profile.strangers.enabled
-    end
-
     local function EmotesHidden()
-        return IsDisabled() or not TFTB.db.profile.strangers.emotesEnabled
+        return not ns.db.strangers.emotesEnabled
     end
 
     local options = {
         name = L["STRANGERS_TITLE"],
         type = "group",
         args = {
-            enableStrangers = {
+            descIntro = ns.OptionsDesc(L["STRANGERS_DESC"], 1),
+            space0 = ns.OptionsSpacer(2),
+            headerMessaging = ns.OptionsSubHeader(L["STRANGERS_MESSAGING"], 5),
+            printStrangers = {
                 type = "toggle",
-                name = L["STRANGERS_ENABLE"],
+                name = L["MESSAGING_PRINT_ENABLE"],
+                desc = L["MESSAGING_PRINT_DESC"],
                 width = "full",
-                order = 10,
+                order = 6,
                 get = function()
-                    return TFTB.db.profile.strangers.enabled
+                    return ns.db.strangers.printEnabled
                 end,
                 set = function(_, val)
-                    TFTB.db.profile.strangers.enabled = val
+                    ns.db.strangers.printEnabled = val
                 end
             },
-            space1 = Spacer(11),
+            whisperStrangers = {
+                type = "toggle",
+                name = L["MESSAGING_WHISPER_ENABLE"],
+                desc = L["MESSAGING_WHISPER_DESC"],
+                width = "full",
+                order = 7,
+                get = function()
+                    return ns.db.strangers.whisperEnabled
+                end,
+                set = function(_, val)
+                    ns.db.strangers.whisperEnabled = val
+                end
+            },
+            enableEmotesStrangers = {
+                type = "toggle",
+                name = L["MESSAGING_EMOTES_ENABLE"],
+                desc = L["MESSAGING_EMOTES_DESC"],
+                width = "full",
+                order = 8,
+                get = function()
+                    return ns.db.strangers.emotesEnabled
+                end,
+                set = function(_, val)
+                    ns.db.strangers.emotesEnabled = val
+                end
+            },
+            emoteSpacer = {type = "description", name = " ", order = 9, hidden = EmotesHidden},
+            strangersEmoteGroup = {
+                type = "group",
+                name = L["STRANGERS_EMOTES_SELECT"],
+                order = 10,
+                inline = true,
+                hidden = EmotesHidden,
+                args = {}
+            },
+            space1 = ns.OptionsSpacer(11),
             cooldownStrangers = {
                 type = "range",
                 name = L["STRANGERS_COOLDOWN"],
@@ -51,15 +76,14 @@ function ns.GetStrangersOptions()
                 min = 1,
                 max = 60,
                 step = 1,
-                hidden = IsDisabled,
                 get = function()
-                    return TFTB.db.profile.strangers.cooldown
+                    return ns.db.strangers.cooldown
                 end,
                 set = function(_, val)
-                    TFTB.db.profile.strangers.cooldown = val
+                    ns.db.strangers.cooldown = val
                 end
             },
-            space2 = {type = "description", name = " ", order = 21, hidden = IsDisabled},
+            space3 = ns.OptionsSpacer(21),
             minDurationStrangers = {
                 type = "range",
                 name = L["STRANGERS_MIN_DURATION"],
@@ -69,57 +93,12 @@ function ns.GetStrangersOptions()
                 min = 0,
                 max = 120,
                 step = 1,
-                hidden = IsDisabled,
                 get = function()
-                    return TFTB.db.profile.strangers.minBuffDuration
+                    return ns.db.strangers.minBuffDuration
                 end,
                 set = function(_, val)
-                    TFTB.db.profile.strangers.minBuffDuration = val
+                    ns.db.strangers.minBuffDuration = val
                 end
-            },
-            space3 = {type = "description", name = " ", order = 23, hidden = IsDisabled},
-            messagingStrangers = {
-                type = "select",
-                name = L["STRANGERS_MESSAGING"],
-                style = "dropdown",
-                width = "double",
-                order = 30,
-                hidden = IsDisabled,
-                values = {
-                    ["NONE"] = L["MESSAGING_NONE_DEFAULT"],
-                    ["PRINT"] = L["MESSAGING_PRINT"],
-                    ["WHISPER"] = L["MESSAGING_WHISPER"]
-                },
-                get = function()
-                    return TFTB.db.profile.strangers.messaging
-                end,
-                set = function(_, val)
-                    TFTB.db.profile.strangers.messaging = val
-                end
-            },
-            space4 = {type = "description", name = " ", order = 31, hidden = IsDisabled},
-            enableEmotesStrangers = {
-                type = "toggle",
-                name = L["STRANGERS_EMOTES_ENABLE"],
-                desc = L["STRANGERS_EMOTES_DESC"],
-                width = "full",
-                order = 40,
-                hidden = IsDisabled,
-                get = function()
-                    return TFTB.db.profile.strangers.emotesEnabled
-                end,
-                set = function(_, val)
-                    TFTB.db.profile.strangers.emotesEnabled = val
-                end
-            },
-            space5 = {type = "description", name = " ", order = 41, hidden = EmotesHidden},
-            strangersEmoteGroup = {
-                type = "group",
-                name = L["STRANGERS_EMOTES_SELECT"],
-                order = 50,
-                inline = true,
-                hidden = EmotesHidden,
-                args = {}
             }
         }
     }
@@ -133,10 +112,10 @@ function ns.GetStrangersOptions()
             order = i,
             width = "half",
             get = function()
-                return TFTB.db.profile.strangers.emotes[emote]
+                return ns.db.strangers.emotes[emote]
             end,
             set = function(_, val)
-                TFTB.db.profile.strangers.emotes[emote] = val
+                ns.db.strangers.emotes[emote] = val
             end
         }
     end

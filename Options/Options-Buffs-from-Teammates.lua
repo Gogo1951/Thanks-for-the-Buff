@@ -1,154 +1,36 @@
-local addonName, ns = ...
-local Data = ns.Data
-local L = ns.L
+local _, ns = ...
 
---------------------------------------------------------------------------------
--- Helpers
---------------------------------------------------------------------------------
+--[[
+    "Buffs from Teammates" panel -- party/raid buffs & cooldowns cast on you. The
+    scaffold (description, messaging toggles, emote picker) and the tracked-list
+    helpers are shared with Group Services and live in Options-Utilities.lua
+    (ns.BuildBuffPanel / ns.SortedEntries / ns.DefineEntryToggle). This file owns
+    only the Teammates-specific layout: one inline group per class category, then
+    the generic Items group.
+]]
 
-local function Desc(text, order)
-    return {type = "description", name = text, fontSize = "medium", order = order}
-end
+function ns.GetTeammatesOptions()
+    local options = ns.BuildBuffPanel("TEAMMATES_TITLE", "TEAMMATES_DESC", "teammates")
 
-local function Spacer(order)
-    return {type = "description", name = " ", order = order}
-end
-
-local function DefineSpellGroupToggle(spellData, order)
-    local TFTB = ns.TFTB
-    local name = spellData.name
-    local ids = spellData.ids
-
-    local desc = string.format(L["COMBAT_TOGGLE_TRACKING"], name)
-    if ids and ids[1] then
-        local spellDesc = C_Spell.GetSpellDescription(ids[1])
-        if spellDesc and spellDesc ~= "" then
-            desc = spellDesc
-        end
-    end
-
-    return {
-        type = "toggle",
-        name = name,
-        desc = desc,
-        order = order,
-        width = "full",
-        get = function()
-            if ids and ids[1] then
-                return TFTB.db.profile.groupBuffs.watchedBuffs[ids[1]]
-            end
-            return false
-        end,
-        set = function(_, val)
-            if ids then
-                for _, id in ipairs(ids) do
-                    TFTB.db.profile.groupBuffs.watchedBuffs[id] = val
-                end
-            end
-        end
-    }
-end
-
---------------------------------------------------------------------------------
--- Options Table
---------------------------------------------------------------------------------
-
-function ns.GetCombatBuffsOptions()
-    local TFTB = ns.TFTB
-
-    local options = {
-        name = L["COMBAT_TITLE"],
-        type = "group",
-        args = {
-            messagingCombat = {
-                type = "select",
-                name = L["COMBAT_MESSAGING"],
-                style = "dropdown",
-                width = "double",
-                order = 10,
-                values = {
-                    ["NONE"] = L["MESSAGING_NONE"],
-                    ["PRINT"] = L["MESSAGING_PRINT"],
-                    ["WHISPER"] = L["MESSAGING_WHISPER"]
-                },
-                get = function()
-                    return TFTB.db.profile.groupBuffs.messaging
-                end,
-                set = function(_, val)
-                    TFTB.db.profile.groupBuffs.messaging = val
-                end
-            },
-            space1 = Spacer(11),
-            headerTracked = Desc("\n" .. ns.GetColor("TEXT") .. L["COMBAT_TRACKED"] .. "|r", 12),
-            space2 = Spacer(13)
+    -- One inline group per category (each class, then Items), built at login.
+    local categoryOrder = 20
+    for _, category in ipairs(ns.TeammateCategories or {}) do
+        local groupKey = "cat_" .. category.id
+        options.args[groupKey] = {
+            type = "group",
+            name = category.name,
+            order = categoryOrder,
+            inline = true,
+            args = {}
         }
-    }
 
-    if Data.SPELL_LIST then
-        local classOrder = 20
-        local classList = {}
-        local hasItems = false
-
-        for class, _ in pairs(Data.SPELL_LIST) do
-            if class == "ITEMS" then
-                hasItems = true
-            else
-                table.insert(classList, class)
-            end
+        local entryOrder = 1
+        for _, entry in ipairs(ns.SortedEntries(category.entries)) do
+            options.args[groupKey].args["entry_" .. entry.ids[1]] = ns.DefineEntryToggle(entry, entryOrder)
+            entryOrder = entryOrder + 1
         end
 
-        table.sort(classList)
-
-        if hasItems then
-            table.insert(classList, "ITEMS")
-        end
-
-        for _, class in ipairs(classList) do
-            local spellGroups = Data.SPELL_LIST[class]
-            local hasVisibleSpells = false
-
-            for _, spellData in ipairs(spellGroups) do
-                for _, id in ipairs(spellData.ids) do
-                    if C_Spell.DoesSpellExist(id) then
-                        hasVisibleSpells = true
-                        break
-                    end
-                end
-                if hasVisibleSpells then
-                    break
-                end
-            end
-
-            if hasVisibleSpells then
-                local color = (class == "ITEMS") and Data.COLORS.TITLE or (Data.CLASS_COLORS[class] or "FFFFFF")
-                local groupName = "|cff" .. color .. class:sub(1, 1) .. class:sub(2):lower() .. "|r"
-
-                options.args["class_" .. class] = {
-                    type = "group",
-                    name = groupName,
-                    order = classOrder,
-                    inline = true,
-                    args = {}
-                }
-
-                local spellOrder = 1
-                for _, spellData in ipairs(spellGroups) do
-                    local spellExists = false
-                    for _, id in ipairs(spellData.ids) do
-                        if C_Spell.DoesSpellExist(id) then
-                            spellExists = true
-                            break
-                        end
-                    end
-                    if spellExists then
-                        local key = "spell_" .. spellData.name:gsub(" ", "_")
-                        options.args["class_" .. class].args[key] = DefineSpellGroupToggle(spellData, spellOrder)
-                        spellOrder = spellOrder + 1
-                    end
-                end
-                classOrder = classOrder + 1
-            end
-        end
+        categoryOrder = categoryOrder + 1
     end
 
     return options

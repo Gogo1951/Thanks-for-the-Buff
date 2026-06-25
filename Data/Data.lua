@@ -1,8 +1,9 @@
-local addonName, ns = ...
-ns.L = LibStub("AceLocale-3.0"):GetLocale("TFTB")
+local ADDON_NAME, ns = ...
+ns.L = LibStub("AceLocale-3.0"):GetLocale(ADDON_NAME)
 ns.Data = {}
 
 local Data = ns.Data
+local L = ns.L
 
 --------------------------------------------------------------------------------
 -- Colors (UI Palette)
@@ -11,12 +12,12 @@ local Data = ns.Data
 Data.COLORS = {
     TITLE = "FFD100",
     INFO = "00BBFF",
-    DESC = "CCCCCC",
+    BODY = "CCCCCC",
     TEXT = "FFFFFF",
-    SUCCESS = "33CC33",
-    DISABLED = "CC3333",
-    SEP = "AAAAAA",
-    MUTED = "808080"
+    ON = "33CC33",
+    OFF = "CC3333",
+    SEPARATOR = "AAAAAA",
+    MUTED = "808080",
 }
 
 --------------------------------------------------------------------------------
@@ -36,23 +37,30 @@ Data.CLASS_COLORS = {
     ROGUE = "FFF468",
     SHAMAN = "0070DD",
     WARLOCK = "8788EE",
-    WARRIOR = "C69B6D",
-    ITEMS = "A335EE"
+    WARRIOR = "C69B6D"
 }
 
 --------------------------------------------------------------------------------
--- Color Helper
+-- Item Quality Colors
 --------------------------------------------------------------------------------
 
-local COLOR_PREFIX = "|cff"
+-- Epic / item-link purple. Not a class color, kept separate.
+Data.ITEM_QUALITY_COLORS = {
+    EPIC = "A335EE"
+}
 
-function ns.GetColor(key)
-    local hex = Data.COLORS[key]
-    if hex then
-        return COLOR_PREFIX .. hex
-    end
-    return COLOR_PREFIX .. "FFFFFF"
-end
+--------------------------------------------------------------------------------
+-- Options Registry
+--------------------------------------------------------------------------------
+
+ns.OPTIONS_REGISTRY = {
+    General = ADDON_NAME,
+    Strangers = ADDON_NAME .. "_Strangers",
+    Teammates = ADDON_NAME .. "_Teammates",
+    Services = ADDON_NAME .. "_Services",
+    ThankYou = ADDON_NAME .. "_ThankYou",
+    Diagnostics = ADDON_NAME .. "_Diagnostics"
+}
 
 --------------------------------------------------------------------------------
 -- Constants
@@ -60,85 +68,366 @@ end
 
 Data.SAFETY_PAUSE = 3
 Data.MACRO_NAME = "- Thank"
-Data.ADDON_TITLE = "Thanks for the Buff"
+
+--[[
+    {rt1} Star, {rt2} Circle, {rt3} Diamond, {rt4} Triangle,
+    {rt5} Moon, {rt6} Square, {rt7} Cross, {rt8} Skull
+]]
+ns.TARGET_MARKER = "{rt1}" -- Star
 
 Data.DISCORD_URL = "https://discord.gg/eh8hKq992Q"
 Data.GITHUB_URL = "https://github.com/Gogo1951/Thanks-for-the-Buff"
 Data.CURSEFORGE_URL = "https://www.curseforge.com/wow/addons/thanks-for-the-buff-revisited"
 
 --------------------------------------------------------------------------------
--- Spell List
+-- Tracking Codes
 --------------------------------------------------------------------------------
 
--- { name, ids (aura IDs on the player), noAura, category, itemId }
---
--- ids        = the spell IDs that fire in SPELL_AURA_APPLIED on the player.
--- noAura     = true means the spell has no buff aura on the target; track via
---              SPELL_CAST_SUCCESS instead (resurrects, grips, direct heals).
--- category   = "PARTY_ITEM" for item-use buffs. Defaults to "CLASS".
--- itemId     = source item ID, used for tooltip lookups on item-based buffs.
+-- How the thank-you reads, and which panel the toggle lives on.
+Data.BUFF = {
+    SOLO = "SOLO", -- cast on you            -> "gave you ..."        (Buffs from Teammates)
+    GROUP = "GROUP", -- party/raid-wide        -> "gave your group ..." (Buffs from Teammates)
+    SERVICE = "SERVICE" -- set out for the group  -> "set out a ..."       (Group Services)
+}
 
-Data.SPELL_LIST = {
-    ["DEATHKNIGHT"] = {
-        {name = "Unholy Frenzy", ids = {49016}}
+-- How the combat log is matched.
+Data.DETECT = {
+    AURA = "AURA", -- SPELL_AURA_APPLIED lands on you
+    CAST = "CAST" -- SPELL_CAST_SUCCESS fires
+}
+
+--------------------------------------------------------------------------------
+-- Tracked Reactions
+--------------------------------------------------------------------------------
+
+--[[
+    One entry == one checkbox in the options panel. Everything about that toggle
+    lives in the entry; nothing merges across rows.
+
+      name      display label. Omit to use the (localized) name of the first
+                trigger -- set it only for a group whose members differ (Portals).
+      class     class bucket for the Buffs-from-Teammates panel. Omit for the
+                generic Items / Group Services lists.
+      type      Data.BUFF.SOLO | GROUP | SERVICE
+      detect    Data.DETECT.AURA | CAST
+      triggers  the rank(s) / variant(s) this one toggle covers. Each is:
+                  {spell = id}              a tracked spell
+                  {spell = id, aura = id}   aura id differs from the cast id
+                  {item = id, spell = id}   an item: shows its icon/name, and the
+                                            tooltip lists every item in the group
+]]
+local BUFF, DETECT = Data.BUFF, Data.DETECT
+
+Data.TRACKED = {
+    -- Death Knight --------------------------------------------------------------
+    {class = "DEATHKNIGHT", type = BUFF.SOLO, detect = DETECT.AURA, triggers = {{spell = 49016}}}, -- Unholy Frenzy
+    -- Druid ---------------------------------------------------------------------
+    {class = "DRUID", type = BUFF.SOLO, detect = DETECT.AURA, triggers = {{spell = 29166}}}, -- Innervate
+    {
+        class = "DRUID",
+        type = BUFF.SOLO,
+        detect = DETECT.CAST,
+        triggers = {
+            -- Rebirth
+            {spell = 20484},
+            {spell = 20739},
+            {spell = 20742},
+            {spell = 20747},
+            {spell = 20748},
+            {spell = 26994},
+            {spell = 48477}
+        }
     },
-    ["DRUID"] = {
-        {name = "Innervate", ids = {29166}},
-        {name = "Ironbark", ids = {102342}},
-        {name = "Rebirth", ids = {20484, 20739, 20742, 20747, 20748, 26994, 48477}, noAura = true}
+    -- Hunter --------------------------------------------------------------------
+    {class = "HUNTER", type = BUFF.SOLO, detect = DETECT.AURA, triggers = {{spell = 53271}}}, -- Master's Call
+    {class = "HUNTER", type = BUFF.SOLO, detect = DETECT.AURA, triggers = {{spell = 34477, aura = 35079}}}, -- Misdirection
+    {class = "HUNTER", type = BUFF.SOLO, detect = DETECT.AURA, triggers = {{spell = 53480}}}, -- Roar of Sacrifice
+    -- Mage ----------------------------------------------------------------------
+    {
+        class = "MAGE",
+        type = BUFF.SOLO,
+        detect = DETECT.AURA,
+        triggers = {
+            -- Amplify Magic
+            {spell = 1008},
+            {spell = 8455},
+            {spell = 10169},
+            {spell = 10170},
+            {spell = 27130},
+            {spell = 43017}
+        }
     },
-    ["HUNTER"] = {
-        {name = "Master's Call", ids = {53271}},
-        {name = "Misdirection", ids = {35079}},
-        {name = "Roar of Sacrifice", ids = {53480}}
+    {
+        class = "MAGE",
+        type = BUFF.SOLO,
+        detect = DETECT.AURA,
+        triggers = {
+            -- Dampen Magic
+            {spell = 604},
+            {spell = 8450},
+            {spell = 8451},
+            {spell = 10173},
+            {spell = 10174},
+            {spell = 33944},
+            {spell = 43015}
+        }
     },
-    ["MAGE"] = {
-        {name = "Amplify Magic", ids = {1008, 604, 8450, 8451, 10169, 10170, 27130, 43017}},
-        {name = "Dampen Magic", ids = {603, 1581, 10173, 10174, 27128, 43015}},
-        {name = "Focus Magic", ids = {54646}}
+    {class = "MAGE", type = BUFF.SOLO, detect = DETECT.AURA, triggers = {{spell = 54646}}}, -- Focus Magic
+    {
+        class = "MAGE",
+        type = BUFF.SERVICE,
+        detect = DETECT.CAST,
+        triggers = {
+            -- Ritual of Refreshment
+            {spell = 43987},
+            {spell = 58659}
+        }
     },
-    ["PALADIN"] = {
-        {name = "Beacon of Light", ids = {53563}},
-        {name = "Divine Intervention", ids = {19752}},
-        {name = "Hand of Freedom", ids = {1044}},
-        {name = "Hand of Protection", ids = {1022, 5599, 10278}},
-        {name = "Hand of Sacrifice", ids = {6940, 20729, 27147, 27148}},
-        {name = "Lay on Hands", ids = {633, 2800, 10310, 27154, 48788}, noAura = true}
+    {
+        name = "Portals",
+        class = "MAGE",
+        type = BUFF.SERVICE,
+        detect = DETECT.CAST,
+        triggers = {
+            {spell = 10059}, -- Stormwind
+            {spell = 11416}, -- Ironforge
+            {spell = 11417}, -- Orgrimmar
+            {spell = 11418}, -- Undercity
+            {spell = 11419}, -- Darnassus
+            {spell = 11420}, -- Thunder Bluff
+            {spell = 32266}, -- Exodar
+            {spell = 32267}, -- Silvermoon
+            {spell = 33691}, -- Shattrath (Alliance)
+            {spell = 35717}, -- Shattrath (Horde)
+            {spell = 49360}, -- Theramore (Alliance)
+            {spell = 49361}, -- Stonard (Horde)
+            {spell = 53142}, -- Dalaran
+            {spell = 28148} -- Karazhan (Atiesh)
+        }
     },
-    ["PRIEST"] = {
-        {name = "Fear Ward", ids = {6346}},
-        {name = "Guardian Spirit", ids = {47788}},
-        {name = "Leap of Faith", ids = {73325}, noAura = true},
-        {name = "Pain Suppression", ids = {33206}},
-        {name = "Power Infusion", ids = {10060}}
+    -- Paladin -------------------------------------------------------------------
+    {class = "PALADIN", type = BUFF.SOLO, detect = DETECT.AURA, triggers = {{spell = 53563}}}, -- Beacon of Light
+    {class = "PALADIN", type = BUFF.SOLO, detect = DETECT.AURA, triggers = {{spell = 19752}}}, -- Divine Intervention
+    {class = "PALADIN", type = BUFF.SOLO, detect = DETECT.AURA, triggers = {{spell = 1044}}}, -- Hand of Freedom
+    {
+        class = "PALADIN",
+        type = BUFF.SOLO,
+        detect = DETECT.AURA,
+        triggers = {
+            -- Hand of Protection
+            {spell = 1022},
+            {spell = 5599},
+            {spell = 10278}
+        }
     },
-    ["ROGUE"] = {
-        {name = "Tricks of the Trade", ids = {57934}}
+    {
+        class = "PALADIN",
+        type = BUFF.SOLO,
+        detect = DETECT.AURA,
+        triggers = {
+            -- Hand of Sacrifice
+            {spell = 6940},
+            {spell = 20729},
+            {spell = 27147},
+            {spell = 27148}
+        }
     },
-    ["SHAMAN"] = {
-        {name = "Bloodlust", ids = {2825}},
-        {name = "Heroism", ids = {32182}},
-        {name = "Water Breathing", ids = {131}},
-        {name = "Water Walking", ids = {546}}
+    {
+        class = "PALADIN",
+        type = BUFF.SOLO,
+        detect = DETECT.CAST,
+        triggers = {
+            -- Lay on Hands
+            {spell = 633},
+            {spell = 2800},
+            {spell = 10310},
+            {spell = 27154},
+            {spell = 48788}
+        }
     },
-    ["WARLOCK"] = {
-        {name = "Soulstone", ids = {20707, 20762, 20763, 20764, 20765, 27239, 47883}},
-        {name = "Unending Breath", ids = {5697}}
+    -- Priest --------------------------------------------------------------------
+    {class = "PRIEST", type = BUFF.SOLO, detect = DETECT.AURA, triggers = {{spell = 6346}}}, -- Fear Ward
+    {class = "PRIEST", type = BUFF.SOLO, detect = DETECT.AURA, triggers = {{spell = 47788}}}, -- Guardian Spirit
+    {class = "PRIEST", type = BUFF.SOLO, detect = DETECT.AURA, triggers = {{spell = 33206}}}, -- Pain Suppression
+    {class = "PRIEST", type = BUFF.SOLO, detect = DETECT.AURA, triggers = {{spell = 10060}}}, -- Power Infusion
+    -- Rogue ---------------------------------------------------------------------
+    {class = "ROGUE", type = BUFF.SOLO, detect = DETECT.AURA, triggers = {{spell = 57934, aura = 57933}}}, -- Tricks of the Trade
+    -- Shaman --------------------------------------------------------------------
+    {class = "SHAMAN", type = BUFF.GROUP, detect = DETECT.AURA, triggers = {{spell = 2825}}}, -- Bloodlust
+    {class = "SHAMAN", type = BUFF.GROUP, detect = DETECT.AURA, triggers = {{spell = 32182}}}, -- Heroism
+    {class = "SHAMAN", type = BUFF.SOLO, detect = DETECT.AURA, triggers = {{spell = 131}}}, -- Water Breathing
+    {class = "SHAMAN", type = BUFF.SOLO, detect = DETECT.AURA, triggers = {{spell = 546}}}, -- Water Walking
+    -- Warlock -------------------------------------------------------------------
+    {class = "WARLOCK", type = BUFF.SOLO, detect = DETECT.AURA, triggers = {{spell = 5697}}}, -- Unending Breath
+    {
+        class = "WARLOCK",
+        type = BUFF.SERVICE,
+        detect = DETECT.CAST,
+        triggers = {
+            -- Ritual of Souls
+            {spell = 29893},
+            {spell = 58887}
+        }
     },
-    ["WARRIOR"] = {
-        {name = "Intervene", ids = {3411}},
-        {name = "Vigilance", ids = {50720}}
+    {class = "WARLOCK", type = BUFF.SERVICE, detect = DETECT.CAST, triggers = {{spell = 698}}}, -- Ritual of Summoning
+    -- Warrior -------------------------------------------------------------------
+    {class = "WARRIOR", type = BUFF.SOLO, detect = DETECT.AURA, triggers = {{spell = 3411}}}, -- Intervene
+    {class = "WARRIOR", type = BUFF.SOLO, detect = DETECT.AURA, triggers = {{spell = 50720}}}, -- Vigilance
+    -- Drums (item) --------------------------------------------------------------
+    {type = BUFF.GROUP, detect = DETECT.AURA, triggers = {{item = 29529, spell = 35476}}}, -- Drums of Battle
+    {type = BUFF.GROUP, detect = DETECT.AURA, triggers = {{item = 29531, spell = 35478}}}, -- Drums of Restoration
+    {type = BUFF.GROUP, detect = DETECT.AURA, triggers = {{item = 29530, spell = 35477}}}, -- Drums of Speed
+    {type = BUFF.GROUP, detect = DETECT.AURA, triggers = {{item = 29528, spell = 35475}}}, -- Drums of War
+    {type = BUFF.GROUP, detect = DETECT.AURA, triggers = {{item = 185848, spell = 351355}}}, -- Greater Drums of Battle
+    {type = BUFF.GROUP, detect = DETECT.AURA, triggers = {{item = 185850, spell = 351358}}}, -- Greater Drums of Restoration
+    {type = BUFF.GROUP, detect = DETECT.AURA, triggers = {{item = 185851, spell = 351359}}}, -- Greater Drums of Speed
+    {type = BUFF.GROUP, detect = DETECT.AURA, triggers = {{item = 185852, spell = 351360}}}, -- Greater Drums of War
+    -- Soulstone (item, Warlock) -------------------------------------------------
+    {
+        name = "Soulstone",
+        class = "WARLOCK",
+        type = BUFF.SOLO,
+        detect = DETECT.AURA,
+        triggers = {
+            {item = 16895, spell = 20764}, -- Greater Soulstone
+            {item = 16892, spell = 20762}, -- Lesser Soulstone
+            {item = 16896, spell = 20765}, -- Major Soulstone
+            {item = 22116, spell = 27239}, -- Master Soulstone
+            {item = 16893, spell = 20763} -- Soulstone
+        }
     },
-    -- itemId = source item; ids = buff aura on the player
-    ["ITEMS"] = {
-        {name = "Drums of Battle", itemId = 29529, ids = {35476}, category = "PARTY_ITEM"},
-        {name = "Drums of Restoration", itemId = 29531, ids = {35478}, category = "PARTY_ITEM"},
-        {name = "Drums of Speed", itemId = 29530, ids = {35477}, category = "PARTY_ITEM"},
-        {name = "Drums of War", itemId = 29528, ids = {35475}, category = "PARTY_ITEM"},
-        {name = "Greater Drums of Battle", itemId = 185848, ids = {351355}, category = "PARTY_ITEM"},
-        {name = "Greater Drums of Restoration", itemId = 185850, ids = {351358}, category = "PARTY_ITEM"},
-        {name = "Greater Drums of Speed", itemId = 185851, ids = {351359}, category = "PARTY_ITEM"},
-        {name = "Greater Drums of War", itemId = 185852, ids = {351360}, category = "PARTY_ITEM"}
+    -- Feasts (item) -------------------------------------------------------------
+    {type = BUFF.SERVICE, detect = DETECT.CAST, triggers = {{item = 43015, spell = 57426}}}, -- Fish Feast
+    {type = BUFF.SERVICE, detect = DETECT.CAST, triggers = {{item = 34753, spell = 57301}}}, -- Great Feast
+    {type = BUFF.SERVICE, detect = DETECT.CAST, triggers = {{item = 43478, spell = 58465}}}, -- Gigantic Feast
+    {type = BUFF.SERVICE, detect = DETECT.CAST, triggers = {{item = 46887, spell = 66476}}}, -- Bountiful Feast
+    {type = BUFF.SERVICE, detect = DETECT.CAST, triggers = {{item = 33052, spell = 33258}}}, -- Fisherman's Feast (TBC)
+    -- Resistance Cauldrons (item) -----------------------------------------------
+    {
+        name = "Resistance Cauldrons",
+        type = BUFF.SERVICE,
+        detect = DETECT.CAST,
+        triggers = {
+            {item = 32839, spell = 41443}, -- Major Arcane Protection
+            {item = 32849, spell = 41494}, -- Major Fire Protection
+            {item = 32850, spell = 41495}, -- Major Frost Protection
+            {item = 32851, spell = 41497}, -- Major Nature Protection
+            {item = 32852, spell = 41498} -- Major Shadow Protection
+        }
+    },
+    -- Stat Scrolls (item) -------------------------------------------------------
+    {
+        name = "Scroll of Spirit",
+        type = BUFF.SOLO,
+        detect = DETECT.AURA,
+        triggers = {
+            {item = 1181, spell = 8112},
+            {item = 1712, spell = 8113},
+            {item = 4424, spell = 8114},
+            {item = 10306, spell = 12177},
+            {item = 27501, spell = 33080},
+            {item = 33460, spell = 43197},
+            {item = 37097, spell = 48103},
+            {item = 37098, spell = 48104}
+        }
+    },
+    {
+        name = "Scroll of Stamina",
+        type = BUFF.SOLO,
+        detect = DETECT.AURA,
+        triggers = {
+            {item = 1180, spell = 8099},
+            {item = 1711, spell = 8100},
+            {item = 4422, spell = 8101},
+            {item = 10307, spell = 12178},
+            {item = 27502, spell = 33081},
+            {item = 33461, spell = 43198},
+            {item = 37093, spell = 48101},
+            {item = 37094, spell = 48102}
+        }
+    },
+    {
+        name = "Scroll of Strength",
+        type = BUFF.SOLO,
+        detect = DETECT.AURA,
+        triggers = {
+            {item = 954, spell = 8118},
+            {item = 2289, spell = 8119},
+            {item = 4426, spell = 8120},
+            {item = 10310, spell = 12179},
+            {item = 27503, spell = 33082},
+            {item = 33462, spell = 43199},
+            {item = 43465, spell = 58448},
+            {item = 43466, spell = 58449}
+        }
+    },
+    {
+        name = "Scroll of Protection",
+        type = BUFF.SOLO,
+        detect = DETECT.AURA,
+        triggers = {
+            {item = 3013, spell = 8091},
+            {item = 1478, spell = 8094},
+            {item = 4421, spell = 8095},
+            {item = 10305, spell = 12175},
+            {item = 27500, spell = 33079},
+            {item = 33459, spell = 43196},
+            {item = 43467, spell = 58452},
+            {item = 43468, spell = 58453}
+        }
+    },
+    {
+        name = "Scroll of Intellect",
+        type = BUFF.SOLO,
+        detect = DETECT.AURA,
+        triggers = {
+            {item = 955, spell = 8096},
+            {item = 2290, spell = 8097},
+            {item = 4419, spell = 8098},
+            {item = 10308, spell = 12176},
+            {item = 27499, spell = 33078},
+            {item = 33458, spell = 43195},
+            {item = 37091, spell = 48099},
+            {item = 37092, spell = 48100}
+        }
+    },
+    {
+        name = "Scroll of Agility",
+        type = BUFF.SOLO,
+        detect = DETECT.AURA,
+        triggers = {
+            {item = 3012, spell = 8115},
+            {item = 1477, spell = 8116},
+            {item = 4425, spell = 8117},
+            {item = 10309, spell = 12174},
+            {item = 27498, spell = 33077},
+            {item = 33457, spell = 43194},
+            {item = 43463, spell = 58450},
+            {item = 43464, spell = 58451}
+        }
+    },
+    -- Repair & Utility (item) ---------------------------------------------------
+    {
+        name = "Repair Bots",
+        type = BUFF.SERVICE,
+        detect = DETECT.CAST,
+        triggers = {
+            {item = 34113, spell = 44389}, -- Field Repair Bot 110G
+            {item = 18232, spell = 22700}, -- Field Repair Bot 74A
+            {item = 49040, spell = 67826} -- Jeeves
+        }
+    },
+    {type = BUFF.SERVICE, detect = DETECT.CAST, triggers = {{item = 40768, spell = 54710}}}, -- MOLL-E
+    {type = BUFF.SERVICE, detect = DETECT.CAST, triggers = {{item = 10725, spell = 23133}}}, -- Gnomish Battle Chicken
+    {
+        name = "Jumper Cables",
+        type = BUFF.SOLO,
+        detect = DETECT.CAST,
+        triggers = {
+            {item = 7148, spell = 8342}, -- Goblin Jumper Cables
+            {item = 18587, spell = 22999}, -- Goblin Jumper Cables XL
+            {item = 40772, spell = 54732} -- Gnomish Army Knife
+        }
     }
 }
 
@@ -147,58 +436,16 @@ Data.SPELL_LIST = {
 --------------------------------------------------------------------------------
 
 Data.EMOTES = {
-    {cmd = "CHEER", displayName = "/cheer", desc = "You cheer at <Target>."},
-    {cmd = "DRINK", displayName = "/drink", desc = "You raise a drink to <Target>."},
-    {cmd = "FLEX", displayName = "/flex", desc = "You flex at <Target>."},
-    {cmd = "GRIN", displayName = "/grin", desc = "You grin wickedly at <Target>."},
-    {cmd = "HIGHFIVE", displayName = "/highfive", desc = "You high-five <Target>."},
-    {cmd = "PRAISE", displayName = "/praise", desc = "You praise <Target>."},
-    {cmd = "SALUTE", displayName = "/salute", desc = "You salute <Target> with respect."},
-    {cmd = "SMILE", displayName = "/smile", desc = "You smile at <Target>."},
-    {cmd = "THANK", displayName = "/thank", desc = "You thank <Target>."},
-    {cmd = "WHOA", displayName = "/whoa", desc = "You look at <Target> and exclaim 'Whoa!'"},
-    {cmd = "WINK", displayName = "/wink", desc = "You wink at <Target>."},
-    {cmd = "YES", displayName = "/yes", desc = "You nod at <Target>."}
-}
-
---------------------------------------------------------------------------------
--- Default Emote Settings
---------------------------------------------------------------------------------
-
-local function GetDefaultEmoteSettings()
-    local emotes = {}
-    for _, data in ipairs(Data.EMOTES) do
-        emotes[data.cmd] = true
-    end
-    return emotes
-end
-
---------------------------------------------------------------------------------
--- Saved Variable Defaults
---------------------------------------------------------------------------------
-
-Data.DEFAULTS = {
-    profile = {
-        lastRunVersion = "0.0.0",
-        global = {
-            welcomeMessage = true
-        },
-        strangers = {
-            enabled = true,
-            messaging = "NONE",
-            cooldown = 3,
-            minBuffDuration = 25,
-            emotesEnabled = true,
-            emotes = GetDefaultEmoteSettings()
-        },
-        slash = {
-            createMacro = true,
-            message = "Thanks, you're the best! (=",
-            emotes = GetDefaultEmoteSettings()
-        },
-        groupBuffs = {
-            messaging = "PRINT",
-            watchedBuffs = {}
-        }
-    }
+    {cmd = "CHEER", displayName = "/cheer", desc = L["EMOTE_CHEER_DESC"]},
+    {cmd = "DRINK", displayName = "/drink", desc = L["EMOTE_DRINK_DESC"]},
+    {cmd = "FLEX", displayName = "/flex", desc = L["EMOTE_FLEX_DESC"]},
+    {cmd = "GRIN", displayName = "/grin", desc = L["EMOTE_GRIN_DESC"]},
+    {cmd = "HIGHFIVE", displayName = "/highfive", desc = L["EMOTE_HIGHFIVE_DESC"]},
+    {cmd = "PRAISE", displayName = "/praise", desc = L["EMOTE_PRAISE_DESC"]},
+    {cmd = "SALUTE", displayName = "/salute", desc = L["EMOTE_SALUTE_DESC"]},
+    {cmd = "SMILE", displayName = "/smile", desc = L["EMOTE_SMILE_DESC"]},
+    {cmd = "THANK", displayName = "/thank", desc = L["EMOTE_THANK_DESC"]},
+    {cmd = "WHOA", displayName = "/whoa", desc = L["EMOTE_WHOA_DESC"]},
+    {cmd = "WINK", displayName = "/wink", desc = L["EMOTE_WINK_DESC"]},
+    {cmd = "YES", displayName = "/yes", desc = L["EMOTE_YES_DESC"]}
 }

@@ -1,341 +1,202 @@
-local addonName, ns = ...
-local Data = ns.Data
+local ADDON_NAME, ns = ...
 local L = ns.L
-
-local TFTB = LibStub("AceAddon-3.0"):NewAddon("TFTB", "AceConsole-3.0", "AceEvent-3.0")
-ns.TFTB = TFTB
 
 --------------------------------------------------------------------------------
 -- State
 --------------------------------------------------------------------------------
 
-local sessionCooldowns = {}
 local welcomeMessageShown = false
-local spellLookup = {}
-
---------------------------------------------------------------------------------
--- Utility Functions
---------------------------------------------------------------------------------
-
-function TFTB:PrintMsg(msg)
-    local prefix = ns.GetColor("INFO") .. Data.ADDON_TITLE .. "|r " .. ns.GetColor("SEP") .. "//" .. "|r "
-    DEFAULT_CHAT_FRAME:AddMessage(prefix .. msg)
-end
-
-local function IsOnCooldown(guid)
-    local now = GetTime()
-    local expiresAt = sessionCooldowns[guid]
-    return expiresAt and expiresAt > now
-end
-
-local function SetCooldown(guid, duration)
-    sessionCooldowns[guid] = GetTime() + (duration or 10)
-end
-
-function TFTB:StartSafetyTimer(duration)
-    self.isReady = false
-    C_Timer.After(
-        duration or Data.SAFETY_PAUSE,
-        function()
-            self.isReady = true
-        end
-    )
-end
 
 --------------------------------------------------------------------------------
 -- Version
 --------------------------------------------------------------------------------
 
 local function GetVersion()
-    local version =
-        (C_AddOns and C_AddOns.GetAddOnMetadata and C_AddOns.GetAddOnMetadata(addonName, "Version")) or
-        (GetAddOnMetadata and GetAddOnMetadata(addonName, "Version"))
+    local GetAddOnMetadata = (C_AddOns and C_AddOns.GetAddOnMetadata) or GetAddOnMetadata
+    local version = GetAddOnMetadata and GetAddOnMetadata(ADDON_NAME, "Version")
     if not version or version:find("@") then
         return "Dev"
     end
     return version
 end
 
+ns.Version = GetVersion()
+
 --------------------------------------------------------------------------------
--- Spell Lookup
+-- Saved Variables
 --------------------------------------------------------------------------------
 
-function TFTB:BuildSpellLookup()
-    wipe(spellLookup)
-    if not Data.SPELL_LIST then
+--[[
+    Additive merge: fill only nil fields so a user's explicit choices are never
+    overwritten. New defaults shipped in an update appear for existing users.
+]]
+local function ApplyDefaults(target, defaults)
+    for key, value in pairs(defaults) do
+        if type(value) == "table" then
+            if type(target[key]) ~= "table" then
+                target[key] = {}
+            end
+            ApplyDefaults(target[key], value)
+        elseif target[key] == nil then
+            target[key] = value
+        end
+    end
+end
+
+--[[
+    One-time lift from the retired AceDB profile layout: settings used to live
+    under TFTB_DB.profiles[key]. Move the active profile up to the account table,
+    then drop the AceDB bookkeeping keys so the merge below sees a flat table.
+]]
+local function MigrateLegacyProfile()
+    local profiles = TFTB_DB.profiles
+    if type(profiles) ~= "table" then
         return
     end
-    for class, spellGroups in pairs(Data.SPELL_LIST) do
-        for _, spellData in ipairs(spellGroups) do
-            for _, id in ipairs(spellData.ids) do
-                spellLookup[id] = {
-                    name = spellData.name,
-                    category = spellData.category or "CLASS",
-                    noAura = spellData.noAura or false
-                }
+
+    local charKey = TFTB_DB.profileKeys and TFTB_DB.profileKeys[UnitName("player") .. " - " .. GetRealmName()]
+    local source = (charKey and profiles[charKey]) or profiles.Default
+    if type(source) == "table" then
+        if type(source.global) == "table" and source.global.welcomeMessage ~= nil then
+            source.welcomeMessage = source.global.welcomeMessage
+        end
+        source.global = nil
+        for key, value in pairs(source) do
+            if TFTB_DB[key] == nil then
+                TFTB_DB[key] = value
             end
         end
     end
+
+    TFTB_DB.profiles = nil
+    TFTB_DB.profileKeys = nil
+    TFTB_DB.profile = nil
 end
 
---------------------------------------------------------------------------------
--- Auto Macro
---------------------------------------------------------------------------------
+local function InitializeDatabase()
+    TFTB_DB = TFTB_DB or {}
+    MigrateLegacyProfile()
+    ApplyDefaults(TFTB_DB, ns.DEFAULT_CONFIGURATION)
+    ns.db = TFTB_DB
+    ns.db.lastRunVersion = ns.Version
 
-function TFTB:CreateAutoMacro()
-    if InCombatLockdown() then
-        return
+    -- Retired the tri-state "messaging" dropdown (independent print / whisper /
+    -- emote toggles now) and the strangers master enable (2026-06; the messaging
+    -- toggles are the enable). Drop the stale fields if they linger.
+    ns.db.strangers.messaging = nil
+    ns.db.strangers.enabled = nil
+
+    -- Renamed welcomeMessage -> showWelcome (2026-06): keep the user's choice, drop the old key.
+    if ns.db.welcomeMessage ~= nil then
+        ns.db.showWelcome = ns.db.welcomeMessage
+        ns.db.welcomeMessage = nil
     end
 
-    if not self.db or not self.db.profile or not self.db.profile.slash or not self.db.profile.slash.createMacro then
-        return
-    end
-
-    local macroIndex = GetMacroIndexByName(Data.MACRO_NAME)
-    if macroIndex == 0 then
-        local numGlobal, _ = GetNumMacros()
-        if numGlobal < 120 then
-            CreateMacro(Data.MACRO_NAME, 134411, "/thankyou", nil)
+    -- Split the old combined "groupBuffs" config (2026-06) into independent
+    -- "Buffs from Teammates" and "Group Services" settings. Carry the player's old
+    -- messaging prefs into both and keep their watched list, so upgrading resets
+    -- nothing.
+    if ns.db.groupBuffs then
+        local old = ns.db.groupBuffs
+        if type(old.watchedBuffs) == "table" then
+            ns.db.watchedBuffs = old.watchedBuffs
         end
+        for _, cfg in ipairs({ns.db.teammates, ns.db.services}) do
+            if old.printEnabled ~= nil then
+                cfg.printEnabled = old.printEnabled
+            end
+            if old.whisperEnabled ~= nil then
+                cfg.whisperEnabled = old.whisperEnabled
+            end
+            if old.emotesEnabled ~= nil then
+                cfg.emotesEnabled = old.emotesEnabled
+            end
+            if type(old.emotes) == "table" then
+                local copy = {}
+                for k, v in pairs(old.emotes) do
+                    copy[k] = v
+                end
+                cfg.emotes = copy
+            end
+        end
+        ns.db.groupBuffs = nil
     end
 end
 
 --------------------------------------------------------------------------------
--- Initialization
+-- Reset
 --------------------------------------------------------------------------------
 
-function TFTB:OnInitialize()
-    self.isReady = false
+function ns:ResetSettings()
+    wipe(TFTB_DB)
+    ApplyDefaults(TFTB_DB, ns.DEFAULT_CONFIGURATION)
+    ns.db.lastRunVersion = ns.Version
+    if ns.PopulateWatchedBuffs then
+        ns.PopulateWatchedBuffs()
+    end
+end
 
-    self.db = LibStub("AceDB-3.0"):New("TFTB_DB", Data.DEFAULTS, "Default")
-    self.db.profile.lastRunVersion = GetVersion()
+--------------------------------------------------------------------------------
+-- Event Dispatch
+--------------------------------------------------------------------------------
 
-    if not self.db.profile.groupBuffs then
-        self:PrintMsg(L["MSG_DB_ERROR"])
-        return
+--[[
+    Every registered event routes through this single dispatcher, which is what
+    lets the diagnostics event log capture them all from one tap. Feature modules
+    register their handlers through ns.RegisterEvent rather than creating their
+    own frames, so the dispatcher stays the single point that sees every event.
+]]
+local eventFrame = CreateFrame("Frame")
+local eventHandlers = {}
+ns.eventHandlers = eventHandlers
+
+function ns.RegisterEvent(event, handler)
+    eventHandlers[event] = handler
+    eventFrame:RegisterEvent(event)
+end
+
+eventFrame:SetScript("OnEvent", function(_, event, ...)
+    if ns.diagnostics and ns.diagnostics.logging then
+        ns:LogEvent(event, ...)
+    end
+    local handler = eventHandlers[event]
+    if handler then
+        handler(...)
+    end
+end)
+
+--------------------------------------------------------------------------------
+-- Lifecycle
+--------------------------------------------------------------------------------
+
+--[[
+    The login sequence owns ordering: the saved variables must exist before any
+    feature reads them, and the display groups must exist before the options panels
+    that render them. Feature logic lives in the feature modules; Core only calls
+    their setup hooks in the right order.
+]]
+local function OnPlayerLogin()
+    InitializeDatabase()
+
+    if ns.SetupBuffTracking then
+        ns.SetupBuffTracking()
     end
 
     if ns.SetupOptions then
         ns.SetupOptions()
     end
 
-    self:PopulateWatchedBuffs()
-    self:BuildSpellLookup()
-end
-
-function TFTB:PopulateWatchedBuffs()
-    local watched = self.db.profile.groupBuffs.watchedBuffs
-    if not Data.SPELL_LIST then
-        return
-    end
-    for class, spellGroups in pairs(Data.SPELL_LIST) do
-        for _, spellData in ipairs(spellGroups) do
-            for _, id in ipairs(spellData.ids) do
-                if watched[id] == nil then
-                    watched[id] = true
-                end
-            end
-        end
+    if ns.CreateAutoMacro then
+        ns:CreateAutoMacro()
     end
 end
 
-function TFTB:OnEnable()
-    self:StartSafetyTimer(Data.SAFETY_PAUSE)
-    self:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
-    self:RegisterEvent("PLAYER_ENTERING_WORLD")
-    self:RegisterEvent("LOADING_SCREEN_DISABLED")
-    self:CreateAutoMacro()
-end
-
---------------------------------------------------------------------------------
--- Notifications
---------------------------------------------------------------------------------
-
-local function ColorPlayerName(sourceGUID, sourceName)
-    if not sourceGUID then
-        return sourceName
-    end
-    local _, englishClass = GetPlayerInfoByGUID(sourceGUID)
-    if englishClass and Data.CLASS_COLORS[englishClass] then
-        return string.format("|cff%s%s|r", Data.CLASS_COLORS[englishClass], sourceName)
-    end
-    return sourceName
-end
-
-local function SendAppreciation(sourceGUID, sourceName, spellLink, category, messagingType, noAura)
-    if messagingType == "PRINT" then
-        local coloredName = ColorPlayerName(sourceGUID, sourceName)
-
-        if category == "PARTY_ITEM" then
-            TFTB:PrintMsg(string.format(L["MSG_PARTY_ITEM"], coloredName, spellLink))
-        elseif noAura then
-            TFTB:PrintMsg(string.format(L["MSG_HIT"], coloredName, spellLink))
-        else
-            TFTB:PrintMsg(string.format(L["MSG_BUFFED"], coloredName, spellLink))
-        end
-    elseif messagingType == "WHISPER" then
-        SendChatMessage(string.format(L["MSG_WHISPER_THANKS"], spellLink), "WHISPER", nil, sourceName)
-    end
-end
-
---------------------------------------------------------------------------------
--- Buff Handlers
---------------------------------------------------------------------------------
-
-local function HandleStrangersBuff(sourceGUID, sourceName, spellID)
-    local db = TFTB.db.profile.strangers
-    if not db or not db.enabled then
-        return
-    end
-
-    local duration = 0
-    local foundAsBuff = false
-    for i = 1, 40 do
-        local aura = C_UnitAuras.GetAuraDataByIndex("player", i, "HELPFUL")
-        if not aura then
-            break
-        end
-        if aura.spellId == spellID then
-            foundAsBuff = true
-            duration = aura.duration
-            break
-        end
-    end
-
-    if not foundAsBuff then
-        return
-    end
-
-    if db.minBuffDuration and db.minBuffDuration > 0 and duration > 0 and duration < db.minBuffDuration then
-        return
-    end
-
-    local spellLink = GetSpellLink(spellID) or "Unknown Spell"
-
-    SendAppreciation(sourceGUID, sourceName, spellLink, "STRANGER", db.messaging)
-
-    if not IsOnCooldown(sourceGUID) then
-        if db.emotesEnabled then
-            local availableEmotes = {}
-            for emoteCmd, isEnabled in pairs(db.emotes) do
-                if isEnabled then
-                    table.insert(availableEmotes, emoteCmd)
-                end
-            end
-            if #availableEmotes > 0 then
-                DoEmote(availableEmotes[math.random(#availableEmotes)], sourceName)
-            end
-        end
-        SetCooldown(sourceGUID, db.cooldown)
-    end
-end
-
-local function HandleGroupBuff(sourceGUID, sourceName, spellID, isAuraEvent)
-    local db = TFTB.db.profile.groupBuffs
-    if not db or not db.watchedBuffs[spellID] then
-        return
-    end
-
-    local info = spellLookup[spellID]
-    if not info then
-        return
-    end
-
-    -- Aura spells fire on SPELL_AURA_APPLIED only; noAura spells fire on
-    -- SPELL_CAST_SUCCESS only. Prevents double-firing.
-    if info.noAura and isAuraEvent then
-        return
-    end
-    if not info.noAura and not isAuraEvent then
-        return
-    end
-
-    local spellLink = GetSpellLink(spellID) or "Unknown Spell"
-
-    SendAppreciation(sourceGUID, sourceName, spellLink, info.category, db.messaging, info.noAura)
-    SetCooldown(sourceGUID, 3)
-end
-
---------------------------------------------------------------------------------
--- Event Handling
---------------------------------------------------------------------------------
-
-function TFTB:COMBAT_LOG_EVENT_UNFILTERED()
-    if not self.isReady or not self.db then
-        return
-    end
-
-    local _, subEvent, _, sourceGUID, sourceName, sourceFlags, _, destGUID, _, _, _, spellID =
-        CombatLogGetCurrentEventInfo()
-
-    local isAuraEvent = (subEvent == "SPELL_AURA_APPLIED")
-    local isCastEvent = (subEvent == "SPELL_CAST_SUCCESS")
-
-    if not isAuraEvent and not isCastEvent then
-        return
-    end
-
-    if destGUID ~= UnitGUID("player") or sourceGUID == UnitGUID("player") or not sourceName then
-        return
-    end
-
-    if UnitInParty(sourceName) or UnitInRaid(sourceName) then
-        HandleGroupBuff(sourceGUID, sourceName, spellID, isAuraEvent)
-    elseif
-        isAuraEvent and not InCombatLockdown() and bit.band(sourceFlags, COMBATLOG_OBJECT_TYPE_PLAYER) > 0 and
-            bit.band(sourceFlags, COMBATLOG_OBJECT_REACTION_FRIENDLY) > 0
-     then
-        HandleStrangersBuff(sourceGUID, sourceName, spellID)
-    end
-end
-
-function TFTB:LOADING_SCREEN_DISABLED()
-    self:StartSafetyTimer(Data.SAFETY_PAUSE)
-end
-
-function TFTB:PLAYER_ENTERING_WORLD()
-    self:CreateAutoMacro()
-
-    if
-        self.db and self.db.profile and self.db.profile.global and self.db.profile.global.welcomeMessage and
-            not welcomeMessageShown
-     then
-        TFTB:PrintMsg(L["MSG_ENABLED"])
+local function OnPlayerEnteringWorld()
+    if ns.db and ns.db.showWelcome and not welcomeMessageShown then
+        ns:PrintMessage(L["CHAT_LOADED"]:format(ns.Version))
         welcomeMessageShown = true
     end
 end
 
---------------------------------------------------------------------------------
--- Slash Commands (/thankyou)
---------------------------------------------------------------------------------
-
-SLASH_THANKYOU1 = "/thankyou"
-SlashCmdList.THANKYOU = function(msg)
-    if not UnitExists("target") or not UnitIsPlayer("target") then
-        TFTB:PrintMsg(L["MSG_SELECT_PLAYER"])
-        return
-    end
-    if UnitIsUnit("target", "player") then
-        TFTB:PrintMsg(L["MSG_CANT_THANK_SELF"])
-        return
-    end
-
-    local db = TFTB.db.profile.slash
-    if not db then
-        return
-    end
-
-    local availableEmotes = {}
-    for emoteCmd, isEnabled in pairs(db.emotes) do
-        if isEnabled then
-            table.insert(availableEmotes, emoteCmd)
-        end
-    end
-    if #availableEmotes > 0 then
-        DoEmote(availableEmotes[math.random(#availableEmotes)], "target")
-    end
-
-    if UnitFactionGroup("player") == UnitFactionGroup("target") and db.message and db.message ~= "" then
-        SendChatMessage(db.message, "WHISPER", nil, GetUnitName("target", true))
-    end
-end
+ns.RegisterEvent("PLAYER_LOGIN", OnPlayerLogin)
+ns.RegisterEvent("PLAYER_ENTERING_WORLD", OnPlayerEnteringWorld)
