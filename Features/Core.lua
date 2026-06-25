@@ -145,6 +145,8 @@ end
     lets the diagnostics event log capture them all from one tap. Feature modules
     register their handlers through ns.RegisterEvent rather than creating their
     own frames, so the dispatcher stays the single point that sees every event.
+    Each event has a single owner: registering the same event twice replaces the
+    earlier handler, so two modules must not claim the same event.
 ]]
 local eventFrame = CreateFrame("Frame")
 local eventHandlers = {}

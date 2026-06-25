@@ -37,10 +37,18 @@ end
 --------------------------------------------------------------------------------
 
 -- Suppresses buff reactions until the world settles after login or a loading screen.
+-- A token invalidates earlier timers: back-to-back loading screens each arm a new
+-- pause, and only the most recent callback may restore readiness, so a stale timer
+-- can't flip isReady back on mid-pause.
+local safetyToken = 0
 local function StartSafetyTimer(duration)
     isReady = false
+    safetyToken = safetyToken + 1
+    local token = safetyToken
     C_Timer.After(duration or Data.SAFETY_PAUSE, function()
-        isReady = true
+        if token == safetyToken then
+            isReady = true
+        end
     end)
 end
 
