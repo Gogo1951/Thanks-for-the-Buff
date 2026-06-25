@@ -1,4 +1,4 @@
-local L = LibStub("AceLocale-3.0"):NewLocale("TFTB", "esES")
+local L = LibStub("AceLocale-3.0"):NewLocale("TFTB", "esMX")
 if not L then return end
 
 --------------------------------------------------------------------------------
@@ -12,7 +12,7 @@ L["ADDON_TITLE"] = "Thanks for the Buff"
 --------------------------------------------------------------------------------
 
 -- System
-L["CHAT_LOADED"] = "Versión %s. La configuración (incluida la opción para desactivar este mensaje) se encuentra en Opciones > Accesorios > Thanks for the Buff. ¿Te gusta el accesorio? ¡Cuéntaselo a un amigo! (="
+L["CHAT_LOADED"] = "Versión %s. La configuración (incluida la opción para desactivar este mensaje) se encuentra en Opciones > AddOns > Thanks for the Buff. ¿Te gusta el add-on? ¡Cuéntaselo a un amigo! (="
 L["MSG_RESET"] = "Todas las opciones han sido restablecidas a sus valores predeterminados."
 
 -- Buff & gift announcements
@@ -48,7 +48,7 @@ L["OPTIONS_RESET"] = "Restablecer"
 L["OPTIONS_RESET_ALL"] = "Restablecer todos los ajustes"
 L["OPTIONS_RESET_ALL_DESC"] = "Restaura cada opción a su valor predeterminado."
 L["OPTIONS_RESET_CONFIRM"] = "¿Estás seguro de que quieres restablecer todas las opciones a sus valores predeterminados?"
-L["OPTIONS_DESCRIPTION"] = "Expresa automáticamente tu agradecimiento con emociones y mensajes cada vez que recibas un beneficio, ya sea de un desconocido en el mundo abierto o de un compañero de equipo que use un tiempo de reutilización para ti en combate."
+L["OPTIONS_DESCRIPTION"] = "Expresa automáticamente tu agradecimiento con gestos y mensajes cada vez que recibas un beneficio, ya sea de un desconocido en el mundo abierto o de un compañero de equipo que use un tiempo de reutilización para ti en combate."
 L["OPTIONS_SUPPORT"] = "Comentarios y Soporte"
 L["OPTIONS_CURSEFORGE"] = "CurseForge"
 L["OPTIONS_GITHUB"] = "GitHub"
@@ -122,13 +122,13 @@ L["DEFAULT_WHISPER"] = "¡Gracias, eres el mejor! (="
 
 L["EMOTE_CHEER_DESC"] = "Animas a <Target>."
 L["EMOTE_DRINK_DESC"] = "Levantas una copa por <Target>."
-L["EMOTE_FLEX_DESC"] = "Haces alarde de tus músculos ante <Target>."
+L["EMOTE_FLEX_DESC"] = "Muestras tus músculos a <Target>."
 L["EMOTE_GRIN_DESC"] = "Le sonríes con malicia a <Target>."
 L["EMOTE_HIGHFIVE_DESC"] = "Chocas los cinco con <Target>."
-L["EMOTE_PRAISE_DESC"] = "Alabas a <Target>."
+L["EMOTE_PRAISE_DESC"] = "Elogias a <Target>."
 L["EMOTE_SALUTE_DESC"] = "Saludas a <Target> con respeto."
 L["EMOTE_SMILE_DESC"] = "Le sonríes a <Target>."
 L["EMOTE_THANK_DESC"] = "Le das las gracias a <Target>."
-L["EMOTE_WHOA_DESC"] = "Miras a <Target> y exclamas '¡Hala!'."
+L["EMOTE_WHOA_DESC"] = "Miras a <Target> y exclamas '¡Wow!'."
 L["EMOTE_WINK_DESC"] = "Le guiñas un ojo a <Target>."
 L["EMOTE_YES_DESC"] = "Asientes a <Target>."

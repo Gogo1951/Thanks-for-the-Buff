@@ -1,37 +1,32 @@
-## Title: Thanks for the Buff!
-## Notes: Automatically express happiness with an emote whenever you receive a new buff.
+## Title: Thanks for the Buff
+## Notes: Automatically express appreciation with emotes and messages whenever you receive a buff — whether it's a stranger buffing you in the open world or a teammate popping a cooldown for you in combat.
 ## Author: Gogo1951
 
-## IconTexture: Interface/AddOns/TFTB/TFTB.tga
+## IconTexture: Interface/AddOns/TFTB/Includes/Images/Thanks-for-the-Buff.tga
 ## Category-enUS: Buffs & Debuffs
 ## X-License: MIT
 
-## Interface: 11508, 20505, 50503
+## Interface: 11508, 20505
 ## Version: @project-version@
 ## X-Curse-Project-ID: 1140285
-
-## X-Discord: https://discord.gg/eh8hKq992Q
 
 ## SavedVariables: TFTB_DB
 
 # Includes
-Includes/LibStub/LibStub.lua
-Includes/CallbackHandler-1.0/CallbackHandler-1.0.xml
-Includes/AceAddon-3.0/AceAddon-3.0.xml
-Includes/AceEvent-3.0/AceEvent-3.0.xml
-Includes/AceDB-3.0/AceDB-3.0.xml
-Includes/AceDBOptions-3.0/AceDBOptions-3.0.xml
-Includes/AceConsole-3.0/AceConsole-3.0.xml
-Includes/AceLocale-3.0/AceLocale-3.0.lua
-Includes/AceGUI-3.0/AceGUI-3.0.xml
-Includes/AceConfig-3.0/AceConfigRegistry-3.0/AceConfigRegistry-3.0.lua
-Includes/AceConfig-3.0/AceConfigDialog-3.0/AceConfigDialog-3.0.lua
-Includes/AceConfig-3.0/AceConfig-3.0.lua
+Includes/Libraries/LibStub/LibStub.lua
+Includes/Libraries/CallbackHandler-1.0/CallbackHandler-1.0.lua
+Includes/Libraries/AceLocale-3.0/AceLocale-3.0.lua
+Includes/Libraries/AceGUI-3.0/AceGUI-3.0.xml
+Includes/Libraries/AceConfig-3.0/AceConfigRegistry-3.0/AceConfigRegistry-3.0.lua
+Includes/Libraries/AceConfig-3.0/AceConfigCmd-3.0/AceConfigCmd-3.0.lua
+Includes/Libraries/AceConfig-3.0/AceConfigDialog-3.0/AceConfigDialog-3.0.lua
+Includes/Libraries/AceConfig-3.0/AceConfig-3.0.lua
 
 # Localization
 Locales/enUS.lua
 Locales/deDE.lua
 Locales/esES.lua
+Locales/esMX.lua
 Locales/frFR.lua
 Locales/itIT.lua
 Locales/koKR.lua
@@ -41,16 +36,28 @@ Locales/zhCN.lua
 Locales/zhTW.lua
 
 # Data
-Data.lua
+Data/Data.lua
+Data/Default-Settings.lua
 
-# Thanks for the Buff!
-Core.lua
-Options-Buffs-from-Strangers.lua
-Options-Combat-Buffs.lua
-Options-Thank-You-Button.lua
-Options.lua
+# Features
+Features/Core.lua
+Features/Utilities.lua
+Features/Announcements.lua
+Features/Buff-Tracking.lua
+Features/Thank-You-Button.lua
+Features/Diagnostics.lua
+
+# Options
+Options/Options-Utilities.lua
+Options/Options-General.lua
+Options/Options-Buffs-from-Strangers.lua
+Options/Options-Buffs-from-Teammates.lua
+Options/Options-Buff-Services.lua
+Options/Options-Thank-You-Button.lua
+Options/Options-Diagnostics.lua
+Options/Options.lua
 
 # Feedback Welcome! (=
-# Thanks for the Buff! on CurseForge // https://www.curseforge.com/wow/addons/thanks-for-the-buff-revisited
-# Thanks for the Buff! on GitHub // https://github.com/Gogo1951/Thanks-for-the-Buff
-# Thanks for the Buff! on Discord // https://discord.gg/eh8hKq992Q
+# Thanks for the Buff on CurseForge // https://www.curseforge.com/wow/addons/thanks-for-the-buff-revisited
+# Thanks for the Buff on GitHub // https://github.com/Gogo1951/Thanks-for-the-Buff
+# Thanks for the Buff on Discord // https://discord.gg/eh8hKq992Q
