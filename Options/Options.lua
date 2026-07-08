@@ -1,6 +1,11 @@
 local _, ns = ...
 local L = ns.L
 
+-- Category id for the top-level options panel, captured from AddToBlizOptions at
+-- registration so OpenOptions can jump straight to it instead of resolving the
+-- category by title string (fragile: the id is numeric on newer clients).
+local optionsCategoryID
+
 --------------------------------------------------------------------------------
 -- Registration
 --------------------------------------------------------------------------------
@@ -12,7 +17,9 @@ function ns.SetupOptions()
     local parent = L["ADDON_TITLE"]
 
     AC:RegisterOptionsTable(registry.General, ns.GetGeneralOptions())
-    ACD:AddToBlizOptions(registry.General, parent)
+    -- AddToBlizOptions returns (frame, categoryID); keep the id for OpenOptions.
+    local _, categoryID = ACD:AddToBlizOptions(registry.General, parent)
+    optionsCategoryID = categoryID
 
     if ns.GetStrangersOptions then
         AC:RegisterOptionsTable(registry.Strangers, ns.GetStrangersOptions())
@@ -36,6 +43,14 @@ function ns.SetupOptions()
         ACD:AddToBlizOptions(registry.ThankYou, L["BUTTON_TITLE"], parent)
     end
 
+    -- Profiles registers second-to-last, directly above Diagnostic Tools. Its
+    -- display name comes already localized from AceDBOptions-3.0.
+    if ns.BuildProfilesOptions then
+        local profilesOptions = ns.BuildProfilesOptions()
+        AC:RegisterOptionsTable(registry.Profiles, profilesOptions)
+        ACD:AddToBlizOptions(registry.Profiles, profilesOptions.name, parent)
+    end
+
     -- Diagnostic Tools registers last so it sits at the bottom of the tree.
     if ns.BuildDiagnosticsOptions then
         AC:RegisterOptionsTable(registry.Diagnostics, ns.BuildDiagnosticsOptions())
@@ -49,12 +64,9 @@ function ns.SetupOptions()
 end
 
 function ns.OpenOptions()
-    if Settings and Settings.GetCategory then
-        local category = Settings.GetCategory(L["ADDON_TITLE"])
-        if category then
-            Settings.OpenToCategory(category.ID)
-            return
-        end
+    if Settings and Settings.OpenToCategory and optionsCategoryID then
+        Settings.OpenToCategory(optionsCategoryID)
+        return
     end
     if InterfaceOptionsFrame_OpenToCategory then
         InterfaceOptionsFrame_OpenToCategory(L["ADDON_TITLE"])

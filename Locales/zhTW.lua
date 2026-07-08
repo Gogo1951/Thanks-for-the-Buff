@@ -5,7 +5,8 @@ if not L then return end
 -- Add-on Identity
 --------------------------------------------------------------------------------
 
-L["ADDON_TITLE"] = "Thanks for the Buff"
+L["ADDON_TITLE"] = "Thanks for the Buff (TFTB)"
+L["ADDON_SHORT"] = "TFTB"
 
 --------------------------------------------------------------------------------
 -- Chat Messages
@@ -22,6 +23,7 @@ L["MSG_GAVE_GROUP"] = "%s 給你的隊伍提供了 %s！"
 L["MSG_USED_ITEM"] = "%s 對你使用了%s的 %s！"
 L["MSG_USED_SPELL"] = "%s 對你使用了 %s！"
 L["MSG_SET_OUT"] = "%s 擺放了 %s！"
+L["MSG_OPENED"] = "%s 開啟了 %s！"
 
 -- Thank-you
 L["MSG_WHISPER_THANKS"] = "感謝您的 %s！"
@@ -44,10 +46,9 @@ L["UNKNOWN_SPELL"] = "未知法術"
 
 L["OPTIONS_WELCOME_TOGGLE"] = "啟用歡迎訊息"
 L["OPTIONS_WELCOME_DESC"] = "在您登入時向聊天視窗發送一則訊息。"
-L["OPTIONS_RESET"] = "重置"
-L["OPTIONS_RESET_ALL"] = "重置所有設定"
-L["OPTIONS_RESET_ALL_DESC"] = "將每個選項恢復為其預設值。"
-L["OPTIONS_RESET_CONFIRM"] = "您確定要將所有設定重置為預設值嗎？"
+L["OPTIONS_RESET_ALL_PROFILES"] = "重置所有設定檔"
+L["OPTIONS_RESET_ALL_PROFILES_DESCRIPTION"] = "將此帳號上的所有設定檔恢復為預設設定。"
+L["OPTIONS_RESET_ALL_PROFILES_CONFIRM"] = "這將把您帳號上的所有設定檔恢復為預設設定——包括每個角色。此操作無法復原。是否繼續？"
 L["OPTIONS_DESCRIPTION"] = "每當收到增益效果時，自動透過表情和訊息表達感謝——無論是野外陌生人給你的增益，還是戰鬥中隊友為你開啟的大招。"
 L["OPTIONS_SUPPORT"] = "回饋與支援"
 L["OPTIONS_CURSEFORGE"] = "CurseForge"

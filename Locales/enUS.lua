@@ -5,7 +5,8 @@ if not L then return end
 -- Add-on Identity
 --------------------------------------------------------------------------------
 
-L["ADDON_TITLE"] = "Thanks for the Buff"
+L["ADDON_TITLE"] = "Thanks for the Buff (TFTB)"
+L["ADDON_SHORT"] = "TFTB"
 
 --------------------------------------------------------------------------------
 -- Chat Messages
@@ -22,6 +23,7 @@ L["MSG_GAVE_GROUP"] = "%s gave your group %s!"
 L["MSG_USED_ITEM"] = "%s used %s %s on you!"
 L["MSG_USED_SPELL"] = "%s used %s on you!"
 L["MSG_SET_OUT"] = "%s set out %s!"
+L["MSG_OPENED"] = "%s opened %s!"
 
 -- Thank-you
 L["MSG_WHISPER_THANKS"] = "Thanks for the %s!"
@@ -44,10 +46,9 @@ L["UNKNOWN_SPELL"] = "Unknown Spell"
 
 L["OPTIONS_WELCOME_TOGGLE"] = "Enable Welcome Message"
 L["OPTIONS_WELCOME_DESC"] = "Print a message to chat when you log in."
-L["OPTIONS_RESET"] = "Reset"
-L["OPTIONS_RESET_ALL"] = "Reset All TFTB Options"
-L["OPTIONS_RESET_ALL_DESC"] = "Restore every option to its default value."
-L["OPTIONS_RESET_CONFIRM"] = "Are you sure you want to reset all settings to their defaults?"
+L["OPTIONS_RESET_ALL_PROFILES"] = "Reset All Profiles"
+L["OPTIONS_RESET_ALL_PROFILES_DESCRIPTION"] = "Reset every profile on this account back to default settings."
+L["OPTIONS_RESET_ALL_PROFILES_CONFIRM"] = "This will reset ALL profiles on your account back to default settings — every character. There is no undo. Continue?"
 L["OPTIONS_DESCRIPTION"] = "Automatically express appreciation with emotes and messages whenever you receive a buff — whether it's a stranger buffing you in the open world or a teammate popping a cooldown for you in combat."
 L["OPTIONS_SUPPORT"] = "Feedback & Support"
 L["OPTIONS_CURSEFORGE"] = "CurseForge"

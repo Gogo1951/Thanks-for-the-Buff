@@ -5,7 +5,8 @@ if not L then return end
 -- Add-on Identity
 --------------------------------------------------------------------------------
 
-L["ADDON_TITLE"] = "Thanks for the Buff"
+L["ADDON_TITLE"] = "Thanks for the Buff (TFTB)"
+L["ADDON_SHORT"] = "TFTB"
 
 --------------------------------------------------------------------------------
 -- Chat Messages
@@ -22,6 +23,7 @@ L["MSG_GAVE_GROUP"] = "%s님이 파티에 %s(을)를 주었습니다!"
 L["MSG_USED_ITEM"] = "%s님이 당신에게 %s %s(을)를 사용했습니다!"
 L["MSG_USED_SPELL"] = "%s님이 당신에게 %s(을)를 사용했습니다!"
 L["MSG_SET_OUT"] = "%s님이 %s(을)를 꺼냈습니다!"
+L["MSG_OPENED"] = "%s님이 %s(을)를 열었습니다!"
 
 -- Thank-you
 L["MSG_WHISPER_THANKS"] = "%s 고맙습니다!"
@@ -44,10 +46,9 @@ L["UNKNOWN_SPELL"] = "알 수 없는 주문"
 
 L["OPTIONS_WELCOME_TOGGLE"] = "환영 메시지 활성화"
 L["OPTIONS_WELCOME_DESC"] = "접속할 때 대화창에 메시지를 출력합니다."
-L["OPTIONS_RESET"] = "초기화"
-L["OPTIONS_RESET_ALL"] = "모든 설정 초기화"
-L["OPTIONS_RESET_ALL_DESC"] = "모든 옵션을 기본값으로 복원합니다."
-L["OPTIONS_RESET_CONFIRM"] = "모든 설정을 기본값으로 초기화하시겠습니까?"
+L["OPTIONS_RESET_ALL_PROFILES"] = "모든 프로필 초기화"
+L["OPTIONS_RESET_ALL_PROFILES_DESCRIPTION"] = "이 계정의 모든 프로필을 기본 설정으로 초기화합니다."
+L["OPTIONS_RESET_ALL_PROFILES_CONFIRM"] = "계정의 모든 프로필이 기본 설정으로 초기화됩니다 — 모든 캐릭터. 되돌릴 수 없습니다. 계속하시겠습니까?"
 L["OPTIONS_DESCRIPTION"] = "야외에서 낯선 사람이 버프를 주거나 전투 중 팀원이 쿨기를 사용해 줄 때마다 감정표현과 메시지로 자동으로 감사를 표합니다."
 L["OPTIONS_SUPPORT"] = "피드백 및 지원"
 L["OPTIONS_CURSEFORGE"] = "CurseForge"

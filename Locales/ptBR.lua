@@ -5,7 +5,8 @@ if not L then return end
 -- Add-on Identity
 --------------------------------------------------------------------------------
 
-L["ADDON_TITLE"] = "Thanks for the Buff"
+L["ADDON_TITLE"] = "Thanks for the Buff (TFTB)"
+L["ADDON_SHORT"] = "TFTB"
 
 --------------------------------------------------------------------------------
 -- Chat Messages
@@ -22,6 +23,7 @@ L["MSG_GAVE_GROUP"] = "%s deu ao seu grupo %s!"
 L["MSG_USED_ITEM"] = "%1$s usou %3$s %2$s em você!"
 L["MSG_USED_SPELL"] = "%s usou %s em você!"
 L["MSG_SET_OUT"] = "%s colocou %s!"
+L["MSG_OPENED"] = "%s abriu %s!"
 
 -- Thank-you
 L["MSG_WHISPER_THANKS"] = "Obrigado por %s!"
@@ -44,10 +46,9 @@ L["UNKNOWN_SPELL"] = "Feitiço Desconhecido"
 
 L["OPTIONS_WELCOME_TOGGLE"] = "Habilitar Mensagem de Boas-vindas"
 L["OPTIONS_WELCOME_DESC"] = "Mostra uma mensagem no chat quando você entra."
-L["OPTIONS_RESET"] = "Redefinir"
-L["OPTIONS_RESET_ALL"] = "Redefinir Todas as Configurações"
-L["OPTIONS_RESET_ALL_DESC"] = "Restaura cada opção ao seu valor padrão."
-L["OPTIONS_RESET_CONFIRM"] = "Tem certeza de que deseja redefinir todas as configurações para seus padrões?"
+L["OPTIONS_RESET_ALL_PROFILES"] = "Redefinir Todos os Perfis"
+L["OPTIONS_RESET_ALL_PROFILES_DESCRIPTION"] = "Redefine todos os perfis desta conta para as configurações padrão."
+L["OPTIONS_RESET_ALL_PROFILES_CONFIRM"] = "Isto redefinirá TODOS os perfis da sua conta para as configurações padrão — todos os personagens. Não há como desfazer. Continuar?"
 L["OPTIONS_DESCRIPTION"] = "Expresse automaticamente sua apreciação com emotes e mensagens sempre que receber um buff — seja de um estranho no mundo aberto ou de um colega de equipe usando uma recarga para você em combate."
 L["OPTIONS_SUPPORT"] = "Feedback e Suporte"
 L["OPTIONS_CURSEFORGE"] = "CurseForge"

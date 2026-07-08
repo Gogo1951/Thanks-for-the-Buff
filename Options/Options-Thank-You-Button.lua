@@ -22,10 +22,10 @@ function ns.GetThankYouButtonOptions()
                 width = "full",
                 order = 10,
                 get = function()
-                    return ns.db.slash.createMacro
+                    return ns.db.profile.slash.createMacro
                 end,
                 set = function(_, val)
-                    ns.db.slash.createMacro = val
+                    ns.db.profile.slash.createMacro = val
                 end
             },
             space1 = ns.OptionsSpacer(11),
@@ -35,10 +35,10 @@ function ns.GetThankYouButtonOptions()
                 width = "full",
                 order = 20,
                 get = function()
-                    return ns.db.slash.message
+                    return ns.db.profile.slash.message
                 end,
                 set = function(_, val)
-                    ns.db.slash.message = val
+                    ns.db.profile.slash.message = val
                 end
             },
             resetMsg = {
@@ -48,7 +48,7 @@ function ns.GetThankYouButtonOptions()
                 width = "half",
                 order = 21,
                 func = function()
-                    ns.db.slash.message = L["DEFAULT_WHISPER"]
+                    ns.db.profile.slash.message = L["DEFAULT_WHISPER"]
                 end
             },
             space2 = ns.OptionsSpacer(22),
@@ -71,10 +71,10 @@ function ns.GetThankYouButtonOptions()
             order = i,
             width = "half",
             get = function()
-                return ns.db.slash.emotes[emote]
+                return ns.db.profile.slash.emotes[emote]
             end,
             set = function(_, val)
-                ns.db.slash.emotes[emote] = val
+                ns.db.profile.slash.emotes[emote] = val
             end
         }
     end

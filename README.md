@@ -1,4 +1,4 @@
-# Thanks for the Buff
+# Thanks for the Buff (TFTB)
 
 Automatically express appreciation with emotes and messages whenever you receive a buff — whether it's a stranger buffing you in the open world or a teammate popping a cooldown for you in combat.
 
@@ -53,11 +53,11 @@ Type `/tftb` to open the options panel. Each kind of buff — from strangers, fr
 
 🟢 World of Warcraft Classic (🟡 Season of Discovery) // WoW 1.15.8
 
-🟢 Burning Crusade Anniversary // WoW 2.5.5
+🟢 Burning Crusade Anniversary // WoW 2.5.6
 
-🔴 Mists of Pandaria Classic // WoW 5.5.3
+🔴 Mists of Pandaria Classic // WoW 5.5.4
 
-🔴 World of Warcraft // WoW 12.0.5
+🔴 World of Warcraft // WoW 12.1.0
 
 **Localization Status** // Works with all Classic WoW Locales (enUS, deDE, esES, esMX, frFR, itIT, koKR, ptBR, ruRU, zhCN, zhTW).
 

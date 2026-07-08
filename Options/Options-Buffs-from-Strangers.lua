@@ -8,7 +8,7 @@ local L = ns.L
 
 function ns.GetStrangersOptions()
     local function EmotesHidden()
-        return not ns.db.strangers.emotesEnabled
+        return not ns.db.profile.strangers.emotesEnabled
     end
 
     local options = {
@@ -25,10 +25,10 @@ function ns.GetStrangersOptions()
                 width = "full",
                 order = 6,
                 get = function()
-                    return ns.db.strangers.printEnabled
+                    return ns.db.profile.strangers.printEnabled
                 end,
                 set = function(_, val)
-                    ns.db.strangers.printEnabled = val
+                    ns.db.profile.strangers.printEnabled = val
                 end
             },
             whisperStrangers = {
@@ -38,10 +38,10 @@ function ns.GetStrangersOptions()
                 width = "full",
                 order = 7,
                 get = function()
-                    return ns.db.strangers.whisperEnabled
+                    return ns.db.profile.strangers.whisperEnabled
                 end,
                 set = function(_, val)
-                    ns.db.strangers.whisperEnabled = val
+                    ns.db.profile.strangers.whisperEnabled = val
                 end
             },
             enableEmotesStrangers = {
@@ -51,10 +51,10 @@ function ns.GetStrangersOptions()
                 width = "full",
                 order = 8,
                 get = function()
-                    return ns.db.strangers.emotesEnabled
+                    return ns.db.profile.strangers.emotesEnabled
                 end,
                 set = function(_, val)
-                    ns.db.strangers.emotesEnabled = val
+                    ns.db.profile.strangers.emotesEnabled = val
                 end
             },
             emoteSpacer = {type = "description", name = " ", order = 9, hidden = EmotesHidden},
@@ -77,10 +77,10 @@ function ns.GetStrangersOptions()
                 max = 60,
                 step = 1,
                 get = function()
-                    return ns.db.strangers.cooldown
+                    return ns.db.profile.strangers.cooldown
                 end,
                 set = function(_, val)
-                    ns.db.strangers.cooldown = val
+                    ns.db.profile.strangers.cooldown = val
                 end
             },
             space3 = ns.OptionsSpacer(21),
@@ -94,10 +94,10 @@ function ns.GetStrangersOptions()
                 max = 120,
                 step = 1,
                 get = function()
-                    return ns.db.strangers.minBuffDuration
+                    return ns.db.profile.strangers.minBuffDuration
                 end,
                 set = function(_, val)
-                    ns.db.strangers.minBuffDuration = val
+                    ns.db.profile.strangers.minBuffDuration = val
                 end
             }
         }
@@ -112,10 +112,10 @@ function ns.GetStrangersOptions()
             order = i,
             width = "half",
             get = function()
-                return ns.db.strangers.emotes[emote]
+                return ns.db.profile.strangers.emotes[emote]
             end,
             set = function(_, val)
-                ns.db.strangers.emotes[emote] = val
+                ns.db.profile.strangers.emotes[emote] = val
             end
         }
     end
