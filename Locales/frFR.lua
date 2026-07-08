@@ -5,7 +5,8 @@ if not L then return end
 -- Add-on Identity
 --------------------------------------------------------------------------------
 
-L["ADDON_TITLE"] = "Thanks for the Buff"
+L["ADDON_TITLE"] = "Thanks for the Buff (TFTB)"
+L["ADDON_SHORT"] = "TFTB"
 
 --------------------------------------------------------------------------------
 -- Chat Messages
@@ -22,6 +23,7 @@ L["MSG_GAVE_GROUP"] = "%s a donné %s à votre groupe !"
 L["MSG_USED_ITEM"] = "%s a utilisé %s %s sur vous !"
 L["MSG_USED_SPELL"] = "%s a utilisé %s sur vous !"
 L["MSG_SET_OUT"] = "%s a déployé %s !"
+L["MSG_OPENED"] = "%s a ouvert %s !"
 
 -- Thank-you
 L["MSG_WHISPER_THANKS"] = "Merci pour %s !"
@@ -44,10 +46,9 @@ L["UNKNOWN_SPELL"] = "Sort inconnu"
 
 L["OPTIONS_WELCOME_TOGGLE"] = "Activer le message de bienvenue"
 L["OPTIONS_WELCOME_DESC"] = "Affiche un message dans la discussion à la connexion."
-L["OPTIONS_RESET"] = "Réinitialiser"
-L["OPTIONS_RESET_ALL"] = "Réinitialiser tous les paramètres"
-L["OPTIONS_RESET_ALL_DESC"] = "Restaure toutes les options à leurs valeurs par défaut."
-L["OPTIONS_RESET_CONFIRM"] = "Êtes-vous sûr de vouloir réinitialiser tous les paramètres à leurs valeurs par défaut ?"
+L["OPTIONS_RESET_ALL_PROFILES"] = "Réinitialiser tous les profils"
+L["OPTIONS_RESET_ALL_PROFILES_DESCRIPTION"] = "Réinitialise tous les profils de ce compte aux paramètres par défaut."
+L["OPTIONS_RESET_ALL_PROFILES_CONFIRM"] = "Cela réinitialisera TOUS les profils de votre compte aux paramètres par défaut – tous les personnages. Cette action est irréversible. Continuer ?"
 L["OPTIONS_DESCRIPTION"] = "Exprimez automatiquement votre gratitude avec des emotes et des messages chaque fois que vous recevez une amélioration — que ce soit un inconnu dans le monde ouvert ou un coéquipier qui utilise un temps de recharge pour vous en combat."
 L["OPTIONS_SUPPORT"] = "Commentaires et Assistance"
 L["OPTIONS_CURSEFORGE"] = "CurseForge"

@@ -23,10 +23,10 @@ function ns.GetGeneralOptions()
                 width = "full",
                 order = 4,
                 get = function()
-                    return ns.db.showWelcome
+                    return ns.db.profile.showWelcome
                 end,
                 set = function(_, val)
-                    ns.db.showWelcome = val
+                    ns.db.profile.showWelcome = val
                 end
             },
             -- /Commands
@@ -39,24 +39,6 @@ function ns.GetGeneralOptions()
                     GetColor("INFO") .. L["OPTIONS_CMD_THANKYOU"] .. "|r" .. "  " .. L["OPTIONS_CMD_THANKYOU_DESC"],
                 8
             ),
-            -- Reset
-            spaceReset0 = ns.OptionsSpacer(59),
-            headerReset = ns.OptionsHeader(L["OPTIONS_RESET"], 60),
-            spaceReset1 = ns.OptionsSpacer(61),
-            descReset = ns.OptionsDesc(L["OPTIONS_RESET_ALL_DESC"], 62),
-            spaceReset2 = ns.OptionsSpacer(63),
-            resetAll = {
-                type = "execute",
-                name = L["OPTIONS_RESET_ALL"],
-                order = 64,
-                width = "double",
-                confirm = true,
-                confirmText = L["OPTIONS_RESET_CONFIRM"],
-                func = function()
-                    ns:ResetSettings()
-                    ns:PrintMessage(L["MSG_RESET"])
-                end
-            },
             -- Feedback & Support
             spaceLinks0 = ns.OptionsSpacer(69),
             headerLinks = ns.OptionsHeader(L["OPTIONS_SUPPORT"], 70),

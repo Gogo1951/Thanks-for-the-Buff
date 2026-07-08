@@ -18,7 +18,7 @@ function ns:CreateAutoMacro()
         return
     end
 
-    if not ns.db or not ns.db.slash or not ns.db.slash.createMacro then
+    if not ns.db or not ns.db.profile.slash or not ns.db.profile.slash.createMacro then
         return
     end
 
@@ -46,7 +46,7 @@ function ns.RunThankYou()
         return
     end
 
-    local db = ns.db and ns.db.slash
+    local db = ns.db and ns.db.profile.slash
     if not db then
         return
     end

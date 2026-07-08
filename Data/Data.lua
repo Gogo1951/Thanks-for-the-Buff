@@ -59,6 +59,7 @@ ns.OPTIONS_REGISTRY = {
     Teammates = ADDON_NAME .. "_Teammates",
     Services = ADDON_NAME .. "_Services",
     ThankYou = ADDON_NAME .. "_ThankYou",
+    Profiles = ADDON_NAME .. "_Profiles",
     Diagnostics = ADDON_NAME .. "_Diagnostics"
 }
 
@@ -110,6 +111,8 @@ Data.DETECT = {
                 generic Items / Group Services lists.
       type      Data.BUFF.SOLO | GROUP | SERVICE
       detect    Data.DETECT.AURA | CAST
+      opened    SERVICE only: announce as "opened" (portals, summons) instead of
+                the default "set out" (feasts, soulwells, repair bots).
       triggers  the rank(s) / variant(s) this one toggle covers. Each is:
                   {spell = id}              a tracked spell
                   {spell = id, aura = id}   aura id differs from the cast id
@@ -188,6 +191,7 @@ Data.TRACKED = {
         class = "MAGE",
         type = BUFF.SERVICE,
         detect = DETECT.CAST,
+        opened = true,
         triggers = {
             {spell = 10059}, -- Stormwind
             {spell = 11416}, -- Ironforge
@@ -269,7 +273,7 @@ Data.TRACKED = {
             {spell = 58887}
         }
     },
-    {class = "WARLOCK", type = BUFF.SERVICE, detect = DETECT.CAST, triggers = {{spell = 698}}}, -- Ritual of Summoning
+    {class = "WARLOCK", type = BUFF.SERVICE, detect = DETECT.CAST, opened = true, triggers = {{spell = 698}}}, -- Ritual of Summoning
     -- Warrior -------------------------------------------------------------------
     {class = "WARRIOR", type = BUFF.SOLO, detect = DETECT.AURA, triggers = {{spell = 3411}}}, -- Intervene
     {class = "WARRIOR", type = BUFF.SOLO, detect = DETECT.AURA, triggers = {{spell = 50720}}}, -- Vigilance

@@ -5,7 +5,8 @@ if not L then return end
 -- Add-on Identity
 --------------------------------------------------------------------------------
 
-L["ADDON_TITLE"] = "Thanks for the Buff"
+L["ADDON_TITLE"] = "Thanks for the Buff (TFTB)"
+L["ADDON_SHORT"] = "TFTB"
 
 --------------------------------------------------------------------------------
 -- Chat Messages
@@ -22,6 +23,7 @@ L["MSG_GAVE_GROUP"] = "%s передает вашей группе %s!"
 L["MSG_USED_ITEM"] = "%s использует %s %s на вас!"
 L["MSG_USED_SPELL"] = "%s применяет %s на вас!"
 L["MSG_SET_OUT"] = "%s ставит %s!"
+L["MSG_OPENED"] = "%s открывает %s!"
 
 -- Thank-you
 L["MSG_WHISPER_THANKS"] = "Спасибо за %s!"
@@ -44,10 +46,9 @@ L["UNKNOWN_SPELL"] = "Неизвестное заклинание"
 
 L["OPTIONS_WELCOME_TOGGLE"] = "Включить приветственное сообщение"
 L["OPTIONS_WELCOME_DESC"] = "Выводит сообщение в чат при входе в игру."
-L["OPTIONS_RESET"] = "Сброс"
-L["OPTIONS_RESET_ALL"] = "Сбросить все настройки"
-L["OPTIONS_RESET_ALL_DESC"] = "Восстанавливает все параметры до их значений по умолчанию."
-L["OPTIONS_RESET_CONFIRM"] = "Вы уверены, что хотите сбросить все настройки по умолчанию?"
+L["OPTIONS_RESET_ALL_PROFILES"] = "Сбросить все профили"
+L["OPTIONS_RESET_ALL_PROFILES_DESCRIPTION"] = "Сбрасывает все профили этой учётной записи до настроек по умолчанию."
+L["OPTIONS_RESET_ALL_PROFILES_CONFIRM"] = "Это сбросит ВСЕ профили вашей учётной записи до настроек по умолчанию — каждого персонажа. Отменить будет невозможно. Продолжить?"
 L["OPTIONS_DESCRIPTION"] = "Автоматически выражайте благодарность с помощью эмоций и сообщений при получении баффа — будь то от незнакомца в открытом мире или от товарища по команде, применившего способность в бою."
 L["OPTIONS_SUPPORT"] = "Отзывы и поддержка"
 L["OPTIONS_CURSEFORGE"] = "CurseForge"

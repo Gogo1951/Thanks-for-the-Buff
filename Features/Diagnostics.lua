@@ -36,7 +36,7 @@ ns.DiagnosticsStrings = {
     EVENT_LOG_START = "Start Logging",
     EVENT_LOG_STOP = "Stop Logging",
     EVENT_LOG_SHOW = "Show Log",
-    EVENT_LOG_HINT = "Records the most recent events the add-on saw, with their arguments. Review the output before pasting it into a bug report -- if you were whispered while logging, the message text will appear here.",
+    EVENT_LOG_HINT = "Records the most recent events the add-on saw, with their arguments, plus every nearby spell cast (SPELL_CAST_SUCCESS) so you can see whether a portal, summon, or feast reaches the add-on and with what spell id. Review the output before pasting it into a bug report -- if you were whispered while logging, the message text will appear here.",
     EVENTS_TITLE = "Event Registration",
     EVENTS_BUTTON = "Run Event Checks",
     API_TITLE = "API Endpoints",
@@ -100,9 +100,9 @@ ns.DIAGNOSTIC_API_CHECKS = {
         end
     },
     {
-        label = "UnitAura",
+        label = "C_UnitAuras.GetBuffDataByIndex / UnitAura",
         test = function()
-            return UnitAura ~= nil
+            return (C_UnitAuras and C_UnitAuras.GetBuffDataByIndex) ~= nil or UnitAura ~= nil
         end
     },
     {
@@ -112,21 +112,21 @@ ns.DIAGNOSTIC_API_CHECKS = {
         end
     },
     {
-        label = "GetSpellLink",
+        label = "C_Spell.GetSpellLink / GetSpellLink",
         test = function()
-            return GetSpellLink ~= nil
+            return (C_Spell and C_Spell.GetSpellLink) ~= nil or GetSpellLink ~= nil
         end
     },
     {
-        label = "GetItemInfo",
+        label = "C_Item.GetItemInfo / GetItemInfo",
         test = function()
-            return GetItemInfo ~= nil
+            return (C_Item and C_Item.GetItemInfo) ~= nil or GetItemInfo ~= nil
         end
     },
     {
-        label = "GetItemIcon",
+        label = "C_Item.GetItemIconByID / GetItemIcon",
         test = function()
-            return GetItemIcon ~= nil
+            return (C_Item and C_Item.GetItemIconByID) ~= nil or GetItemIcon ~= nil
         end
     },
     {
@@ -198,12 +198,14 @@ ns.DIAGNOSTIC_TRACKED = {entriesLive = 0, entriesTotal = 0, auraIds = 0, castIds
 --------------------------------------------------------------------------------
 
 local function GetClientHeader()
-    local _, build = GetBuildInfo()
+    local version, build, _, tocVersion = GetBuildInfo()
     return string.format(
-        "%s %s | Build %s | Locale %s | Project %s",
+        "%s %s // Client %s // Build %s // TOC %s // Locale %s // Project %s",
         ns.L["ADDON_TITLE"],
         ns.Version or "Dev",
+        tostring(version),
         tostring(build),
+        tostring(tocVersion),
         tostring(GetLocale()),
         tostring(WOW_PROJECT_ID or 0)
     )
@@ -265,6 +267,54 @@ function ns:LogEvent(event, ...)
     end
 end
 
+--[[
+    Opt-in probe for the "why isn't this cast announced" case (portals, summons,
+    feasts). COMBAT_LOG_EVENT_UNFILTERED is kept out of the general event log as a
+    firehose, so the buff engine calls this directly for each SPELL_CAST_SUCCESS
+    while logging is on. It records the RAW event -- spell id + name, source, the
+    decoded affiliation/reaction flags, and whether the add-on tracks and watches
+    that id -- before any filtering, so a cast that arrives but is dropped is still
+    visible. tracked=false on a portal means its id never made the lookup (a data
+    problem); tracked=true watched=true means the cast reached us and the issue is
+    downstream.
+]]
+function ns:LogCombatCast(spellID, sourceName, sourceFlags, tracked, watched)
+    local log = ns.diagnostics.log
+    if not log then
+        return
+    end
+
+    local flags = sourceFlags or 0
+    local isPlayer = bit.band(flags, COMBATLOG_OBJECT_TYPE_PLAYER) > 0
+    local isFriendly = bit.band(flags, COMBATLOG_OBJECT_REACTION_FRIENDLY) > 0
+    local affiliation =
+        (bit.band(flags, COMBATLOG_OBJECT_AFFILIATION_MINE) > 0 and "MINE")
+        or (bit.band(flags, COMBATLOG_OBJECT_AFFILIATION_PARTY) > 0 and "PARTY")
+        or (bit.band(flags, COMBATLOG_OBJECT_AFFILIATION_RAID) > 0 and "RAID")
+        or (bit.band(flags, COMBATLOG_OBJECT_AFFILIATION_OUTSIDER) > 0 and "OUTSIDER")
+        or "?"
+
+    local spellName = (ns.GetSpellName and ns.GetSpellName(spellID)) or "?"
+
+    local entry = string.format(
+        "%.3f  CAST  %s [%s]  from %s  player=%s friendly=%s aff=%s  tracked=%s watched=%s",
+        GetTime(),
+        tostring(spellID),
+        tostring(spellName),
+        tostring(sourceName),
+        tostring(isPlayer),
+        tostring(isFriendly),
+        affiliation,
+        tostring(tracked and true or false),
+        tostring(watched and true or false)
+    )
+
+    log[#log + 1] = entry
+    if #log > EVENT_LOG_SIZE then
+        table.remove(log, 1)
+    end
+end
+
 function ns:BuildEventLogReport()
     local log = ns.diagnostics.log
     local body
@@ -291,7 +341,7 @@ function ns:RunEventChecks()
     local frame = GetProbeFrame()
 
     local names = {}
-    for event in pairs(ns.eventHandlers or {}) do
+    for _, event in ipairs(ns.EVENT_NAMES or {}) do
         names[#names + 1] = event
     end
     table.sort(names)
@@ -352,7 +402,7 @@ function ns:BuildContextReport()
         tostring(InCombatLockdown() and true or false)
     )
 
-    local db = ns.db
+    local db = ns.db and ns.db.profile
     if db then
         lines[#lines + 1] = string.format(
             "Strangers: print=%s whisper=%s emotes=%s  minDuration=%s cooldown=%s",

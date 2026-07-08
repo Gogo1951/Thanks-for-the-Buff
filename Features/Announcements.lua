@@ -8,9 +8,9 @@ local GetColor = ns.GetColor
 -- Print Outs (Player Only)
 --------------------------------------------------------------------------------
 
--- Format: |cff[INFO]Add-on Name|r |cff[SEPARATOR]//|r |cff[TEXT]Message|r
+-- Format: |cff[INFO]TFTB|r |cff[SEPARATOR]//|r |cff[TEXT]Message|r
 function ns:PrintMessage(message)
-    local prefix = GetColor("INFO") .. L["ADDON_TITLE"] .. "|r " .. GetColor("SEPARATOR") .. "//" .. "|r "
+    local prefix = GetColor("INFO") .. L["ADDON_SHORT"] .. "|r " .. GetColor("SEPARATOR") .. "//" .. "|r "
     --[[
         Plain messages get the standard white body. Messages that embed their own
         colors (spell links, class-colored names) are left untouched so an outer
@@ -28,9 +28,10 @@ end
 
 --[[
     Branded sent messages for the automated buff/service thank-yous:
-    {marker} Add-on Name // Message. BuildAnnounceMessage assembles the decorated
-    string and Announce sends it. The body carries a spell/item link, which is
-    legal in chat and passes through unchanged, so pipes are not stripped.
+    {rt1} TFTB // Message. BuildAnnounceMessage assembles the decorated string and
+    Announce sends it. The body carries a spell/item link and the leading raid-
+    target marker; the chat system renders both on send (the marker becomes the
+    Star icon), so the pipes and braces pass through unchanged.
 ]]
 function ns:BuildAnnounceMessage(formatKey, ...)
     local template = L[formatKey]
@@ -38,7 +39,7 @@ function ns:BuildAnnounceMessage(formatKey, ...)
         return nil
     end
     local body = string.format(template, ...)
-    return ns.TARGET_MARKER .. " " .. L["ADDON_TITLE"] .. " // " .. body
+    return ns.TARGET_MARKER .. " " .. L["ADDON_SHORT"] .. " // " .. body
 end
 
 function ns:Announce(channel, target, formatKey, ...)
@@ -68,7 +69,13 @@ end
 -- Emotes
 --------------------------------------------------------------------------------
 
--- Perform a random enabled emote from the given selection, directed at target.
+--[[
+    Perform a random enabled emote from the given selection. `target` is a live
+    unit token ("target", "party3") to direct the emote at, or nil to emote
+    undirected -- callers pass a resolved unit, never a raw player name, since
+    DoEmote can't reliably direct at a name (and cross-realm "Name-Realm" names
+    match no unit at all). DoEmote(cmd, nil) is the same as an undirected emote.
+]]
 function ns:DoRandomEmote(emotes, target)
     if not emotes then
         return
@@ -112,12 +119,12 @@ end
 -- Item-driven buffs link the source item; everything else links the spell.
 local function GetLink(entry, spellID)
     if entry.itemId then
-        local link = select(2, GetItemInfo(entry.itemId))
+        local link = select(2, ns.GetItemInfo(entry.itemId))
         if link then
             return link
         end
     end
-    return GetSpellLink(spellID) or L["UNKNOWN_SPELL"]
+    return ns.GetSpellLink(spellID) or L["UNKNOWN_SPELL"]
 end
 
 --[[
@@ -136,7 +143,7 @@ function ns:AnnounceTracked(entry, creditGUID, creditName, spellID, printEnabled
         local name = ColorName(creditGUID, creditName)
         local message
         if entry.type == Data.BUFF.SERVICE then
-            message = L["MSG_SET_OUT"]:format(name, link)
+            message = (entry.opened and L["MSG_OPENED"] or L["MSG_SET_OUT"]):format(name, link)
         elseif entry.type == Data.BUFF.GROUP then
             message = L["MSG_GAVE_GROUP"]:format(name, link)
         elseif entry.itemId then

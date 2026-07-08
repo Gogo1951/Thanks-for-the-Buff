@@ -27,81 +27,101 @@ ns.Version = GetVersion()
 --------------------------------------------------------------------------------
 
 --[[
-    Additive merge: fill only nil fields so a user's explicit choices are never
-    overwritten. New defaults shipped in an update appear for existing users.
+    AceDB-3.0 owns the SavedVariables lifecycle: it applies ns.DATABASE_DEFAULTS
+    via metatables, so there is no hand-rolled merge and every setting lives under
+    ns.db.profile. The two helpers below only bridge older on-disk layouts into
+    the profile once; AceDB handles everything else.
 ]]
-local function ApplyDefaults(target, defaults)
-    for key, value in pairs(defaults) do
-        if type(value) == "table" then
-            if type(target[key]) ~= "table" then
-                target[key] = {}
-            end
-            ApplyDefaults(target[key], value)
-        elseif target[key] == nil then
-            target[key] = value
+
+--[[
+    Overlay saved user values onto the defaults-backed profile. Recurses into
+    tables so a value the user set wins while keys they never touched keep their
+    default -- this preserves AceDB's default-fill for newly shipped keys, which a
+    wholesale subtable assignment would drop.
+]]
+local function LiftInto(dst, src)
+    for key, value in pairs(src) do
+        if type(value) == "table" and type(dst[key]) == "table" then
+            LiftInto(dst[key], value)
+        else
+            dst[key] = value
         end
     end
 end
 
 --[[
-    One-time lift from the retired AceDB profile layout: settings used to live
-    under TFTB_DB.profiles[key]. Move the active profile up to the account table,
-    then drop the AceDB bookkeeping keys so the merge below sees a flat table.
+    MIGRATION (remove after 2026-10-05): lift the pre-AceDB flat layout into the
+    AceDB profile. Settings used to live at the TFTB_DB root; AceDB now owns the
+    root for its own bookkeeping, so those orphaned root keys are copied into the
+    shared Default profile once and then removed. Older copies that still hold a
+    real AceDB `profiles` table are adopted by AceDB:New directly and never reach
+    this path. When the window closes, delete this function and its call.
 ]]
-local function MigrateLegacyProfile()
-    local profiles = TFTB_DB.profiles
-    if type(profiles) ~= "table" then
+local function MigrateFlatToProfile()
+    local root = TFTB_DB
+    if type(root) ~= "table" then
         return
     end
+    local profile = ns.db.profile
 
-    local charKey = TFTB_DB.profileKeys and TFTB_DB.profileKeys[UnitName("player") .. " - " .. GetRealmName()]
-    local source = (charKey and profiles[charKey]) or profiles.Default
-    if type(source) == "table" then
-        if type(source.global) == "table" and source.global.welcomeMessage ~= nil then
-            source.welcomeMessage = source.global.welcomeMessage
-        end
-        source.global = nil
-        for key, value in pairs(source) do
-            if TFTB_DB[key] == nil then
-                TFTB_DB[key] = value
+    local liftKeys = {
+        "showWelcome",
+        "welcomeMessage",
+        "strangers",
+        "teammates",
+        "services",
+        "slash",
+        "watchedBuffs",
+        "groupBuffs"
+    }
+    for _, key in ipairs(liftKeys) do
+        local value = root[key]
+        if value ~= nil then
+            if type(value) == "table" and type(profile[key]) == "table" then
+                LiftInto(profile[key], value)
+            else
+                profile[key] = value
             end
+            root[key] = nil
         end
     end
 
-    TFTB_DB.profiles = nil
-    TFTB_DB.profileKeys = nil
-    TFTB_DB.profile = nil
+    -- Retired scalar, never carried forward.
+    root.lastRunVersion = nil
 end
 
-local function InitializeDatabase()
-    TFTB_DB = TFTB_DB or {}
-    MigrateLegacyProfile()
-    ApplyDefaults(TFTB_DB, ns.DEFAULT_CONFIGURATION)
-    ns.db = TFTB_DB
-    ns.db.lastRunVersion = ns.Version
+--[[
+    Field-level cleanups from the flat era, now applied to the profile. Kept until
+    their windows close so a user upgrading straight from an older build doesn't
+    lose a setting.
+]]
+local function ApplyFieldMigrations()
+    local profile = ns.db.profile
 
-    -- Retired the tri-state "messaging" dropdown (independent print / whisper /
-    -- emote toggles now) and the strangers master enable (2026-06; the messaging
-    -- toggles are the enable). Drop the stale fields if they linger.
-    ns.db.strangers.messaging = nil
-    ns.db.strangers.enabled = nil
-
-    -- Renamed welcomeMessage -> showWelcome (2026-06): keep the user's choice, drop the old key.
-    if ns.db.welcomeMessage ~= nil then
-        ns.db.showWelcome = ns.db.welcomeMessage
-        ns.db.welcomeMessage = nil
+    -- MIGRATION (remove after 2026-09-28): drop the retired tri-state "messaging"
+    -- dropdown and the strangers master enable (the print / whisper / emote
+    -- toggles are the enable now).
+    if type(profile.strangers) == "table" then
+        profile.strangers.messaging = nil
+        profile.strangers.enabled = nil
     end
 
-    -- Split the old combined "groupBuffs" config (2026-06) into independent
-    -- "Buffs from Teammates" and "Group Services" settings. Carry the player's old
-    -- messaging prefs into both and keep their watched list, so upgrading resets
-    -- nothing.
-    if ns.db.groupBuffs then
-        local old = ns.db.groupBuffs
+    -- MIGRATION (remove after 2026-09-28): renamed welcomeMessage -> showWelcome.
+    if profile.welcomeMessage ~= nil then
+        profile.showWelcome = profile.welcomeMessage
+        profile.welcomeMessage = nil
+    end
+
+    -- MIGRATION (remove after 2026-09-28): split the old combined "groupBuffs"
+    -- config into independent "Buffs from Teammates" and "Group Services"
+    -- settings. Carry the player's old messaging prefs into both and keep their
+    -- watched list, so upgrading resets nothing.
+    if profile.groupBuffs then
+        local old = profile.groupBuffs
         if type(old.watchedBuffs) == "table" then
-            ns.db.watchedBuffs = old.watchedBuffs
+            profile.watchedBuffs = old.watchedBuffs
         end
-        for _, cfg in ipairs({ns.db.teammates, ns.db.services}) do
+        for _, cfg in ipairs({profile.teammates, profile.services}) do
             if old.printEnabled ~= nil then
                 cfg.printEnabled = old.printEnabled
             end
@@ -119,21 +139,48 @@ local function InitializeDatabase()
                 cfg.emotes = copy
             end
         end
-        ns.db.groupBuffs = nil
+        profile.groupBuffs = nil
     end
+end
+
+--[[
+    A profile switch / copy / reset swaps every user setting at once, so re-seed
+    the watched-buff list (a fresh profile starts empty and defaults on) and
+    refresh any open options panels off the new values.
+]]
+local function OnProfileChanged()
+    if ns.PopulateWatchedBuffs then
+        ns.PopulateWatchedBuffs()
+    end
+    local registry = LibStub("AceConfigRegistry-3.0")
+    for _, name in pairs(ns.OPTIONS_REGISTRY) do
+        registry:NotifyChange(name)
+    end
+end
+
+local function InitializeDatabase()
+    ns.db = LibStub("AceDB-3.0"):New("TFTB_DB", ns.DATABASE_DEFAULTS, true)
+    MigrateFlatToProfile()
+    ApplyFieldMigrations()
+    ns.db.RegisterCallback(ns, "OnProfileChanged", OnProfileChanged)
+    ns.db.RegisterCallback(ns, "OnProfileCopied", OnProfileChanged)
+    ns.db.RegisterCallback(ns, "OnProfileReset", OnProfileChanged)
+    ns.db.RegisterCallback(ns, "OnDatabaseReset", OnProfileChanged)
 end
 
 --------------------------------------------------------------------------------
 -- Reset
 --------------------------------------------------------------------------------
 
-function ns:ResetSettings()
-    wipe(TFTB_DB)
-    ApplyDefaults(TFTB_DB, ns.DEFAULT_CONFIGURATION)
-    ns.db.lastRunVersion = ns.Version
-    if ns.PopulateWatchedBuffs then
-        ns.PopulateWatchedBuffs()
-    end
+--[[
+    Reset every profile on the account back to defaults -- the Profiles panel's
+    one custom control. ResetDB fires OnDatabaseReset, which re-seeds the watched
+    list and refreshes the panels. There is no minimap button, so nothing needs to
+    survive the wipe.
+]]
+function ns:ResetAllProfiles()
+    ns.db:ResetDB()
+    ns:PrintMessage(L["MSG_RESET"])
 end
 
 --------------------------------------------------------------------------------
@@ -141,20 +188,33 @@ end
 --------------------------------------------------------------------------------
 
 --[[
-    Every registered event routes through this single dispatcher, which is what
-    lets the diagnostics event log capture them all from one tap. Feature modules
-    register their handlers through ns.RegisterEvent rather than creating their
-    own frames, so the dispatcher stays the single point that sees every event.
-    Each event has a single owner: registering the same event twice replaces the
-    earlier handler, so two modules must not claim the same event.
+    The complete list of events the add-on uses. Core owns it, the dispatcher
+    registers the frame from it, and Diagnostics reads it -- so the registered
+    set, the tap the event log relies on, and the event-registration probe can
+    never drift from one another. To use a new event, add it here and attach its
+    handler with ns.SetEventHandler; never register a frame anywhere else.
+]]
+ns.EVENT_NAMES = {
+    "PLAYER_LOGIN",
+    "PLAYER_ENTERING_WORLD",
+    "COMBAT_LOG_EVENT_UNFILTERED",
+    "UNIT_SPELLCAST_SUCCEEDED",
+    "LOADING_SCREEN_DISABLED"
+}
+
+--[[
+    Every event routes through this single dispatcher -- the one point that sees
+    them all, which is what lets the diagnostics event log capture everything from
+    one tap. Feature modules attach handlers by name with ns.SetEventHandler; they
+    never create their own frames. Each event has a single owner: attaching the
+    same event twice replaces the earlier handler, so two modules must not claim
+    the same event.
 ]]
 local eventFrame = CreateFrame("Frame")
 local eventHandlers = {}
-ns.eventHandlers = eventHandlers
 
-function ns.RegisterEvent(event, handler)
+function ns.SetEventHandler(event, handler)
     eventHandlers[event] = handler
-    eventFrame:RegisterEvent(event)
 end
 
 eventFrame:SetScript("OnEvent", function(_, event, ...)
@@ -166,6 +226,10 @@ eventFrame:SetScript("OnEvent", function(_, event, ...)
         handler(...)
     end
 end)
+
+for _, event in ipairs(ns.EVENT_NAMES) do
+    eventFrame:RegisterEvent(event)
+end
 
 --------------------------------------------------------------------------------
 -- Lifecycle
@@ -194,11 +258,11 @@ local function OnPlayerLogin()
 end
 
 local function OnPlayerEnteringWorld()
-    if ns.db and ns.db.showWelcome and not welcomeMessageShown then
+    if ns.db and ns.db.profile.showWelcome and not welcomeMessageShown then
         ns:PrintMessage(L["CHAT_LOADED"]:format(ns.Version))
         welcomeMessageShown = true
     end
 end
 
-ns.RegisterEvent("PLAYER_LOGIN", OnPlayerLogin)
-ns.RegisterEvent("PLAYER_ENTERING_WORLD", OnPlayerEnteringWorld)
+ns.SetEventHandler("PLAYER_LOGIN", OnPlayerLogin)
+ns.SetEventHandler("PLAYER_ENTERING_WORLD", OnPlayerEnteringWorld)

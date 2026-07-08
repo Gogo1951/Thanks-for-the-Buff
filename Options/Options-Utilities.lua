@@ -36,8 +36,9 @@ end
     (Options-Buffs-from-Teammates.lua / Options-Buff-Services.lua). Both panels have the same
     shape -- description, messaging toggles, emote picker, tracked list -- and
     differ only in their text, which settings table they bind to
-    (ns.db.teammates / ns.db.services), and which tracked entries they list. The
-    watched-buff list is shared (ns.db.watchedBuffs); a given id only ever appears
+    (ns.db.profile.teammates / ns.db.profile.services), and which tracked entries
+    they list. The watched-buff list is shared (ns.db.profile.watchedBuffs); a
+    given id only ever appears
     on one of the two panels.
 ]]
 
@@ -60,8 +61,8 @@ function ns.DefineEntryToggle(entry, order)
         local itemId = entry.itemId
         local groupLabel = entry.label
         nameField = function()
-            local shown = groupLabel or GetItemInfo(itemId) or L["COMBAT_ITEM_PENDING"]:format(itemId)
-            local texture = GetItemIcon and GetItemIcon(itemId)
+            local shown = groupLabel or ns.GetItemInfo(itemId) or L["COMBAT_ITEM_PENDING"]:format(itemId)
+            local texture = ns.GetItemIcon and ns.GetItemIcon(itemId)
             if texture then
                 return "|T" .. texture .. ":16|t " .. shown
             end
@@ -73,11 +74,11 @@ function ns.DefineEntryToggle(entry, order)
             if entry.itemIds and #entry.itemIds > 1 then
                 local lines = {}
                 for _, id in ipairs(entry.itemIds) do
-                    lines[#lines + 1] = (select(2, GetItemInfo(id))) or L["COMBAT_ITEM_PENDING"]:format(id)
+                    lines[#lines + 1] = (select(2, ns.GetItemInfo(id))) or L["COMBAT_ITEM_PENDING"]:format(id)
                 end
                 return table.concat(lines, "\n")
             end
-            return (select(2, GetItemInfo(itemId))) or ""
+            return (select(2, ns.GetItemInfo(itemId))) or ""
         end
     else
         local name = entry.spellName
@@ -120,11 +121,11 @@ function ns.DefineEntryToggle(entry, order)
         order = order,
         width = "full",
         get = function()
-            return ns.db.watchedBuffs[primary]
+            return ns.db.profile.watchedBuffs[primary]
         end,
         set = function(_, val)
             for _, id in ipairs(ids) do
-                ns.db.watchedBuffs[id] = val
+                ns.db.profile.watchedBuffs[id] = val
             end
         end
     }
@@ -135,7 +136,7 @@ end
 local function EntrySortKey(entry)
     local name = entry.label or entry.spellName
     if not name and entry.itemId then
-        name = GetItemInfo(entry.itemId)
+        name = ns.GetItemInfo(entry.itemId)
     end
     return (name or ""):lower()
 end
@@ -164,7 +165,7 @@ end
 -- its own tracked list afterward.
 function ns.BuildBuffPanel(titleKey, descKey, settingsKey)
     local function settings()
-        return ns.db[settingsKey]
+        return ns.db.profile[settingsKey]
     end
     local function EmotesHidden()
         return not settings().emotesEnabled

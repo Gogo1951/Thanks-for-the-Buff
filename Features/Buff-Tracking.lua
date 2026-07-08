@@ -6,7 +6,8 @@ local L = ns.L
     The buff-reaction engine behind the Strangers, Teammates, and Services options
     panels. Watches the combat log, classifies the source, and routes to
     the announcement helpers. Owns its own lookups, caches, cooldowns, and timers;
-    its event handlers register through Core's dispatcher (ns.RegisterEvent).
+    its event handlers attach through Core's dispatcher (ns.SetEventHandler), and
+    the events themselves are declared in Core's ns.EVENT_NAMES.
 ]]
 
 --------------------------------------------------------------------------------
@@ -17,6 +18,7 @@ local sessionCooldowns = {}
 local isReady = false
 local auraLookup = {}
 local castLookup = {}
+local playerGUID -- cached at login; a character's GUID never changes within a session
 
 --------------------------------------------------------------------------------
 -- Cooldowns
@@ -29,7 +31,38 @@ local function IsOnCooldown(guid)
 end
 
 local function SetCooldown(guid, duration)
-    sessionCooldowns[guid] = GetTime() + (duration or 10)
+    local now = GetTime()
+    -- Opportunistic sweep: drop lapsed entries so the table can't grow unbounded
+    -- across a long session (one key per distinct source/recipient reacted to).
+    -- Clearing an existing field mid-pairs is defined behavior in Lua.
+    for key, expiresAt in pairs(sessionCooldowns) do
+        if expiresAt <= now then
+            sessionCooldowns[key] = nil
+        end
+    end
+    sessionCooldowns[guid] = now + (duration or 10)
+end
+
+--[[
+    Per-recipient whisper throttle. Whispers go to OTHER players, so unlike the
+    self-only prints (which fire on every buff) they must not repeat: a player who
+    rebuffs you several times is thanked at most once per window, which also keeps
+    us clear of Blizzard's whisper spam squelch. Keyed by GUID under a "whisper:"
+    namespace so it never collides with the emote/service cooldowns on the same
+    GUID. Checks and stamps in one call, and only stamps when a whisper is actually
+    cleared to send, so the window is measured from the last whisper we sent.
+]]
+local WHISPER_COOLDOWN = 45
+local function TryWhisperCooldown(guid)
+    if not guid then
+        return true
+    end
+    local key = "whisper:" .. guid
+    if IsOnCooldown(key) then
+        return false
+    end
+    SetCooldown(key, WHISPER_COOLDOWN)
+    return true
 end
 
 --------------------------------------------------------------------------------
@@ -85,7 +118,8 @@ local function BuildLookups()
                 lookup[watched] = {
                     type = entry.type,
                     detect = entry.detect,
-                    itemId = trigger.item
+                    itemId = trigger.item,
+                    opened = entry.opened
                 }
             end
         end
@@ -107,7 +141,7 @@ end
 -- One shared list backs both the Teammates and Services panels; ids never overlap
 -- between them, so a single table is unambiguous.
 local function PopulateWatchedBuffs()
-    local watched = ns.db.watchedBuffs
+    local watched = ns.db.profile.watchedBuffs
     for id in pairs(auraLookup) do
         if watched[id] == nil then
             watched[id] = true
@@ -157,7 +191,7 @@ local function WarmItemCache()
     for _, entry in ipairs(Data.TRACKED) do
         for _, trigger in ipairs(entry.triggers) do
             if trigger.item then
-                GetItemInfo(trigger.item)
+                ns.GetItemInfo(trigger.item)
             end
         end
     end
@@ -293,13 +327,48 @@ local function ResolveSource(sourceGUID, sourceName, sourceFlags)
     return sourceGUID, sourceName
 end
 
+--[[
+    A usable emote target must be a live unit token: DoEmote only directs "you
+    cheer at X" at a real unit, and a combat-log name is not one -- cross-realm
+    sources arrive as "Name-Realm" and never resolve. Map the buffer's GUID to a
+    unit we actually have (the player, a group member, or the current target /
+    focus / mouseover) and return nil when none matches, so the caller emotes
+    undirected instead of passing an unmatchable name.
+]]
+local function ResolveEmoteUnit(guid)
+    if not guid then
+        return nil
+    end
+    if UnitGUID("player") == guid then
+        return "player"
+    end
+    local prefix, count = "party", 4
+    if IsInRaid() then
+        prefix, count = "raid", 40
+    end
+    for i = 1, count do
+        local unit = prefix .. i
+        if UnitExists(unit) and UnitGUID(unit) == guid then
+            return unit
+        end
+    end
+    for _, unit in ipairs({"target", "focus", "mouseover"}) do
+        if UnitExists(unit) and UnitGUID(unit) == guid then
+            return unit
+        end
+    end
+    return nil
+end
+
 --------------------------------------------------------------------------------
 -- Buff Handlers
 --------------------------------------------------------------------------------
 
 --[[
-    Group/raid reactions are intentionally NOT rate-limited: each cast is a
-    distinct cooldown a teammate spent, so we acknowledge every one.
+    Group/raid PRINTS and emotes are intentionally NOT rate-limited: each cast is a
+    distinct cooldown a teammate spent, so we acknowledge every one. The outgoing
+    whisper is the exception -- it is throttled per-recipient (TryWhisperCooldown)
+    so a teammate who repeatedly buffs you in a raid isn't whisper-spammed.
 ]]
 local function HandleTracked(entry, spellID, creditGUID, creditName, destGUID, playerGUID)
     if entry.type == Data.BUFF.SERVICE then
@@ -312,44 +381,33 @@ local function HandleTracked(entry, spellID, creditGUID, creditName, destGUID, p
         return
     end
 
-    if not ns.db.watchedBuffs[spellID] then
+    if not ns.db.profile.watchedBuffs[spellID] then
         return
     end
 
     -- No-aura raid help reacts with the Group Services settings; everything cast
     -- on you (SOLO / GROUP) uses the Buffs from Teammates settings.
-    local db = (entry.type == Data.BUFF.SERVICE) and ns.db.services or ns.db.teammates
-    ns:AnnounceTracked(entry, creditGUID, creditName, spellID, db.printEnabled, db.whisperEnabled)
+    local db = (entry.type == Data.BUFF.SERVICE) and ns.db.profile.services or ns.db.profile.teammates
+    local whisperAllowed = db.whisperEnabled and TryWhisperCooldown(creditGUID)
+    ns:AnnounceTracked(entry, creditGUID, creditName, spellID, db.printEnabled, whisperAllowed)
 
     -- Emotes are visible and social, so they are held back until you leave combat.
     if db.emotesEnabled and not InCombatLockdown() then
-        ns:DoRandomEmote(db.emotes, creditName)
+        ns:DoRandomEmote(db.emotes, ResolveEmoteUnit(creditGUID))
     end
 end
 
 local function HandleStrangersBuff(sourceGUID, sourceName, spellID)
     -- No master on/off switch: the print / whisper / emote toggles are the enable.
     -- With all three off, AnnounceStranger and the emote both no-op, so nothing fires.
-    local db = ns.db.strangers
+    local db = ns.db.profile.strangers
     if not db then
         return
     end
 
-    local duration = 0
-    local foundAsBuff = false
-    for i = 1, 40 do
-        local name, _, _, _, auraDuration, _, _, _, _, auraSpellId = UnitAura("player", i, "HELPFUL")
-        if not name then
-            break
-        end
-        if auraSpellId == spellID then
-            foundAsBuff = true
-            duration = auraDuration
-            break
-        end
-    end
-
-    if not foundAsBuff then
+    -- nil means the buff isn't on you; a live buff may still report 0 (no timer).
+    local duration = ns.GetBuffDuration("player", spellID)
+    if not duration then
         return
     end
 
@@ -357,23 +415,26 @@ local function HandleStrangersBuff(sourceGUID, sourceName, spellID)
         return
     end
 
-    local spellLink = GetSpellLink(spellID) or L["UNKNOWN_SPELL"]
+    local spellLink = ns.GetSpellLink(spellID) or L["UNKNOWN_SPELL"]
 
     --[[
-        Messages and emotes are rate-limited differently, on purpose:
+        Prints, whispers, and emotes are rate-limited differently, on purpose:
 
-        - Messages fire on EVERY qualifying buff, ignoring the per-source
-          cooldown. Print-outs are self-only and whispers go to the buffer, so
-          they always reflect the buff that just landed -- in or out of combat.
+        - Prints fire on EVERY qualifying buff. They are self-only, so they always
+          reflect the buff that just landed -- in or out of combat.
+        - Whispers go to the OTHER player, so they are throttled per-recipient
+          (TryWhisperCooldown): a player who rebuffs you repeatedly is thanked at
+          most once per window, which also keeps us clear of the whisper squelch.
         - The emote is gated by the per-source cooldown (db.cooldown) so we don't
           visibly emote at the same player over and over, and is held back
           entirely while you are in combat. The cooldown is only spent when an
           emote actually fires, so the next buff after combat reacts right away.
     ]]
-    ns:AnnounceStranger(sourceGUID, sourceName, spellLink, db.printEnabled, db.whisperEnabled)
+    local whisperAllowed = db.whisperEnabled and TryWhisperCooldown(sourceGUID)
+    ns:AnnounceStranger(sourceGUID, sourceName, spellLink, db.printEnabled, whisperAllowed)
 
     if db.emotesEnabled and not InCombatLockdown() and not IsOnCooldown(sourceGUID) then
-        ns:DoRandomEmote(db.emotes, sourceName)
+        ns:DoRandomEmote(db.emotes, ResolveEmoteUnit(sourceGUID))
         SetCooldown(sourceGUID, db.cooldown)
     end
 end
@@ -396,12 +457,26 @@ local function OnCombatLogEvent()
         return
     end
 
-    local playerGUID = UnitGUID("player")
+    -- Diagnostics probe: log raw cast-success events (portals, summons, feasts)
+    -- before the guards below drop anything, so even your own test casts and casts
+    -- that get filtered out are still visible in the event log. See ns:LogCombatCast.
+    if isCast and ns.diagnostics and ns.diagnostics.logging then
+        ns:LogCombatCast(spellID, sourceName, sourceFlags, castLookup[spellID] ~= nil, ns.db.profile.watchedBuffs and ns.db.profile.watchedBuffs[spellID])
+    end
+
     if not sourceGUID or sourceGUID == playerGUID then
         return
     end
 
     local entry = (isAura and auraLookup[spellID]) or (isCast and castLookup[spellID])
+
+    -- Service casts (portals, summons, feasts) are announced from
+    -- UNIT_SPELLCAST_SUCCEEDED instead -- they don't reliably reach the combat log
+    -- -- so drop any that surface here, both to avoid a double announce and because
+    -- the combat log can't be relied on to carry them at all.
+    if entry and entry.type == Data.BUFF.SERVICE then
+        entry = nil
+    end
 
     --[[
         A stranger buff is a HELPFUL aura that lands on you from a friendly
@@ -413,11 +488,12 @@ local function OnCombatLogEvent()
         processing stays cheap, using the affiliation flag instead of a UnitIn*
         scan to recognize an outsider.
     ]]
-    local maybeStranger =
-        isAura and destGUID == playerGUID and
+    local sourceIsOutsider =
         bit.band(sourceFlags or 0, COMBATLOG_OBJECT_TYPE_PLAYER) > 0 and
         bit.band(sourceFlags or 0, COMBATLOG_OBJECT_REACTION_FRIENDLY) > 0 and
         bit.band(sourceFlags or 0, COMBATLOG_OBJECT_AFFILIATION_OUTSIDER) > 0
+
+    local maybeStranger = isAura and destGUID == playerGUID and sourceIsOutsider
 
     if not entry and not maybeStranger then
         return
@@ -451,6 +527,50 @@ local function OnCombatLogEvent()
     end
 end
 
+--[[
+    Group services are announced from UNIT_SPELLCAST_SUCCEEDED, not the combat log:
+    portals, summons, feasts and the like are utility casts that don't reliably
+    produce a SPELL_CAST_SUCCESS in COMBAT_LOG_EVENT_UNFILTERED, but they DO fire
+    this unit event for any unit the client tracks (party/raid, target, focus). A
+    service has no per-you target, so crediting the casting unit is all we need --
+    which is also why solo casts (Rebirth, Lay on Hands) stay on the combat log,
+    where the destination tells us the buff actually landed on you.
+
+    The per-source "service:" cooldown does double duty: it rate-limits a mage
+    opening several portals in a row, and it dedupes the multiple tokens a single
+    cast can fire (party1 and target for the same caster resolve to one GUID, so the
+    second is already on cooldown).
+]]
+local function OnUnitSpellcastSucceeded(unitTarget, _, spellID)
+    if not isReady or not ns.db then
+        return
+    end
+
+    local entry = castLookup[spellID]
+    if not entry or entry.type ~= Data.BUFF.SERVICE then
+        return
+    end
+
+    -- Friendly players only, never ourselves.
+    if not UnitIsPlayer(unitTarget) or not UnitIsFriend("player", unitTarget) then
+        return
+    end
+    local creditGUID = UnitGUID(unitTarget)
+    if not creditGUID or creditGUID == playerGUID then
+        return
+    end
+    local creditName = GetUnitName(unitTarget, true)
+    if not creditName then
+        return
+    end
+
+    local cooldownKey = "service:" .. creditGUID
+    if not IsOnCooldown(cooldownKey) then
+        HandleTracked(entry, spellID, creditGUID, creditName, nil, playerGUID)
+        SetCooldown(cooldownKey)
+    end
+end
+
 local function OnLoadingScreenDisabled()
     StartSafetyTimer(Data.SAFETY_PAUSE)
 end
@@ -465,6 +585,7 @@ end
     seeds the watched list, warms the item cache, and arms the safety timer.
 ]]
 function ns.SetupBuffTracking()
+    playerGUID = UnitGUID("player")
     BuildLookups()
     PopulateWatchedBuffs()
     WarmItemCache()
@@ -472,5 +593,6 @@ function ns.SetupBuffTracking()
     StartSafetyTimer(Data.SAFETY_PAUSE)
 end
 
-ns.RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED", OnCombatLogEvent)
-ns.RegisterEvent("LOADING_SCREEN_DISABLED", OnLoadingScreenDisabled)
+ns.SetEventHandler("COMBAT_LOG_EVENT_UNFILTERED", OnCombatLogEvent)
+ns.SetEventHandler("UNIT_SPELLCAST_SUCCEEDED", OnUnitSpellcastSucceeded)
+ns.SetEventHandler("LOADING_SCREEN_DISABLED", OnLoadingScreenDisabled)
