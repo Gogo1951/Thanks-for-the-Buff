@@ -8,14 +8,14 @@ local _, ns = ...
     list: the whole panel is one category, so there are no inner headers.
 ]]
 
-function ns.GetServicesOptions()
-    local options = ns.BuildBuffPanel("SERVICES_TITLE", "SERVICES_DESC", "services")
+function ns.BuildServicesOptions()
+	local options = ns.BuildBuffPanel("TAB_SERVICES", "SERVICES_DESC", "services")
 
-    local entryOrder = 20
-    for _, entry in ipairs(ns.SortedEntries(ns.ServiceEntries or {})) do
-        options.args["entry_" .. entry.ids[1]] = ns.DefineEntryToggle(entry, entryOrder)
-        entryOrder = entryOrder + 1
-    end
+	local entryOrder = 20
+	for _, entry in ipairs(ns.SortedEntries(ns.ServiceEntries or {})) do
+		options.args["entry_" .. entry.ids[1]] = ns.DefineEntryToggle(entry, entryOrder)
+		entryOrder = entryOrder + 1
+	end
 
-    return options
+	return options
 end

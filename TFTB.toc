@@ -1,9 +1,6 @@
 ## Title: Thanks for the Buff (TFTB)
-## Notes: Automatically express appreciation with emotes and messages whenever you receive a buff — whether it's a stranger buffing you in the open world or a teammate popping a cooldown for you in combat.
+## Notes: Automatically thank players who buff you with emotes, whispers, and chat notifications, whether it's a stranger in the open world or a teammate's cooldown like Power Infusion or Innervate. Get a heads-up for feasts, portals, and same-class cooldowns too.
 ## Author: Gogo1951
-
-## IconTexture: Interface/AddOns/TFTB/Includes/Images/Thanks-for-the-Buff.tga
-## X-License: MIT
 
 ## Category-enUS: Buffs & Debuffs
 ## Category-deDE: Buffs & Debuffs
@@ -17,7 +14,10 @@
 ## Category-zhCN: 增益和减益
 ## Category-zhTW: 增益與減益
 
-## Interface: 11508, 20506
+## IconTexture: Interface/AddOns/TFTB/Includes/Images/Thanks-for-the-Buff.tga
+## X-License: MIT
+
+## Interface: 11509, 20506
 ## Version: @project-version@
 ## X-Curse-Project-ID: 1140285
 ## X-Wago-ID: 5NR8PeK3
@@ -51,6 +51,8 @@ Locales/zhTW.lua
 
 # Data
 Data/Data.lua
+Data/Tracked-Abilities.lua
+Data/Peer-Pressure-Abilities.lua
 Data/Default-Settings.lua
 
 # Features
@@ -58,6 +60,7 @@ Features/Core.lua
 Features/Utilities.lua
 Features/Announcements.lua
 Features/Buff-Tracking.lua
+Features/Peer-Pressure.lua
 Features/Thank-You-Button.lua
 Features/Diagnostics.lua
 
@@ -67,12 +70,13 @@ Options/Options-General.lua
 Options/Options-Buffs-from-Strangers.lua
 Options/Options-Buffs-from-Teammates.lua
 Options/Options-Buff-Services.lua
+Options/Options-Good-News.lua
+Options/Options-Peer-Pressure.lua
 Options/Options-Thank-You-Button.lua
 Options/Options-Profiles.lua
 Options/Options-Diagnostics.lua
 Options/Options.lua
 
 # Feedback Welcome! (=
-# Thanks for the Buff on CurseForge // https://www.curseforge.com/wow/addons/thanks-for-the-buff-revisited
 # Thanks for the Buff on GitHub // https://github.com/Gogo1951/Thanks-for-the-Buff
 # Thanks for the Buff on Discord // https://discord.gg/eh8hKq992Q
