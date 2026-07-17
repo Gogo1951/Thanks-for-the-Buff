@@ -12,19 +12,25 @@ local GetSpellTexture = ns.GetSpellTexture
 --------------------------------------------------------------------------------
 
 function ns.OptionsHeader(text, order)
-    return {type = "header", name = GetColor("TITLE") .. text .. "|r", order = order}
+	return { type = "header", name = GetColor("TITLE") .. text .. "|r", order = order }
 end
 
 function ns.OptionsDesc(text, order)
-    return {type = "description", name = text, fontSize = "medium", order = order}
+	return { type = "description", name = text, fontSize = "medium", order = order }
 end
 
 function ns.OptionsSpacer(order)
-    return {type = "description", name = " ", order = order}
+	return { type = "description", name = " ", order = order }
 end
 
 function ns.OptionsSubHeader(text, order, hidden)
-    return {type = "description", name = "\n" .. GetColor("TITLE") .. text .. "|r", fontSize = "medium", order = order, hidden = hidden}
+	return {
+		type = "description",
+		name = "\n" .. GetColor("TITLE") .. text .. "|r",
+		fontSize = "medium",
+		order = order,
+		hidden = hidden,
+	}
 end
 
 --------------------------------------------------------------------------------
@@ -50,95 +56,103 @@ end
     also carry an explicit `label` naming the whole group, since their per-rank
     item names differ. Either way the toggle flips every watched id in the entry
     and reads its state from the first.
+
+    `watched` is an optional accessor returning the id->bool table the toggle
+    binds to; it defaults to the shared thank-you list (watchedBuffs). The Buffs
+    Given panel passes its own list, since it reuses the same ids with
+    independent choices.
 ]]
-function ns.DefineEntryToggle(entry, order)
-    local ids = entry.ids
-    local primary = ids[1]
+function ns.DefineEntryToggle(entry, order, watched)
+	local ids = entry.ids
+	local primary = ids[1]
+	local function list()
+		return watched and watched() or ns.db.profile.watchedBuffs
+	end
 
-    local nameField, descField
+	local nameField, descField
 
-    if entry.itemId then
-        local itemId = entry.itemId
-        local groupLabel = entry.label
-        nameField = function()
-            local shown = groupLabel or ns.GetItemInfo(itemId) or L["COMBAT_ITEM_PENDING"]:format(itemId)
-            local texture = ns.GetItemIcon and ns.GetItemIcon(itemId)
-            if texture then
-                return "|T" .. texture .. ":16|t " .. shown
-            end
-            return shown
-        end
-        descField = function()
-            -- For a grouped toggle, list every member item (links) so the tooltip
-            -- spells out exactly what the single checkbox covers.
-            if entry.itemIds and #entry.itemIds > 1 then
-                local lines = {}
-                for _, id in ipairs(entry.itemIds) do
-                    lines[#lines + 1] = (select(2, ns.GetItemInfo(id))) or L["COMBAT_ITEM_PENDING"]:format(id)
-                end
-                return table.concat(lines, "\n")
-            end
-            return (select(2, ns.GetItemInfo(itemId))) or ""
-        end
-    else
-        local name = entry.spellName
-        local displayName = name
-        if primary then
-            local texture = GetSpellTexture and GetSpellTexture(primary)
-            if texture then
-                displayName = "|T" .. texture .. ":16|t " .. name
-            end
-        end
-        nameField = displayName
+	if entry.itemId then
+		local itemId = entry.itemId
+		local groupLabel = entry.label
+		nameField = function()
+			local shown = groupLabel or ns.GetItemInfo(itemId) or L["COMBAT_ITEM_PENDING"]:format(itemId)
+			local texture = ns.GetItemIcon and ns.GetItemIcon(itemId)
+			if texture then
+				return "|T" .. texture .. ":16|t " .. shown
+			end
+			return shown
+		end
+		descField = function()
+			-- For a grouped toggle, list every member item (links) so the tooltip
+			-- spells out exactly what the single checkbox covers.
+			if entry.itemIds and #entry.itemIds > 1 then
+				local lines = {}
+				for _, id in ipairs(entry.itemIds) do
+					lines[#lines + 1] = (select(2, ns.GetItemInfo(id))) or L["COMBAT_ITEM_PENDING"]:format(id)
+				end
+				return table.concat(lines, "\n")
+			end
+			return (select(2, ns.GetItemInfo(itemId))) or ""
+		end
+	else
+		local name = entry.spellName
+		local displayName = name
+		if primary then
+			local texture = GetSpellTexture and GetSpellTexture(primary)
+			if texture then
+				displayName = "|T" .. texture .. ":16|t " .. name
+			end
+		end
+		nameField = displayName
 
-        if entry.spellIds and #entry.spellIds > 1 then
-            -- Grouped spells (e.g. Portals): list the members alphabetically so the
-            -- tooltip spells out exactly what the one checkbox covers.
-            descField = function()
-                local names = {}
-                for _, id in ipairs(entry.spellIds) do
-                    names[#names + 1] = GetSpellName(id) or ("Spell " .. id)
-                end
-                table.sort(names)
-                return table.concat(names, "\n")
-            end
-        else
-            local desc = string.format(L["COMBAT_TOGGLE_TRACKING"], name)
-            if primary then
-                local spellDesc = GetSpellDescription and GetSpellDescription(primary)
-                if spellDesc and spellDesc ~= "" then
-                    desc = spellDesc
-                end
-            end
-            descField = desc
-        end
-    end
+		if entry.spellIds and #entry.spellIds > 1 then
+			-- Grouped spells (e.g. Portals): list the members alphabetically so the
+			-- tooltip spells out exactly what the one checkbox covers.
+			descField = function()
+				local names = {}
+				for _, id in ipairs(entry.spellIds) do
+					names[#names + 1] = GetSpellName(id) or L["COMBAT_SPELL_PENDING"]:format(id)
+				end
+				table.sort(names)
+				return table.concat(names, "\n")
+			end
+		else
+			local desc = string.format(L["COMBAT_TOGGLE_TRACKING"], name)
+			if primary then
+				local spellDesc = GetSpellDescription and GetSpellDescription(primary)
+				if spellDesc and spellDesc ~= "" then
+					desc = spellDesc
+				end
+			end
+			descField = desc
+		end
+	end
 
-    return {
-        type = "toggle",
-        name = nameField,
-        desc = descField,
-        order = order,
-        width = "full",
-        get = function()
-            return ns.db.profile.watchedBuffs[primary]
-        end,
-        set = function(_, val)
-            for _, id in ipairs(ids) do
-                ns.db.profile.watchedBuffs[id] = val
-            end
-        end
-    }
+	return {
+		type = "toggle",
+		name = nameField,
+		desc = descField,
+		order = order,
+		width = "full",
+		get = function()
+			return list()[primary]
+		end,
+		set = function(_, val)
+			for _, id in ipairs(ids) do
+				list()[id] = val
+			end
+		end,
+	}
 end
 
 -- The displayed name embeds an icon escape (|T...|t), so sorting by it would sort
 -- by texture path. This returns the clean, lowercased name for comparison only.
 local function EntrySortKey(entry)
-    local name = entry.label or entry.spellName
-    if not name and entry.itemId then
-        name = ns.GetItemInfo(entry.itemId)
-    end
-    return (name or ""):lower()
+	local name = entry.label or entry.spellName
+	if not name and entry.itemId then
+		name = ns.GetItemInfo(entry.itemId)
+	end
+	return (name or ""):lower()
 end
 
 -- A copy of `entries` ordered alphabetically by display name, with the watched id
@@ -146,107 +160,149 @@ end
 -- panels register their builders as functions (run on open, when the item cache
 -- is warm) rather than as prebuilt tables.
 function ns.SortedEntries(entries)
-    local sorted = {}
-    for i = 1, #entries do
-        sorted[i] = entries[i]
-    end
-    table.sort(sorted, function(a, b)
-        local ka, kb = EntrySortKey(a), EntrySortKey(b)
-        if ka == kb then
-            return (a.ids[1] or 0) < (b.ids[1] or 0)
-        end
-        return ka < kb
-    end)
-    return sorted
+	local sorted = {}
+	for i = 1, #entries do
+		sorted[i] = entries[i]
+	end
+	table.sort(sorted, function(a, b)
+		local ka, kb = EntrySortKey(a), EntrySortKey(b)
+		if ka == kb then
+			return (a.ids[1] or 0) < (b.ids[1] or 0)
+		end
+		return ka < kb
+	end)
+	return sorted
+end
+
+--[[
+    The "Enable Sound Effect" toggle. Lives here (not in the shared BuildBuffPanel
+    scaffold) because only Strangers and Teammates offer sound -- Group Services
+    deliberately has none. NOT full-width: its DefineSoundPreview speaker shares the
+    row, and full-width would push the speaker onto its own line.
+]]
+function ns.DefineSoundToggle(settings, order)
+	return {
+		type = "toggle",
+		name = L["MESSAGING_SOUND_ENABLE"],
+		desc = L["MESSAGING_SOUND_DESC"],
+		order = order,
+		get = function()
+			return settings().soundEnabled
+		end,
+		set = function(_, val)
+			settings().soundEnabled = val
+		end,
+	}
+end
+
+--[[
+    The speaker icon that previews a panel's sound effect, placed on the same
+    row right after its "Enable Sound Effect" toggle. It plays regardless of the
+    toggle's state -- hearing the sound BEFORE enabling it is the point. The
+    texture is the client's own voice-chat speaker, so it matches the UI in
+    every locale without shipping art.
+]]
+function ns.DefineSoundPreview(playSound, order, hidden)
+	return {
+		type = "execute",
+		name = "",
+		image = "Interface\\Common\\VoiceChat-Speaker",
+		imageWidth = 18,
+		imageHeight = 18,
+		width = 0.15,
+		order = order,
+		hidden = hidden,
+		func = playSound,
+	}
 end
 
 -- Title, description, messaging toggles, and the emote picker -- everything both
 -- panels share. `settingsKey` is "teammates" or "services"; the caller appends
 -- its own tracked list afterward.
 function ns.BuildBuffPanel(titleKey, descKey, settingsKey)
-    local function settings()
-        return ns.db.profile[settingsKey]
-    end
-    local function EmotesHidden()
-        return not settings().emotesEnabled
-    end
+	local function settings()
+		return ns.db.profile[settingsKey]
+	end
+	local function EmotesHidden()
+		return not settings().emotesEnabled
+	end
 
-    local options = {
-        name = L[titleKey],
-        type = "group",
-        args = {
-            descIntro = ns.OptionsDesc(L[descKey], 1),
-            space0 = ns.OptionsSpacer(2),
-            headerMessaging = ns.OptionsSubHeader(L["COMBAT_MESSAGING"], 5),
-            printOut = {
-                type = "toggle",
-                name = L["MESSAGING_PRINT_ENABLE"],
-                desc = L["MESSAGING_PRINT_DESC"],
-                width = "full",
-                order = 6,
-                get = function()
-                    return settings().printEnabled
-                end,
-                set = function(_, val)
-                    settings().printEnabled = val
-                end
-            },
-            whisper = {
-                type = "toggle",
-                name = L["MESSAGING_WHISPER_ENABLE"],
-                desc = L["MESSAGING_WHISPER_DESC"],
-                width = "full",
-                order = 7,
-                get = function()
-                    return settings().whisperEnabled
-                end,
-                set = function(_, val)
-                    settings().whisperEnabled = val
-                end
-            },
-            emotes = {
-                type = "toggle",
-                name = L["MESSAGING_EMOTES_ENABLE"],
-                desc = L["MESSAGING_EMOTES_DESC"],
-                width = "full",
-                order = 8,
-                get = function()
-                    return settings().emotesEnabled
-                end,
-                set = function(_, val)
-                    settings().emotesEnabled = val
-                end
-            },
-            emoteSpacer = {type = "description", name = " ", order = 9, hidden = EmotesHidden},
-            emoteGroup = {
-                type = "group",
-                name = L["COMBAT_EMOTES_SELECT"],
-                order = 10,
-                inline = true,
-                hidden = EmotesHidden,
-                args = {}
-            },
-            headerTracked = ns.OptionsSubHeader(L["COMBAT_TRACKED"], 12),
-            space2 = ns.OptionsSpacer(13)
-        }
-    }
+	local options = {
+		name = L[titleKey],
+		type = "group",
+		args = {
+			descIntro = ns.OptionsDesc(L[descKey], 1),
+			space0 = ns.OptionsSpacer(2),
+			headerMessaging = ns.OptionsSubHeader(L["MESSAGING_HEADER"], 5),
+			printOut = {
+				type = "toggle",
+				name = L["MESSAGING_PRINT_ENABLE"],
+				desc = L["MESSAGING_PRINT_DESC"],
+				width = "full",
+				order = 6,
+				get = function()
+					return settings().printEnabled
+				end,
+				set = function(_, val)
+					settings().printEnabled = val
+				end,
+			},
+			whisper = {
+				type = "toggle",
+				name = L["MESSAGING_WHISPER_ENABLE"],
+				desc = L["MESSAGING_WHISPER_DESC"],
+				width = "full",
+				order = 7,
+				get = function()
+					return settings().whisperEnabled
+				end,
+				set = function(_, val)
+					settings().whisperEnabled = val
+				end,
+			},
+			emotes = {
+				type = "toggle",
+				name = L["MESSAGING_EMOTES_ENABLE"],
+				desc = L["MESSAGING_EMOTES_DESC"],
+				width = "full",
+				order = 8,
+				get = function()
+					return settings().emotesEnabled
+				end,
+				set = function(_, val)
+					settings().emotesEnabled = val
+				end,
+			},
+			emoteSpacer = { type = "description", name = " ", order = 9, hidden = EmotesHidden },
+			emoteGroup = {
+				type = "group",
+				name = L["MESSAGING_EMOTES_SELECT"],
+				order = 10,
+				inline = true,
+				hidden = EmotesHidden,
+				args = {},
+			},
+			headerTracked = ns.OptionsSubHeader(L["COMBAT_TRACKED"], 12),
+			space2 = ns.OptionsSpacer(13),
+		},
+	}
 
-    for i, emoteData in ipairs(Data.EMOTES) do
-        local emote = emoteData.cmd
-        options.args.emoteGroup.args[emote] = {
-            type = "toggle",
-            name = emoteData.displayName,
-            desc = emoteData.desc,
-            order = i,
-            width = "half",
-            get = function()
-                return settings().emotes[emote]
-            end,
-            set = function(_, val)
-                settings().emotes[emote] = val
-            end
-        }
-    end
+	for i, emoteData in ipairs(Data.EMOTES) do
+		local emote = emoteData.cmd
+		options.args.emoteGroup.args[emote] = {
+			type = "toggle",
+			name = emoteData.displayName,
+			desc = emoteData.desc,
+			order = i,
+			width = "half",
+			get = function()
+				return settings().emotes[emote]
+			end,
+			set = function(_, val)
+				settings().emotes[emote] = val
+			end,
+		}
+	end
 
-    return options
+	return options
 end

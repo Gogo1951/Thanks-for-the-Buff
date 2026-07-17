@@ -9,29 +9,37 @@ local _, ns = ...
     the generic Items group.
 ]]
 
-function ns.GetTeammatesOptions()
-    local options = ns.BuildBuffPanel("TEAMMATES_TITLE", "TEAMMATES_DESC", "teammates")
+function ns.BuildTeammatesOptions()
+	local options = ns.BuildBuffPanel("TAB_TEAMMATES", "TEAMMATES_DESC", "teammates")
 
-    -- One inline group per category (each class, then Items), built at login.
-    local categoryOrder = 20
-    for _, category in ipairs(ns.TeammateCategories or {}) do
-        local groupKey = "cat_" .. category.id
-        options.args[groupKey] = {
-            type = "group",
-            name = category.name,
-            order = categoryOrder,
-            inline = true,
-            args = {}
-        }
+	-- Added here, not in the shared scaffold: Group Services has no sound option.
+	-- 8.5/8.6 slot the toggle and its preview speaker right after the scaffold's
+	-- Enable Emotes toggle (order 8).
+	options.args.sound = ns.DefineSoundToggle(function()
+		return ns.db.profile.teammates
+	end, 8.5)
+	options.args.soundPreview = ns.DefineSoundPreview(ns.PlayTeammateSound, 8.6)
 
-        local entryOrder = 1
-        for _, entry in ipairs(ns.SortedEntries(category.entries)) do
-            options.args[groupKey].args["entry_" .. entry.ids[1]] = ns.DefineEntryToggle(entry, entryOrder)
-            entryOrder = entryOrder + 1
-        end
+	-- One inline group per category (each class, then Items), built at login.
+	local categoryOrder = 20
+	for _, category in ipairs(ns.TeammateCategories or {}) do
+		local groupKey = "cat_" .. category.id
+		options.args[groupKey] = {
+			type = "group",
+			name = category.name,
+			order = categoryOrder,
+			inline = true,
+			args = {},
+		}
 
-        categoryOrder = categoryOrder + 1
-    end
+		local entryOrder = 1
+		for _, entry in ipairs(ns.SortedEntries(category.entries)) do
+			options.args[groupKey].args["entry_" .. entry.ids[1]] = ns.DefineEntryToggle(entry, entryOrder)
+			entryOrder = entryOrder + 1
+		end
 
-    return options
+		categoryOrder = categoryOrder + 1
+	end
+
+	return options
 end
