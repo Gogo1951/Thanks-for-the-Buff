@@ -1,33 +1,35 @@
 # Thanks for the Buff (TFTB)
 
-Automatically express appreciation with emotes and messages whenever you receive a buff — whether it's a stranger buffing you in the open world or a teammate popping a cooldown for you in combat.
+Automatically thank players who buff you with emotes, whispers, and chat notifications, whether it's a stranger in the open world or a teammate's cooldown like Power Infusion or Innervate. Get a heads-up for feasts, portals, and same-class cooldowns too.
 
 ## Features
 
-- 👋 **Buffs from Strangers** // When a player outside your group buffs you out in the world, react with a random emote (cheer, salute, thank, and more) — with a cooldown and a minimum-duration filter so it never turns into spam.
-- 🛡️ **Buffs from Teammates** // Know the instant a groupmate spends a cooldown on you — Power Infusion, Innervate, Lay on Hands, Misdirection, Hand of Protection — with a chat note or an automatic whisper of thanks.
-- 🍖 **Group Services** // Get a heads-up when someone sets out a feast, drops a soulwell, opens a portal, or puts down a repair bot for the group.
-- 🙏 **Thank You Button** // A one-click `- Thank` macro that emotes at your target and whispers them a personal thank-you — perfect for healers, a mage's portal, or a warlock's summon.
-- 🦺 **Safety First** // Only ever emotes and sends chat — never casts a spell or spends one of your cooldowns — and holds emotes until you're out of combat.
+🙌 **Every Buff Gets a Thank-You** // A stranger's world buff or a teammate's cooldown (Power Infusion, Innervate, Lay on Hands) triggers an emote, a chat note, or an automatic whisper — with anti-spam cooldowns and a minimum-duration filter so it never turns spammy.
+
+🍖 **Group Services** // Get a heads-up when someone sets out a feast, drops a soulwell, opens a portal, or puts down a repair bot for the group.
+
+📣 **Send Good News** // Automatically whisper the players you buff to tell them what they got and how long it lasts — perfect for Power Infusion, Blessing of Kings, or a clutch Innervate.
+
+🚂 **Peer Pressure** // Get pinged the moment another player of your class pops a cooldown, so you can hop on and stack yours too.
+
+🙏 **Thank You Button** // A one-click `- Thank` macro that emotes at your target and whispers them a personal thank-you — great for a healer, a mage's portal, or a warlock's summon.
 
 ## Setup
 
-1. **Install** from [CurseForge](https://www.curseforge.com/wow/addons/thanks-for-the-buff-revisited).
+1. Install the add-on, ideally using [CurseForge](https://www.curseforge.com/wow/addons/thanks-for-the-buff-revisited) or [Wago](https://addons.wago.io/addons/thanks-for-the-buff).
 2. Log in — sensible defaults are already on, so a teammate's buffs start printing to your chat right away.
-3. Type `/tftb` to choose how you react to each kind of buff — chat note, whisper, emote, or any mix — and pick which emotes to use.
+3. Type `/tftb` to choose how you react to each kind of buff — chat note, whisper, emote, sound, or any mix — and pick which emotes to use.
 4. Out in the world, strangers' buffs get an automatic emote; set the cooldown and minimum duration so it stays classy.
 5. Drag the auto-created `- Thank` macro to your action bar to thank your target on demand.
 6. *"Manners maketh the raid."*
 
 ## How It Works
 
-Type `/tftb` to open the options panel. Each kind of buff — from strangers, from teammates, and group services — gets its own tab, where you choose how to react: a self-only chat note, an automatic whisper to whoever helped you, an emote, or any combination. You can also toggle individual abilities and items on or off.
-
-<img width="800" src="https://github.com/user-attachments/assets/0df2e8a3-b05d-4e8d-8846-f4de6c454eef" />
+Type `/tftb` to open the options panel. Buffs from strangers, buffs from teammates, and group services each get their own tab, where you choose how to react: a self-only chat note, an automatic whisper to whoever helped you, an emote, a sound, or any combination. Good News whispers the people you buff, and Peer Pressure pings you when a same-class player pops a cooldown. You can toggle individual abilities and items on or off anywhere they appear.
 
 ### Tracked Abilities
 
-| Class | Abilities |
+| Class | Buffs & Cooldowns |
 | --- | --- |
 | Death Knight | Unholy Frenzy |
 | Druid | Innervate, Rebirth |
@@ -39,7 +41,7 @@ Type `/tftb` to open the options panel. Each kind of buff — from strangers, fr
 | Shaman | Bloodlust, Heroism, Water Breathing, Water Walking |
 | Warlock | Soulstone, Unending Breath |
 | Warrior | Intervene, Vigilance |
-| Group Services | Portals, Soulwells, Summons, Refreshment Tables, Feasts, Resistance Cauldrons, Repair Bots |
+| Group Services | Feasts, Refreshment Tables, Soulwells, Portals, Summons, Resistance Cauldrons, Repair Bots, MOLL-E |
 | Items | Drums, Scrolls, Jumper Cables |
 
 ### Slash Commands
@@ -47,11 +49,13 @@ Type `/tftb` to open the options panel. Each kind of buff — from strangers, fr
 | Command | Effect |
 | --- | --- |
 | `/tftb` | Open the options panel |
-| `/thankyou` | Emote and whisper your targeted player |
+| `/thankyou` | Emote at and whisper your current target |
+
+<img width="800" src="https://github.com/user-attachments/assets/a77bd74a-18e4-4e89-bc74-13c5c86052f7" />
 
 ## Testing & Localization Status
 
-🟢 World of Warcraft Classic (🟡 Season of Discovery) // WoW 1.15.8
+🟢 World of Warcraft Classic (🟡 Season of Discovery) // WoW 1.15.9
 
 🟢 Burning Crusade Anniversary // WoW 2.5.6
 
@@ -65,7 +69,6 @@ Please reach out if you would like to be involved!
 
 ## Links
 
-- [CurseForge](https://www.curseforge.com/wow/addons/thanks-for-the-buff-revisited)
 - [GitHub](https://github.com/Gogo1951/Thanks-for-the-Buff)
 - [Discord](https://discord.gg/eh8hKq992Q)
 
