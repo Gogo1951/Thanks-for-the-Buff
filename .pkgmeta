@@ -20,7 +20,6 @@ externals:
 ignore:
   - .DS_Store
   - .git
-  - .gitattributes
   - .github
   - .gitignore
   - .idea
