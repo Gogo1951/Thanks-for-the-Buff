@@ -152,21 +152,21 @@ function ns:AnnounceTracked(entry, creditGUID, creditName, spellID, printEnabled
 		local name = ColorName(creditGUID, creditName)
 		local message
 		if entry.type == Data.BUFF.SERVICE then
-			message = (entry.opened and L["MSG_OPENED"] or L["MSG_SET_OUT"]):format(name, link)
+			message = (entry.opened and L["MESSAGE_OPENED"] or L["MESSAGE_SET_OUT"]):format(name, link)
 		elseif entry.type == Data.BUFF.GROUP then
-			message = L["MSG_GAVE_GROUP"]:format(name, link)
+			message = L["MESSAGE_GAVE_GROUP"]:format(name, link)
 		elseif entry.itemId then
-			message = L["MSG_USED_ITEM"]:format(name, Possessive(creditGUID), link)
+			message = L["MESSAGE_USED_ITEM"]:format(name, Possessive(creditGUID), link)
 		elseif entry.detect == Data.DETECT.CAST then
-			message = L["MSG_USED_SPELL"]:format(name, link)
+			message = L["MESSAGE_USED_SPELL"]:format(name, link)
 		else
-			message = L["MSG_GAVE_YOU"]:format(name, link)
+			message = L["MESSAGE_GAVE_YOU"]:format(name, link)
 		end
 		ns:PrintMessage(message)
 	end
 
 	if whisperEnabled then
-		ns:Announce("WHISPER", creditName, "MSG_WHISPER_THANKS", link)
+		ns:Announce("WHISPER", creditName, "MESSAGE_WHISPER_THANKS", link)
 	end
 end
 
@@ -184,9 +184,9 @@ function ns:BuildPeerPressureMessage(class, sourceName, spellID, targetName)
 	local link = (ns.GetSpellLink(spellID) or L["UNKNOWN_SPELL"]) .. color
 	local body
 	if targetName then
-		body = L["MSG_PEER_PRESSURE_TARGET"]:format(sourceName, link, targetName)
+		body = L["MESSAGE_PEER_PRESSURE_TARGET"]:format(sourceName, link, targetName)
 	else
-		body = L["MSG_PEER_PRESSURE"]:format(sourceName, link)
+		body = L["MESSAGE_PEER_PRESSURE"]:format(sourceName, link)
 	end
 	return color .. body .. "|r"
 end
@@ -198,10 +198,10 @@ end
 -- Any helpful buff from a non-grouped friendly player.
 function ns:AnnounceStranger(sourceGUID, sourceName, link, printEnabled, whisperEnabled)
 	if printEnabled then
-		ns:PrintMessage(L["MSG_BUFFED"]:format(ColorName(sourceGUID, sourceName), link))
+		ns:PrintMessage(L["MESSAGE_BUFFED"]:format(ColorName(sourceGUID, sourceName), link))
 	end
 	if whisperEnabled then
-		ns:Announce("WHISPER", sourceName, "MSG_WHISPER_THANKS", link)
+		ns:Announce("WHISPER", sourceName, "MESSAGE_WHISPER_THANKS", link)
 	end
 end
 
@@ -305,9 +305,9 @@ function ns:AnnounceGoodNews(entry, destName, spellID, duration)
 	local link = GetLink(entry, spellID)
 	local message
 	if duration and duration > 0 then
-		message = ns:BuildAnnounceMessage("MSG_GOODNEWS_DURATION", link, FormatDuration(duration))
+		message = ns:BuildAnnounceMessage("MESSAGE_GOOD_NEWS_DURATION", link, FormatDuration(duration))
 	else
-		message = ns:BuildAnnounceMessage("MSG_GOODNEWS", link)
+		message = ns:BuildAnnounceMessage("MESSAGE_GOOD_NEWS", link)
 	end
 	if message then
 		QueueWhisper(destName, message)

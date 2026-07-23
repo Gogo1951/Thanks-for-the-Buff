@@ -19,7 +19,7 @@ function ns.BuildGeneralOptions()
 			enableWelcome = {
 				type = "toggle",
 				name = L["OPTIONS_WELCOME_TOGGLE"],
-				desc = L["OPTIONS_WELCOME_DESC"],
+				desc = L["OPTIONS_WELCOME_DESCRIPTION"],
 				width = "full",
 				order = 4,
 				get = function()
@@ -35,16 +35,16 @@ function ns.BuildGeneralOptions()
 			spaceCommands1 = ns.OptionsSpacer(7),
 			descCommands = ns.OptionsDesc(
 				GetColor("INFO")
-					.. L["OPTIONS_CMD_TFTB"]
+					.. L["OPTIONS_COMMAND_TFTB"]
 					.. "|r"
 					.. "  "
-					.. L["OPTIONS_CMD_TFTB_DESC"]
+					.. L["OPTIONS_COMMAND_TFTB_DESCRIPTION"]
 					.. "\n\n"
 					.. GetColor("INFO")
-					.. L["OPTIONS_CMD_THANKYOU"]
+					.. L["OPTIONS_COMMAND_THANKYOU"]
 					.. "|r"
 					.. "  "
-					.. L["OPTIONS_CMD_THANKYOU_DESC"],
+					.. L["OPTIONS_COMMAND_THANKYOU_DESCRIPTION"],
 				8
 			),
 			-- Feedback & Support (house order: Discord, GitHub, CurseForge, Wago)

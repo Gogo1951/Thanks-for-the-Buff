@@ -26,12 +26,12 @@ function ns.BuildGoodNewsOptions()
 		name = L["TAB_GOOD_NEWS"],
 		type = "group",
 		args = {
-			descIntro = ns.OptionsDesc(L["GOOD_NEWS_DESC"], 1),
+			descIntro = ns.OptionsDesc(L["GOOD_NEWS_DESCRIPTION"], 1),
 			space0 = ns.OptionsSpacer(2),
 			enable = {
 				type = "toggle",
 				name = L["GOOD_NEWS_WHISPER_ENABLE"],
-				desc = L["GOOD_NEWS_WHISPER_DESC"],
+				desc = L["GOOD_NEWS_WHISPER_DESCRIPTION"],
 				order = 5,
 				get = function()
 					return ns.db.profile.goodNews.whisperEnabled
@@ -73,7 +73,7 @@ function ns.BuildGoodNewsOptions()
 				type = "description",
 				name = function()
 					local link = ns.GetSpellLink(10060) or "" -- Power Infusion
-					local message = ns:BuildAnnounceMessage("MSG_GOODNEWS_DURATION", link, ns.FormatDuration(15))
+					local message = ns:BuildAnnounceMessage("MESSAGE_GOOD_NEWS_DURATION", link, ns.FormatDuration(15))
 					return "   "
 						.. message:gsub(ns.TARGET_MARKER, "|TInterface\\TargetingFrame\\UI-RaidTargetingIcon_1:14|t", 1)
 						.. "\n"

@@ -1,11 +1,6 @@
 local _, ns = ...
 local L = ns.L
 
--- Category id for the top-level options panel, captured from AddToBlizOptions at
--- registration so OpenOptions can jump straight to it instead of resolving the
--- category by title string (fragile: the id is numeric on newer clients).
-local optionsCategoryID
-
 --------------------------------------------------------------------------------
 -- Registration
 --------------------------------------------------------------------------------
@@ -17,9 +12,12 @@ function ns.SetupOptions()
 	local parent = L["ADDON_TITLE"]
 
 	AC:RegisterOptionsTable(registry.General, ns.BuildGeneralOptions())
-	-- AddToBlizOptions returns (frame, categoryID); keep the id for OpenOptions.
-	local _, categoryID = ACD:AddToBlizOptions(registry.General, parent)
-	optionsCategoryID = categoryID
+	-- AddToBlizOptions returns (frame, categoryID). Both are kept: the opener
+	-- routes by the captured id, then by the captured frame, and never resolves
+	-- the panel by title -- a name lookup returns nil on clients that carry the
+	-- Settings API, which is what makes the panel open as a floating window.
+	local mainPanel, mainCategoryID = ACD:AddToBlizOptions(registry.General, parent)
+	ns.optionsFrames = { main = mainPanel, categoryID = mainCategoryID }
 
 	if ns.BuildStrangersOptions then
 		AC:RegisterOptionsTable(registry.Strangers, ns.BuildStrangersOptions())
@@ -69,20 +67,27 @@ function ns.SetupOptions()
 
 	SLASH_TFTB_CONFIG1 = "/tftb"
 	SlashCmdList.TFTB_CONFIG = function()
-		ns.OpenOptions()
+		ns:OpenOptionsPanel()
 	end
 end
 
-function ns.OpenOptions()
-	if Settings and Settings.OpenToCategory and optionsCategoryID then
-		Settings.OpenToCategory(optionsCategoryID)
+function ns:OpenOptionsPanel()
+	if not ns.optionsFrames then
 		return
 	end
+
+	if Settings and Settings.OpenToCategory and ns.optionsFrames.categoryID then
+		Settings.OpenToCategory(ns.optionsFrames.categoryID)
+		return
+	end
+
 	if InterfaceOptionsFrame_OpenToCategory then
-		InterfaceOptionsFrame_OpenToCategory(L["ADDON_TITLE"])
-		InterfaceOptionsFrame_OpenToCategory(L["ADDON_TITLE"])
+		InterfaceOptionsFrame_OpenToCategory(ns.optionsFrames.main)
+		-- Called twice for Classic compatibility
+		InterfaceOptionsFrame_OpenToCategory(ns.optionsFrames.main)
 		return
 	end
+
 	LibStub("AceConfigDialog-3.0"):Open(ns.OPTIONS_REGISTRY.General)
 end
 

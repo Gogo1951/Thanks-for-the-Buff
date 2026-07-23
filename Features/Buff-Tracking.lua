@@ -494,7 +494,7 @@ local function HandleTracked(entry, spellID, creditGUID, creditName, destGUID, p
 	-- cast, in or out of combat. Services never define soundEnabled (no sound
 	-- option on that panel), so this is teammates-only by construction.
 	if db.soundEnabled then
-		ns.PlayTeammateSound()
+		ns.PlayBuffSound()
 	end
 
 	-- Emotes are visible and social, so they are held back until you leave combat.
@@ -531,7 +531,7 @@ local function HandleStrangersBuff(sourceGUID, sourceName, spellID)
 	ns:AnnounceStranger(sourceGUID, sourceName, spellLink, db.printEnabled, whisperAllowed)
 
 	if db.soundEnabled then
-		ns.PlayStrangerSound()
+		ns.PlayBuffSound()
 	end
 
 	if db.emotesEnabled and not InCombatLockdown() and not IsOnCooldown(sourceGUID) then
@@ -742,14 +742,17 @@ local function OnCombatLogEvent()
         group members' untracked buffs in a raid -- bails here so combat log
         processing stays cheap, using the affiliation flag instead of a UnitIn*
         scan to recognize an outsider.
+
+        Ordered cheapest first, so a cast event or an aura landing on anyone but
+        you stops at a comparison before the GUID check allocates. Only that GUID
+        check proves the source is a player (a pet's doesn't, whatever its flags
+        claim); the flags then say whose side they're on and which group.
     ]]
-	-- The GUID says whether the source is a player (a pet's isn't, whatever its
-	-- flags claim); the flags say whose side they're on and which group.
-	local sourceIsOutsider = ns.IsPlayerGUID(sourceGUID)
+	local maybeStranger = isAura
+		and destGUID == playerGUID
+		and ns.IsPlayerGUID(sourceGUID)
 		and bit.band(sourceFlags or 0, COMBATLOG_OBJECT_REACTION_FRIENDLY) > 0
 		and bit.band(sourceFlags or 0, COMBATLOG_OBJECT_AFFILIATION_OUTSIDER) > 0
-
-	local maybeStranger = isAura and destGUID == playerGUID and sourceIsOutsider
 
 	if not entry and not maybeStranger then
 		return
@@ -792,6 +795,10 @@ end
     which is also why solo casts (Rebirth, Lay on Hands) stay on the combat log,
     where the destination tells us the buff actually landed on you.
 
+    That same breadth is why the caster is filtered to your party or raid below:
+    the event's reach is much wider than the feature's, and a service cast by
+    someone you merely have targeted was never meant to announce.
+
     The per-source "service:" cooldown does double duty: it rate-limits a mage
     opening several portals in a row, and it dedupes the multiple tokens a single
     cast can fire (party1 and target for the same caster resolve to one GUID, so the
@@ -816,8 +823,17 @@ local function OnUnitSpellcastSucceeded(unitTarget, castGUID, spellID)
 		return
 	end
 
-	-- Friendly players only, never ourselves.
-	if not UnitIsPlayer(unitTarget) or not UnitIsFriend("player", unitTarget) then
+	-- Group members only, never ourselves. The event fires for every unit the
+	-- client tracks, so without the group test a stranger opening a portal
+	-- across a capital city reads as a service to us -- and "Group Services" is
+	-- the whole promise of the panel. Being in the group subsumes the old
+	-- friendly-player test; UnitIsPlayer stays to drop group pets, which the
+	-- group calls don't distinguish. A battleground IS a raid, so it needs no
+	-- case of its own.
+	if not UnitIsPlayer(unitTarget) then
+		return
+	end
+	if not (UnitInParty(unitTarget) or UnitInRaid(unitTarget)) then
 		return
 	end
 	local creditGUID = UnitGUID(unitTarget)

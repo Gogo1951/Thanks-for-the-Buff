@@ -72,12 +72,14 @@ ns.DATABASE_DEFAULTS = {
 		},
 		-- Peer Pressure: alert when another player of your class pops
 		-- a cooldown from Data.PEER_PRESSURE -- or you do, while triggerOnOwnCasts is on.
-		-- Self-only reactions, so everything defaults on; the watched list
-		-- seeds from the per-flavor digits in Data/Peer-Pressure-Abilities.lua.
+		-- Self-only reactions, so they default on -- except own casts, which are
+		-- opt-in: you already know what you just pressed, and the point of the
+		-- feature is what everyone else is doing. The watched list seeds from
+		-- the per-flavor digits in Data/Peer-Pressure-Abilities.lua.
 		peerPressure = {
 			enabled = true,
 			printEnabled = true,
-			triggerOnOwnCasts = true,
+			triggerOnOwnCasts = false,
 			soundEnabled = true,
 			watched = {},
 		},

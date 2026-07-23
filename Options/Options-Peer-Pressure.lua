@@ -25,7 +25,7 @@ function ns.BuildPeerPressureOptions()
 		name = L["TAB_PEER_PRESSURE"],
 		type = "group",
 		args = {
-			descIntro = ns.OptionsDesc(L["PEER_PRESSURE_DESC"], 1),
+			descIntro = ns.OptionsDesc(L["PEER_PRESSURE_DESCRIPTION"], 1),
 			space0 = ns.OptionsSpacer(2),
 			enable = {
 				type = "toggle",
@@ -43,7 +43,7 @@ function ns.BuildPeerPressureOptions()
 			printOut = {
 				type = "toggle",
 				name = L["MESSAGING_PRINT_ENABLE"],
-				desc = L["PEER_PRESSURE_PRINT_DESC"],
+				desc = L["PEER_PRESSURE_PRINT_DESCRIPTION"],
 				width = "full",
 				order = 6,
 				hidden = PeerPressureHidden,
@@ -57,7 +57,7 @@ function ns.BuildPeerPressureOptions()
 			ownCasts = {
 				type = "toggle",
 				name = L["PEER_PRESSURE_OWN_CASTS"],
-				desc = L["PEER_PRESSURE_OWN_CASTS_DESC"],
+				desc = L["PEER_PRESSURE_OWN_CASTS_DESCRIPTION"],
 				width = "full",
 				order = 6.5,
 				hidden = PeerPressureHidden,
@@ -72,7 +72,7 @@ function ns.BuildPeerPressureOptions()
 			sound = {
 				type = "toggle",
 				name = L["MESSAGING_SOUND_ENABLE"],
-				desc = L["PEER_PRESSURE_SOUND_DESC"],
+				desc = L["PEER_PRESSURE_SOUND_DESCRIPTION"],
 				order = 7,
 				hidden = PeerPressureHidden,
 				get = function()

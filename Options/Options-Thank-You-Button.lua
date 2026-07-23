@@ -13,12 +13,15 @@ function ns.BuildThankYouButtonOptions()
 		name = L["TAB_THANK_YOU_BUTTON"],
 		type = "group",
 		args = {
-			descIntro = ns.OptionsDesc(L["BUTTON_DESC"], 1),
+			descIntro = ns.OptionsDesc(L["BUTTON_DESCRIPTION"], 1),
 			space0 = ns.OptionsSpacer(2),
 			createMacro = {
 				type = "toggle",
 				name = L["BUTTON_CREATE_MACRO"],
-				desc = string.format(L["BUTTON_CREATE_MACRO_DESC"], GetColor("TITLE") .. Data.MACRO_NAME .. "|r"),
+				desc = string.format(
+					L["BUTTON_CREATE_MACRO_DESCRIPTION"],
+					GetColor("TITLE") .. Data.MACRO_NAME .. "|r"
+				),
 				width = "full",
 				order = 10,
 				get = function()
@@ -44,7 +47,7 @@ function ns.BuildThankYouButtonOptions()
 			resetMsg = {
 				type = "execute",
 				name = L["BUTTON_RESET"],
-				desc = L["BUTTON_RESET_DESC"],
+				desc = L["BUTTON_RESET_DESCRIPTION"],
 				width = "half",
 				order = 21,
 				func = function()

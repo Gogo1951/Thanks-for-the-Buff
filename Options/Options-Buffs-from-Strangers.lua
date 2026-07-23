@@ -15,13 +15,13 @@ function ns.BuildStrangersOptions()
 		name = L["TAB_STRANGERS"],
 		type = "group",
 		args = {
-			descIntro = ns.OptionsDesc(L["STRANGERS_DESC"], 1),
+			descIntro = ns.OptionsDesc(L["STRANGERS_DESCRIPTION"], 1),
 			space0 = ns.OptionsSpacer(2),
 			headerMessaging = ns.OptionsSubHeader(L["MESSAGING_HEADER"], 5),
 			printStrangers = {
 				type = "toggle",
 				name = L["MESSAGING_PRINT_ENABLE"],
-				desc = L["MESSAGING_PRINT_DESC"],
+				desc = L["MESSAGING_PRINT_DESCRIPTION"],
 				width = "full",
 				order = 6,
 				get = function()
@@ -34,7 +34,7 @@ function ns.BuildStrangersOptions()
 			whisperStrangers = {
 				type = "toggle",
 				name = L["MESSAGING_WHISPER_ENABLE"],
-				desc = L["MESSAGING_WHISPER_DESC"],
+				desc = L["MESSAGING_WHISPER_DESCRIPTION"],
 				width = "full",
 				order = 7,
 				get = function()
@@ -47,7 +47,7 @@ function ns.BuildStrangersOptions()
 			enableEmotesStrangers = {
 				type = "toggle",
 				name = L["MESSAGING_EMOTES_ENABLE"],
-				desc = L["MESSAGING_EMOTES_DESC"],
+				desc = L["MESSAGING_EMOTES_DESCRIPTION"],
 				width = "full",
 				order = 8,
 				get = function()
@@ -63,7 +63,7 @@ function ns.BuildStrangersOptions()
 			soundStrangers = ns.DefineSoundToggle(function()
 				return ns.db.profile.strangers
 			end, 8.5),
-			soundPreviewStrangers = ns.DefineSoundPreview(ns.PlayStrangerSound, 8.6),
+			soundPreviewStrangers = ns.DefineSoundPreview(ns.PlayBuffSound, 8.6),
 			emoteSpacer = { type = "description", name = " ", order = 9, hidden = EmotesHidden },
 			strangersEmoteGroup = {
 				type = "group",
@@ -77,7 +77,7 @@ function ns.BuildStrangersOptions()
 			cooldownStrangers = {
 				type = "range",
 				name = L["STRANGERS_COOLDOWN"],
-				desc = L["STRANGERS_COOLDOWN_DESC"],
+				desc = L["STRANGERS_COOLDOWN_DESCRIPTION"],
 				order = 20,
 				width = "double",
 				min = 1,
@@ -94,7 +94,7 @@ function ns.BuildStrangersOptions()
 			minDurationStrangers = {
 				type = "range",
 				name = L["STRANGERS_MIN_DURATION"],
-				desc = L["STRANGERS_MIN_DURATION_DESC"],
+				desc = L["STRANGERS_MIN_DURATION_DESCRIPTION"],
 				order = 22,
 				width = "double",
 				min = 0,
