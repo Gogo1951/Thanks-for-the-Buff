@@ -50,7 +50,7 @@ local function LiftInto(dst, src)
 end
 
 --[[
-    MIGRATION (remove after 2026-10-05): lift the pre-AceDB flat layout into the
+    MIGRATION (remove after 2026-08-15): lift the pre-AceDB flat layout into the
     AceDB profile. Settings used to live at the TFTB_DB root; AceDB now owns the
     root for its own bookkeeping, so those orphaned root keys are copied into the
     shared Default profile once and then removed. Older copies that still hold a
@@ -98,7 +98,7 @@ end
 local function ApplyFieldMigrations()
 	local profile = ns.db.profile
 
-	-- MIGRATION (remove after 2026-09-28): drop the retired tri-state "messaging"
+	-- MIGRATION (remove after 2026-08-15): drop the retired tri-state "messaging"
 	-- dropdown and the strangers master enable (the print / whisper / emote
 	-- toggles are the enable now).
 	if type(profile.strangers) == "table" then
@@ -106,13 +106,13 @@ local function ApplyFieldMigrations()
 		profile.strangers.enabled = nil
 	end
 
-	-- MIGRATION (remove after 2026-09-28): renamed welcomeMessage -> showWelcome.
+	-- MIGRATION (remove after 2026-08-15): renamed welcomeMessage -> showWelcome.
 	if profile.welcomeMessage ~= nil then
 		profile.showWelcome = profile.welcomeMessage
 		profile.welcomeMessage = nil
 	end
 
-	-- MIGRATION (remove after 2026-09-28): split the old combined "groupBuffs"
+	-- MIGRATION (remove after 2026-08-15): split the old combined "groupBuffs"
 	-- config into independent "Buffs from Teammates" and "Group Services"
 	-- settings. Carry the player's old messaging prefs into both and keep their
 	-- watched list, so upgrading resets nothing.
@@ -142,7 +142,7 @@ local function ApplyFieldMigrations()
 		profile.groupBuffs = nil
 	end
 
-	-- MIGRATION (remove after 2027-01-17): the Buff Train and Buffs Given features
+	-- MIGRATION (remove after 2026-08-15): the Buff Train and Buffs Given features
 	-- were renamed Peer Pressure and Good News. Their saved settings move to the
 	-- renamed profile keys so no one loses their toggles or watched lists.
 	if type(profile.buffTrain) == "table" then

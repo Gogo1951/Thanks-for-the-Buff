@@ -38,11 +38,11 @@ end
 -- Body of the /thankyou slash command; the registration lives in Options/Options.lua.
 function ns.RunThankYou()
 	if not UnitExists("target") or not UnitIsPlayer("target") then
-		ns:PrintMessage(L["MSG_SELECT_PLAYER"])
+		ns:PrintMessage(L["MESSAGE_SELECT_PLAYER"])
 		return
 	end
 	if UnitIsUnit("target", "player") then
-		ns:PrintMessage(L["MSG_CANT_THANK_SELF"])
+		ns:PrintMessage(L["MESSAGE_CANT_THANK_SELF"])
 		return
 	end
 

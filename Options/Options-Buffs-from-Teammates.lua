@@ -10,7 +10,7 @@ local _, ns = ...
 ]]
 
 function ns.BuildTeammatesOptions()
-	local options = ns.BuildBuffPanel("TAB_TEAMMATES", "TEAMMATES_DESC", "teammates")
+	local options = ns.BuildBuffPanel("TAB_TEAMMATES", "TEAMMATES_DESCRIPTION", "teammates")
 
 	-- Added here, not in the shared scaffold: Group Services has no sound option.
 	-- 8.5/8.6 slot the toggle and its preview speaker right after the scaffold's
@@ -18,7 +18,7 @@ function ns.BuildTeammatesOptions()
 	options.args.sound = ns.DefineSoundToggle(function()
 		return ns.db.profile.teammates
 	end, 8.5)
-	options.args.soundPreview = ns.DefineSoundPreview(ns.PlayTeammateSound, 8.6)
+	options.args.soundPreview = ns.DefineSoundPreview(ns.PlayBuffSound, 8.6)
 
 	-- One inline group per category (each class, then Items), built at login.
 	local categoryOrder = 20

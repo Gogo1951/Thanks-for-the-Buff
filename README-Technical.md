@@ -4,39 +4,49 @@ This document combines architecture notes and contribution guidance for develope
 
 ## File Map
 
+The repo root *is* the add-on folder; the packager renames it to `TFTB` on release (`package-as` in `.pkgmeta`), which is why the installed path is `Interface/AddOns/TFTB/`.
+
 ```
-TFTB/
-├── TFTB.toc                            Load order; single TOC for Era + TBC Anniversary
+Thanks-for-the-Buff/
+├── .github/workflows/package.yml   Release packaging (repo only)
+├── .pkgmeta                        Packager manifest: package-as, externals, ignore list (repo only)
+├── LICENSE                         MIT (repo only)
+├── TFTB.toc                        Load order; one TOC for Era + TBC Anniversary
 ├── Data/
-│   ├── Data.lua                        Locale init, raw palette, class colors, options registry, target marker, URLs, emote list
-│   ├── Tracked-Abilities.lua           Static Data.TRACKED: buffs/cooldowns/services others cast on you (SQL-sourced, StyLua-formatted)
-│   ├── Peer-Pressure-Abilities.lua        Static Data.PEER_PRESSURE: same-class cooldowns for the Peer Pressure alert
-│   └── Default-Settings.lua            ns.DATABASE_DEFAULTS (AceDB profile; global is empty)
+│   ├── Data.lua                    Locale init, raw palette, class colors, options registry, target marker, URLs, emote list
+│   ├── Tracked-Abilities.lua       Data.TRACKED: buffs / cooldowns / services others spend on you
+│   ├── Peer-Pressure-Abilities.lua Data.PEER_PRESSURE: same-class cooldowns for the Peer Pressure alert
+│   └── Default-Settings.lua        ns.DATABASE_DEFAULTS (AceDB profile; global ships empty)
 ├── Features/
-│   ├── Core.lua                        Version read, AceDB lifecycle + migrations, single event dispatcher, login sequence
-│   ├── Utilities.lua                   ns.GetColor, spell/item/aura API shims, ns.GetSpellLink, ns.IsPlayerGUID, sounds, ns.FLAVOR_INDEX
-│   ├── Announcements.lua               Print / whisper / group message builders, emotes, Good News whisper queue
-│   ├── Buff-Tracking.lua               The reaction engine: combat-log + cast taps, source classification, watched lists, display groups
-│   ├── Peer-Pressure.lua                  Peer Pressure: same-class cooldown alert
-│   ├── Thank-You-Button.lua            The /thankyou command and its auto-created macro
-│   └── Diagnostics.lua                 Runtime-only probes and bug-report dumps (never persisted; strings not localized)
+│   ├── Core.lua                    Version read, AceDB lifecycle + migrations, the one event dispatcher, login sequence
+│   ├── Utilities.lua               ns.GetColor, spell/item/aura API shims, ns.GetSpellLink, ns.IsPlayerGUID, sounds, ns.FLAVOR_INDEX
+│   ├── Announcements.lua           Print / whisper message builders, emotes, plural resolution, Good News whisper queue
+│   ├── Buff-Tracking.lua           The reaction engine: combat-log + cast taps, source classification, watched lists, display groups
+│   ├── Peer-Pressure.lua           Same-class cooldown alert, tapped from the combat-log handler
+│   ├── Thank-You-Button.lua        The /thankyou command body and its auto-created macro
+│   └── Diagnostics.lua             Runtime-only probes and bug-report dumps (never persisted; strings not localized)
 ├── Options/
-│   ├── Options-Utilities.lua           Shared AceConfig helpers + the BuildBuffPanel scaffold both group panels share
-│   ├── Options-General.lua             Root panel: description, welcome toggle, /commands, Feedback & Support links, version
+│   ├── Options-Utilities.lua       Shared AceConfig helpers + the BuildBuffPanel scaffold both group panels share
+│   ├── Options-General.lua         Root panel: description, welcome toggle, /commands, Feedback & Support links
 │   ├── Options-Buffs-from-Strangers.lua
 │   ├── Options-Buffs-from-Teammates.lua
-│   ├── Options-Buff-Services.lua       Group Services panel
-│   ├── Options-Good-News.lua         Good News panel
-│   ├── Options-Peer-Pressure.lua          Peer Pressure panel
+│   ├── Options-Buff-Services.lua   Group Services panel
+│   ├── Options-Good-News.lua       Good News panel
+│   ├── Options-Peer-Pressure.lua   Peer Pressure panel
 │   ├── Options-Thank-You-Button.lua
-│   ├── Options-Profiles.lua            Stock AceDBOptions-3.0 table, returned as-is
-│   ├── Options-Diagnostics.lua         Renders the Diagnostics probes
-│   └── Options.lua                     Panel registration order, /tftb + /thankyou slash commands
-├── Locales/                            AceLocale-3.0 files; enUS.lua is the source of truth
-├── Includes/                           Vendored libraries + Images/ (icon) + Sounds/ (Buff, Combat-Buff, Thunder) — never edited by hand
-├── README.md                           End-user documentation
-└── README-Technical.md                 This document
+│   ├── Options-Profiles.lua        Stock AceDBOptions-3.0 table, returned as-is
+│   ├── Options-Diagnostics.lua     Renders the Diagnostics probes
+│   └── Options.lua                 Panel registration order, /tftb + /thankyou slash commands
+├── Locales/                        AceLocale-3.0 files; enUS.lua is the source of truth
+├── Includes/
+│   ├── Libraries/                  Vendored Ace3 + LibStub + CallbackHandler — never hand-edited (see below)
+│   ├── Images/                     Thanks-for-the-Buff.tga (the TOC IconTexture)
+│   └── Sounds/                     Buff.ogg (any buff on you), Thunder.ogg (Peer Pressure)
+├── README.md                       End-user documentation
+└── README-Technical.md             This document
 ```
+
+`Includes/Libraries/` is committed *and* declared as packager `externals`, so every release re-pulls each library from upstream — a hand-edit to a vendored file is silently discarded on the next build. Fix the upstream library or work around it in `Features/`.
 
 No deprecated files remain in the tree. The pre-AceDB flat saved-variable layout and the combined `groupBuffs` config are handled by the migrations in `Features/Core.lua` (see Migration Chain), not by any lingering file.
 
@@ -65,7 +75,7 @@ The one thing combat gates is emotes. `/cheer`-style emotes are visible and soci
 
 The reaction pipeline runs across `Features/Buff-Tracking.lua` and `Features/Announcements.lua`:
 
-1. **Detect** — `OnCombatLogEvent` taps `SPELL_AURA_APPLIED`/`SPELL_AURA_REFRESH` (buffs landing on you) and `SPELL_CAST_SUCCESS`; `OnUnitSpellcastSucceeded` taps group services and confirms Good News casts; `OnUnitSpellcastSent` captures the recipient of your own casts. Lookups (`auraLookup`, `castLookup`, `givenLookup`) are keyed by the id the relevant event actually carries.
+1. **Detect** — `OnCombatLogEvent` taps `SPELL_AURA_APPLIED`/`SPELL_AURA_REFRESH` (buffs landing on you) and `SPELL_CAST_SUCCESS`; `OnUnitSpellcastSucceeded` taps group services and confirms Good News casts; `OnUnitSpellcastSent` captures the recipient of your own casts. The three lookups (`auraLookup`, `castLookup`, `givenLookup`) are each keyed by the id the relevant event actually carries.
 2. **Classify** — `ResolveSource` trades a pet/guardian GUID for its owner and returns nil (drop the event) when no owner unit resolves. Cross-realm sources arrive as `Name-Realm` and never match a name lookup, so group membership is decided by the combat-log affiliation flags (`MINE`/`PARTY`/`RAID`), and a friendly outsider is recognized by `AFFILIATION_OUTSIDER`.
 3. **Announce** — `HandleTracked` / `HandleStrangersBuff` route to the announcement helpers, which apply the target marker, brand, and colors. Sent messages carry a spell/item link; `SendChatMessage` rejects anything over **255 bytes**, and TFTB's single-line messages stay well under it.
 
@@ -75,17 +85,40 @@ Item names and links come from `GetItemInfo`, which returns nil on a cold cache 
 
 ### Cooldown Namespaces
 
-A single `sessionCooldowns` table (GUID/key → expiry) backs every throttle, with disjoint string namespaces so keys on the same GUID never collide: bare GUID for the per-source stranger emote, `whisper:<guid>` for the per-recipient whisper throttle, `service:<guid>` for the group-service rate-limit and token-dedup, and `goodnews:<guid>:<spellID>` for the Good News per-recipient-per-spell dedup. `SetCooldown` opportunistically sweeps lapsed entries on each write so the table can't grow unbounded across a long session.
+A single `sessionCooldowns` table (key → expiry) backs every throttle, with disjoint string namespaces so keys on the same GUID never collide:
+
+| Key                            | Window | Purpose                                          |
+| ------------------------------ | ------ | ------------------------------------------------ |
+| `<guid>`                       | `strangers.cooldown` (default 3s) | Per-source stranger emote     |
+| `whisper:<guid>`               | 45s    | Per-recipient outgoing whisper throttle          |
+| `service:<guid>`               | 10s    | Group-service rate limit *and* multi-token dedup |
+| `goodnews:<guid>:<spellID>`    | 10s    | Good News per-recipient-per-spell dedup          |
+
+`SetCooldown` opportunistically sweeps lapsed entries on each write, so the table can't grow unbounded across a long session.
 
 ## Reaction Sources: Combat Log vs Cast Events
 
 Why the same feature set reads three different event streams:
 
 - **Buffs on you (Strangers, Teammates)** ride the combat log. `SPELL_AURA_APPLIED`/`REFRESH` tell you a buff landed and on whom.
-- **Group services (feasts, soulwells, portals, repair bots)** ride `UNIT_SPELLCAST_SUCCEEDED`, *not* the combat log — these utility casts don't reliably emit `SPELL_CAST_SUCCESS` in `COMBAT_LOG_EVENT_UNFILTERED`, but they do fire the unit event for any unit the client tracks. A service has no per-you destination, so crediting the casting unit is all that's needed.
+- **Group services (feasts, soulwells, portals, repair bots)** ride `UNIT_SPELLCAST_SUCCEEDED`, *not* the combat log — these utility casts don't reliably emit `SPELL_CAST_SUCCESS` in `COMBAT_LOG_EVENT_UNFILTERED`, but they do fire the unit event for any unit the client tracks. A service has no per-you destination, so crediting the casting unit is all that's needed. Because the event's reach (target, focus, nameplates) is far wider than the feature's, the caster is filtered to `UnitInParty` / `UnitInRaid` — otherwise a stranger opening a portal across a capital city announces as a service.
 - **Good News (buffs you cast on others)** rides `UNIT_SPELLCAST_SENT` + `UNIT_SPELLCAST_SUCCEEDED`. The combat log is scoped to you, your group, and units in combat, so buffing a player *outside* your group produces no `SPELL_AURA_APPLIED` at all — the most common case for this feature is exactly the one the combat log never reports. `SENT` is also the only event that names the recipient; `SUCCEEDED` confirms the cast went off, so an interrupted cast stays silent.
 
-Because `SENT`/`SUCCEEDED` carry the **cast** id, `givenLookup` is keyed by cast id, and each record carries `watchedId` (the id the panel toggle and settings list use) and `auraId` (the id to read the recipient's remaining duration with — deliberately absent for no-aura casts like Rebirth and for `noDuration` entries like Fear Ward and Misdirection, which is what drops the "for 10 minutes" clause from their message). The aura lands a beat after the cast succeeds, so `AnnounceGivenCast` waits `AURA_SETTLE` (0.1s) before reading the duration, re-checking the unit still holds the recipient's GUID.
+## Good News
+
+Good News whispers the player *you* just buffed to tell them what they got and how long it lasts. It is the only feature driven by your own casts, and the only one that sends more than one message per trigger.
+
+Because `SENT`/`SUCCEEDED` carry the **cast** id, `givenLookup` is keyed by cast id, and each record carries `watchedId` (the id the panel toggle and settings list use) and `auraId` (the id to read the recipient's remaining duration with). `auraId` is deliberately absent for no-aura casts like Rebirth and for `noDuration` entries like Fear Ward and Misdirection — nothing to read is what drops the "for 10 minutes" clause from their message.
+
+Three timing constants shape the flow, all in `Features/Buff-Tracking.lua`:
+
+- `AURA_SETTLE` (0.1s) — the aura lands a beat *after* the cast succeeds, so `AnnounceGivenCast` waits before reading the duration, re-checking that the unit still holds the recipient's GUID.
+- `PENDING_TTL` (15s) — a `SENT` whose `SUCCEEDED` never arrives (interrupted cast) is swept from `pendingGiven`.
+- `GOODNEWS_DEDUP` (10s) — a quick recast on the same person doesn't whisper twice.
+
+The whispers themselves are **queued, not sent inline** (`QueueWhisper` in `Features/Announcements.lua`, `WHISPER_GAP` 0.35s). A raid-wide buff like Prayer of Fortitude lands on every recipient in the same instant, and a burst of same-frame whispers risks the server-side chat squelch — which would drop them all silently. An empty queue still sends immediately, so the common one-recipient case feels instant.
+
+Durations render through the client's own localized `D_HOURS` / `D_MINUTES` / `D_SECONDS` templates, so the units are correct in every language without TFTB shipping its own copies. That comes with a trap severe enough to have its own entry in Common Pitfalls: those templates carry a `|4singular:plural;` escape that `SendChatMessage` rejects outright, so `ResolvePlurals` expands it to plain text first.
 
 ## Per-Flavor Tracking Data
 
@@ -95,40 +128,44 @@ A `"-"` in the flavor column means the row **does not exist on this flavor at al
 
 ## Peer Pressure
 
-Peer Pressure alerts you when another player of your class pops a tracked cooldown so you can join in. `Features/Peer-Pressure.lua` builds a class-keyed lookup from `Data.PEER_PRESSURE`; `ns.CheckPeerPressure` is called from the combat-log tap for every `SPELL_CAST_SUCCESS`. (This feature shipped under the codename **Buff Train** and the sibling **Good News** feature as **Buffs Given**; both were renamed to match their player-facing labels, saved-variable keys included — see the Migration Chain.)
+Peer Pressure alerts you when another player of your class pops a tracked cooldown so you can join in. `Features/Peer-Pressure.lua` builds a class-keyed lookup from `Data.PEER_PRESSURE`; `ns.CheckPeerPressure` is called from the combat-log tap for every `SPELL_CAST_SUCCESS`. Spells are class-locked, so "the caster is your class" needs no GUID inspection — the entry's class tag against your own is the whole test. (This feature shipped under the codename **Buff Train** and the sibling **Good News** feature as **Buffs Given**; both were renamed to match their player-facing labels, saved-variable keys included — see the Migration Chain.)
 
-The alert normally fires only for *other* players' casts, but "Trigger on Own Casts" (`triggerOnOwnCasts`, default on) lets your own cooldowns fire it too — which is why the Peer Pressure tap sits *above* the own-source drop in `OnCombatLogEvent`; `CheckPeerPressure` applies the setting itself. Print and sound are independent toggles; the message renders in your class color with a standard spell link.
+The alert normally fires only for *other* players' casts, but "Trigger on Own Casts" (`triggerOnOwnCasts`, default off) lets your own cooldowns fire it too — which is why the Peer Pressure tap sits *above* the own-source drop in `OnCombatLogEvent`; `CheckPeerPressure` applies the setting itself. Print and sound are independent toggles; the message renders in your class color with a standard spell link.
 
 ## Thank You Button
 
-`Features/Thank-You-Button.lua` provides the `/thankyou` command (registered in `Options/Options.lua`) and an auto-created macro named `Data.MACRO_NAME` (`- Thank`, icon `134411`, body `/thankyou`). The macro is created only at login, only when `slash.createMacro` is set, only out of combat, and only if fewer than 120 global macros exist. `/thankyou` emotes at and whispers your current target; it whispers only when the target shares your faction and the message is non-empty. The whisper body (`slash.message`, user-editable) is sent verbatim via `SendChatMessage` — a custom message must respect the 255-byte limit.
+`Features/Thank-You-Button.lua` provides the `/thankyou` command (registered in `Options/Options.lua`) and an auto-created macro named `Data.MACRO_NAME` (`- Thank`, icon `134411`, body `/thankyou`). The macro is created only at login, only when `slash.createMacro` is set, only out of combat, and only if fewer than 120 global macros exist. `/thankyou` emotes at and whispers your current target; it whispers only when the target shares your faction and the message is non-empty. The whisper body (`slash.message`, user-editable) is sent verbatim via `SendChatMessage` and is unbranded by design — a human-sounding message, deliberately without the marker or add-on name. A custom message must respect the 255-byte chat limit.
 
 ## Diagnostics
 
-`Features/Diagnostics.lua` is runtime-only: `ns.diagnostics` holds `enabled`/`logging`/`log` and **nothing persists to SavedVariables**. Its strings live in `ns.DiagnosticsStrings` as plain English and never go through `Locales/` (they are developer-facing). The enable gate defaults off; turning it off also stops the event log. The event log snapshots each argument to a string immediately (never retaining frame/table references), caps arg count and length, and escapes pipes after truncation so a clipped argument can't eat the next separator. `COMBAT_LOG_EVENT_UNFILTERED` is excluded from the general log as a firehose; the buff engine instead feeds one decoded line per nearby `SPELL_CAST_SUCCESS` through `ns:LogCombatCast`, recorded before any filtering — so a portal or feast that arrives but is dropped is still visible, with `tracked`/`watched` flags to tell a data problem from a downstream one.
+`Features/Diagnostics.lua` is runtime-only: `ns.diagnostics` holds `enabled`/`logging`/`log` and **nothing persists to SavedVariables**. Its strings live in `ns.DiagnosticsStrings` as plain English and never go through `Locales/` (they are developer-facing). The enable gate defaults off; turning it off also stops the event log.
+
+The event log snapshots each argument to a string immediately (never retaining frame/table references), caps arg count and length (`EVENT_LOG_SIZE` 500, `EVENT_LOG_MAX_ARGS` 8, `EVENT_LOG_MAX_ARG_LENGTH` 255), and escapes pipes *after* truncation so a clipped argument can't eat the next separator. `COMBAT_LOG_EVENT_UNFILTERED` is the sole entry in `ns.DIAGNOSTIC_EVENT_EXCLUDE` — as a firehose it would bury the signal. The buff engine instead feeds one decoded line per nearby `SPELL_CAST_SUCCESS` through `ns:LogCombatCast`, recorded *before* any filtering, so a portal or feast that arrives but is dropped is still visible, with `tracked`/`watched` flags to tell a data problem from a downstream one.
 
 ## Saved Variables
 
-One account-wide table, `TFTB_DB`, managed by AceDB-3.0. Every user setting lives under `profile`; `global` ships empty.
+One account-wide table, `TFTB_DB`, managed by AceDB-3.0. Every user setting lives under `profile`; `global` ships empty (there is no minimap button or other profile-independent state).
 
 - **`profile.showWelcome`** — login welcome message on/off.
 - **`profile.strangers`** — `printEnabled`, `whisperEnabled`, `emotesEnabled`, `soundEnabled`, `emotes`, plus `cooldown` (emote rate-limit seconds) and `minBuffDuration` (filter for short HoTs).
 - **`profile.teammates`** — `printEnabled`, `whisperEnabled`, `emotesEnabled`, `soundEnabled`, `emotes`.
-- **`profile.services`** — as teammates, minus sound (Group Services has no sound option).
-- **`profile.goodNews`** (Good News) — `whisperEnabled`, `scope` (`ALWAYS` = anyone you buff, otherwise group only), and `watched` (its own list of ids you want announced).
-- **`profile.peerPressure`** (Peer Pressure) — `enabled`, `printEnabled`, `triggerOnOwnCasts`, `soundEnabled`, `watched`.
+- **`profile.services`** — as teammates, minus `soundEnabled` (Group Services has no sound option).
+- **`profile.goodNews`** — `whisperEnabled`, `scope` (`ALWAYS` = anyone you buff, anything else = group only), and `watched` (its own list of ids you want announced).
+- **`profile.peerPressure`** — `enabled`, `printEnabled`, `triggerOnOwnCasts`, `soundEnabled`, `watched`.
 - **`profile.slash`** (Thank You Button) — `createMacro`, `message`, `emotes`.
 - **`profile.watchedBuffs`** — the shared thank-you list behind Teammates and Group Services (their ids never overlap, so one table is unambiguous).
 
+Good News keeps its own `watched` list rather than sharing `watchedBuffs` because it reuses the *same* teammate buff ids with independent choices — one shared table couldn't hold both "thank someone for it" and "announce it when I cast it."
+
 ### Migration Chain
 
-Applied once in `InitializeDatabase`, in order, each removable after its dated window:
+Applied once in `InitializeDatabase`, in order. All three share the one house cutoff, 2026-08-15, after which every block below is deleted outright:
 
-1. **`MigrateFlatToProfile`** (remove after 2026-10-05) — lifts the pre-AceDB flat layout (settings that used to sit at the `TFTB_DB` root) into the shared Default profile, then clears the orphaned root keys. Recurses per-key so a value the user set wins while untouched keys keep their default.
-2. **`ApplyFieldMigrations`** (remove after 2026-09-28) — drops the retired `strangers.messaging` dropdown and `strangers.enabled` master switch; renames `welcomeMessage` → `showWelcome`; and splits the old combined `groupBuffs` config into independent `teammates` and `services` settings, carrying the player's old messaging prefs and watched list into both so upgrading resets nothing.
-3. **Feature rename** (in `ApplyFieldMigrations`, remove after 2027-01-17) — the Buff Train and Buffs Given features were renamed Peer Pressure and Good News; their saved profile keys move `buffTrain` → `peerPressure` and `buffsGiven` → `goodNews` (via `LiftInto`), so existing toggles and watched lists survive the rename.
+1. **`MigrateFlatToProfile`** (remove after 2026-08-15) — lifts the pre-AceDB flat layout (settings that used to sit at the `TFTB_DB` root) into the shared Default profile, then clears the orphaned root keys. Recurses per-key via `LiftInto` so a value the user set wins while untouched keys keep their default. Older copies that already hold a real AceDB `profiles` table are adopted by `AceDB:New` directly and never reach this path.
+2. **`ApplyFieldMigrations`** (remove after 2026-08-15) — drops the retired `strangers.messaging` dropdown and `strangers.enabled` master switch; renames `welcomeMessage` → `showWelcome`; and splits the old combined `groupBuffs` config into independent `teammates` and `services` settings, carrying the player's old messaging prefs and watched list into both so upgrading resets nothing.
+3. **Feature rename** (in `ApplyFieldMigrations`, remove after 2026-08-15) — the Buff Train and Buffs Given features were renamed Peer Pressure and Good News; their saved profile keys move `buffTrain` → `peerPressure` and `buffsGiven` → `goodNews` (via `LiftInto`), so existing toggles and watched lists survive the rename.
 
-Defaults come from `ns.DATABASE_DEFAULTS` and are applied lazily by AceDB-3.0 via metatables — nothing is copied into the saved table, and explicit user values (including `false`) are never overridden.
+Defaults come from `ns.DATABASE_DEFAULTS` and are applied by AceDB-3.0 when a scope is first accessed — explicit user values, including `false`, are never overridden. Note that scalar and table defaults are physically copied into the saved table (`copyDefaults` via `rawset`); only `*`/`**` wildcard defaults resolve through metatables.
 
 Both watched lists refill on empty: `PopulateWatchedBuffs` and `PopulatePeerPressureWatched` seed any id the saved list doesn't hold yet from the per-flavor default columns, and prune ids not live on this client so the saved data stays client-real. They run at login and again on every profile change / copy / reset (`OnProfileChanged`), because a profile swap replaces every setting at once.
 
@@ -139,7 +176,8 @@ Both watched lists refill on empty: `PopulateWatchedBuffs` and `PopulatePeerPres
 1. Add an entry with its `type` (`SOLO` / `GROUP` / `SERVICE`), `detect` (`AURA` / `CAST`), the `received` and (non-service) `given` per-flavor columns, and a `triggers` list of `{ spell = id }` (add `item = id` for item-driven buffs, `aura = id` when the applied aura id differs from the cast id).
 2. For a multi-rank/variant group under one toggle, list every id in `triggers` and set `name = L["GROUP_*"]` (add the key to every locale). A single spell/item takes its name from the client and needs no locale key.
 3. Use `"-"` in a flavor column for any id that means a different ability on that flavor; give each identity its own row.
-4. No code change is needed — `BuildLookups`, `PopulateWatchedBuffs`, and `BuildDisplayGroups` consume the table at login.
+4. Set `noDuration` when the buff is spent by an event rather than by time (Fear Ward, Misdirection), so Good News drops its duration clause. Set `opened` on a `SERVICE` to read "opened" (portals, summons) instead of "set out" (feasts, soulwells, repair bots).
+5. No code change is needed — `BuildLookups`, `PopulateWatchedBuffs`, and `BuildDisplayGroups` consume the table at login.
 
 ## Adding a New Peer Pressure Ability
 
@@ -153,14 +191,15 @@ Both watched lists refill on empty: `PopulateWatchedBuffs` and `PopulatePeerPres
 
 ## Localization
 
-- **Structure** — locale files live in `Locales/<locale>.lua`, each registered through AceLocale-3.0's `NewLocale("TFTB", "<code>")`. `enUS.lua` is the source of truth and the only file that passes the `true` default-fallback flag; every string originates there.
+- **Structure** — locale files live in `Locales/<locale>.lua`, each registered through AceLocale-3.0's `NewLocale("TFTB", "<code>")`. `enUS.lua` is the source of truth and the only file that passes the `true` default-fallback flag; every string originates there and the other locales translate from it.
 - **Keeping locales in sync** — every other locale carries a translation of the same key set, and AceLocale falls back to English via `__index` for anything missing at runtime. Translating each `enUS.lua` key into every locale and keeping the files aligned is the job of the Localization pass (`3 - Copy Cleanup & Localization Prompt.md`); don't hand-edit the other locales during ordinary work.
-- **Placeholders** — `%s`/`%d` count, type, and order must match `enUS` per key in every locale, or the string crashes at runtime. `MSG_USED_ITEM` uses positional specifiers (`%1$s`/`%2$s`/`%3$s`) in locales whose word order differs (e.g. ptBR); keep the numbering when translating.
+- **Placeholders** — `%s`/`%d` count, type, and order must match `enUS` per key in every locale, or the string crashes at runtime. Where a language needs a different word order, use WoW Lua's positional specifiers: `MESSAGE_USED_ITEM` is `"%s used %s %s on you!"` (name, possessive, link) in `enUS`, and ptBR reorders it to `"%1$s usou %3$s %2$s em você!"` so the item link precedes the possessive. Keep the numbering when translating — it is the only file that uses positional form today.
 - **Spanish** — esES and esMX are two separate, self-contained files; identical strings in both is correct and expected.
-- **Locale overflow** — German is the usual canary against the 255-byte `SendChatMessage` limit; the tracked message templates (`MSG_*`) are the ones that carry a live spell/item link, so keep translated bodies short enough to leave the link room.
+- **Locale overflow** — TFTB writes no user-authored macro body, so its real ceiling is the **255-byte** `SendChatMessage` limit. It is measured in *bytes*, not characters, so the canary is whichever locale encodes widest — ruRU, koKR, and zhCN/zhTW all spend 2–3 UTF-8 bytes per character, which makes them the binding constraint long before German's longer word count does. The `MESSAGE_*` templates are the ones that carry a live spell/item link (itself a translated spell name), so keep translated bodies short enough to leave the link room.
 
 ## Common Pitfalls
 
+- **A `|4` plural escape in a sent message**: WoW's own duration strings (`D_MINUTES` is `"%d |4minute:minutes;"`) carry an escape the UI expands only at render time. It looks correct in a print, but `SendChatMessage` rejects any message still holding one — "Invalid escape code in chat message" — and silently drops the *whole line*. `ResolvePlurals` in `Features/Announcements.lua` expands it to plain text before the whisper is queued.
 - **Whispering a pet name**: a whisper addressed to a pet bounces ("No player named 'X' is currently playing"). Every whisper path is guarded by `ns.IsPlayerGUID`, and pet sources are traded for their owner via `ResolveSource` (which returns nil rather than falling back to the pet).
 - **Cross-realm source names**: a combat-log name is `Name-Realm` and never matches a name lookup or resolves as an emote target. Classify group membership by affiliation flags, and strip the realm with `Ambiguate(name, "short")` before passing a name to `DoEmote`.
 - **`DoEmote(cmd, nil)` is not undirected**: it falls back to your *current target*, thanking a bystander. Pass `"none"` (or an unresolvable name, which degrades the same way) to force the undirected emote.
@@ -168,15 +207,16 @@ Both watched lists refill on empty: `PopulateWatchedBuffs` and `PopulatePeerPres
 - **A live buff reporting 0 duration**: `ns.GetBuffDuration` returns 0 for a timerless buff and nil for absent — callers must nil-check, never test the number for truthiness.
 - **Native `GetSpellLink` in chat**: on Classic it omits the trailing `:0` field, which `SendChatMessage`'s validator strips on send, so whispers arrive with the link gone. `ns.GetSpellLink` builds `|Hspell:<id>:0|h` by hand to pass the validator.
 - **Reusing a spell id across flavors**: `DoesSpellExist` can't tell Ice Block (Era) from Cold Snap (TBC) — they share id `11958`. Use the `"-"` flavor column, one row per identity (see Per-Flavor Tracking Data).
+- **Editing a vendored library**: `Includes/Libraries/` is refreshed from upstream by the packager on every release (`externals` in `.pkgmeta`), so a local fix is discarded at build time. Work around it in `Features/` or fix it upstream.
 
 ## Contributing
 
 - **Issues** — <https://github.com/Gogo1951/Thanks-for-the-Buff/issues>.
 - **Bug reports** — include game version + locale, class + level, repro steps, and the relevant chat output. The Diagnostic Tools panel (enable it, run the Context / API / Event checks) produces a ready-to-paste report.
 - **Discord** — <https://discord.gg/eh8hKq992Q>.
-- **PRs** — keep changes scoped; run StyLua with its default config over every touched Lua file; preserve migration discipline (never rename a saved-variable key without a dated migration window and note); check any macro or sent-message change against the 255-byte limit; and update this document if the architecture or file map changes.
+- **PRs** — keep changes scoped; run StyLua with its default config over every touched Lua file; preserve migration discipline (never rename a saved-variable key without a dated migration window and note); check any sent-message change against the **255-byte** chat limit in the widest-encoding locale, and any macro-body change against the **255-character** macro limit; and update this document if the architecture or file map changes.
 - **Commit and PR descriptions require a User Story.** Frame the change by who it helps and why, not just what changed.
 
    **Format:** *As a [role], I [needed / wanted] [behavior] so that [outcome]. This change [does X].*
 
-   **Example:** *As a healer who buffs strangers in the open world, I wanted a distinct sound only for combat cooldowns cast on me so that I could tell them apart from routine buffs. This change points `PlayTeammateSound` at `Combat-Buff.ogg` while strangers keep `Buff.ogg`.*
+   **Example:** *As a raider who gets buffed constantly, I wanted teammate buffs to use the same soft sound as stranger buffs so that a busy pull stops sounding like an alarm. This change collapses the two sound helpers into `ns.PlayBuffSound` and drops `Combat-Buff.ogg`.*

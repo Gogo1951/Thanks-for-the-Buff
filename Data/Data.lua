@@ -101,16 +101,16 @@ Data.DETECT = {
 --------------------------------------------------------------------------------
 
 Data.EMOTES = {
-	{ cmd = "CHEER", displayName = "/cheer", desc = L["EMOTE_CHEER_DESC"] },
-	{ cmd = "DRINK", displayName = "/drink", desc = L["EMOTE_DRINK_DESC"] },
-	{ cmd = "FLEX", displayName = "/flex", desc = L["EMOTE_FLEX_DESC"] },
-	{ cmd = "GRIN", displayName = "/grin", desc = L["EMOTE_GRIN_DESC"] },
-	{ cmd = "HIGHFIVE", displayName = "/highfive", desc = L["EMOTE_HIGHFIVE_DESC"] },
-	{ cmd = "PRAISE", displayName = "/praise", desc = L["EMOTE_PRAISE_DESC"] },
-	{ cmd = "SALUTE", displayName = "/salute", desc = L["EMOTE_SALUTE_DESC"] },
-	{ cmd = "SMILE", displayName = "/smile", desc = L["EMOTE_SMILE_DESC"] },
-	{ cmd = "THANK", displayName = "/thank", desc = L["EMOTE_THANK_DESC"] },
-	{ cmd = "WHOA", displayName = "/whoa", desc = L["EMOTE_WHOA_DESC"] },
-	{ cmd = "WINK", displayName = "/wink", desc = L["EMOTE_WINK_DESC"] },
-	{ cmd = "YES", displayName = "/yes", desc = L["EMOTE_YES_DESC"] },
+	{ cmd = "CHEER", displayName = "/cheer", desc = L["EMOTE_CHEER_DESCRIPTION"] },
+	{ cmd = "DRINK", displayName = "/drink", desc = L["EMOTE_DRINK_DESCRIPTION"] },
+	{ cmd = "FLEX", displayName = "/flex", desc = L["EMOTE_FLEX_DESCRIPTION"] },
+	{ cmd = "GRIN", displayName = "/grin", desc = L["EMOTE_GRIN_DESCRIPTION"] },
+	{ cmd = "HIGHFIVE", displayName = "/highfive", desc = L["EMOTE_HIGHFIVE_DESCRIPTION"] },
+	{ cmd = "PRAISE", displayName = "/praise", desc = L["EMOTE_PRAISE_DESCRIPTION"] },
+	{ cmd = "SALUTE", displayName = "/salute", desc = L["EMOTE_SALUTE_DESCRIPTION"] },
+	{ cmd = "SMILE", displayName = "/smile", desc = L["EMOTE_SMILE_DESCRIPTION"] },
+	{ cmd = "THANK", displayName = "/thank", desc = L["EMOTE_THANK_DESCRIPTION"] },
+	{ cmd = "WHOA", displayName = "/whoa", desc = L["EMOTE_WHOA_DESCRIPTION"] },
+	{ cmd = "WINK", displayName = "/wink", desc = L["EMOTE_WINK_DESCRIPTION"] },
+	{ cmd = "YES", displayName = "/yes", desc = L["EMOTE_YES_DESCRIPTION"] },
 }

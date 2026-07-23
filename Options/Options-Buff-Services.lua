@@ -9,7 +9,7 @@ local _, ns = ...
 ]]
 
 function ns.BuildServicesOptions()
-	local options = ns.BuildBuffPanel("TAB_SERVICES", "SERVICES_DESC", "services")
+	local options = ns.BuildBuffPanel("TAB_SERVICES", "SERVICES_DESCRIPTION", "services")
 
 	local entryOrder = 20
 	for _, entry in ipairs(ns.SortedEntries(ns.ServiceEntries or {})) do

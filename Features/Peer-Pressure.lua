@@ -6,8 +6,8 @@ local L = ns.L
     Peer Pressure -- the same-class cooldown alert.
     When ANOTHER player of YOUR class uses a cooldown from Data.PEER_PRESSURE
     (Data/Peer-Pressure-Abilities.lua), print a message and/or play the Thunder
-    sound so you can join in. With "Trigger on Own Casts" (default on), your
-    own cooldowns fire it too.
+    sound so you can join in. With "Trigger on Own Casts" turned on
+    (default off), your own cooldowns fire it too.
 
     The combat log tap arrives via ns.CheckPeerPressure, called from Buff-Tracking's
     OnCombatLogEvent -- Core's rule is one owner per event, and

@@ -58,8 +58,8 @@ end
     and reads its state from the first.
 
     `watched` is an optional accessor returning the id->bool table the toggle
-    binds to; it defaults to the shared thank-you list (watchedBuffs). The Buffs
-    Given panel passes its own list, since it reuses the same ids with
+    binds to; it defaults to the shared thank-you list (watchedBuffs). The
+    Good News panel passes its own list, since it reuses the same ids with
     independent choices.
 ]]
 function ns.DefineEntryToggle(entry, order, watched)
@@ -184,7 +184,7 @@ function ns.DefineSoundToggle(settings, order)
 	return {
 		type = "toggle",
 		name = L["MESSAGING_SOUND_ENABLE"],
-		desc = L["MESSAGING_SOUND_DESC"],
+		desc = L["MESSAGING_SOUND_DESCRIPTION"],
 		order = order,
 		get = function()
 			return settings().soundEnabled
@@ -237,7 +237,7 @@ function ns.BuildBuffPanel(titleKey, descKey, settingsKey)
 			printOut = {
 				type = "toggle",
 				name = L["MESSAGING_PRINT_ENABLE"],
-				desc = L["MESSAGING_PRINT_DESC"],
+				desc = L["MESSAGING_PRINT_DESCRIPTION"],
 				width = "full",
 				order = 6,
 				get = function()
@@ -250,7 +250,7 @@ function ns.BuildBuffPanel(titleKey, descKey, settingsKey)
 			whisper = {
 				type = "toggle",
 				name = L["MESSAGING_WHISPER_ENABLE"],
-				desc = L["MESSAGING_WHISPER_DESC"],
+				desc = L["MESSAGING_WHISPER_DESCRIPTION"],
 				width = "full",
 				order = 7,
 				get = function()
@@ -263,7 +263,7 @@ function ns.BuildBuffPanel(titleKey, descKey, settingsKey)
 			emotes = {
 				type = "toggle",
 				name = L["MESSAGING_EMOTES_ENABLE"],
-				desc = L["MESSAGING_EMOTES_DESC"],
+				desc = L["MESSAGING_EMOTES_DESCRIPTION"],
 				width = "full",
 				order = 8,
 				get = function()

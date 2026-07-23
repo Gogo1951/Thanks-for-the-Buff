@@ -104,17 +104,14 @@ end
 -- Sound
 --------------------------------------------------------------------------------
 
--- One sound per feature, all on the Master channel so they stay audible for
--- players who run with game sound effects turned down. File names must match
+-- Both sounds play on the Master channel so they stay audible for players who
+-- run with game sound effects turned down. File names must match
 -- Includes/Sounds/ exactly.
 local SOUND_ROOT = "Interface/AddOns/TFTB/Includes/Sounds/"
 
-function ns.PlayStrangerSound()
+-- Any buff landing on you shares this one, stranger or teammate alike.
+function ns.PlayBuffSound()
 	PlaySoundFile(SOUND_ROOT .. "Buff.ogg", "Master")
-end
-
-function ns.PlayTeammateSound()
-	PlaySoundFile(SOUND_ROOT .. "Combat-Buff.ogg", "Master")
 end
 
 function ns.PlayPeerPressureSound()
