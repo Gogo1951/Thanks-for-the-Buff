@@ -70,12 +70,15 @@ L["OPTIONS_COMMAND_THANKYOU_DESCRIPTION"] = "Esegue un'emote e sussurra al tuo b
 
 L["TAB_STRANGERS"] = "Potenziamenti da Sconosciuti"
 L["STRANGERS_DESCRIPTION"] = "Un potenziamento su di te da parte di un giocatore fuori dal tuo gruppo (mondo aperto)."
-L["STRANGERS_COOLDOWN"] = "Tempo di Recupero (Secondi)"
-L["STRANGERS_COOLDOWN_DESCRIPTION"] =
-	"Con quale frequenza massima eseguire un'emote verso lo stesso giocatore.\n\nI messaggi non sono influenzati; vengono inviati per ogni potenziamento."
+L["STRANGERS_OVERALL_COOLDOWN"] = "Tempo di Recupero dei Ringraziamenti (Secondi)"
+L["STRANGERS_OVERALL_COOLDOWN_DESCRIPTION"] =
+	"Con quale frequenza massima ringraziare chiunque, da chiunque provenga il potenziamento.\n\nImposta 0 per disattivare questo limite. Le notifiche non sono influenzate."
+L["STRANGERS_SOURCE_COOLDOWN"] = "Tempo di Recupero per Giocatore (Secondi)"
+L["STRANGERS_SOURCE_COOLDOWN_DESCRIPTION"] =
+	"Con quale frequenza massima ringraziare lo stesso giocatore.\n\nLe notifiche non sono influenzate."
 L["STRANGERS_MIN_DURATION"] = "Durata Minima del Potenziamento (Secondi)"
 L["STRANGERS_MIN_DURATION_DESCRIPTION"] =
-	"La durata minima che il potenziamento deve avere per attivare un ringraziamento.\n\nFiltra cure brevi nel tempo come Rinnovamento o Ringiovanimento."
+	"Quanto deve durare il potenziamento perché valga la pena reagire.\n\nFiltra cure brevi nel tempo come Rinnovamento o Ringiovanimento. Anche le notifiche sono influenzate; un potenziamento al di sotto di questo valore viene ignorato completamente, senza messaggio, suono, sussurro o emote."
 
 --------------------------------------------------------------------------------
 -- Options: Combat Buff Panels
@@ -121,6 +124,35 @@ L["COMBAT_ITEM_PENDING"] = "Oggetto #%d"
 L["COMBAT_SPELL_PENDING"] = "Incantesimo #%d"
 
 --------------------------------------------------------------------------------
+-- Shared: Praise and Notifications
+--------------------------------------------------------------------------------
+
+-- The two section headers every buff panel is built from: what the other player
+-- sees, then what only you get. Peer Pressure sends nothing outward, so it
+-- carries the Notifications header alone. Key prefixes match the header the
+-- control appears under.
+L["PRAISE_HEADER"] = "Messaggi di Ringraziamento ed Emote"
+L["NOTIFICATIONS_HEADER"] = "Notifiche"
+
+L["PRAISE_WHISPER_ENABLE"] = "Abilita Sussurri di Ringraziamento"
+L["PRAISE_WHISPER_DESCRIPTION"] = "Sussurra un ringraziamento al giocatore che ti ha potenziato."
+L["PRAISE_EMOTES_ENABLE"] = "Abilita Emote (Fuori dal Combattimento)"
+L["PRAISE_EMOTES_DESCRIPTION"] =
+	"Mostra il tuo apprezzamento con un'emote. Le emote vengono trattenute mentre sei in combattimento."
+L["PRAISE_EMOTES_SELECT"] = "Seleziona Emote"
+L["PRAISE_DELAY_ENABLE"] = "Abilita Ritardo del Ringraziamento"
+L["PRAISE_DELAY_DESCRIPTION"] =
+	"Attende un istante prima del sussurro e dell'emote, così il tuo ringraziamento non arriva nello stesso istante del potenziamento.\n\nLe notifiche non sono influenzate."
+L["PRAISE_DELAY_LENGTH"] = "Ritardo"
+L["PRAISE_DELAY_LENGTH_DESCRIPTION"] = "Quanto attendere prima di ringraziare il giocatore che ti ha potenziato."
+
+L["NOTIFICATIONS_PRINT_ENABLE"] = "Abilita Messaggi Stampati"
+L["NOTIFICATIONS_PRINT_DESCRIPTION"] =
+	"Stampa un messaggio nella tua chat quando ricevi un potenziamento. Lo vedi solo tu."
+L["NOTIFICATIONS_SOUND_ENABLE"] = "Abilita Effetti Sonori"
+L["NOTIFICATIONS_SOUND_DESCRIPTION"] = "Riproduce un suono quando ricevi un potenziamento. Lo senti solo tu."
+
+--------------------------------------------------------------------------------
 -- Tracked Ability Groups
 --------------------------------------------------------------------------------
 
@@ -149,22 +181,6 @@ L["BUTTON_CREATE_MACRO_DESCRIPTION"] = "Crea automaticamente una macro chiamata 
 L["BUTTON_WHISPER"] = "Messaggio di Sussurro"
 L["BUTTON_RESET"] = "Ripristina"
 L["BUTTON_RESET_DESCRIPTION"] = "Ripristina il messaggio di sussurro al testo predefinito."
-
---------------------------------------------------------------------------------
--- Shared: Messaging
---------------------------------------------------------------------------------
-
-L["MESSAGING_HEADER"] = "Messaggistica"
-L["MESSAGING_PRINT_ENABLE"] = "Abilita Messaggi Stampati"
-L["MESSAGING_PRINT_DESCRIPTION"] = "Stampa un messaggio nella tua chat quando ricevi un potenziamento. Lo vedi solo tu."
-L["MESSAGING_WHISPER_ENABLE"] = "Abilita Sussurri di Ringraziamento"
-L["MESSAGING_WHISPER_DESCRIPTION"] = "Sussurra un ringraziamento al giocatore che ti ha potenziato."
-L["MESSAGING_EMOTES_ENABLE"] = "Abilita Emote (Fuori dal Combattimento)"
-L["MESSAGING_EMOTES_DESCRIPTION"] =
-	"Mostra il tuo apprezzamento con un'emote. Le emote vengono trattenute mentre sei in combattimento."
-L["MESSAGING_EMOTES_SELECT"] = "Seleziona Emote"
-L["MESSAGING_SOUND_ENABLE"] = "Abilita Effetto Sonoro"
-L["MESSAGING_SOUND_DESCRIPTION"] = "Riproduce un suono quando ricevi un potenziamento. Lo senti solo tu."
 
 --------------------------------------------------------------------------------
 -- Defaults

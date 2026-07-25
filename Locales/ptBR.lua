@@ -70,12 +70,15 @@ L["OPTIONS_COMMAND_THANKYOU_DESCRIPTION"] = "Manda um emote e um sussurro para o
 
 L["TAB_STRANGERS"] = "Buffs de Estranhos"
 L["STRANGERS_DESCRIPTION"] = "Um buff em você de um jogador de fora do seu grupo (mundo aberto)."
-L["STRANGERS_COOLDOWN"] = "Recarga (Segundos)"
-L["STRANGERS_COOLDOWN_DESCRIPTION"] =
-	"No máximo, com que frequência lançar emote no mesmo jogador.\n\nAs mensagens não são afetadas; elas são disparadas a cada buff."
+L["STRANGERS_OVERALL_COOLDOWN"] = "Recarga de Agradecimentos (Segundos)"
+L["STRANGERS_OVERALL_COOLDOWN_DESCRIPTION"] =
+	"No máximo, com que frequência agradecer a alguém, venha de quem vier o buff.\n\nDefina 0 para desativar esse limite. As notificações não são afetadas."
+L["STRANGERS_SOURCE_COOLDOWN"] = "Recarga por Jogador (Segundos)"
+L["STRANGERS_SOURCE_COOLDOWN_DESCRIPTION"] =
+	"No máximo, com que frequência agradecer ao mesmo jogador.\n\nAs notificações não são afetadas."
 L["STRANGERS_MIN_DURATION"] = "Duração Mínima do Buff (Segundos)"
 L["STRANGERS_MIN_DURATION_DESCRIPTION"] =
-	"A duração mínima que o buff deve durar para disparar um agradecimento.\n\nFiltra curas curtas ao longo do tempo como Renovar ou Rejuvenescer."
+	"Quanto o buff deve durar para valer a pena reagir.\n\nFiltra curas curtas ao longo do tempo como Renovar ou Rejuvenescer. As notificações também são afetadas; um buff abaixo disso é ignorado por completo, sem mensagem, som, sussurro ou emote."
 
 --------------------------------------------------------------------------------
 -- Options: Combat Buff Panels
@@ -119,6 +122,35 @@ L["COMBAT_ITEM_PENDING"] = "Item #%d"
 L["COMBAT_SPELL_PENDING"] = "Feitiço #%d"
 
 --------------------------------------------------------------------------------
+-- Shared: Praise and Notifications
+--------------------------------------------------------------------------------
+
+-- The two section headers every buff panel is built from: what the other player
+-- sees, then what only you get. Peer Pressure sends nothing outward, so it
+-- carries the Notifications header alone. Key prefixes match the header the
+-- control appears under.
+L["PRAISE_HEADER"] = "Mensagens de Agradecimento e Emotes"
+L["NOTIFICATIONS_HEADER"] = "Notificações"
+
+L["PRAISE_WHISPER_ENABLE"] = "Habilitar Sussurros de Agradecimento"
+L["PRAISE_WHISPER_DESCRIPTION"] = "Sussurra um agradecimento ao jogador que buffou você."
+L["PRAISE_EMOTES_ENABLE"] = "Habilitar Emotes (Fora de Combate)"
+L["PRAISE_EMOTES_DESCRIPTION"] =
+	"Mostre sua apreciação com um emote. Emotes são retidos enquanto você está em combate."
+L["PRAISE_EMOTES_SELECT"] = "Selecionar Emotes"
+L["PRAISE_DELAY_ENABLE"] = "Habilitar Atraso do Agradecimento"
+L["PRAISE_DELAY_DESCRIPTION"] =
+	"Espera um instante antes do sussurro e do emote, para que seu agradecimento não chegue no mesmo instante que o buff.\n\nAs notificações não são afetadas."
+L["PRAISE_DELAY_LENGTH"] = "Atraso"
+L["PRAISE_DELAY_LENGTH_DESCRIPTION"] = "Quanto esperar antes de agradecer ao jogador que buffou você."
+
+L["NOTIFICATIONS_PRINT_ENABLE"] = "Habilitar Mensagens no Chat"
+L["NOTIFICATIONS_PRINT_DESCRIPTION"] =
+	"Mostra uma mensagem no seu próprio chat quando você recebe um buff. Só você vê."
+L["NOTIFICATIONS_SOUND_ENABLE"] = "Habilitar Efeitos Sonoros"
+L["NOTIFICATIONS_SOUND_DESCRIPTION"] = "Toca um som quando você recebe um buff. Só você ouve."
+
+--------------------------------------------------------------------------------
 -- Tracked Ability Groups
 --------------------------------------------------------------------------------
 
@@ -147,23 +179,6 @@ L["BUTTON_CREATE_MACRO_DESCRIPTION"] = "Cria automaticamente uma macro chamada %
 L["BUTTON_WHISPER"] = "Mensagem de Sussurro"
 L["BUTTON_RESET"] = "Redefinir"
 L["BUTTON_RESET_DESCRIPTION"] = "Redefine a mensagem de sussurro para o texto padrão."
-
---------------------------------------------------------------------------------
--- Shared: Messaging
---------------------------------------------------------------------------------
-
-L["MESSAGING_HEADER"] = "Mensagens"
-L["MESSAGING_PRINT_ENABLE"] = "Habilitar Mensagens no Chat"
-L["MESSAGING_PRINT_DESCRIPTION"] =
-	"Mostra uma mensagem no seu próprio chat quando você recebe um buff. Só você vê."
-L["MESSAGING_WHISPER_ENABLE"] = "Habilitar Sussurros de Agradecimento"
-L["MESSAGING_WHISPER_DESCRIPTION"] = "Sussurra um agradecimento ao jogador que buffou você."
-L["MESSAGING_EMOTES_ENABLE"] = "Habilitar Emotes (Fora de Combate)"
-L["MESSAGING_EMOTES_DESCRIPTION"] =
-	"Mostre sua apreciação com um emote. Emotes são retidos enquanto você está em combate."
-L["MESSAGING_EMOTES_SELECT"] = "Selecionar Emotes"
-L["MESSAGING_SOUND_ENABLE"] = "Habilitar Efeito Sonoro"
-L["MESSAGING_SOUND_DESCRIPTION"] = "Toca um som quando você recebe um buff. Só você ouve."
 
 --------------------------------------------------------------------------------
 -- Defaults

@@ -26,9 +26,20 @@ end
 ns.DATABASE_DEFAULTS = {
 	profile = {
 		showWelcome = true,
+		--[[
+            Praise (the outgoing whisper and emote) carries its own throttles here:
+            `praiseCooldown` is the gap between any two praises whoever buffed you,
+            `cooldown` the gap between two praises of the SAME player. The overall
+            one ships at 0 (off), so out of the box only the per-source limit
+            applies. `praiseDelay` is only read while `praiseDelayEnabled` is set,
+            and its values are the ones the dropdown offers (Data.PRAISE_DELAY_CHOICES).
+        ]]
 		strangers = {
 			printEnabled = false,
 			whisperEnabled = false,
+			praiseDelayEnabled = false,
+			praiseDelay = 2,
+			praiseCooldown = 0,
 			cooldown = 3,
 			minBuffDuration = 25,
 			emotesEnabled = true,
@@ -44,17 +55,28 @@ ns.DATABASE_DEFAULTS = {
 		-- Services (no-aura raid help) each own their messaging settings, like
 		-- strangers above. The watched-buff list is shared (ids never overlap) and
 		-- seeds from the per-flavor `received` columns in Data/Tracked-Abilities.lua.
+		-- Teammates offers the same Praise Delay as strangers, but no cooldowns: a
+		-- teammate's cooldown is worth acknowledging every single time it lands.
 		teammates = {
 			printEnabled = true,
 			whisperEnabled = true,
+			praiseDelayEnabled = false,
+			praiseDelay = 2,
 			emotesEnabled = false,
 			soundEnabled = false,
 			emotes = GetDefaultEmoteSettings(),
 		},
+		-- Services carries the same Praise Delay and sound as teammates, and no
+		-- cooldowns for the same reason. Its sound ships off: a feast or a portal
+		-- is ambient group help rather than something aimed at you, so it earns a
+		-- chat line by default and nothing louder.
 		services = {
 			printEnabled = true,
 			whisperEnabled = false,
+			praiseDelayEnabled = false,
+			praiseDelay = 2,
 			emotesEnabled = false,
+			soundEnabled = false,
 			emotes = GetDefaultEmoteSettings(),
 		},
 		-- Good News: whispers for buffs YOU cast on other players.

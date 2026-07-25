@@ -70,12 +70,15 @@ L["OPTIONS_COMMAND_THANKYOU_DESCRIPTION"] = "현재 대상에게 감정표현을
 
 L["TAB_STRANGERS"] = "낯선 사람의 버프"
 L["STRANGERS_DESCRIPTION"] = "파티 외부(야외)의 플레이어가 당신에게 주는 버프입니다."
-L["STRANGERS_COOLDOWN"] = "재사용 대기시간 (초)"
-L["STRANGERS_COOLDOWN_DESCRIPTION"] =
-	"동일한 플레이어에게 감정표현을 하는 최대 빈도입니다.\n\n메시지는 영향을 받지 않으며, 모든 버프에 대해 발동합니다."
+L["STRANGERS_OVERALL_COOLDOWN"] = "감사 표시 대기시간 (초)"
+L["STRANGERS_OVERALL_COOLDOWN_DESCRIPTION"] =
+	"누구에게 버프를 받았든 상관없이 감사를 표하는 최대 빈도입니다.\n\n0으로 설정하면 이 제한이 꺼집니다. 알림은 영향을 받지 않습니다."
+L["STRANGERS_SOURCE_COOLDOWN"] = "플레이어별 감사 표시 대기시간 (초)"
+L["STRANGERS_SOURCE_COOLDOWN_DESCRIPTION"] =
+	"동일한 플레이어에게 감사를 표하는 최대 빈도입니다.\n\n알림은 영향을 받지 않습니다."
 L["STRANGERS_MIN_DURATION"] = "최소 버프 지속시간 (초)"
 L["STRANGERS_MIN_DURATION_DESCRIPTION"] =
-	"감사를 트리거하려면 버프가 지속되어야 하는 최소 시간입니다.\n\n소생이나 회복과 같은 짧은 지속 치유는 무시합니다."
+	"반응할 가치가 있으려면 버프가 지속되어야 하는 최소 시간입니다.\n\n소생이나 회복과 같은 짧은 지속 치유는 무시합니다. 알림도 영향을 받으며, 이보다 짧은 버프는 메시지, 효과음, 귓속말, 감정표현 없이 완전히 무시됩니다."
 
 --------------------------------------------------------------------------------
 -- Options: Combat Buff Panels
@@ -122,6 +125,37 @@ L["COMBAT_ITEM_PENDING"] = "아이템 #%d"
 L["COMBAT_SPELL_PENDING"] = "주문 #%d"
 
 --------------------------------------------------------------------------------
+-- Shared: Praise and Notifications
+--------------------------------------------------------------------------------
+
+-- The two section headers every buff panel is built from: what the other player
+-- sees, then what only you get. Peer Pressure sends nothing outward, so it
+-- carries the Notifications header alone. Key prefixes match the header the
+-- control appears under.
+L["PRAISE_HEADER"] = "감사 메시지 및 감정표현"
+L["NOTIFICATIONS_HEADER"] = "알림"
+
+L["PRAISE_WHISPER_ENABLE"] = "감사 귓속말 활성화"
+L["PRAISE_WHISPER_DESCRIPTION"] = "버프를 준 플레이어에게 감사의 귓속말을 보냅니다."
+L["PRAISE_EMOTES_ENABLE"] = "감정표현 활성화 (비전투 시)"
+L["PRAISE_EMOTES_DESCRIPTION"] =
+	"감정표현으로 감사를 표합니다. 전투 중에는 감정표현이 보류됩니다."
+L["PRAISE_EMOTES_SELECT"] = "감정표현 선택"
+L["PRAISE_DELAY_ENABLE"] = "감사 표시 지연 활성화"
+L["PRAISE_DELAY_DESCRIPTION"] =
+	"귓속말과 감정표현 전에 잠시 기다려, 버프와 같은 순간에 감사가 전달되지 않도록 합니다.\n\n알림은 영향을 받지 않습니다."
+L["PRAISE_DELAY_LENGTH"] = "지연 시간"
+L["PRAISE_DELAY_LENGTH_DESCRIPTION"] =
+	"버프를 준 플레이어에게 감사를 표하기 전에 기다릴 시간입니다."
+
+L["NOTIFICATIONS_PRINT_ENABLE"] = "출력 메시지 활성화"
+L["NOTIFICATIONS_PRINT_DESCRIPTION"] =
+	"버프를 받을 때 자신의 대화창에 메시지를 출력합니다. 자신만 볼 수 있습니다."
+L["NOTIFICATIONS_SOUND_ENABLE"] = "효과음 활성화"
+L["NOTIFICATIONS_SOUND_DESCRIPTION"] =
+	"버프를 받을 때 효과음을 재생합니다. 자신에게만 들립니다."
+
+--------------------------------------------------------------------------------
 -- Tracked Ability Groups
 --------------------------------------------------------------------------------
 
@@ -151,23 +185,6 @@ L["BUTTON_CREATE_MACRO_DESCRIPTION"] =
 L["BUTTON_WHISPER"] = "귓속말 메시지"
 L["BUTTON_RESET"] = "초기화"
 L["BUTTON_RESET_DESCRIPTION"] = "귓속말 메시지를 기본 텍스트로 초기화합니다."
-
---------------------------------------------------------------------------------
--- Shared: Messaging
---------------------------------------------------------------------------------
-
-L["MESSAGING_HEADER"] = "메시지"
-L["MESSAGING_PRINT_ENABLE"] = "출력 메시지 활성화"
-L["MESSAGING_PRINT_DESCRIPTION"] =
-	"버프를 받을 때 자신의 대화창에 메시지를 출력합니다. 자신만 볼 수 있습니다."
-L["MESSAGING_WHISPER_ENABLE"] = "감사 귓속말 활성화"
-L["MESSAGING_WHISPER_DESCRIPTION"] = "버프를 준 플레이어에게 감사의 귓속말을 보냅니다."
-L["MESSAGING_EMOTES_ENABLE"] = "감정표현 활성화 (비전투 시)"
-L["MESSAGING_EMOTES_DESCRIPTION"] =
-	"감정표현으로 감사를 표합니다. 전투 중에는 감정표현이 보류됩니다."
-L["MESSAGING_EMOTES_SELECT"] = "감정표현 선택"
-L["MESSAGING_SOUND_ENABLE"] = "효과음 활성화"
-L["MESSAGING_SOUND_DESCRIPTION"] = "버프를 받을 때 효과음을 재생합니다. 자신에게만 들립니다."
 
 --------------------------------------------------------------------------------
 -- Defaults

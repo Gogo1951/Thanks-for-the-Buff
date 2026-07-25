@@ -9,24 +9,25 @@ The repo root *is* the add-on folder; the packager renames it to `TFTB` on relea
 ```
 Thanks-for-the-Buff/
 ├── .github/workflows/package.yml   Release packaging (repo only)
+├── .gitattributes                  LF normalization; keeps the GitHub web UI from committing CRLF (repo only)
 ├── .pkgmeta                        Packager manifest: package-as, externals, ignore list (repo only)
 ├── LICENSE                         MIT (repo only)
 ├── TFTB.toc                        Load order; one TOC for Era + TBC Anniversary
 ├── Data/
-│   ├── Data.lua                    Locale init, raw palette, class colors, options registry, target marker, URLs, emote list
+│   ├── Data.lua                    Locale init, raw palette, class colors, options registry, target marker, URLs, emote list, praise-delay choices
 │   ├── Tracked-Abilities.lua       Data.TRACKED: buffs / cooldowns / services others spend on you
 │   ├── Peer-Pressure-Abilities.lua Data.PEER_PRESSURE: same-class cooldowns for the Peer Pressure alert
 │   └── Default-Settings.lua        ns.DATABASE_DEFAULTS (AceDB profile; global ships empty)
 ├── Features/
 │   ├── Core.lua                    Version read, AceDB lifecycle + migrations, the one event dispatcher, login sequence
 │   ├── Utilities.lua               ns.GetColor, spell/item/aura API shims, ns.GetSpellLink, ns.IsPlayerGUID, sounds, ns.FLAVOR_INDEX
-│   ├── Announcements.lua           Print / whisper message builders, emotes, plural resolution, Good News whisper queue
-│   ├── Buff-Tracking.lua           The reaction engine: combat-log + cast taps, source classification, watched lists, display groups
+│   ├── Announcements.lua           Print / whisper builders, ns.GetBuffLink, emotes, plural resolution, Good News whisper queue
+│   ├── Buff-Tracking.lua           The reaction engine: combat-log + cast taps, source classification, praise delivery, watched lists, display groups
 │   ├── Peer-Pressure.lua           Same-class cooldown alert, tapped from the combat-log handler
 │   ├── Thank-You-Button.lua        The /thankyou command body and its auto-created macro
 │   └── Diagnostics.lua             Runtime-only probes and bug-report dumps (never persisted; strings not localized)
 ├── Options/
-│   ├── Options-Utilities.lua       Shared AceConfig helpers + the BuildBuffPanel scaffold both group panels share
+│   ├── Options-Utilities.lua       Shared AceConfig helpers + the control factories every buff panel draws from
 │   ├── Options-General.lua         Root panel: description, welcome toggle, /commands, Feedback & Support links
 │   ├── Options-Buffs-from-Strangers.lua
 │   ├── Options-Buffs-from-Teammates.lua
@@ -36,14 +37,15 @@ Thanks-for-the-Buff/
 │   ├── Options-Thank-You-Button.lua
 │   ├── Options-Profiles.lua        Stock AceDBOptions-3.0 table, returned as-is
 │   ├── Options-Diagnostics.lua     Renders the Diagnostics probes
-│   └── Options.lua                 Panel registration order, /tftb + /thankyou slash commands
-├── Locales/                        AceLocale-3.0 files; enUS.lua is the source of truth
+│   └── Options.lua                 Panel registration order, panel-open routing, /tftb + /thankyou slash commands
+├── Locales/                        AceLocale-3.0 files, one per supported locale; enUS.lua is the source of truth
 ├── Includes/
-│   ├── Libraries/                  Vendored Ace3 + LibStub + CallbackHandler — never hand-edited (see below)
+│   ├── Libraries/                  Vendored LibStub, CallbackHandler-1.0, AceLocale/DB/DBOptions/GUI/Config — never hand-edited (see below)
 │   ├── Images/                     Thanks-for-the-Buff.tga (the TOC IconTexture)
 │   └── Sounds/                     Buff.ogg (any buff on you), Thunder.ogg (Peer Pressure)
 ├── README.md                       End-user documentation
-└── README-Technical.md             This document
+├── README-Technical.md             This document
+└── README-Testing.md               Manual QA script, walked before tagging a release
 ```
 
 `Includes/Libraries/` is committed *and* declared as packager `externals`, so every release re-pulls each library from upstream — a hand-edit to a vendored file is silently discarded on the next build. Fix the upstream library or work around it in `Features/`.
@@ -69,7 +71,16 @@ A safety timer (`Data.SAFETY_PAUSE`, 3s) suppresses buff reactions until the wor
 
 Thanks for the Buff writes only one macro, and only at login (`ns:CreateAutoMacro`), guarded by `InCombatLockdown()` — so no macro write is ever attempted mid-combat. The reaction paths themselves run in combat: self-only prints, sounds, and outgoing whispers all fire on qualifying buffs whether or not you are fighting, because they touch no protected functions.
 
-The one thing combat gates is emotes. `/cheer`-style emotes are visible and social, so `HandleTracked` and `HandleStrangersBuff` perform them only when `not InCombatLockdown()`. This is suppression, not a replay queue: an emote skipped during combat is simply not performed for that buff, and — because the per-source emote cooldown is spent only when an emote actually fires — the next qualifying buff after combat reacts immediately.
+The one thing combat gates is emotes. `/cheer`-style emotes are visible and social, so `HandleTracked` and `HandleStrangersBuff` perform them only when `not InCombatLockdown()`. This is suppression, not a replay queue: an emote skipped during combat is simply not performed for that buff, and — because a praise cooldown is spent only when praise actually goes out — the next qualifying buff after combat reacts immediately. Combat is tested twice: once when the reaction is decided, and again inside `DeliverPraise` when the emote fires, so entering combat during a Praise Delay still suppresses it.
+
+### Praise vs Notifications
+
+The reactions split into two kinds, which is also how the Strangers and Teammates panels are laid out:
+
+- **Praise** — the thank-you whisper and the emote. Both go outward to the player who buffed you, so both answer to the cooldowns and to the Praise Delay, and both are delivered by `DeliverPraise` in `Features/Buff-Tracking.lua`.
+- **Notifications** — the chat print and the sound. Self-only, never throttled or delayed, fired inline the moment the buff qualifies.
+
+`DeliverPraise` receives decisions, not permissions to re-derive: every gate (the toggles, both cooldowns, the whisper throttle, the combat check) is settled before the timer is armed, so a burst of buffs landing inside the delay window cannot slip past a cooldown. `praiseDelayEnabled` off, or a missing `praiseDelay`, means a delay of 0 and inline delivery. The emote *target* is the deliberate exception, resolved inside the timer rather than before it: `ResolveEmoteTarget` returns a live unit token, and `target` / `focus` / `mouseover` all name whoever you are pointing at in that instant, so resolving early makes a delayed emote thank whoever you moved on to.
 
 ### Detect → Classify → Announce
 
@@ -83,16 +94,31 @@ The reaction pipeline runs across `Features/Buff-Tracking.lua` and `Features/Ann
 
 Item names and links come from `GetItemInfo`, which returns nil on a cold cache and fills asynchronously. `WarmItemCache` (login) touches every tracked item so its name/link is warm by the time an options panel or a "used their X on you" message needs it. Where a name still isn't ready, the options toggle shows the `COMBAT_ITEM_PENDING` placeholder (`Item #%d`) and resolves on the next panel open — which is why the Teammates, Services, Good News, and Peer Pressure panels register as functions (rebuilt on open) rather than as prebuilt tables. All item/spell access goes through the `ns.GetItemInfo` / `ns.GetSpellName` shims in `Features/Utilities.lua`, which resolve the modern `C_Item`/`C_Spell` API or the legacy global once at load.
 
+### Options Panels
+
+Ten AceConfig panels register in `Options/Options.lua`, in the order they appear in Blizzard's settings tree: General (root), the feature panels, then Profiles second-to-last and Diagnostic Tools last.
+
+Each panel file owns its own layout and order numbers; the controls themselves come from factories in `Options/Options-Utilities.lua` (`ns.DefinePrintToggle`, `ns.DefineWhisperToggle`, `ns.DefineEmotesToggle`, `ns.DefineEmoteGroup`, `ns.DefineSoundToggle`, `ns.DefinePraiseDelayToggle`, and friends). Every factory takes a `settings` accessor returning the profile subtable it binds to, so one definition serves Strangers, Teammates, and Group Services without those three having to share a layout — which they no longer do.
+
+Two registration shapes coexist deliberately. Panels whose contents are fixed at login register a **prebuilt table**; panels that render tracked abilities register the **builder function itself**, so the table is rebuilt on open once lazily-loaded item names have resolved (see Item Data Caching).
+
+Section headers are real AceConfig `header` widgets throughout — `ns.OptionsHeader`, which takes an optional third `hidden` argument for the panels whose whole section collapses behind a master switch (Peer Pressure, Good News, Diagnostic Tools).
+
+`ns:OpenOptionsPanel` backs the `/tftb` command. It routes by the **category ID captured from `AddToBlizOptions`**, never by panel title — see the Common Pitfalls entry for why a title lookup is the standing trap here.
+
 ### Cooldown Namespaces
 
 A single `sessionCooldowns` table (key → expiry) backs every throttle, with disjoint string namespaces so keys on the same GUID never collide:
 
 | Key                            | Window | Purpose                                          |
 | ------------------------------ | ------ | ------------------------------------------------ |
-| `<guid>`                       | `strangers.cooldown` (default 3s) | Per-source stranger emote     |
+| `praise:all`                   | `strangers.praiseCooldown` (default 0 = off) | Overall stranger praise limit |
+| `praise:<guid>`                | `strangers.cooldown` (default 3s) | Per-source stranger praise    |
 | `whisper:<guid>`               | 45s    | Per-recipient outgoing whisper throttle          |
 | `service:<guid>`               | 10s    | Group-service rate limit *and* multi-token dedup |
 | `goodnews:<guid>:<spellID>`    | 10s    | Good News per-recipient-per-spell dedup          |
+
+Both `praise:` keys gate the whisper and the emote alike, and neither is stamped unless praise actually goes out. `whisper:<guid>` is a floor underneath them that no setting can lower: a 1-second praise cooldown still cannot whisper the same player more than once every 45 seconds, which is what keeps a generous setting clear of the server's chat squelch.
 
 `SetCooldown` opportunistically sweeps lapsed entries on each write, so the table can't grow unbounded across a long session.
 
@@ -147,9 +173,9 @@ The event log snapshots each argument to a string immediately (never retaining f
 One account-wide table, `TFTB_DB`, managed by AceDB-3.0. Every user setting lives under `profile`; `global` ships empty (there is no minimap button or other profile-independent state).
 
 - **`profile.showWelcome`** — login welcome message on/off.
-- **`profile.strangers`** — `printEnabled`, `whisperEnabled`, `emotesEnabled`, `soundEnabled`, `emotes`, plus `cooldown` (emote rate-limit seconds) and `minBuffDuration` (filter for short HoTs).
-- **`profile.teammates`** — `printEnabled`, `whisperEnabled`, `emotesEnabled`, `soundEnabled`, `emotes`.
-- **`profile.services`** — as teammates, minus `soundEnabled` (Group Services has no sound option).
+- **`profile.strangers`** — `printEnabled`, `whisperEnabled`, `emotesEnabled`, `soundEnabled`, `emotes`, plus `praiseDelayEnabled` / `praiseDelay` (hold the whisper and emote back by 1-4 seconds), `praiseCooldown` (overall praise rate limit, 0 = off), `cooldown` (per-source praise rate limit) and `minBuffDuration` (filter for short HoTs).
+- **`profile.teammates`** — `printEnabled`, `whisperEnabled`, `emotesEnabled`, `soundEnabled`, `emotes`, `praiseDelayEnabled`, `praiseDelay`. No cooldown fields: a teammate's cooldown is acknowledged every time it lands.
+- **`profile.services`** — the same fields as teammates. `soundEnabled` ships off here: a feast or a portal is ambient group help rather than something aimed at you.
 - **`profile.goodNews`** — `whisperEnabled`, `scope` (`ALWAYS` = anyone you buff, anything else = group only), and `watched` (its own list of ids you want announced).
 - **`profile.peerPressure`** — `enabled`, `printEnabled`, `triggerOnOwnCasts`, `soundEnabled`, `watched`.
 - **`profile.slash`** (Thank You Button) — `createMacro`, `message`, `emotes`.
@@ -195,6 +221,7 @@ Both watched lists refill on empty: `PopulateWatchedBuffs` and `PopulatePeerPres
 - **Keeping locales in sync** — every other locale carries a translation of the same key set, and AceLocale falls back to English via `__index` for anything missing at runtime. Translating each `enUS.lua` key into every locale and keeping the files aligned is the job of the Localization pass (`3 - Copy Cleanup & Localization Prompt.md`); don't hand-edit the other locales during ordinary work.
 - **Placeholders** — `%s`/`%d` count, type, and order must match `enUS` per key in every locale, or the string crashes at runtime. Where a language needs a different word order, use WoW Lua's positional specifiers: `MESSAGE_USED_ITEM` is `"%s used %s %s on you!"` (name, possessive, link) in `enUS`, and ptBR reorders it to `"%1$s usou %3$s %2$s em você!"` so the item link precedes the possessive. Keep the numbering when translating — it is the only file that uses positional form today.
 - **Spanish** — esES and esMX are two separate, self-contained files; identical strings in both is correct and expected.
+- **Quote style** — a value containing a double quote is written with single-quoted Lua delimiters and stays that way under StyLua (`ruRU`'s `GOOD_NEWS_WHISPER_ENABLE` is the one live example). Any script that audits key parity must accept both delimiters; a double-quote-only regex reports that key as missing from ruRU and invites re-adding a key that already exists.
 - **Locale overflow** — TFTB writes no user-authored macro body, so its real ceiling is the **255-byte** `SendChatMessage` limit. It is measured in *bytes*, not characters, so the canary is whichever locale encodes widest — ruRU, koKR, and zhCN/zhTW all spend 2–3 UTF-8 bytes per character, which makes them the binding constraint long before German's longer word count does. The `MESSAGE_*` templates are the ones that carry a live spell/item link (itself a translated spell name), so keep translated bodies short enough to leave the link room.
 
 ## Common Pitfalls
@@ -203,6 +230,8 @@ Both watched lists refill on empty: `PopulateWatchedBuffs` and `PopulatePeerPres
 - **Whispering a pet name**: a whisper addressed to a pet bounces ("No player named 'X' is currently playing"). Every whisper path is guarded by `ns.IsPlayerGUID`, and pet sources are traded for their owner via `ResolveSource` (which returns nil rather than falling back to the pet).
 - **Cross-realm source names**: a combat-log name is `Name-Realm` and never matches a name lookup or resolves as an emote target. Classify group membership by affiliation flags, and strip the realm with `Ambiguate(name, "short")` before passing a name to `DoEmote`.
 - **`DoEmote(cmd, nil)` is not undirected**: it falls back to your *current target*, thanking a bystander. Pass `"none"` (or an unresolvable name, which degrades the same way) to force the undirected emote.
+- **Resolving an emote target before a delay**: `ResolveEmoteTarget` hands back a live unit token, and `target` / `focus` / `mouseover` name whoever you are pointing at *in that instant*. Resolve it when the buff lands and a delayed emote thanks whoever you moved on to. `DeliverPraise` resolves inside the timer for exactly this reason; every other gate is settled before the timer arms.
+- **Opening the options panel by title**: `Settings.GetCategory(<title>)`, or passing the add-on title to `Settings.OpenToCategory`, returns nil on clients that carry the Settings API — execution falls through to `AceConfigDialog:Open`, and the panel opens as a floating window instead of docking into Blizzard's settings. It still works on Classic Era, so one-flavor testing misses it. `ns:OpenOptionsPanel` captures both return values of `AddToBlizOptions` and routes by the captured ID, then the captured frame, resolving no names anywhere.
 - **Reading a buff's duration too early**: for Good News, the aura lands a tick *after* the cast succeeds, so reading it inline reports "no duration" for every buff. Wait `AURA_SETTLE`, then read it off the recipient after re-confirming their GUID.
 - **A live buff reporting 0 duration**: `ns.GetBuffDuration` returns 0 for a timerless buff and nil for absent — callers must nil-check, never test the number for truthiness.
 - **Native `GetSpellLink` in chat**: on Classic it omits the trailing `:0` field, which `SendChatMessage`'s validator strips on send, so whispers arrive with the link gone. `ns.GetSpellLink` builds `|Hspell:<id>:0|h` by hand to pass the validator.

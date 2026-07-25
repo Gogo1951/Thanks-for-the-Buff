@@ -497,24 +497,34 @@ function ns:BuildContextReport()
 	local db = ns.db and ns.db.profile
 	if db then
 		lines[#lines + 1] = string.format(
-			"Strangers: print=%s whisper=%s emotes=%s  minDuration=%s cooldown=%s",
+			"Strangers: print=%s whisper=%s emotes=%s sound=%s  praiseDelay=%s/%s praiseCooldown=%s minDuration=%s cooldown=%s",
 			tostring(db.strangers and db.strangers.printEnabled),
 			tostring(db.strangers and db.strangers.whisperEnabled),
 			tostring(db.strangers and db.strangers.emotesEnabled),
+			tostring(db.strangers and db.strangers.soundEnabled),
+			tostring(db.strangers and db.strangers.praiseDelayEnabled),
+			tostring(db.strangers and db.strangers.praiseDelay),
+			tostring(db.strangers and db.strangers.praiseCooldown),
 			tostring(db.strangers and db.strangers.minBuffDuration),
 			tostring(db.strangers and db.strangers.cooldown)
 		)
 		lines[#lines + 1] = string.format(
-			"Teammates: print=%s whisper=%s emotes=%s",
+			"Teammates: print=%s whisper=%s emotes=%s sound=%s  praiseDelay=%s/%s",
 			tostring(db.teammates and db.teammates.printEnabled),
 			tostring(db.teammates and db.teammates.whisperEnabled),
-			tostring(db.teammates and db.teammates.emotesEnabled)
+			tostring(db.teammates and db.teammates.emotesEnabled),
+			tostring(db.teammates and db.teammates.soundEnabled),
+			tostring(db.teammates and db.teammates.praiseDelayEnabled),
+			tostring(db.teammates and db.teammates.praiseDelay)
 		)
 		lines[#lines + 1] = string.format(
-			"Services: print=%s whisper=%s emotes=%s",
+			"Services: print=%s whisper=%s emotes=%s sound=%s  praiseDelay=%s/%s",
 			tostring(db.services and db.services.printEnabled),
 			tostring(db.services and db.services.whisperEnabled),
-			tostring(db.services and db.services.emotesEnabled)
+			tostring(db.services and db.services.emotesEnabled),
+			tostring(db.services and db.services.soundEnabled),
+			tostring(db.services and db.services.praiseDelayEnabled),
+			tostring(db.services and db.services.praiseDelay)
 		)
 		lines[#lines + 1] = string.format("Good News: whisper=%s", tostring(db.goodNews and db.goodNews.whisperEnabled))
 		lines[#lines + 1] = string.format(

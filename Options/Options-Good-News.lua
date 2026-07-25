@@ -32,7 +32,7 @@ function ns.BuildGoodNewsOptions()
 				type = "toggle",
 				name = L["GOOD_NEWS_WHISPER_ENABLE"],
 				desc = L["GOOD_NEWS_WHISPER_DESCRIPTION"],
-				order = 5,
+				order = 3,
 				get = function()
 					return ns.db.profile.goodNews.whisperEnabled
 				end,
@@ -45,7 +45,7 @@ function ns.BuildGoodNewsOptions()
 			scope = {
 				type = "select",
 				name = "",
-				order = 6,
+				order = 4,
 				hidden = GoodNewsHidden,
 				values = {
 					ALWAYS = L["GOOD_NEWS_SCOPE_ALWAYS"],
@@ -61,7 +61,7 @@ function ns.BuildGoodNewsOptions()
 					ns.db.profile.goodNews.scope = val
 				end,
 			},
-			sampleSpacer = { type = "description", name = " ", order = 6.5, hidden = GoodNewsHidden },
+			sampleSpacer = { type = "description", name = " ", order = 5, hidden = GoodNewsHidden },
 			--[[
                 A sample of the outgoing whisper, built by the SAME pipeline that
                 sends the real one (template, spell link, localized duration), so
@@ -79,11 +79,12 @@ function ns.BuildGoodNewsOptions()
 						.. "\n"
 				end,
 				fontSize = "medium",
-				order = 7,
+				order = 6,
 				hidden = GoodNewsHidden,
 			},
-			headerTracked = ns.OptionsSubHeader(L["COMBAT_TRACKED"], 12, GoodNewsHidden),
-			space2 = { type = "description", name = " ", order = 13, hidden = GoodNewsHidden },
+			space1 = { type = "description", name = " ", order = 7, hidden = GoodNewsHidden },
+			headerTracked = ns.OptionsHeader(L["COMBAT_TRACKED"], 8, GoodNewsHidden),
+			space2 = { type = "description", name = " ", order = 9, hidden = GoodNewsHidden },
 		},
 	}
 
