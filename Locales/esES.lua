@@ -70,12 +70,15 @@ L["OPTIONS_COMMAND_THANKYOU_DESCRIPTION"] = "Hace un emote y susurra a tu objeti
 
 L["TAB_STRANGERS"] = "Beneficios de Desconocidos"
 L["STRANGERS_DESCRIPTION"] = "Un beneficio sobre ti de un jugador fuera de tu grupo (mundo abierto)."
-L["STRANGERS_COOLDOWN"] = "Tiempo de reutilización (Segundos)"
-L["STRANGERS_COOLDOWN_DESCRIPTION"] =
-	"Con qué frecuencia máxima se enviará un emote al mismo jugador.\n\nLos mensajes no se ven afectados; se activan para cada beneficio."
+L["STRANGERS_OVERALL_COOLDOWN"] = "Tiempo de reutilización de elogios (Segundos)"
+L["STRANGERS_OVERALL_COOLDOWN_DESCRIPTION"] =
+	"Con qué frecuencia máxima elogiar a alguien, venga de quien venga el beneficio.\n\nEstablécelo en 0 para desactivar este límite. Las notificaciones no se ven afectadas."
+L["STRANGERS_SOURCE_COOLDOWN"] = "Tiempo de reutilización por jugador (Segundos)"
+L["STRANGERS_SOURCE_COOLDOWN_DESCRIPTION"] =
+	"Con qué frecuencia máxima elogiar al mismo jugador.\n\nLas notificaciones no se ven afectadas."
 L["STRANGERS_MIN_DURATION"] = "Duración mínima del beneficio (Segundos)"
 L["STRANGERS_MIN_DURATION_DESCRIPTION"] =
-	"Duración mínima que debe durar el beneficio para activar un agradecimiento.\n\nFiltra sanaciones cortas en el tiempo como Renovar o Rejuvenecimiento."
+	"Cuánto debe durar el beneficio para que merezca la pena reaccionar.\n\nFiltra sanaciones cortas en el tiempo como Renovar o Rejuvenecimiento. Las notificaciones también se ven afectadas; un beneficio por debajo de esto se ignora por completo, sin mensaje, sonido, susurro ni emote."
 
 --------------------------------------------------------------------------------
 -- Options: Combat Buff Panels
@@ -120,6 +123,34 @@ L["COMBAT_ITEM_PENDING"] = "Objeto #%d"
 L["COMBAT_SPELL_PENDING"] = "Hechizo #%d"
 
 --------------------------------------------------------------------------------
+-- Shared: Praise and Notifications
+--------------------------------------------------------------------------------
+
+-- The two section headers every buff panel is built from: what the other player
+-- sees, then what only you get. Peer Pressure sends nothing outward, so it
+-- carries the Notifications header alone. Key prefixes match the header the
+-- control appears under.
+L["PRAISE_HEADER"] = "Mensajes de elogio y emotes"
+L["NOTIFICATIONS_HEADER"] = "Notificaciones"
+
+L["PRAISE_WHISPER_ENABLE"] = "Habilitar susurros de agradecimiento"
+L["PRAISE_WHISPER_DESCRIPTION"] = "Susurra un agradecimiento al jugador que te dio el beneficio."
+L["PRAISE_EMOTES_ENABLE"] = "Habilitar Emotes (Fuera de combate)"
+L["PRAISE_EMOTES_DESCRIPTION"] = "Muestra tu aprecio con un emote. Los emotes se retienen mientras estás en combate."
+L["PRAISE_EMOTES_SELECT"] = "Seleccionar Emotes"
+L["PRAISE_DELAY_ENABLE"] = "Habilitar retraso de elogio"
+L["PRAISE_DELAY_DESCRIPTION"] =
+	"Espera un momento antes del susurro y el emote, para que tu agradecimiento no llegue en el mismo instante que el beneficio.\n\nLas notificaciones no se ven afectadas."
+L["PRAISE_DELAY_LENGTH"] = "Retraso"
+L["PRAISE_DELAY_LENGTH_DESCRIPTION"] = "Cuánto esperar antes de elogiar al jugador que te dio el beneficio."
+
+L["NOTIFICATIONS_PRINT_ENABLE"] = "Habilitar mensajes impresos"
+L["NOTIFICATIONS_PRINT_DESCRIPTION"] =
+	"Imprime un mensaje en tu propio chat cuando recibes un beneficio. Solo tú lo ves."
+L["NOTIFICATIONS_SOUND_ENABLE"] = "Habilitar efectos de sonido"
+L["NOTIFICATIONS_SOUND_DESCRIPTION"] = "Reproduce un sonido cuando recibes un beneficio. Solo tú lo oyes."
+
+--------------------------------------------------------------------------------
 -- Tracked Ability Groups
 --------------------------------------------------------------------------------
 
@@ -148,22 +179,6 @@ L["BUTTON_CREATE_MACRO_DESCRIPTION"] = "Crea automáticamente una macro llamada 
 L["BUTTON_WHISPER"] = "Mensaje de Susurro"
 L["BUTTON_RESET"] = "Restablecer"
 L["BUTTON_RESET_DESCRIPTION"] = "Restablece el mensaje de susurro al texto predeterminado."
-
---------------------------------------------------------------------------------
--- Shared: Messaging
---------------------------------------------------------------------------------
-
-L["MESSAGING_HEADER"] = "Mensajes"
-L["MESSAGING_PRINT_ENABLE"] = "Habilitar mensajes impresos"
-L["MESSAGING_PRINT_DESCRIPTION"] = "Imprime un mensaje en tu propio chat cuando recibes un beneficio. Solo tú lo ves."
-L["MESSAGING_WHISPER_ENABLE"] = "Habilitar susurros de agradecimiento"
-L["MESSAGING_WHISPER_DESCRIPTION"] = "Susurra un agradecimiento al jugador que te dio el beneficio."
-L["MESSAGING_EMOTES_ENABLE"] = "Habilitar Emotes (Fuera de combate)"
-L["MESSAGING_EMOTES_DESCRIPTION"] =
-	"Muestra tu aprecio con un emote. Los emotes se retienen mientras estás en combate."
-L["MESSAGING_EMOTES_SELECT"] = "Seleccionar Emotes"
-L["MESSAGING_SOUND_ENABLE"] = "Habilitar efecto de sonido"
-L["MESSAGING_SOUND_DESCRIPTION"] = "Reproduce un sonido cuando recibes un beneficio. Solo tú lo oyes."
 
 --------------------------------------------------------------------------------
 -- Defaults

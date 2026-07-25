@@ -11,8 +11,14 @@ local GetSpellTexture = ns.GetSpellTexture
 -- Shared Options Helpers
 --------------------------------------------------------------------------------
 
-function ns.OptionsHeader(text, order)
-	return { type = "header", name = GetColor("TITLE") .. text .. "|r", order = order }
+--[[
+    Every section header in the add-on is a real AceConfig "header" -- the ruled
+    line with the title set into it -- and no panel draws its own out of a colored
+    description. `hidden` is optional (a function or a boolean) for the panels
+    whose whole section collapses behind a master switch.
+]]
+function ns.OptionsHeader(text, order, hidden)
+	return { type = "header", name = GetColor("TITLE") .. text .. "|r", order = order, hidden = hidden }
 end
 
 function ns.OptionsDesc(text, order)
@@ -23,29 +29,19 @@ function ns.OptionsSpacer(order)
 	return { type = "description", name = " ", order = order }
 end
 
-function ns.OptionsSubHeader(text, order, hidden)
-	return {
-		type = "description",
-		name = "\n" .. GetColor("TITLE") .. text .. "|r",
-		fontSize = "medium",
-		order = order,
-		hidden = hidden,
-	}
-end
-
 --------------------------------------------------------------------------------
 -- Shared Buff-Panel Builders
 --------------------------------------------------------------------------------
 
 --[[
-    Scaffold shared by the Buffs-from-Teammates and Group-Services panels
-    (Options-Buffs-from-Teammates.lua / Options-Buff-Services.lua). Both panels have the same
-    shape -- description, messaging toggles, emote picker, tracked list -- and
-    differ only in their text, which settings table they bind to
-    (ns.db.profile.teammates / ns.db.profile.services), and which tracked entries
-    they list. The watched-buff list is shared (ns.db.profile.watchedBuffs); a
-    given id only ever appears
-    on one of the two panels.
+    Widget factories shared by the three buff panels (Buffs from Strangers, Buffs
+    from Teammates, Group Services). Each panel file owns its own layout and order
+    numbers, since the three no longer share one shape, and draws its controls
+    from here. Every factory takes a `settings` accessor returning the profile
+    subtable the control binds to (ns.db.profile.strangers / .teammates /
+    .services), so one definition serves every panel. The watched-buff list is
+    shared between Teammates and Services (ns.db.profile.watchedBuffs); a given id
+    only ever appears on one of the two panels.
 ]]
 
 --[[
@@ -175,16 +171,15 @@ function ns.SortedEntries(entries)
 end
 
 --[[
-    The "Enable Sound Effect" toggle. Lives here (not in the shared BuildBuffPanel
-    scaffold) because only Strangers and Teammates offer sound -- Group Services
-    deliberately has none. NOT full-width: its DefineSoundPreview speaker shares the
-    row, and full-width would push the speaker onto its own line.
+    The "Enable Sound Effects" toggle, offered by every buff panel. NOT
+    full-width: its DefineSoundPreview speaker shares the row, and full-width
+    would push the speaker onto its own line.
 ]]
 function ns.DefineSoundToggle(settings, order)
 	return {
 		type = "toggle",
-		name = L["MESSAGING_SOUND_ENABLE"],
-		desc = L["MESSAGING_SOUND_DESCRIPTION"],
+		name = L["NOTIFICATIONS_SOUND_ENABLE"],
+		desc = L["NOTIFICATIONS_SOUND_DESCRIPTION"],
 		order = order,
 		get = function()
 			return settings().soundEnabled
@@ -197,7 +192,7 @@ end
 
 --[[
     The speaker icon that previews a panel's sound effect, placed on the same
-    row right after its "Enable Sound Effect" toggle. It plays regardless of the
+    row right after its "Enable Sound Effects" toggle. It plays regardless of the
     toggle's state -- hearing the sound BEFORE enabling it is the point. The
     texture is the client's own voice-chat speaker, so it matches the UI in
     every locale without shipping art.
@@ -216,80 +211,87 @@ function ns.DefineSoundPreview(playSound, order, hidden)
 	}
 end
 
--- Title, description, messaging toggles, and the emote picker -- everything both
--- panels share. `settingsKey` is "teammates" or "services"; the caller appends
--- its own tracked list afterward.
-function ns.BuildBuffPanel(titleKey, descKey, settingsKey)
-	local function settings()
-		return ns.db.profile[settingsKey]
-	end
-	local function EmotesHidden()
+--------------------------------------------------------------------------------
+-- Shared Praise & Notification Controls
+--------------------------------------------------------------------------------
+
+--[[
+    The reaction toggles every buff panel offers, one factory each. They are
+    separate rather than one block because the panels file them under different
+    headers: the whisper and the emote are praise the other player sees, the
+    print and the sound are notifications only you get.
+]]
+function ns.DefinePrintToggle(settings, order)
+	return {
+		type = "toggle",
+		name = L["NOTIFICATIONS_PRINT_ENABLE"],
+		desc = L["NOTIFICATIONS_PRINT_DESCRIPTION"],
+		width = "full",
+		order = order,
+		get = function()
+			return settings().printEnabled
+		end,
+		set = function(_, val)
+			settings().printEnabled = val
+		end,
+	}
+end
+
+function ns.DefineWhisperToggle(settings, order)
+	return {
+		type = "toggle",
+		name = L["PRAISE_WHISPER_ENABLE"],
+		desc = L["PRAISE_WHISPER_DESCRIPTION"],
+		width = "full",
+		order = order,
+		get = function()
+			return settings().whisperEnabled
+		end,
+		set = function(_, val)
+			settings().whisperEnabled = val
+		end,
+	}
+end
+
+function ns.DefineEmotesToggle(settings, order)
+	return {
+		type = "toggle",
+		name = L["PRAISE_EMOTES_ENABLE"],
+		desc = L["PRAISE_EMOTES_DESCRIPTION"],
+		width = "full",
+		order = order,
+		get = function()
+			return settings().emotesEnabled
+		end,
+		set = function(_, val)
+			settings().emotesEnabled = val
+		end,
+	}
+end
+
+-- Shared by the emote picker and the blank line above it, so both disappear
+-- together when the panel's emotes are switched off.
+function ns.EmotesHidden(settings)
+	return function()
 		return not settings().emotesEnabled
 	end
+end
 
-	local options = {
-		name = L[titleKey],
+-- The emote picker: one half-width toggle per entry in Data.EMOTES, inline under
+-- the panel's Enable Emotes toggle and hidden along with it.
+function ns.DefineEmoteGroup(settings, order)
+	local group = {
 		type = "group",
-		args = {
-			descIntro = ns.OptionsDesc(L[descKey], 1),
-			space0 = ns.OptionsSpacer(2),
-			headerMessaging = ns.OptionsSubHeader(L["MESSAGING_HEADER"], 5),
-			printOut = {
-				type = "toggle",
-				name = L["MESSAGING_PRINT_ENABLE"],
-				desc = L["MESSAGING_PRINT_DESCRIPTION"],
-				width = "full",
-				order = 6,
-				get = function()
-					return settings().printEnabled
-				end,
-				set = function(_, val)
-					settings().printEnabled = val
-				end,
-			},
-			whisper = {
-				type = "toggle",
-				name = L["MESSAGING_WHISPER_ENABLE"],
-				desc = L["MESSAGING_WHISPER_DESCRIPTION"],
-				width = "full",
-				order = 7,
-				get = function()
-					return settings().whisperEnabled
-				end,
-				set = function(_, val)
-					settings().whisperEnabled = val
-				end,
-			},
-			emotes = {
-				type = "toggle",
-				name = L["MESSAGING_EMOTES_ENABLE"],
-				desc = L["MESSAGING_EMOTES_DESCRIPTION"],
-				width = "full",
-				order = 8,
-				get = function()
-					return settings().emotesEnabled
-				end,
-				set = function(_, val)
-					settings().emotesEnabled = val
-				end,
-			},
-			emoteSpacer = { type = "description", name = " ", order = 9, hidden = EmotesHidden },
-			emoteGroup = {
-				type = "group",
-				name = L["MESSAGING_EMOTES_SELECT"],
-				order = 10,
-				inline = true,
-				hidden = EmotesHidden,
-				args = {},
-			},
-			headerTracked = ns.OptionsSubHeader(L["COMBAT_TRACKED"], 12),
-			space2 = ns.OptionsSpacer(13),
-		},
+		name = L["PRAISE_EMOTES_SELECT"],
+		order = order,
+		inline = true,
+		hidden = ns.EmotesHidden(settings),
+		args = {},
 	}
 
 	for i, emoteData in ipairs(Data.EMOTES) do
 		local emote = emoteData.cmd
-		options.args.emoteGroup.args[emote] = {
+		group.args[emote] = {
 			type = "toggle",
 			name = emoteData.displayName,
 			desc = emoteData.desc,
@@ -304,5 +306,56 @@ function ns.BuildBuffPanel(titleKey, descKey, settingsKey)
 		}
 	end
 
-	return options
+	return group
+end
+
+--[[
+    "Enable Praise Delay" and the dropdown that sets its length, offered by every
+    buff panel. The delay holds back the whisper and the emote only: the print and
+    the sound are your own heads-up and stay instant. NOT full-width, so the
+    dropdown can share the row.
+]]
+function ns.DefinePraiseDelayToggle(settings, order)
+	return {
+		type = "toggle",
+		name = L["PRAISE_DELAY_ENABLE"],
+		desc = L["PRAISE_DELAY_DESCRIPTION"],
+		order = order,
+		get = function()
+			return settings().praiseDelayEnabled
+		end,
+		set = function(_, val)
+			settings().praiseDelayEnabled = val
+		end,
+	}
+end
+
+-- Nothing to set while the delay is off, so the dropdown only appears with it.
+-- Its labels come from the client's own duration strings (ns.FormatDuration), so
+-- "2 seconds" reads correctly in every language without TFTB shipping a string
+-- per length. Data.PRAISE_DELAY_CHOICES doubles as the display order.
+function ns.DefinePraiseDelaySelect(settings, order)
+	return {
+		type = "select",
+		name = L["PRAISE_DELAY_LENGTH"],
+		desc = L["PRAISE_DELAY_LENGTH_DESCRIPTION"],
+		order = order,
+		hidden = function()
+			return not settings().praiseDelayEnabled
+		end,
+		sorting = Data.PRAISE_DELAY_CHOICES,
+		values = function()
+			local values = {}
+			for _, seconds in ipairs(Data.PRAISE_DELAY_CHOICES) do
+				values[seconds] = ns.FormatDuration(seconds)
+			end
+			return values
+		end,
+		get = function()
+			return settings().praiseDelay
+		end,
+		set = function(_, val)
+			settings().praiseDelay = val
+		end,
+	}
 end

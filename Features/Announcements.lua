@@ -125,9 +125,15 @@ local function Possessive(guid)
 	return L["PRONOUN_THEIR"]
 end
 
--- Item-driven buffs link the source item; everything else links the spell.
-local function GetLink(entry, spellID)
-	if entry.itemId then
+--[[
+    Item-driven buffs link the source item; everything else links the spell. A
+    stranger buff carries no tracked entry, so a nil entry is simply the spell
+    case. Resolved once by the caller and passed to whichever of the print and
+    the whisper actually fire, since the two no longer go out together (see
+    ns:WhisperThanks).
+]]
+function ns.GetBuffLink(entry, spellID)
+	if entry and entry.itemId then
 		local link = select(2, ns.GetItemInfo(entry.itemId))
 		if link then
 			return link
@@ -137,37 +143,36 @@ local function GetLink(entry, spellID)
 end
 
 --[[
-    Tracked teammate buffs and group services. The verb comes from the entry's
-    type/detect: a solo buff "gave you", a group buff "gave your group", a service
-    "set out", an item used on you "used [their] X on you", a cast "used X on you".
+    The chat line for a tracked teammate buff or group service. The verb comes
+    from the entry's type/detect: a solo buff "gave you", a group buff "gave your
+    group", a service "set out", an item used on you "used [their] X on you", a
+    cast "used X on you".
 ]]
-function ns:AnnounceTracked(entry, creditGUID, creditName, spellID, printEnabled, whisperEnabled)
-	if not printEnabled and not whisperEnabled then
-		return
+function ns:AnnounceTracked(entry, creditGUID, creditName, link)
+	local name = ColorName(creditGUID, creditName)
+	local message
+	if entry.type == Data.BUFF.SERVICE then
+		message = (entry.opened and L["MESSAGE_OPENED"] or L["MESSAGE_SET_OUT"]):format(name, link)
+	elseif entry.type == Data.BUFF.GROUP then
+		message = L["MESSAGE_GAVE_GROUP"]:format(name, link)
+	elseif entry.itemId then
+		message = L["MESSAGE_USED_ITEM"]:format(name, Possessive(creditGUID), link)
+	elseif entry.detect == Data.DETECT.CAST then
+		message = L["MESSAGE_USED_SPELL"]:format(name, link)
+	else
+		message = L["MESSAGE_GAVE_YOU"]:format(name, link)
 	end
+	ns:PrintMessage(message)
+end
 
-	local link = GetLink(entry, spellID)
-
-	if printEnabled then
-		local name = ColorName(creditGUID, creditName)
-		local message
-		if entry.type == Data.BUFF.SERVICE then
-			message = (entry.opened and L["MESSAGE_OPENED"] or L["MESSAGE_SET_OUT"]):format(name, link)
-		elseif entry.type == Data.BUFF.GROUP then
-			message = L["MESSAGE_GAVE_GROUP"]:format(name, link)
-		elseif entry.itemId then
-			message = L["MESSAGE_USED_ITEM"]:format(name, Possessive(creditGUID), link)
-		elseif entry.detect == Data.DETECT.CAST then
-			message = L["MESSAGE_USED_SPELL"]:format(name, link)
-		else
-			message = L["MESSAGE_GAVE_YOU"]:format(name, link)
-		end
-		ns:PrintMessage(message)
-	end
-
-	if whisperEnabled then
-		ns:Announce("WHISPER", creditName, "MESSAGE_WHISPER_THANKS", link)
-	end
+--[[
+    The thank-you whisper behind both the Strangers and the Teammates reactions.
+    Split out from the prints above because the two are no longer sent together:
+    the whisper is praise the other player sees and can be held back by the Praise
+    Delay, while the print is your own heads-up and always fires immediately.
+]]
+function ns:WhisperThanks(target, link)
+	ns:Announce("WHISPER", target, "MESSAGE_WHISPER_THANKS", link)
 end
 
 --[[
@@ -195,14 +200,10 @@ function ns:AnnouncePeerPressure(class, sourceName, spellID, targetName)
 	ns:PrintMessage(ns:BuildPeerPressureMessage(class, sourceName, spellID, targetName))
 end
 
--- Any helpful buff from a non-grouped friendly player.
-function ns:AnnounceStranger(sourceGUID, sourceName, link, printEnabled, whisperEnabled)
-	if printEnabled then
-		ns:PrintMessage(L["MESSAGE_BUFFED"]:format(ColorName(sourceGUID, sourceName), link))
-	end
-	if whisperEnabled then
-		ns:Announce("WHISPER", sourceName, "MESSAGE_WHISPER_THANKS", link)
-	end
+-- The chat line for any helpful buff from a non-grouped friendly player. Its
+-- thank-you whisper goes out through ns:WhisperThanks.
+function ns:AnnounceStranger(sourceGUID, sourceName, link)
+	ns:PrintMessage(L["MESSAGE_BUFFED"]:format(ColorName(sourceGUID, sourceName), link))
 end
 
 --------------------------------------------------------------------------------
@@ -302,7 +303,7 @@ ns.FormatDuration = FormatDuration
     X!".
 ]]
 function ns:AnnounceGoodNews(entry, destName, spellID, duration)
-	local link = GetLink(entry, spellID)
+	local link = ns.GetBuffLink(entry, spellID)
 	local message
 	if duration and duration > 0 then
 		message = ns:BuildAnnounceMessage("MESSAGE_GOOD_NEWS_DURATION", link, FormatDuration(duration))

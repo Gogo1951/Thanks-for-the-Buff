@@ -6,13 +6,13 @@ Automatically thank players who buff you with emotes, whispers, and chat notific
 
 ## Features
 
-🙌 **Every Buff Gets a Thank-You** // A stranger's buff out in the world or a teammate's cooldown — Power Infusion, Innervate, Lay on Hands — fires an emote, a chat note, or an automatic whisper. Per-player cooldowns and a minimum-duration filter keep it from ever turning spammy.
+🙌 **Every Buff Gets a Thank-You** // Be the player who always says thanks — to the stranger who buffs you in passing and the teammate who burns a cooldown on you — without ever stopping to type it.
 
 🍖 **Group Services** // A heads-up the moment someone sets out a feast, drops a soulwell, opens a portal, or puts down a repair bot for the group.
 
-📣 **Send Good News** // Whisper the players you buff to tell them what they got and how long it lasts — perfect for Power Infusion, a clutch Innervate, or a soulstone before the pull.
+📣 **Give Good News** // Whisper the players you buff to tell them what they got and how long it lasts — perfect for Power Infusion, a clutch Innervate, or a soulstone before the pull.
 
-🚂 **Peer Pressure** // Get pinged the moment another player of your class pops a cooldown, so you can stack yours on top.
+🚂 **Feel Peer Pressure** // Get pinged the moment another player of your class pops a cooldown, so you can stack yours on top.
 
 🙏 **Thank You Button** // A one-click `- Thank` macro that emotes at your target and whispers them a personal thank-you — great for a healer, a mage's portal, or a warlock's summon.
 
@@ -21,13 +21,13 @@ Automatically thank players who buff you with emotes, whispers, and chat notific
 1. Install the add-on, ideally using [CurseForge](https://www.curseforge.com/wow/addons/thanks-for-the-buff-revisited) or [Wago](https://addons.wago.io/addons/thanks-for-the-buff).
 2. Log in — sensible defaults are already on, so a teammate's buffs start printing to your chat right away.
 3. Type `/tftb` to choose how you react to each kind of buff — chat note, whisper, emote, sound, or any mix — and pick which emotes to use.
-4. Out in the world, strangers' buffs get an automatic emote; set the cooldown and minimum duration so it stays classy.
+4. Out in the world, strangers' buffs get an automatic emote; tune the cooldowns, the minimum duration, and an optional delay so it stays classy.
 5. Drag the auto-created `- Thank` macro to your action bar to thank your target on demand.
 6. *"Manners maketh the raid."*
 
 ## How It Works
 
-Type `/tftb` to open the options panel. Buffs from strangers, buffs from teammates, and group services each get their own tab, where you choose how to react: a self-only chat note, an automatic whisper to whoever helped you, an emote, a sound, or any combination. Good News whispers the people you buff, and Peer Pressure pings you when a same-class player pops a cooldown. You can toggle individual abilities and items on or off anywhere they appear.
+Type `/tftb` to open the options panel. Buffs from strangers, buffs from teammates, and group services each get their own tab, and every tab splits the same way: **Praise Messages & Emotes** is what the player who helped you sees, and **Notifications** is the chat note and sound only you get. Turn on whichever you like, add a short delay so your thanks doesn't land in the same instant as the buff, and set cooldowns so a wave of world buffs never turns into spam. Good News whispers the people you buff, and Peer Pressure pings you when a same-class player pops a cooldown. You can toggle individual abilities and items on or off anywhere they appear.
 
 ### Tracked Abilities
 
@@ -90,6 +90,8 @@ Please reach out if you would like to be involved!
 🟢 Pairs With // Gogo1951's [Connoisseur](https://www.curseforge.com/wow/addons/consumable-connoisseur)
 
 🟢 Pairs With // Brylack's [Never Locky](https://www.curseforge.com/wow/addons/never-locky)
+
+🟢 Pairs With // Gogo1951's [Play It Forward](https://www.curseforge.com/wow/addons/play-it-forward)
 
 🟢 Pairs With // Codermik's [SmartBuff](https://www.curseforge.com/wow/addons/smartbuff-retail-burning-crusade-classic)
 

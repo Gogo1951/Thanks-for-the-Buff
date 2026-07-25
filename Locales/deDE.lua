@@ -70,12 +70,15 @@ L["OPTIONS_COMMAND_THANKYOU_DESCRIPTION"] = "Nutzt ein Emote und flüstert Eurem
 
 L["TAB_STRANGERS"] = "Buffs von Fremden"
 L["STRANGERS_DESCRIPTION"] = "Ein Buff auf Euch von einem Spieler außerhalb Eurer Gruppe (offene Welt)."
-L["STRANGERS_COOLDOWN"] = "Abklingzeit (Sekunden)"
-L["STRANGERS_COOLDOWN_DESCRIPTION"] =
-	"Wie oft dem gleichen Spieler maximal mit Emotes gedankt werden soll.\n\nNachrichten sind davon nicht betroffen; sie werden für jeden Buff ausgelöst."
+L["STRANGERS_OVERALL_COOLDOWN"] = "Lob-Abklingzeit (Sekunden)"
+L["STRANGERS_OVERALL_COOLDOWN_DESCRIPTION"] =
+	"Wie oft überhaupt gelobt werden soll, ganz gleich von wem der Buff kam.\n\nAuf 0 setzen, um diese Begrenzung zu deaktivieren. Benachrichtigungen sind davon nicht betroffen."
+L["STRANGERS_SOURCE_COOLDOWN"] = "Lob-Abklingzeit pro Spieler (Sekunden)"
+L["STRANGERS_SOURCE_COOLDOWN_DESCRIPTION"] =
+	"Wie oft derselbe Spieler maximal gelobt werden soll.\n\nBenachrichtigungen sind davon nicht betroffen."
 L["STRANGERS_MIN_DURATION"] = "Minimale Buff-Dauer (Sekunden)"
 L["STRANGERS_MIN_DURATION_DESCRIPTION"] =
-	"Die Mindestdauer des Buffs, um ein Dankeschön auszulösen.\n\nFiltert kurze Heilungen über Zeit wie Erneuerung oder Verjüngung heraus."
+	"Wie lange der Buff mindestens anhalten muss, damit überhaupt darauf reagiert wird.\n\nFiltert kurze Heilungen über Zeit wie Erneuerung oder Verjüngung heraus. Benachrichtigungen sind ebenfalls betroffen; ein Buff darunter wird vollständig ignoriert, ohne Nachricht, Ton, Flüstern oder Emote."
 
 --------------------------------------------------------------------------------
 -- Options: Combat Buff Panels
@@ -121,6 +124,36 @@ L["COMBAT_ITEM_PENDING"] = "Gegenstand #%d"
 L["COMBAT_SPELL_PENDING"] = "Zauber #%d"
 
 --------------------------------------------------------------------------------
+-- Shared: Praise and Notifications
+--------------------------------------------------------------------------------
+
+-- The two section headers every buff panel is built from: what the other player
+-- sees, then what only you get. Peer Pressure sends nothing outward, so it
+-- carries the Notifications header alone. Key prefixes match the header the
+-- control appears under.
+L["PRAISE_HEADER"] = "Lobnachrichten & Emotes"
+L["NOTIFICATIONS_HEADER"] = "Benachrichtigungen"
+
+L["PRAISE_WHISPER_ENABLE"] = "Dankesflüstern aktivieren"
+L["PRAISE_WHISPER_DESCRIPTION"] = "Flüstert dem Spieler, der Euch gebufft hat, ein Dankeschön zu."
+L["PRAISE_EMOTES_ENABLE"] = "Emotes aktivieren (Außerhalb des Kampfes)"
+L["PRAISE_EMOTES_DESCRIPTION"] =
+	"Drückt Eure Wertschätzung durch Emotes aus. Emotes werden zurückgehalten, solange Ihr Euch im Kampf befindet."
+L["PRAISE_EMOTES_SELECT"] = "Emotes auswählen"
+L["PRAISE_DELAY_ENABLE"] = "Lob-Verzögerung aktivieren"
+L["PRAISE_DELAY_DESCRIPTION"] =
+	"Wartet einen Moment vor dem Flüstern und dem Emote, damit Euer Dank nicht im selben Augenblick wie der Buff eintrifft.\n\nBenachrichtigungen sind davon nicht betroffen."
+L["PRAISE_DELAY_LENGTH"] = "Verzögerung"
+L["PRAISE_DELAY_LENGTH_DESCRIPTION"] =
+	"Wie lange gewartet werden soll, bevor dem Spieler gedankt wird, der Euch gebufft hat."
+
+L["NOTIFICATIONS_PRINT_ENABLE"] = "Chat-Nachrichten aktivieren"
+L["NOTIFICATIONS_PRINT_DESCRIPTION"] =
+	"Gibt eine Nachricht in Eurem eigenen Chat aus, wenn Ihr einen Buff erhaltet. Nur Ihr seht sie."
+L["NOTIFICATIONS_SOUND_ENABLE"] = "Soundeffekte aktivieren"
+L["NOTIFICATIONS_SOUND_DESCRIPTION"] = "Spielt einen Ton ab, wenn Ihr einen Buff erhaltet. Nur Ihr hört ihn."
+
+--------------------------------------------------------------------------------
 -- Tracked Ability Groups
 --------------------------------------------------------------------------------
 
@@ -149,23 +182,6 @@ L["BUTTON_CREATE_MACRO_DESCRIPTION"] = "Erstellt beim Einloggen automatisch ein 
 L["BUTTON_WHISPER"] = "Flüsternachricht"
 L["BUTTON_RESET"] = "Zurücksetzen"
 L["BUTTON_RESET_DESCRIPTION"] = "Setzt die Flüsternachricht auf den Standardtext zurück."
-
---------------------------------------------------------------------------------
--- Shared: Messaging
---------------------------------------------------------------------------------
-
-L["MESSAGING_HEADER"] = "Nachrichten"
-L["MESSAGING_PRINT_ENABLE"] = "Chat-Nachrichten aktivieren"
-L["MESSAGING_PRINT_DESCRIPTION"] =
-	"Gibt eine Nachricht in Eurem eigenen Chat aus, wenn Ihr einen Buff erhaltet. Nur Ihr seht sie."
-L["MESSAGING_WHISPER_ENABLE"] = "Dankesflüstern aktivieren"
-L["MESSAGING_WHISPER_DESCRIPTION"] = "Flüstert dem Spieler, der Euch gebufft hat, ein Dankeschön zu."
-L["MESSAGING_EMOTES_ENABLE"] = "Emotes aktivieren (Außerhalb des Kampfes)"
-L["MESSAGING_EMOTES_DESCRIPTION"] =
-	"Drückt Eure Wertschätzung durch Emotes aus. Emotes werden zurückgehalten, solange Ihr Euch im Kampf befindet."
-L["MESSAGING_EMOTES_SELECT"] = "Emotes auswählen"
-L["MESSAGING_SOUND_ENABLE"] = "Soundeffekt aktivieren"
-L["MESSAGING_SOUND_DESCRIPTION"] = "Spielt einen Ton ab, wenn Ihr einen Buff erhaltet. Nur Ihr hört ihn."
 
 --------------------------------------------------------------------------------
 -- Defaults

@@ -70,12 +70,15 @@ L["OPTIONS_COMMAND_THANKYOU_DESCRIPTION"] = "对你当前的目标发送表情�
 
 L["TAB_STRANGERS"] = "来自陌生人的增益"
 L["STRANGERS_DESCRIPTION"] = "来自队伍外的玩家（开放世界）给你的增益。"
-L["STRANGERS_COOLDOWN"] = "冷却时间（秒）"
-L["STRANGERS_COOLDOWN_DESCRIPTION"] =
-	"对同一名玩家发送表情的最高频率。\n\n消息不受此影响；它们会在每个增益触发。"
+L["STRANGERS_OVERALL_COOLDOWN"] = "感谢冷却时间（秒）"
+L["STRANGERS_OVERALL_COOLDOWN_DESCRIPTION"] =
+	"无论增益来自谁，向任何人表示感谢的最高频率。\n\n设为 0 可关闭此限制。通知不受此影响。"
+L["STRANGERS_SOURCE_COOLDOWN"] = "同一玩家感谢冷却时间（秒）"
+L["STRANGERS_SOURCE_COOLDOWN_DESCRIPTION"] =
+	"对同一名玩家表示感谢的最高频率。\n\n通知不受此影响。"
 L["STRANGERS_MIN_DURATION"] = "最低增益持续时间（秒）"
 L["STRANGERS_MIN_DURATION_DESCRIPTION"] =
-	"增益效果必须持续的最短时间才能触发感谢。\n\n过滤掉恢复或回春术等短时间持续治疗。"
+	"增益需要持续多久才值得作出反应。\n\n过滤掉恢复或回春术等短时间持续治疗。通知同样受影响；低于此时长的增益会被完全忽略，不会有信息、音效、密语或表情。"
 
 --------------------------------------------------------------------------------
 -- Options: Combat Buff Panels
@@ -118,6 +121,34 @@ L["COMBAT_ITEM_PENDING"] = "物品 #%d"
 L["COMBAT_SPELL_PENDING"] = "法术 #%d"
 
 --------------------------------------------------------------------------------
+-- Shared: Praise and Notifications
+--------------------------------------------------------------------------------
+
+-- The two section headers every buff panel is built from: what the other player
+-- sees, then what only you get. Peer Pressure sends nothing outward, so it
+-- carries the Notifications header alone. Key prefixes match the header the
+-- control appears under.
+L["PRAISE_HEADER"] = "感谢信息与表情"
+L["NOTIFICATIONS_HEADER"] = "通知"
+
+L["PRAISE_WHISPER_ENABLE"] = "启用感谢密语"
+L["PRAISE_WHISPER_DESCRIPTION"] = "向给你增益的玩家密语感谢。"
+L["PRAISE_EMOTES_ENABLE"] = "启用表情（脱战时）"
+L["PRAISE_EMOTES_DESCRIPTION"] = "用表情表达你的感谢。战斗中会暂缓发送表情。"
+L["PRAISE_EMOTES_SELECT"] = "选择表情"
+L["PRAISE_DELAY_ENABLE"] = "启用感谢延迟"
+L["PRAISE_DELAY_DESCRIPTION"] =
+	"在密语和表情之前稍作等待，让你的感谢不会与增益同时出现。\n\n通知不受此影响。"
+L["PRAISE_DELAY_LENGTH"] = "延迟"
+L["PRAISE_DELAY_LENGTH_DESCRIPTION"] = "在感谢给你增益的玩家之前等待多久。"
+
+L["NOTIFICATIONS_PRINT_ENABLE"] = "启用聊天框信息"
+L["NOTIFICATIONS_PRINT_DESCRIPTION"] =
+	"当收到增益时，在你的聊天框输出一条信息。只有你能看到。"
+L["NOTIFICATIONS_SOUND_ENABLE"] = "启用音效"
+L["NOTIFICATIONS_SOUND_DESCRIPTION"] = "当收到增益时播放音效。只有你能听到。"
+
+--------------------------------------------------------------------------------
 -- Tracked Ability Groups
 --------------------------------------------------------------------------------
 
@@ -146,21 +177,6 @@ L["BUTTON_CREATE_MACRO_DESCRIPTION"] = "登录时自动为你创建一个名为 
 L["BUTTON_WHISPER"] = "密语信息"
 L["BUTTON_RESET"] = "重置"
 L["BUTTON_RESET_DESCRIPTION"] = "将密语信息重置为默认文本。"
-
---------------------------------------------------------------------------------
--- Shared: Messaging
---------------------------------------------------------------------------------
-
-L["MESSAGING_HEADER"] = "消息设置"
-L["MESSAGING_PRINT_ENABLE"] = "启用聊天框信息"
-L["MESSAGING_PRINT_DESCRIPTION"] = "当收到增益时，在你的聊天框输出一条信息。只有你能看到。"
-L["MESSAGING_WHISPER_ENABLE"] = "启用感谢密语"
-L["MESSAGING_WHISPER_DESCRIPTION"] = "向给你增益的玩家密语感谢。"
-L["MESSAGING_EMOTES_ENABLE"] = "启用表情（脱战时）"
-L["MESSAGING_EMOTES_DESCRIPTION"] = "用表情表达你的感谢。战斗中会暂缓发送表情。"
-L["MESSAGING_EMOTES_SELECT"] = "选择表情"
-L["MESSAGING_SOUND_ENABLE"] = "启用音效"
-L["MESSAGING_SOUND_DESCRIPTION"] = "当收到增益时播放音效。只有你能听到。"
 
 --------------------------------------------------------------------------------
 -- Defaults

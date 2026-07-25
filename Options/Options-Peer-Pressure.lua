@@ -31,7 +31,7 @@ function ns.BuildPeerPressureOptions()
 				type = "toggle",
 				name = L["PEER_PRESSURE_ENABLE"],
 				width = "full",
-				order = 4,
+				order = 3,
 				get = function()
 					return ns.db.profile.peerPressure.enabled
 				end,
@@ -39,56 +39,14 @@ function ns.BuildPeerPressureOptions()
 					ns.db.profile.peerPressure.enabled = val
 				end,
 			},
-			headerMessaging = ns.OptionsSubHeader(L["MESSAGING_HEADER"], 5, PeerPressureHidden),
-			printOut = {
-				type = "toggle",
-				name = L["MESSAGING_PRINT_ENABLE"],
-				desc = L["PEER_PRESSURE_PRINT_DESCRIPTION"],
-				width = "full",
-				order = 6,
-				hidden = PeerPressureHidden,
-				get = function()
-					return ns.db.profile.peerPressure.printEnabled
-				end,
-				set = function(_, val)
-					ns.db.profile.peerPressure.printEnabled = val
-				end,
-			},
-			ownCasts = {
-				type = "toggle",
-				name = L["PEER_PRESSURE_OWN_CASTS"],
-				desc = L["PEER_PRESSURE_OWN_CASTS_DESCRIPTION"],
-				width = "full",
-				order = 6.5,
-				hidden = PeerPressureHidden,
-				get = function()
-					return ns.db.profile.peerPressure.triggerOnOwnCasts
-				end,
-				set = function(_, val)
-					ns.db.profile.peerPressure.triggerOnOwnCasts = val
-				end,
-			},
-			-- Not full-width: the preview speaker sits on the same row.
-			sound = {
-				type = "toggle",
-				name = L["MESSAGING_SOUND_ENABLE"],
-				desc = L["PEER_PRESSURE_SOUND_DESCRIPTION"],
-				order = 7,
-				hidden = PeerPressureHidden,
-				get = function()
-					return ns.db.profile.peerPressure.soundEnabled
-				end,
-				set = function(_, val)
-					ns.db.profile.peerPressure.soundEnabled = val
-				end,
-			},
-			soundPreview = ns.DefineSoundPreview(ns.PlayPeerPressureSound, 7.5, PeerPressureHidden),
-			sampleSpacer = { type = "description", name = " ", order = 7.6, hidden = PeerPressureHidden },
+			sampleSpacer = { type = "description", name = " ", order = 4, hidden = PeerPressureHidden },
 			--[[
                 A sample of the alert, built by the SAME pipeline as the real
                 print (prefix, class color, spell link), so it can never drift
                 from what actually shows in chat: rogue-colored body, link-blue
-                spell link. Blade Flurry (13877) is live on every flavor.
+                spell link. Blade Flurry (13877) is live on every flavor. Sits
+                directly under the enable toggle so turning the feature on shows
+                you what you just signed up for.
             ]]
 			sampleMessage = {
 				type = "description",
@@ -99,11 +57,62 @@ function ns.BuildPeerPressureOptions()
 						.. "\n"
 				end,
 				fontSize = "medium",
-				order = 7.7,
+				order = 5,
 				hidden = PeerPressureHidden,
 			},
-			headerTracked = ns.OptionsSubHeader(L["COMBAT_TRACKED"], 12, PeerPressureHidden),
-			space2 = { type = "description", name = " ", order = 13, hidden = PeerPressureHidden },
+			space1 = { type = "description", name = " ", order = 6, hidden = PeerPressureHidden },
+
+			headerNotifications = ns.OptionsHeader(L["NOTIFICATIONS_HEADER"], 7, PeerPressureHidden),
+			space2 = { type = "description", name = " ", order = 8, hidden = PeerPressureHidden },
+			printOut = {
+				type = "toggle",
+				name = L["NOTIFICATIONS_PRINT_ENABLE"],
+				desc = L["PEER_PRESSURE_PRINT_DESCRIPTION"],
+				width = "full",
+				order = 9,
+				hidden = PeerPressureHidden,
+				get = function()
+					return ns.db.profile.peerPressure.printEnabled
+				end,
+				set = function(_, val)
+					ns.db.profile.peerPressure.printEnabled = val
+				end,
+			},
+			space3 = { type = "description", name = " ", order = 10, hidden = PeerPressureHidden },
+			ownCasts = {
+				type = "toggle",
+				name = L["PEER_PRESSURE_OWN_CASTS"],
+				desc = L["PEER_PRESSURE_OWN_CASTS_DESCRIPTION"],
+				width = "full",
+				order = 11,
+				hidden = PeerPressureHidden,
+				get = function()
+					return ns.db.profile.peerPressure.triggerOnOwnCasts
+				end,
+				set = function(_, val)
+					ns.db.profile.peerPressure.triggerOnOwnCasts = val
+				end,
+			},
+			space4 = { type = "description", name = " ", order = 12, hidden = PeerPressureHidden },
+			-- Not full-width: the preview speaker sits on the same row.
+			sound = {
+				type = "toggle",
+				name = L["NOTIFICATIONS_SOUND_ENABLE"],
+				desc = L["PEER_PRESSURE_SOUND_DESCRIPTION"],
+				order = 13,
+				hidden = PeerPressureHidden,
+				get = function()
+					return ns.db.profile.peerPressure.soundEnabled
+				end,
+				set = function(_, val)
+					ns.db.profile.peerPressure.soundEnabled = val
+				end,
+			},
+			soundPreview = ns.DefineSoundPreview(ns.PlayPeerPressureSound, 14, PeerPressureHidden),
+			space5 = { type = "description", name = " ", order = 15, hidden = PeerPressureHidden },
+
+			headerTracked = ns.OptionsHeader(L["COMBAT_TRACKED"], 16, PeerPressureHidden),
+			space6 = { type = "description", name = " ", order = 17, hidden = PeerPressureHidden },
 		},
 	}
 

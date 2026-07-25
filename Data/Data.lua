@@ -68,6 +68,11 @@ ns.OPTIONS_REGISTRY = {
 Data.SAFETY_PAUSE = 3
 Data.MACRO_NAME = "- Thank"
 
+-- Praise Delay lengths, in seconds. Doubles as the dropdown's display order; the
+-- labels themselves come from the client's own duration strings at panel-build
+-- time (see ns.DefinePraiseDelaySelect).
+Data.PRAISE_DELAY_CHOICES = { 1, 2, 3, 4 }
+
 --[[
     {rt1} Star, {rt2} Circle, {rt3} Diamond, {rt4} Triangle,
     {rt5} Moon, {rt6} Square, {rt7} Cross, {rt8} Skull

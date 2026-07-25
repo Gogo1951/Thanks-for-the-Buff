@@ -57,7 +57,7 @@ function ns.BuildThankYouButtonOptions()
 			space2 = ns.OptionsSpacer(22),
 			slashEmoteGroup = {
 				type = "group",
-				name = L["MESSAGING_EMOTES_SELECT"],
+				name = L["PRAISE_EMOTES_SELECT"],
 				order = 31,
 				inline = true,
 				args = {},

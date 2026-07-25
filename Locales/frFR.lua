@@ -70,12 +70,15 @@ L["OPTIONS_COMMAND_THANKYOU_DESCRIPTION"] = "Fait une emote et chuchote à votre
 
 L["TAB_STRANGERS"] = "Améliorations d'Inconnus"
 L["STRANGERS_DESCRIPTION"] = "Une amélioration sur vous d'un joueur en dehors de votre groupe (monde ouvert)."
-L["STRANGERS_COOLDOWN"] = "Temps de recharge (Secondes)"
-L["STRANGERS_COOLDOWN_DESCRIPTION"] =
-	"Fréquence maximale d'utilisation d'une emote envers le même joueur.\n\nLes messages ne sont pas affectés ; ils se déclenchent pour chaque amélioration."
+L["STRANGERS_OVERALL_COOLDOWN"] = "Temps de recharge des remerciements (Secondes)"
+L["STRANGERS_OVERALL_COOLDOWN_DESCRIPTION"] =
+	"Fréquence maximale à laquelle remercier qui que ce soit, quelle que soit la provenance de l'amélioration.\n\nMettez 0 pour désactiver cette limite. Les notifications ne sont pas affectées."
+L["STRANGERS_SOURCE_COOLDOWN"] = "Temps de recharge par joueur (Secondes)"
+L["STRANGERS_SOURCE_COOLDOWN_DESCRIPTION"] =
+	"Fréquence maximale à laquelle remercier le même joueur.\n\nLes notifications ne sont pas affectées."
 L["STRANGERS_MIN_DURATION"] = "Durée minimale de l'amélioration (Secondes)"
 L["STRANGERS_MIN_DURATION_DESCRIPTION"] =
-	"Durée minimale pendant laquelle l'amélioration doit persister pour déclencher un remerciement.\n\nFiltre les soins sur la durée courts comme Rénovation ou Récupération."
+	"Durée minimale que l'amélioration doit avoir pour mériter une réaction.\n\nFiltre les soins sur la durée courts comme Rénovation ou Récupération. Les notifications sont également affectées ; une amélioration en dessous de ce seuil est entièrement ignorée, sans message, son, chuchotement ni emote."
 
 --------------------------------------------------------------------------------
 -- Options: Combat Buff Panels
@@ -121,6 +124,35 @@ L["COMBAT_ITEM_PENDING"] = "Objet #%d"
 L["COMBAT_SPELL_PENDING"] = "Sort #%d"
 
 --------------------------------------------------------------------------------
+-- Shared: Praise and Notifications
+--------------------------------------------------------------------------------
+
+-- The two section headers every buff panel is built from: what the other player
+-- sees, then what only you get. Peer Pressure sends nothing outward, so it
+-- carries the Notifications header alone. Key prefixes match the header the
+-- control appears under.
+L["PRAISE_HEADER"] = "Messages de remerciement et emotes"
+L["NOTIFICATIONS_HEADER"] = "Notifications"
+
+L["PRAISE_WHISPER_ENABLE"] = "Activer les chuchotements de remerciement"
+L["PRAISE_WHISPER_DESCRIPTION"] = "Chuchote un remerciement au joueur qui vous a amélioré."
+L["PRAISE_EMOTES_ENABLE"] = "Activer les Emotes (Hors combat)"
+L["PRAISE_EMOTES_DESCRIPTION"] =
+	"Exprimez votre appréciation par une emote. Les emotes sont retenues pendant que vous êtes en combat."
+L["PRAISE_EMOTES_SELECT"] = "Sélectionner des Emotes"
+L["PRAISE_DELAY_ENABLE"] = "Activer le délai de remerciement"
+L["PRAISE_DELAY_DESCRIPTION"] =
+	"Attend un instant avant le chuchotement et l'emote, afin que votre remerciement n'arrive pas au même instant que l'amélioration.\n\nLes notifications ne sont pas affectées."
+L["PRAISE_DELAY_LENGTH"] = "Délai"
+L["PRAISE_DELAY_LENGTH_DESCRIPTION"] = "Combien de temps attendre avant de remercier le joueur qui vous a amélioré."
+
+L["NOTIFICATIONS_PRINT_ENABLE"] = "Activer les messages imprimés"
+L["NOTIFICATIONS_PRINT_DESCRIPTION"] =
+	"Affiche un message dans votre propre discussion lorsque vous recevez une amélioration. Vous seul le voyez."
+L["NOTIFICATIONS_SOUND_ENABLE"] = "Activer les effets sonores"
+L["NOTIFICATIONS_SOUND_DESCRIPTION"] = "Joue un son lorsque vous recevez une amélioration. Vous seul l'entendez."
+
+--------------------------------------------------------------------------------
 -- Tracked Ability Groups
 --------------------------------------------------------------------------------
 
@@ -149,23 +181,6 @@ L["BUTTON_CREATE_MACRO_DESCRIPTION"] = "Crée automatiquement une macro nommée 
 L["BUTTON_WHISPER"] = "Message de Chuchotement"
 L["BUTTON_RESET"] = "Réinitialiser"
 L["BUTTON_RESET_DESCRIPTION"] = "Réinitialise le message de chuchotement au texte par défaut."
-
---------------------------------------------------------------------------------
--- Shared: Messaging
---------------------------------------------------------------------------------
-
-L["MESSAGING_HEADER"] = "Messagerie"
-L["MESSAGING_PRINT_ENABLE"] = "Activer les messages imprimés"
-L["MESSAGING_PRINT_DESCRIPTION"] =
-	"Affiche un message dans votre propre discussion lorsque vous recevez une amélioration. Vous seul le voyez."
-L["MESSAGING_WHISPER_ENABLE"] = "Activer les chuchotements de remerciement"
-L["MESSAGING_WHISPER_DESCRIPTION"] = "Chuchote un remerciement au joueur qui vous a amélioré."
-L["MESSAGING_EMOTES_ENABLE"] = "Activer les Emotes (Hors combat)"
-L["MESSAGING_EMOTES_DESCRIPTION"] =
-	"Exprimez votre appréciation par une emote. Les emotes sont retenues pendant que vous êtes en combat."
-L["MESSAGING_EMOTES_SELECT"] = "Sélectionner des Emotes"
-L["MESSAGING_SOUND_ENABLE"] = "Activer l'effet sonore"
-L["MESSAGING_SOUND_DESCRIPTION"] = "Joue un son lorsque vous recevez une amélioration. Vous seul l'entendez."
 
 --------------------------------------------------------------------------------
 -- Defaults

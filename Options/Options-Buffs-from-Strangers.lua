@@ -1,131 +1,98 @@
 local _, ns = ...
-local Data = ns.Data
 local L = ns.L
+
+--[[
+    "Buffs from Strangers" panel -- a helpful buff on you from a player outside
+    your group. Two sections: Praise (what the buffer sees you send back, and the
+    limits on it) and Notifications (the chat line and sound only you get). The
+    controls themselves come from the shared factories in Options-Utilities.lua.
+]]
 
 --------------------------------------------------------------------------------
 -- Options Table
 --------------------------------------------------------------------------------
 
 function ns.BuildStrangersOptions()
-	local function EmotesHidden()
-		return not ns.db.profile.strangers.emotesEnabled
+	local function settings()
+		return ns.db.profile.strangers
 	end
 
-	local options = {
+	return {
 		name = L["TAB_STRANGERS"],
 		type = "group",
 		args = {
 			descIntro = ns.OptionsDesc(L["STRANGERS_DESCRIPTION"], 1),
 			space0 = ns.OptionsSpacer(2),
-			headerMessaging = ns.OptionsSubHeader(L["MESSAGING_HEADER"], 5),
-			printStrangers = {
-				type = "toggle",
-				name = L["MESSAGING_PRINT_ENABLE"],
-				desc = L["MESSAGING_PRINT_DESCRIPTION"],
-				width = "full",
-				order = 6,
+
+			headerPraise = ns.OptionsHeader(L["PRAISE_HEADER"], 3),
+			space1 = ns.OptionsSpacer(4),
+			emotesStrangers = ns.DefineEmotesToggle(settings, 5),
+			emoteSpacer = { type = "description", name = " ", order = 6, hidden = ns.EmotesHidden(settings) },
+			strangersEmoteGroup = ns.DefineEmoteGroup(settings, 7),
+			space2 = ns.OptionsSpacer(8),
+			whisperStrangers = ns.DefineWhisperToggle(settings, 9),
+			space3 = ns.OptionsSpacer(10),
+			praiseDelayStrangers = ns.DefinePraiseDelayToggle(settings, 11),
+			praiseDelayLengthStrangers = ns.DefinePraiseDelaySelect(settings, 12),
+			space4 = ns.OptionsSpacer(13),
+			praiseCooldownStrangers = {
+				type = "range",
+				name = L["STRANGERS_OVERALL_COOLDOWN"],
+				desc = L["STRANGERS_OVERALL_COOLDOWN_DESCRIPTION"],
+				order = 14,
+				width = "double",
+				min = 0,
+				max = 60,
+				step = 1,
 				get = function()
-					return ns.db.profile.strangers.printEnabled
+					return settings().praiseCooldown
 				end,
 				set = function(_, val)
-					ns.db.profile.strangers.printEnabled = val
+					settings().praiseCooldown = val
 				end,
 			},
-			whisperStrangers = {
-				type = "toggle",
-				name = L["MESSAGING_WHISPER_ENABLE"],
-				desc = L["MESSAGING_WHISPER_DESCRIPTION"],
-				width = "full",
-				order = 7,
-				get = function()
-					return ns.db.profile.strangers.whisperEnabled
-				end,
-				set = function(_, val)
-					ns.db.profile.strangers.whisperEnabled = val
-				end,
-			},
-			enableEmotesStrangers = {
-				type = "toggle",
-				name = L["MESSAGING_EMOTES_ENABLE"],
-				desc = L["MESSAGING_EMOTES_DESCRIPTION"],
-				width = "full",
-				order = 8,
-				get = function()
-					return ns.db.profile.strangers.emotesEnabled
-				end,
-				set = function(_, val)
-					ns.db.profile.strangers.emotesEnabled = val
-				end,
-			},
-			-- 8.5/8.6 slot the sound toggle and its preview speaker between
-			-- Enable Emotes (8) and the emote picker (9-10) without renumbering
-			-- the rest of the panel.
-			soundStrangers = ns.DefineSoundToggle(function()
-				return ns.db.profile.strangers
-			end, 8.5),
-			soundPreviewStrangers = ns.DefineSoundPreview(ns.PlayBuffSound, 8.6),
-			emoteSpacer = { type = "description", name = " ", order = 9, hidden = EmotesHidden },
-			strangersEmoteGroup = {
-				type = "group",
-				name = L["MESSAGING_EMOTES_SELECT"],
-				order = 10,
-				inline = true,
-				hidden = EmotesHidden,
-				args = {},
-			},
-			space1 = ns.OptionsSpacer(11),
+			space5 = ns.OptionsSpacer(15),
 			cooldownStrangers = {
 				type = "range",
-				name = L["STRANGERS_COOLDOWN"],
-				desc = L["STRANGERS_COOLDOWN_DESCRIPTION"],
-				order = 20,
+				name = L["STRANGERS_SOURCE_COOLDOWN"],
+				desc = L["STRANGERS_SOURCE_COOLDOWN_DESCRIPTION"],
+				order = 16,
 				width = "double",
 				min = 1,
 				max = 60,
 				step = 1,
 				get = function()
-					return ns.db.profile.strangers.cooldown
+					return settings().cooldown
 				end,
 				set = function(_, val)
-					ns.db.profile.strangers.cooldown = val
+					settings().cooldown = val
 				end,
 			},
-			space3 = ns.OptionsSpacer(21),
+			space6 = ns.OptionsSpacer(17),
 			minDurationStrangers = {
 				type = "range",
 				name = L["STRANGERS_MIN_DURATION"],
 				desc = L["STRANGERS_MIN_DURATION_DESCRIPTION"],
-				order = 22,
+				order = 18,
 				width = "double",
 				min = 0,
 				max = 120,
 				step = 1,
 				get = function()
-					return ns.db.profile.strangers.minBuffDuration
+					return settings().minBuffDuration
 				end,
 				set = function(_, val)
-					ns.db.profile.strangers.minBuffDuration = val
+					settings().minBuffDuration = val
 				end,
 			},
+			space7 = ns.OptionsSpacer(19),
+
+			headerNotifications = ns.OptionsHeader(L["NOTIFICATIONS_HEADER"], 20),
+			space8 = ns.OptionsSpacer(21),
+			printStrangers = ns.DefinePrintToggle(settings, 22),
+			space9 = ns.OptionsSpacer(23),
+			soundStrangers = ns.DefineSoundToggle(settings, 24),
+			soundPreviewStrangers = ns.DefineSoundPreview(ns.PlayBuffSound, 25),
 		},
 	}
-
-	for i, emoteData in ipairs(Data.EMOTES) do
-		local emote = emoteData.cmd
-		options.args.strangersEmoteGroup.args[emote] = {
-			type = "toggle",
-			name = emoteData.displayName,
-			desc = emoteData.desc,
-			order = i,
-			width = "half",
-			get = function()
-				return ns.db.profile.strangers.emotes[emote]
-			end,
-			set = function(_, val)
-				ns.db.profile.strangers.emotes[emote] = val
-			end,
-		}
-	end
-
-	return options
 end

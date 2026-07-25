@@ -70,12 +70,15 @@ L["OPTIONS_COMMAND_THANKYOU_DESCRIPTION"] = "Emotes at and whispers your current
 
 L["TAB_STRANGERS"] = "Buffs from Strangers"
 L["STRANGERS_DESCRIPTION"] = "A buff on you from a player outside your group (open world)."
-L["STRANGERS_COOLDOWN"] = "Cooldown (Seconds)"
-L["STRANGERS_COOLDOWN_DESCRIPTION"] =
-	"At most, how often to emote at the same player.\n\nMessages are not affected; they fire for every buff."
+L["STRANGERS_OVERALL_COOLDOWN"] = "Praise Cooldown (Seconds)"
+L["STRANGERS_OVERALL_COOLDOWN_DESCRIPTION"] =
+	"At most, how often to praise anyone at all, whoever the buff came from.\n\nSet to 0 to turn this limit off. Notifications are not affected."
+L["STRANGERS_SOURCE_COOLDOWN"] = "Same-Source Praise Cooldown (Seconds)"
+L["STRANGERS_SOURCE_COOLDOWN_DESCRIPTION"] =
+	"At most, how often to praise the same player.\n\nNotifications are not affected."
 L["STRANGERS_MIN_DURATION"] = "Minimum Buff Duration (Seconds)"
 L["STRANGERS_MIN_DURATION_DESCRIPTION"] =
-	"Minimum duration the buff must last to trigger a thank-you.\n\nFilters out short heals over time like Renew or Rejuvenation."
+	"How long the buff must last to be worth reacting to at all.\n\nFilters out short heals over time like Renew or Rejuvenation. Notifications are affected too; a buff below this is ignored completely, with no message, sound, whisper, or emote."
 
 --------------------------------------------------------------------------------
 -- Options: Combat Buff Panels
@@ -117,6 +120,33 @@ L["COMBAT_ITEM_PENDING"] = "Item #%d"
 L["COMBAT_SPELL_PENDING"] = "Spell #%d"
 
 --------------------------------------------------------------------------------
+-- Shared: Praise and Notifications
+--------------------------------------------------------------------------------
+
+-- The two section headers every buff panel is built from: what the other player
+-- sees, then what only you get. Peer Pressure sends nothing outward, so it
+-- carries the Notifications header alone. Key prefixes match the header the
+-- control appears under.
+L["PRAISE_HEADER"] = "Praise Messages & Emotes"
+L["NOTIFICATIONS_HEADER"] = "Notifications"
+
+L["PRAISE_WHISPER_ENABLE"] = "Enable Thank You Whispers"
+L["PRAISE_WHISPER_DESCRIPTION"] = "Whisper a thank-you to the player who buffed you."
+L["PRAISE_EMOTES_ENABLE"] = "Enable Emotes (When Out of Combat)"
+L["PRAISE_EMOTES_DESCRIPTION"] = "Emote your appreciation. Emotes are held back while you are in combat."
+L["PRAISE_EMOTES_SELECT"] = "Select Emotes"
+L["PRAISE_DELAY_ENABLE"] = "Enable Praise Delay"
+L["PRAISE_DELAY_DESCRIPTION"] =
+	"Wait a moment before the whisper and the emote, so your thanks doesn't land in the same instant as the buff.\n\nNotifications are not affected."
+L["PRAISE_DELAY_LENGTH"] = "Delay"
+L["PRAISE_DELAY_LENGTH_DESCRIPTION"] = "How long to wait before praising the player who buffed you."
+
+L["NOTIFICATIONS_PRINT_ENABLE"] = "Enable Print Out Messages"
+L["NOTIFICATIONS_PRINT_DESCRIPTION"] = "Print a message to your own chat when you receive a buff. Only you see it."
+L["NOTIFICATIONS_SOUND_ENABLE"] = "Enable Sound Effects"
+L["NOTIFICATIONS_SOUND_DESCRIPTION"] = "Play a sound when you receive a buff. Only you hear it."
+
+--------------------------------------------------------------------------------
 -- Tracked Ability Groups
 --------------------------------------------------------------------------------
 
@@ -145,21 +175,6 @@ L["BUTTON_CREATE_MACRO_DESCRIPTION"] = "Automatically creates a macro named %s w
 L["BUTTON_WHISPER"] = "Whisper Message"
 L["BUTTON_RESET"] = "Reset"
 L["BUTTON_RESET_DESCRIPTION"] = "Reset the whisper message to the default text."
-
---------------------------------------------------------------------------------
--- Shared: Messaging
---------------------------------------------------------------------------------
-
-L["MESSAGING_HEADER"] = "Messaging"
-L["MESSAGING_PRINT_ENABLE"] = "Enable Print Out Messages"
-L["MESSAGING_PRINT_DESCRIPTION"] = "Print a message to your own chat when you receive a buff. Only you see it."
-L["MESSAGING_WHISPER_ENABLE"] = "Enable Thank You Whispers"
-L["MESSAGING_WHISPER_DESCRIPTION"] = "Whisper a thank-you to the player who buffed you."
-L["MESSAGING_EMOTES_ENABLE"] = "Enable Emotes (When Out of Combat)"
-L["MESSAGING_EMOTES_DESCRIPTION"] = "Emote your appreciation. Emotes are held back while you are in combat."
-L["MESSAGING_EMOTES_SELECT"] = "Select Emotes"
-L["MESSAGING_SOUND_ENABLE"] = "Enable Sound Effect"
-L["MESSAGING_SOUND_DESCRIPTION"] = "Play a sound when you receive a buff. Only you hear it."
 
 --------------------------------------------------------------------------------
 -- Defaults

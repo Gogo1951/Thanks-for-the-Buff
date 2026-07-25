@@ -52,9 +52,10 @@ end
     self-only prints (which fire on every buff) they must not repeat: a player who
     rebuffs you several times is thanked at most once per window, which also keeps
     us clear of Blizzard's whisper spam squelch. Keyed by GUID under a "whisper:"
-    namespace so it never collides with the emote/service cooldowns on the same
-    GUID. Checks and stamps in one call, and only stamps when a whisper is actually
-    cleared to send, so the window is measured from the last whisper we sent.
+    namespace so it never collides with the praise/service cooldowns on the same
+    GUID, and it sits underneath the user-set praise cooldowns as a floor they
+    cannot lower. Checks and stamps in one call, and only stamps when a whisper is
+    actually cleared to send, so the window is measured from the last whisper we sent.
 ]]
 local WHISPER_COOLDOWN = 45
 local function TryWhisperCooldown(guid)
@@ -68,6 +69,11 @@ local function TryWhisperCooldown(guid)
 	SetCooldown(key, WHISPER_COOLDOWN)
 	return true
 end
+
+-- The Strangers panel's overall praise limit: one key for the whole feature,
+-- since it asks "how recently did I praise ANYONE", not "how recently did I
+-- praise this player" (that is the per-source "praise:<guid>" key).
+local PRAISE_OVERALL_KEY = "praise:all"
 
 --------------------------------------------------------------------------------
 -- Safety Timer
@@ -464,6 +470,39 @@ end
 --------------------------------------------------------------------------------
 
 --[[
+    Send the praise: the thank-you whisper, the emote, or both. Every gate -- the
+    toggles, the cooldowns, the whisper throttle, the combat check -- is settled
+    by the caller before the timer is armed, so the Praise Delay holds back
+    delivery only; a burst of buffs can't slip past a cooldown by landing inside
+    the delay window.
+
+    Two things are deliberately decided late instead, when the emote actually
+    fires. Combat, because the promise on that toggle is that an emote never
+    plays while you are fighting. And the emote target: ResolveEmoteTarget hands
+    back a live unit token, and "target", "focus", and "mouseover" all name
+    whoever you are pointing at in that instant -- resolve it early and a delayed
+    emote thanks whoever you moved on to. An unresolvable buffer degrades to
+    their bare name, then to the undirected emote.
+]]
+local function DeliverPraise(db, guid, name, link, whisperAllowed, emoteAllowed)
+	local function Praise()
+		if whisperAllowed then
+			ns:WhisperThanks(name, link)
+		end
+		if emoteAllowed and not InCombatLockdown() then
+			ns:DoRandomEmote(db.emotes, ResolveEmoteTarget(guid, name))
+		end
+	end
+
+	local delay = db.praiseDelayEnabled and db.praiseDelay or 0
+	if delay > 0 then
+		C_Timer.After(delay, Praise)
+	else
+		Praise()
+	end
+end
+
+--[[
     Group/raid PRINTS and emotes are intentionally NOT rate-limited: each cast is a
     distinct cooldown a teammate spent, so we acknowledge every one. The outgoing
     whisper is the exception -- it is throttled per-recipient (TryWhisperCooldown)
@@ -487,19 +526,23 @@ local function HandleTracked(entry, spellID, creditGUID, creditName, destGUID, p
 	-- No-aura raid help reacts with the Group Services settings; everything cast
 	-- on you (SOLO / GROUP) uses the Buffs from Teammates settings.
 	local db = (entry.type == Data.BUFF.SERVICE) and ns.db.profile.services or ns.db.profile.teammates
-	local whisperAllowed = db.whisperEnabled and TryWhisperCooldown(creditGUID)
-	ns:AnnounceTracked(entry, creditGUID, creditName, spellID, db.printEnabled, whisperAllowed)
+	local link = ns.GetBuffLink(entry, spellID)
+
+	if db.printEnabled then
+		ns:AnnounceTracked(entry, creditGUID, creditName, link)
+	end
 
 	-- Like the print, the sound is self-only and fires on every acknowledged
-	-- cast, in or out of combat. Services never define soundEnabled (no sound
-	-- option on that panel), so this is teammates-only by construction.
+	-- cast, in or out of combat.
 	if db.soundEnabled then
 		ns.PlayBuffSound()
 	end
 
 	-- Emotes are visible and social, so they are held back until you leave combat.
-	if db.emotesEnabled and not InCombatLockdown() then
-		ns:DoRandomEmote(db.emotes, ResolveEmoteTarget(creditGUID, creditName))
+	local whisperAllowed = db.whisperEnabled and TryWhisperCooldown(creditGUID)
+	local emoteAllowed = db.emotesEnabled and not InCombatLockdown()
+	if whisperAllowed or emoteAllowed then
+		DeliverPraise(db, creditGUID, creditName, link, whisperAllowed, emoteAllowed)
 	end
 end
 
@@ -517,27 +560,50 @@ local function HandleStrangersBuff(sourceGUID, sourceName, spellID)
 		return
 	end
 
+	-- Too short to be worth reacting to at all: no notification and no praise.
 	if db.minBuffDuration and db.minBuffDuration > 0 and duration > 0 and duration < db.minBuffDuration then
 		return
 	end
 
-	local spellLink = ns.GetSpellLink(spellID) or L["UNKNOWN_SPELL"]
+	local link = ns.GetBuffLink(nil, spellID)
 
-	-- Each channel is rate-limited differently: print and sound are self-only and
-	-- fire on every buff; the whisper is throttled per-recipient; the emote is
-	-- gated by the per-source cooldown, held until out of combat, and spends the
-	-- cooldown only when it actually fires.
-	local whisperAllowed = db.whisperEnabled and TryWhisperCooldown(sourceGUID)
-	ns:AnnounceStranger(sourceGUID, sourceName, spellLink, db.printEnabled, whisperAllowed)
+	-- Notifications are self-only and fire for every qualifying buff, in or out of
+	-- combat. Only the praise below answers to the cooldowns and the delay.
+	if db.printEnabled then
+		ns:AnnounceStranger(sourceGUID, sourceName, link)
+	end
 
 	if db.soundEnabled then
 		ns.PlayBuffSound()
 	end
 
-	if db.emotesEnabled and not InCombatLockdown() and not IsOnCooldown(sourceGUID) then
-		ns:DoRandomEmote(db.emotes, ResolveEmoteTarget(sourceGUID, sourceName))
-		SetCooldown(sourceGUID, db.cooldown)
+	--[[
+        Two praise cooldowns, both user settings: the overall one keeps a
+        mass-buff moment from turning into a chain of thank-yous, the per-source
+        one keeps a single player from being praised over and over. Neither is
+        spent unless praise is cleared to go out, so a buff that arrives while you
+        are in combat with emotes as your only enabled praise costs nothing. The
+        per-recipient whisper throttle sits on top as a floor no setting can
+        lower, so a short cooldown can't whisper someone into the server's chat
+        squelch.
+    ]]
+	local sourceKey = "praise:" .. sourceGUID
+	if IsOnCooldown(PRAISE_OVERALL_KEY) or IsOnCooldown(sourceKey) then
+		return
 	end
+
+	local whisperAllowed = db.whisperEnabled and TryWhisperCooldown(sourceGUID)
+	local emoteAllowed = db.emotesEnabled and not InCombatLockdown()
+	if not whisperAllowed and not emoteAllowed then
+		return
+	end
+
+	if db.praiseCooldown and db.praiseCooldown > 0 then
+		SetCooldown(PRAISE_OVERALL_KEY, db.praiseCooldown)
+	end
+	SetCooldown(sourceKey, db.cooldown)
+
+	DeliverPraise(db, sourceGUID, sourceName, link, whisperAllowed, emoteAllowed)
 end
 
 --------------------------------------------------------------------------------
