@@ -29,6 +29,21 @@ function ns.OptionsSpacer(order)
 	return { type = "description", name = " ", order = order }
 end
 
+--[[
+    The left half of a label-beside-control row: the control that follows carries
+    name = "" and ns.OPTIONS_CONTROL_WIDTH, so the two total one row and flow onto
+    the same line. A row whose control needs more room passes its own width here.
+]]
+function ns.OptionsRowLabel(text, order, width)
+	return {
+		type = "description",
+		name = text,
+		fontSize = "medium",
+		width = width or ns.OPTIONS_LABEL_WIDTH,
+		order = order,
+	}
+end
+
 --------------------------------------------------------------------------------
 -- Shared Buff-Panel Builders
 --------------------------------------------------------------------------------
@@ -312,14 +327,16 @@ end
 --[[
     "Enable Praise Delay" and the dropdown that sets its length, offered by every
     buff panel. The delay holds back the whisper and the emote only: the print and
-    the sound are your own heads-up and stay instant. NOT full-width, so the
-    dropdown can share the row.
+    the sound are your own heads-up and stay instant. The toggle takes the label
+    half of the row and the dropdown the other half, so the two total one row and
+    the dropdown sits clear of the caption.
 ]]
 function ns.DefinePraiseDelayToggle(settings, order)
 	return {
 		type = "toggle",
 		name = L["PRAISE_DELAY_ENABLE"],
 		desc = L["PRAISE_DELAY_DESCRIPTION"],
+		width = ns.OPTIONS_LABEL_WIDTH,
 		order = order,
 		get = function()
 			return settings().praiseDelayEnabled
@@ -337,8 +354,9 @@ end
 function ns.DefinePraiseDelaySelect(settings, order)
 	return {
 		type = "select",
-		name = L["PRAISE_DELAY_LENGTH"],
+		name = "",
 		desc = L["PRAISE_DELAY_LENGTH_DESCRIPTION"],
+		width = ns.OPTIONS_CONTROL_WIDTH,
 		order = order,
 		hidden = function()
 			return not settings().praiseDelayEnabled

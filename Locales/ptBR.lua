@@ -16,7 +16,8 @@ L["ADDON_SHORT"] = "TFTB"
 
 -- System
 L["CHAT_LOADED"] =
-	"Versão %s. Configurações (incluindo a opção de desativar esta mensagem) podem ser encontradas em Opções > AddOns > Thanks for the Buff. Gostando do add-on? Conte a um amigo! (="
+	"Versão %s. Configurações (incluindo a opção de desativar esta mensagem) podem ser encontradas em Opções > AddOns > Thanks for the Buff (TFTB). Gostando do add-on? Conte a um amigo! (="
+L["CHAT_OPTIONS_IN_COMBAT"] = "Por precaução, a interface de opções não pode ser aberta durante o combate."
 
 -- Buff & gift announcements
 L["MESSAGE_BUFFED"] = "%s buffou você com %s!"
@@ -59,8 +60,9 @@ L["OPTIONS_CURSEFORGE"] = "CurseForge"
 L["OPTIONS_GITHUB"] = "GitHub"
 L["OPTIONS_DISCORD"] = "Discord"
 L["OPTIONS_WAGO"] = "Wago"
-L["OPTIONS_COMMAND_TFTB"] = "/tftb"
-L["OPTIONS_COMMAND_TFTB_DESCRIPTION"] = "Abre a interface de opções do Thanks for the Buff."
+L["OPTIONS_COMMANDS_HEADER"] = "/Commands"
+L["OPTIONS_COMMAND"] = "/tftb"
+L["OPTIONS_COMMAND_DESCRIPTION"] = "Abre a interface de opções deste add-on."
 L["OPTIONS_COMMAND_THANKYOU"] = "/thankyou"
 L["OPTIONS_COMMAND_THANKYOU_DESCRIPTION"] = "Manda um emote e um sussurro para o seu alvo atual."
 
@@ -117,7 +119,7 @@ L["PEER_PRESSURE_SOUND_DESCRIPTION"] = "Toca um som quando um tempo de recarga d
 -- Shared across the combat panels
 L["COMBAT_TRACKED"] = "Habilidades Rastreadas"
 L["COMBAT_GROUP_ITEMS"] = "Itens"
-L["COMBAT_TOGGLE_TRACKING"] = "Alternar rastreio para %s"
+L["COMBAT_TOGGLE_TRACKING"] = "Alternar rastreio para %s."
 L["COMBAT_ITEM_PENDING"] = "Item #%d"
 L["COMBAT_SPELL_PENDING"] = "Feitiço #%d"
 
@@ -141,7 +143,6 @@ L["PRAISE_EMOTES_SELECT"] = "Selecionar Emotes"
 L["PRAISE_DELAY_ENABLE"] = "Habilitar Atraso do Agradecimento"
 L["PRAISE_DELAY_DESCRIPTION"] =
 	"Espera um instante antes do sussurro e do emote, para que seu agradecimento não chegue no mesmo instante que o buff.\n\nAs notificações não são afetadas."
-L["PRAISE_DELAY_LENGTH"] = "Atraso"
 L["PRAISE_DELAY_LENGTH_DESCRIPTION"] = "Quanto esperar antes de agradecer ao jogador que buffou você."
 
 L["NOTIFICATIONS_PRINT_ENABLE"] = "Habilitar Mensagens no Chat"

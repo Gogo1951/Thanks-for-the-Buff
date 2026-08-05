@@ -8,44 +8,44 @@ The repo root *is* the add-on folder; the packager renames it to `TFTB` on relea
 
 ```
 Thanks-for-the-Buff/
-├── .github/workflows/package.yml   Release packaging (repo only)
-├── .gitattributes                  LF normalization; keeps the GitHub web UI from committing CRLF (repo only)
-├── .pkgmeta                        Packager manifest: package-as, externals, ignore list (repo only)
-├── LICENSE                         MIT (repo only)
-├── TFTB.toc                        Load order; one TOC for Era + TBC Anniversary
+├── .github/workflows/package.yml         Release packaging (repo only)
+├── .gitattributes                        LF normalization; keeps the GitHub web UI from committing CRLF (repo only)
+├── .pkgmeta                              Packager manifest: package-as, externals, ignore list (repo only)
+├── LICENSE                               MIT (repo only)
+├── TFTB.toc                              Load order; one TOC for Era + TBC Anniversary
 ├── Data/
-│   ├── Data.lua                    Locale init, raw palette, class colors, options registry, target marker, URLs, emote list, praise-delay choices
-│   ├── Tracked-Abilities.lua       Data.TRACKED: buffs / cooldowns / services others spend on you
-│   ├── Peer-Pressure-Abilities.lua Data.PEER_PRESSURE: same-class cooldowns for the Peer Pressure alert
-│   └── Default-Settings.lua        ns.DATABASE_DEFAULTS (AceDB profile; global ships empty)
+│   ├── Data.lua                          Locale init, raw palette, class colors, options registry, target marker, URLs, emote list, praise-delay choices
+│   ├── Tracked-Abilities.lua             Data.TRACKED: buffs / cooldowns / services others spend on you
+│   ├── Peer-Pressure-Abilities.lua       Data.PEER_PRESSURE: same-class cooldowns for the Peer Pressure alert
+│   └── Default-Settings.lua              ns.DATABASE_DEFAULTS (one shared AceDB profile; global ships empty)
 ├── Features/
-│   ├── Core.lua                    Version read, AceDB lifecycle + migrations, the one event dispatcher, login sequence
-│   ├── Utilities.lua               ns.GetColor, spell/item/aura API shims, ns.GetSpellLink, ns.IsPlayerGUID, sounds, ns.FLAVOR_INDEX
-│   ├── Announcements.lua           Print / whisper builders, ns.GetBuffLink, emotes, plural resolution, Good News whisper queue
-│   ├── Buff-Tracking.lua           The reaction engine: combat-log + cast taps, source classification, praise delivery, watched lists, display groups
-│   ├── Peer-Pressure.lua           Same-class cooldown alert, tapped from the combat-log handler
-│   ├── Thank-You-Button.lua        The /thankyou command body and its auto-created macro
-│   └── Diagnostics.lua             Runtime-only probes and bug-report dumps (never persisted; strings not localized)
+│   ├── Core.lua                          Version read, AceDB lifecycle + migrations, the one event dispatcher, login sequence
+│   ├── Utilities.lua                     ns.GetColor, spell/item/aura API shims, ns.GetSpellLink, ns.IsPlayerGUID, sounds, ns.FLAVOR_INDEX
+│   ├── Announcements.lua                 Print / whisper builders, ns.GetBuffLink, emotes, plural resolution, Good News whisper queue
+│   ├── Buff-Tracking.lua                 The reaction engine: combat-log + cast taps, source classification, praise delivery, watched lists, display groups
+│   ├── Peer-Pressure.lua                 Same-class cooldown alert, tapped from the combat-log handler
+│   ├── Thank-You-Button.lua              The /thankyou command body and its auto-created macro
+│   └── Diagnostics.lua                   Runtime-only probes and bug-report dumps (never persisted; strings not localized)
 ├── Options/
-│   ├── Options-Utilities.lua       Shared AceConfig helpers + the control factories every buff panel draws from
-│   ├── Options-General.lua         Root panel: description, welcome toggle, /commands, Feedback & Support links
+│   ├── Options-Utilities.lua             Shared AceConfig helpers + the control factories every buff panel draws from
+│   ├── Options-General.lua               Root panel: description, welcome toggle, /commands, Feedback & Support links
 │   ├── Options-Buffs-from-Strangers.lua
 │   ├── Options-Buffs-from-Teammates.lua
-│   ├── Options-Buff-Services.lua   Group Services panel
-│   ├── Options-Good-News.lua       Good News panel
-│   ├── Options-Peer-Pressure.lua   Peer Pressure panel
+│   ├── Options-Buff-Services.lua         Group Services panel
+│   ├── Options-Good-News.lua             Good News panel
+│   ├── Options-Peer-Pressure.lua         Peer Pressure panel
 │   ├── Options-Thank-You-Button.lua
-│   ├── Options-Profiles.lua        Stock AceDBOptions-3.0 table, returned as-is
-│   ├── Options-Diagnostics.lua     Renders the Diagnostics probes
-│   └── Options.lua                 Panel registration order, panel-open routing, /tftb + /thankyou slash commands
-├── Locales/                        AceLocale-3.0 files, one per supported locale; enUS.lua is the source of truth
+│   ├── Options-Profiles.lua              Stock AceDBOptions-3.0 table, returned as-is
+│   ├── Options-Diagnostics.lua           Renders the Diagnostics probes
+│   └── Options.lua                       Panel registration order, panel-open routing, /tftb + /thankyou slash commands
+├── Locales/                              AceLocale-3.0 files, one per supported locale; enUS.lua is the source of truth
 ├── Includes/
-│   ├── Libraries/                  Vendored LibStub, CallbackHandler-1.0, AceLocale/DB/DBOptions/GUI/Config — never hand-edited (see below)
-│   ├── Images/                     Thanks-for-the-Buff.tga (the TOC IconTexture)
-│   └── Sounds/                     Buff.ogg (any buff on you), Thunder.ogg (Peer Pressure)
-├── README.md                       End-user documentation
-├── README-Technical.md             This document
-└── README-Testing.md               Manual QA script, walked before tagging a release
+│   ├── Libraries/                        Vendored LibStub, CallbackHandler-1.0, AceLocale/DB/DBOptions/GUI/Config — never hand-edited (see below)
+│   ├── Images/                           Thanks-for-the-Buff.tga (the TOC IconTexture)
+│   └── Sounds/                           Buff.ogg (any buff on you), Thunder.ogg (Peer Pressure)
+├── README.md                             End-user documentation
+├── README-Technical.md                   This document
+└── README-Testing.md                     Manual QA script, walked before tagging a release
 ```
 
 `Includes/Libraries/` is committed *and* declared as packager `externals`, so every release re-pulls each library from upstream — a hand-edit to a vendored file is silently discarded on the next build. Fix the upstream library or work around it in `Features/`.
@@ -69,9 +69,13 @@ A safety timer (`Data.SAFETY_PAUSE`, 3s) suppresses buff reactions until the wor
 
 ### Combat Lockdown
 
-Thanks for the Buff writes only one macro, and only at login (`ns:CreateAutoMacro`), guarded by `InCombatLockdown()` — so no macro write is ever attempted mid-combat. The reaction paths themselves run in combat: self-only prints, sounds, and outgoing whispers all fire on qualifying buffs whether or not you are fighting, because they touch no protected functions.
+Three things answer to combat, in three different ways.
 
-The one thing combat gates is emotes. `/cheer`-style emotes are visible and social, so `HandleTracked` and `HandleStrangersBuff` perform them only when `not InCombatLockdown()`. This is suppression, not a replay queue: an emote skipped during combat is simply not performed for that buff, and — because a praise cooldown is spent only when praise actually goes out — the next qualifying buff after combat reacts immediately. Combat is tested twice: once when the reaction is decided, and again inside `DeliverPraise` when the emote fires, so entering combat during a Praise Delay still suppresses it.
+**The options panel refuses outright.** `InCombatLockdown()` is the first thing `ns:OpenOptionsPanel` does — one gate in front of the whole routing chain, ahead of the Settings / legacy / AceConfigDialog branches, so `/tftb` behaves identically on every flavor. It prints `CHAT_OPTIONS_IN_COMBAT` and returns. It never queues the panel to open when combat ends and never registers `PLAYER_REGEN_ENABLED` to finish the job later; Blizzard's Settings panel is protected in combat, and a silent refusal reads as a broken command.
+
+**The macro never has to defer.** Thanks for the Buff writes only one macro, and only at login (`ns:CreateAutoMacro`), guarded by `InCombatLockdown()` — so no macro write is ever attempted mid-combat and there is no dirty flag to replay.
+
+**Emotes are suppressed, not queued.** The reaction paths themselves run in combat: self-only prints, sounds, and outgoing whispers all fire on qualifying buffs whether or not you are fighting, because they touch no protected functions. `/cheer`-style emotes are visible and social, so `HandleTracked` and `HandleStrangersBuff` perform them only when `not InCombatLockdown()`. An emote skipped during combat is simply not performed for that buff — and because a praise cooldown is spent only when praise actually goes out, the next qualifying buff after combat reacts immediately. Combat is tested twice: once when the reaction is decided, and again inside `DeliverPraise` when the emote fires, so entering combat during a Praise Delay still suppresses it.
 
 ### Praise vs Notifications
 
@@ -96,11 +100,11 @@ Item names and links come from `GetItemInfo`, which returns nil on a cold cache 
 
 ### Options Panels
 
-Ten AceConfig panels register in `Options/Options.lua`, in the order they appear in Blizzard's settings tree: General (root), the feature panels, then Profiles second-to-last and Diagnostic Tools last.
+Nine AceConfig panels register in `Options/Options.lua` — one per key in `ns.OPTIONS_REGISTRY` — in the order they appear in Blizzard's settings tree: General (root), the six feature panels, then Profiles second-to-last and Diagnostic Tools last.
 
 Each panel file owns its own layout and order numbers; the controls themselves come from factories in `Options/Options-Utilities.lua` (`ns.DefinePrintToggle`, `ns.DefineWhisperToggle`, `ns.DefineEmotesToggle`, `ns.DefineEmoteGroup`, `ns.DefineSoundToggle`, `ns.DefinePraiseDelayToggle`, and friends). Every factory takes a `settings` accessor returning the profile subtable it binds to, so one definition serves Strangers, Teammates, and Group Services without those three having to share a layout — which they no longer do.
 
-Two registration shapes coexist deliberately. Panels whose contents are fixed at login register a **prebuilt table**; panels that render tracked abilities register the **builder function itself**, so the table is rebuilt on open once lazily-loaded item names have resolved (see Item Data Caching).
+Two registration shapes coexist deliberately. Panels whose contents are fixed at login register a **prebuilt table** (General, Strangers, Thank You Button, Profiles, Diagnostic Tools); panels that render tracked abilities register the **builder function itself** (Teammates, Services, Good News, Peer Pressure), so the table is rebuilt on open once lazily-loaded item names have resolved (see Item Data Caching).
 
 Section headers are real AceConfig `header` widgets throughout — `ns.OptionsHeader`, which takes an optional third `hidden` argument for the panels whose whole section collapses behind a master switch (Peer Pressure, Good News, Diagnostic Tools).
 
@@ -170,12 +174,14 @@ The event log snapshots each argument to a string immediately (never retaining f
 
 ## Saved Variables
 
-One account-wide table, `TFTB_DB`, managed by AceDB-3.0. Every user setting lives under `profile`; `global` ships empty (there is no minimap button or other profile-independent state).
+One account-wide table, `TFTB_DB`, managed by AceDB-3.0.
+
+**Thanks for the Buff uses the Simple saved-variables model.** `AceDB:New` is called with `true` as its third argument, so every character on the account lands on the one shared `"Default"` profile and the whole database lives under `profile`; `global` ships empty (there is no minimap button or other profile-independent state), and there is nothing the add-on stores that differs from character to character. **Reset Profile therefore clears everything, back to install defaults.** A new setting belongs in `ns.db.profile`.
 
 - **`profile.showWelcome`** — login welcome message on/off.
 - **`profile.strangers`** — `printEnabled`, `whisperEnabled`, `emotesEnabled`, `soundEnabled`, `emotes`, plus `praiseDelayEnabled` / `praiseDelay` (hold the whisper and emote back by 1-4 seconds), `praiseCooldown` (overall praise rate limit, 0 = off), `cooldown` (per-source praise rate limit) and `minBuffDuration` (filter for short HoTs).
 - **`profile.teammates`** — `printEnabled`, `whisperEnabled`, `emotesEnabled`, `soundEnabled`, `emotes`, `praiseDelayEnabled`, `praiseDelay`. No cooldown fields: a teammate's cooldown is acknowledged every time it lands.
-- **`profile.services`** — the same fields as teammates. `soundEnabled` ships off here: a feast or a portal is ambient group help rather than something aimed at you.
+- **`profile.services`** — the same fields as teammates, and the one default that differs between the two: `whisperEnabled` ships off here (teammates ships it on), because a feast or a portal is ambient group help rather than something aimed at you.
 - **`profile.goodNews`** — `whisperEnabled`, `scope` (`ALWAYS` = anyone you buff, anything else = group only), and `watched` (its own list of ids you want announced).
 - **`profile.peerPressure`** — `enabled`, `printEnabled`, `triggerOnOwnCasts`, `soundEnabled`, `watched`.
 - **`profile.slash`** (Thank You Button) — `createMacro`, `message`, `emotes`.
@@ -193,17 +199,19 @@ Applied once in `InitializeDatabase`, in order. All three share the one house cu
 
 Defaults come from `ns.DATABASE_DEFAULTS` and are applied by AceDB-3.0 when a scope is first accessed — explicit user values, including `false`, are never overridden. Note that scalar and table defaults are physically copied into the saved table (`copyDefaults` via `rawset`); only `*`/`**` wildcard defaults resolve through metatables.
 
-Both watched lists refill on empty: `PopulateWatchedBuffs` and `PopulatePeerPressureWatched` seed any id the saved list doesn't hold yet from the per-flavor default columns, and prune ids not live on this client so the saved data stays client-real. They run at login and again on every profile change / copy / reset (`OnProfileChanged`), because a profile swap replaces every setting at once.
+Both watched lists refill on empty: `PopulateWatchedBuffs` and `PopulatePeerPressureWatched` seed any id the saved list doesn't hold yet from the per-flavor default columns, and prune ids not live on this client so the saved data stays client-real. They run at login and again on every profile change / copy / reset (`OnProfileChanged`), because a profile swap replaces every setting at once — which is also where the open options panels are told to redraw, one `NotifyChange` per entry in `ns.OPTIONS_REGISTRY`.
 
 ## Adding a New Tracked Buff or Cooldown
 
 `Data.TRACKED` in `Data/Tracked-Abilities.lua` — one entry is one checkbox on the Teammates, Services, or Good News panel.
 
 1. Add an entry with its `type` (`SOLO` / `GROUP` / `SERVICE`), `detect` (`AURA` / `CAST`), the `received` and (non-service) `given` per-flavor columns, and a `triggers` list of `{ spell = id }` (add `item = id` for item-driven buffs, `aura = id` when the applied aura id differs from the cast id).
-2. For a multi-rank/variant group under one toggle, list every id in `triggers` and set `name = L["GROUP_*"]` (add the key to every locale). A single spell/item takes its name from the client and needs no locale key.
+2. For a multi-rank/variant group under one toggle, list every id in `triggers` and set `name = L["GROUP_*"]` (add the key to `Locales/enUS.lua`; the Localization pass translates it into the rest). A single spell/item takes its name from the client and needs no locale key.
 3. Use `"-"` in a flavor column for any id that means a different ability on that flavor; give each identity its own row.
 4. Set `noDuration` when the buff is spent by an event rather than by time (Fear Ward, Misdirection), so Good News drops its duration clause. Set `opened` on a `SERVICE` to read "opened" (portals, summons) instead of "set out" (feasts, soulwells, repair bots).
 5. No code change is needed — `BuildLookups`, `PopulateWatchedBuffs`, and `BuildDisplayGroups` consume the table at login.
+
+Whatever the entry, its chat line ends up inside a message capped at **255 bytes** (Style Guide → MESSAGES → Message Length) once the spell/item link is expanded, so a new `GROUP_*` label should stay short.
 
 ## Adding a New Peer Pressure Ability
 
@@ -218,7 +226,7 @@ Both watched lists refill on empty: `PopulateWatchedBuffs` and `PopulatePeerPres
 ## Localization
 
 - **Structure** — locale files live in `Locales/<locale>.lua`, each registered through AceLocale-3.0's `NewLocale("TFTB", "<code>")`. `enUS.lua` is the source of truth and the only file that passes the `true` default-fallback flag; every string originates there and the other locales translate from it.
-- **Keeping locales in sync** — every other locale carries a translation of the same key set, and AceLocale falls back to English via `__index` for anything missing at runtime. Translating each `enUS.lua` key into every locale and keeping the files aligned is the job of the Localization pass (`3 - Copy Cleanup & Localization Prompt.md`); don't hand-edit the other locales during ordinary work.
+- **Keeping locales in sync** — every other locale carries a translation of the same key set, and AceLocale falls back to English via `__index` for anything missing at runtime. Translating each `enUS.lua` key into every locale and keeping the files aligned is the job of the Localization pass (`3 - Copy Cleanup & Localization Prompt.md`); don't hand-edit the other locales during ordinary work. WoW ships a fixed locale set and all eleven files already exist — this is maintenance, never expansion.
 - **Placeholders** — `%s`/`%d` count, type, and order must match `enUS` per key in every locale, or the string crashes at runtime. Where a language needs a different word order, use WoW Lua's positional specifiers: `MESSAGE_USED_ITEM` is `"%s used %s %s on you!"` (name, possessive, link) in `enUS`, and ptBR reorders it to `"%1$s usou %3$s %2$s em você!"` so the item link precedes the possessive. Keep the numbering when translating — it is the only file that uses positional form today.
 - **Spanish** — esES and esMX are two separate, self-contained files; identical strings in both is correct and expected.
 - **Quote style** — a value containing a double quote is written with single-quoted Lua delimiters and stays that way under StyLua (`ruRU`'s `GOOD_NEWS_WHISPER_ENABLE` is the one live example). Any script that audits key parity must accept both delimiters; a double-quote-only regex reports that key as missing from ruRU and invites re-adding a key that already exists.
@@ -243,7 +251,7 @@ Both watched lists refill on empty: `PopulateWatchedBuffs` and `PopulatePeerPres
 - **Issues** — <https://github.com/Gogo1951/Thanks-for-the-Buff/issues>.
 - **Bug reports** — include game version + locale, class + level, repro steps, and the relevant chat output. The Diagnostic Tools panel (enable it, run the Context / API / Event checks) produces a ready-to-paste report.
 - **Discord** — <https://discord.gg/eh8hKq992Q>.
-- **PRs** — keep changes scoped; run StyLua with its default config over every touched Lua file; preserve migration discipline (never rename a saved-variable key without a dated migration window and note); check any sent-message change against the **255-byte** chat limit in the widest-encoding locale, and any macro-body change against the **255-character** macro limit; and update this document if the architecture or file map changes.
+- **PRs** — keep changes scoped; run StyLua with its default config over every touched Lua file; preserve migration discipline (never rename a saved-variable key without a dated migration window and note); check any sent-message change against the **255-byte** chat limit in the widest-encoding locale (Style Guide → MESSAGES → Message Length is canonical for both output ceilings — the macro one is measured in bytes with `#body`, though TFTB's only macro body is the fixed literal `/thankyou`); and update this document if the architecture or file map changes.
 - **Commit and PR descriptions require a User Story.** Frame the change by who it helps and why, not just what changed.
 
    **Format:** *As a [role], I [needed / wanted] [behavior] so that [outcome]. This change [does X].*

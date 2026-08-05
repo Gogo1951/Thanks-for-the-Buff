@@ -16,7 +16,8 @@ L["ADDON_SHORT"] = "TFTB"
 
 -- System
 L["CHAT_LOADED"] =
-	"Versión %s. La configuración (incluida la opción para desactivar este mensaje) se encuentra en Opciones > Accesorios > Thanks for the Buff. ¿Te gusta el accesorio? ¡Cuéntaselo a un amigo! (="
+	"Versión %s. La configuración (incluida la opción para desactivar este mensaje) se encuentra en Opciones > Accesorios > Thanks for the Buff (TFTB). ¿Te gusta el accesorio? ¡Cuéntaselo a un amigo! (="
+L["CHAT_OPTIONS_IN_COMBAT"] = "Por seguridad, la interfaz de opciones no se puede abrir durante el combate."
 
 -- Buff & gift announcements
 L["MESSAGE_BUFFED"] = "¡%s te ha beneficiado con %s!"
@@ -59,8 +60,9 @@ L["OPTIONS_CURSEFORGE"] = "CurseForge"
 L["OPTIONS_GITHUB"] = "GitHub"
 L["OPTIONS_DISCORD"] = "Discord"
 L["OPTIONS_WAGO"] = "Wago"
-L["OPTIONS_COMMAND_TFTB"] = "/tftb"
-L["OPTIONS_COMMAND_TFTB_DESCRIPTION"] = "Abre la interfaz de opciones de Thanks for the Buff."
+L["OPTIONS_COMMANDS_HEADER"] = "/Commands"
+L["OPTIONS_COMMAND"] = "/tftb"
+L["OPTIONS_COMMAND_DESCRIPTION"] = "Abre la interfaz de opciones de este accesorio."
 L["OPTIONS_COMMAND_THANKYOU"] = "/thankyou"
 L["OPTIONS_COMMAND_THANKYOU_DESCRIPTION"] = "Hace un emote y susurra a tu objetivo actual."
 
@@ -118,7 +120,7 @@ L["PEER_PRESSURE_SOUND_DESCRIPTION"] =
 -- Shared across the combat panels
 L["COMBAT_TRACKED"] = "Habilidades rastreadas"
 L["COMBAT_GROUP_ITEMS"] = "Objetos"
-L["COMBAT_TOGGLE_TRACKING"] = "Alternar rastreo para %s"
+L["COMBAT_TOGGLE_TRACKING"] = "Alternar rastreo para %s."
 L["COMBAT_ITEM_PENDING"] = "Objeto #%d"
 L["COMBAT_SPELL_PENDING"] = "Hechizo #%d"
 
@@ -141,7 +143,6 @@ L["PRAISE_EMOTES_SELECT"] = "Seleccionar Emotes"
 L["PRAISE_DELAY_ENABLE"] = "Habilitar retraso de elogio"
 L["PRAISE_DELAY_DESCRIPTION"] =
 	"Espera un momento antes del susurro y el emote, para que tu agradecimiento no llegue en el mismo instante que el beneficio.\n\nLas notificaciones no se ven afectadas."
-L["PRAISE_DELAY_LENGTH"] = "Retraso"
 L["PRAISE_DELAY_LENGTH_DESCRIPTION"] = "Cuánto esperar antes de elogiar al jugador que te dio el beneficio."
 
 L["NOTIFICATIONS_PRINT_ENABLE"] = "Habilitar mensajes impresos"

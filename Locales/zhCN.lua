@@ -16,7 +16,8 @@ L["ADDON_SHORT"] = "TFTB"
 
 -- System
 L["CHAT_LOADED"] =
-	"版本 %s。设置（包括关闭此消息的选项）可以在 选项 > 插件 > Thanks for the Buff 中找到。喜欢这个插件吗？告诉你的朋友吧！(="
+	"版本 %s。设置（包括关闭此消息的选项）可以在 选项 > 插件 > Thanks for the Buff (TFTB) 中找到。喜欢这个插件吗？告诉你的朋友吧！(="
+L["CHAT_OPTIONS_IN_COMBAT"] = "出于安全考虑，战斗中无法打开选项界面。"
 
 -- Buff & gift announcements
 L["MESSAGE_BUFFED"] = "%s 给你施放了 %s！"
@@ -59,8 +60,9 @@ L["OPTIONS_CURSEFORGE"] = "CurseForge"
 L["OPTIONS_GITHUB"] = "GitHub"
 L["OPTIONS_DISCORD"] = "Discord"
 L["OPTIONS_WAGO"] = "Wago"
-L["OPTIONS_COMMAND_TFTB"] = "/tftb"
-L["OPTIONS_COMMAND_TFTB_DESCRIPTION"] = "打开 Thanks for the Buff 的选项界面。"
+L["OPTIONS_COMMANDS_HEADER"] = "/Commands"
+L["OPTIONS_COMMAND"] = "/tftb"
+L["OPTIONS_COMMAND_DESCRIPTION"] = "打开此插件的选项界面。"
 L["OPTIONS_COMMAND_THANKYOU"] = "/thankyou"
 L["OPTIONS_COMMAND_THANKYOU_DESCRIPTION"] = "对你当前的目标发送表情和密语。"
 
@@ -116,7 +118,7 @@ L["PEER_PRESSURE_SOUND_DESCRIPTION"] = "当同职业技能被使用时播放音�
 -- Shared across the combat panels
 L["COMBAT_TRACKED"] = "追踪的技能"
 L["COMBAT_GROUP_ITEMS"] = "物品"
-L["COMBAT_TOGGLE_TRACKING"] = "切换对 %s 的追踪"
+L["COMBAT_TOGGLE_TRACKING"] = "切换对 %s 的追踪。"
 L["COMBAT_ITEM_PENDING"] = "物品 #%d"
 L["COMBAT_SPELL_PENDING"] = "法术 #%d"
 
@@ -139,7 +141,6 @@ L["PRAISE_EMOTES_SELECT"] = "选择表情"
 L["PRAISE_DELAY_ENABLE"] = "启用感谢延迟"
 L["PRAISE_DELAY_DESCRIPTION"] =
 	"在密语和表情之前稍作等待，让你的感谢不会与增益同时出现。\n\n通知不受此影响。"
-L["PRAISE_DELAY_LENGTH"] = "延迟"
 L["PRAISE_DELAY_LENGTH_DESCRIPTION"] = "在感谢给你增益的玩家之前等待多久。"
 
 L["NOTIFICATIONS_PRINT_ENABLE"] = "启用聊天框信息"

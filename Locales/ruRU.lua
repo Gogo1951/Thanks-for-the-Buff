@@ -16,7 +16,9 @@ L["ADDON_SHORT"] = "TFTB"
 
 -- System
 L["CHAT_LOADED"] =
-	"Версия %s. Настройки (включая возможность отключить это сообщение) находятся в меню Настройки > Модификации > Thanks for the Buff. Нравится аддон? Расскажите о нем друзьям! (="
+	"Версия %s. Настройки (включая возможность отключить это сообщение) находятся в меню Настройки > Модификации > Thanks for the Buff (TFTB). Нравится аддон? Расскажите о нем друзьям! (="
+L["CHAT_OPTIONS_IN_COMBAT"] =
+	"В целях безопасности настройки нельзя открыть во время боя."
 
 -- Buff & gift announcements
 L["MESSAGE_BUFFED"] = "%s накладывает на вас %s!"
@@ -59,8 +61,9 @@ L["OPTIONS_CURSEFORGE"] = "CurseForge"
 L["OPTIONS_GITHUB"] = "GitHub"
 L["OPTIONS_DISCORD"] = "Discord"
 L["OPTIONS_WAGO"] = "Wago"
-L["OPTIONS_COMMAND_TFTB"] = "/tftb"
-L["OPTIONS_COMMAND_TFTB_DESCRIPTION"] = "Открывает настройки Thanks for the Buff."
+L["OPTIONS_COMMANDS_HEADER"] = "/Commands"
+L["OPTIONS_COMMAND"] = "/tftb"
+L["OPTIONS_COMMAND_DESCRIPTION"] = "Открывает настройки этого аддона."
 L["OPTIONS_COMMAND_THANKYOU"] = "/thankyou"
 L["OPTIONS_COMMAND_THANKYOU_DESCRIPTION"] =
 	"Применяет эмоцию и отправляет личное сообщение вашей текущей цели."
@@ -124,7 +127,7 @@ L["PEER_PRESSURE_SOUND_DESCRIPTION"] =
 -- Shared across the combat panels
 L["COMBAT_TRACKED"] = "Отслеживаемые способности"
 L["COMBAT_GROUP_ITEMS"] = "Предметы"
-L["COMBAT_TOGGLE_TRACKING"] = "Включить/выключить отслеживание для %s"
+L["COMBAT_TOGGLE_TRACKING"] = "Включить/выключить отслеживание для %s."
 L["COMBAT_ITEM_PENDING"] = "Предмет #%d"
 L["COMBAT_SPELL_PENDING"] = "Заклинание #%d"
 
@@ -149,7 +152,6 @@ L["PRAISE_EMOTES_SELECT"] = "Выбрать эмоции"
 L["PRAISE_DELAY_ENABLE"] = "Включить задержку благодарности"
 L["PRAISE_DELAY_DESCRIPTION"] =
 	"Немного подождать перед шепотом и эмоцией, чтобы благодарность не пришла в тот же миг, что и бафф.\n\nНе влияет на уведомления."
-L["PRAISE_DELAY_LENGTH"] = "Задержка"
 L["PRAISE_DELAY_LENGTH_DESCRIPTION"] =
 	"Сколько ждать перед тем, как поблагодарить игрока, давшего бафф."
 

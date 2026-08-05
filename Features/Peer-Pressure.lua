@@ -155,13 +155,14 @@ function ns.CheckPeerPressure(spellID, sourceGUID, sourceName, destGUID, destNam
 		return
 	end
 
-	local targetName
+	local targetName, targetClass
 	if destName and ns.IsPlayerGUID(destGUID) and destGUID ~= sourceGUID then
 		targetName = destName
+		targetClass = select(2, GetPlayerInfoByGUID(destGUID))
 	end
 
 	if db.printEnabled then
-		ns:AnnouncePeerPressure(entry[1], sourceName, spellID, targetName)
+		ns:AnnouncePeerPressure(entry[1], sourceName, spellID, targetName, targetClass)
 	end
 	if db.soundEnabled then
 		ns.PlayPeerPressureSound()

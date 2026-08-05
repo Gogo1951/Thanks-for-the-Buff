@@ -16,7 +16,8 @@ L["ADDON_SHORT"] = "TFTB"
 
 -- System
 L["CHAT_LOADED"] =
-	"Version %s. Les paramètres (y compris l'option pour désactiver ce message) se trouvent dans Options > AddOns > Thanks for the Buff. Vous aimez l'add-on ? Parlez-en à un ami ! (="
+	"Version %s. Les paramètres (y compris l'option pour désactiver ce message) se trouvent dans Options > AddOns > Thanks for the Buff (TFTB). Vous aimez l'add-on ? Parlez-en à un ami ! (="
+L["CHAT_OPTIONS_IN_COMBAT"] = "Par précaution, l'interface des options ne peut pas être ouverte pendant le combat."
 
 -- Buff & gift announcements
 L["MESSAGE_BUFFED"] = "%s vous a amélioré avec %s !"
@@ -59,8 +60,9 @@ L["OPTIONS_CURSEFORGE"] = "CurseForge"
 L["OPTIONS_GITHUB"] = "GitHub"
 L["OPTIONS_DISCORD"] = "Discord"
 L["OPTIONS_WAGO"] = "Wago"
-L["OPTIONS_COMMAND_TFTB"] = "/tftb"
-L["OPTIONS_COMMAND_TFTB_DESCRIPTION"] = "Ouvre l'interface des options de Thanks for the Buff."
+L["OPTIONS_COMMANDS_HEADER"] = "/Commands"
+L["OPTIONS_COMMAND"] = "/tftb"
+L["OPTIONS_COMMAND_DESCRIPTION"] = "Ouvre l'interface des options de cet add-on."
 L["OPTIONS_COMMAND_THANKYOU"] = "/thankyou"
 L["OPTIONS_COMMAND_THANKYOU_DESCRIPTION"] = "Fait une emote et chuchote à votre cible actuelle."
 
@@ -119,7 +121,7 @@ L["PEER_PRESSURE_SOUND_DESCRIPTION"] =
 -- Shared across the combat panels
 L["COMBAT_TRACKED"] = "Capacités suivies"
 L["COMBAT_GROUP_ITEMS"] = "Objets"
-L["COMBAT_TOGGLE_TRACKING"] = "Basculer le suivi pour %s"
+L["COMBAT_TOGGLE_TRACKING"] = "Basculer le suivi pour %s."
 L["COMBAT_ITEM_PENDING"] = "Objet #%d"
 L["COMBAT_SPELL_PENDING"] = "Sort #%d"
 
@@ -143,7 +145,6 @@ L["PRAISE_EMOTES_SELECT"] = "Sélectionner des Emotes"
 L["PRAISE_DELAY_ENABLE"] = "Activer le délai de remerciement"
 L["PRAISE_DELAY_DESCRIPTION"] =
 	"Attend un instant avant le chuchotement et l'emote, afin que votre remerciement n'arrive pas au même instant que l'amélioration.\n\nLes notifications ne sont pas affectées."
-L["PRAISE_DELAY_LENGTH"] = "Délai"
 L["PRAISE_DELAY_LENGTH_DESCRIPTION"] = "Combien de temps attendre avant de remercier le joueur qui vous a amélioré."
 
 L["NOTIFICATIONS_PRINT_ENABLE"] = "Activer les messages imprimés"

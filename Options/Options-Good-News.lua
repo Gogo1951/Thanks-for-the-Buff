@@ -32,6 +32,7 @@ function ns.BuildGoodNewsOptions()
 				type = "toggle",
 				name = L["GOOD_NEWS_WHISPER_ENABLE"],
 				desc = L["GOOD_NEWS_WHISPER_DESCRIPTION"],
+				width = ns.OPTIONS_LABEL_WIDTH,
 				order = 3,
 				get = function()
 					return ns.db.profile.goodNews.whisperEnabled
@@ -40,11 +41,13 @@ function ns.BuildGoodNewsOptions()
 					ns.db.profile.goodNews.whisperEnabled = val
 				end,
 			},
-			-- Who gets whispered, on the master's row. Unlabeled on purpose --
-			-- the values are self-describing and the mock keeps the row tight.
+			-- Who gets whispered, on the master's row. Unlabeled on purpose: the
+			-- values are self-describing, and the enable toggle beside it reads as
+			-- the caption. Takes the control half of the row so neither value clips.
 			scope = {
 				type = "select",
 				name = "",
+				width = ns.OPTIONS_CONTROL_WIDTH,
 				order = 4,
 				hidden = GoodNewsHidden,
 				values = {

@@ -28,9 +28,10 @@ ns.Version = GetVersion()
 
 --[[
     AceDB-3.0 owns the SavedVariables lifecycle: it applies ns.DATABASE_DEFAULTS
-    via metatables, so there is no hand-rolled merge and every setting lives under
-    ns.db.profile. The two helpers below only bridge older on-disk layouts into
-    the profile once; AceDB handles everything else.
+    itself -- copied into the saved table, an explicit false preserved -- so there
+    is no hand-rolled merge and every setting lives under ns.db.profile. The two
+    helpers below only bridge older on-disk layouts into the profile once; AceDB
+    handles everything else.
 ]]
 
 --[[

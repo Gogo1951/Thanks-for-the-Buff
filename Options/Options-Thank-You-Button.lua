@@ -4,6 +4,11 @@ local L = ns.L
 
 local GetColor = ns.GetColor
 
+-- The whisper row: a caption-sized label, so the message box keeps the rest of the
+-- row and a full sentence stays readable while it is being edited.
+local WHISPER_LABEL_WIDTH = 0.9
+local WHISPER_INPUT_WIDTH = ns.OPTIONS_ROW_WIDTH - WHISPER_LABEL_WIDTH
+
 --------------------------------------------------------------------------------
 -- Options Table
 --------------------------------------------------------------------------------
@@ -32,10 +37,11 @@ function ns.BuildThankYouButtonOptions()
 				end,
 			},
 			space1 = ns.OptionsSpacer(11),
+			whisperLabel = ns.OptionsRowLabel(L["BUTTON_WHISPER"], 19, WHISPER_LABEL_WIDTH),
 			whisperMsg = {
 				type = "input",
-				name = L["BUTTON_WHISPER"],
-				width = "full",
+				name = "",
+				width = WHISPER_INPUT_WIDTH,
 				order = 20,
 				get = function()
 					return ns.db.profile.slash.message

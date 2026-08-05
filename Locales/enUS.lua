@@ -16,7 +16,8 @@ L["ADDON_SHORT"] = "TFTB"
 
 -- System
 L["CHAT_LOADED"] =
-	"Version %s. Settings (including the option to disable this message) can be found under Options > AddOns > Thanks for the Buff. Enjoying the add-on? Tell a friend about it! (="
+	"Version %s. Settings (including the option to disable this message) can be found under Options > AddOns > Thanks for the Buff (TFTB). Enjoying the add-on? Tell a friend about it! (="
+L["CHAT_OPTIONS_IN_COMBAT"] = "As a safety precaution, the Options Interface cannot be opened during combat."
 
 -- Buff & gift announcements
 L["MESSAGE_BUFFED"] = "%s buffed you with %s!"
@@ -59,8 +60,9 @@ L["OPTIONS_CURSEFORGE"] = "CurseForge"
 L["OPTIONS_GITHUB"] = "GitHub"
 L["OPTIONS_DISCORD"] = "Discord"
 L["OPTIONS_WAGO"] = "Wago"
-L["OPTIONS_COMMAND_TFTB"] = "/tftb"
-L["OPTIONS_COMMAND_TFTB_DESCRIPTION"] = "Opens the Thanks for the Buff options interface."
+L["OPTIONS_COMMANDS_HEADER"] = "/Commands"
+L["OPTIONS_COMMAND"] = "/tftb"
+L["OPTIONS_COMMAND_DESCRIPTION"] = "Opens the Options Interface for this add-on."
 L["OPTIONS_COMMAND_THANKYOU"] = "/thankyou"
 L["OPTIONS_COMMAND_THANKYOU_DESCRIPTION"] = "Emotes at and whispers your current target."
 
@@ -115,7 +117,7 @@ L["PEER_PRESSURE_SOUND_DESCRIPTION"] = "Play a sound when a same-class cooldown 
 -- Shared across the combat panels
 L["COMBAT_TRACKED"] = "Tracked Abilities"
 L["COMBAT_GROUP_ITEMS"] = "Items"
-L["COMBAT_TOGGLE_TRACKING"] = "Toggle tracking for %s"
+L["COMBAT_TOGGLE_TRACKING"] = "Toggle tracking for %s."
 L["COMBAT_ITEM_PENDING"] = "Item #%d"
 L["COMBAT_SPELL_PENDING"] = "Spell #%d"
 
@@ -138,7 +140,6 @@ L["PRAISE_EMOTES_SELECT"] = "Select Emotes"
 L["PRAISE_DELAY_ENABLE"] = "Enable Praise Delay"
 L["PRAISE_DELAY_DESCRIPTION"] =
 	"Wait a moment before the whisper and the emote, so your thanks doesn't land in the same instant as the buff.\n\nNotifications are not affected."
-L["PRAISE_DELAY_LENGTH"] = "Delay"
 L["PRAISE_DELAY_LENGTH_DESCRIPTION"] = "How long to wait before praising the player who buffed you."
 
 L["NOTIFICATIONS_PRINT_ENABLE"] = "Enable Print Out Messages"
