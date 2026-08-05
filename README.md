@@ -2,8 +2,6 @@
 
 Automatically thank players who buff you with emotes, whispers, and chat notifications, whether it's a stranger in the open world or a teammate's cooldown like Power Infusion or Innervate. Get a heads-up for feasts, portals, and same-class cooldowns too.
 
-<img width="800" src="https://github.com/user-attachments/assets/a77bd74a-18e4-4e89-bc74-13c5c86052f7" />
-
 ## Features
 
 🙌 **Every Buff Gets a Thank-You** // Emote and whisper the stranger who buffed you in passing and the teammate who burned a cooldown on you, with cooldowns and a delay so it never turns into spam.
@@ -54,6 +52,8 @@ Only the abilities your client actually has show up in the options panel, so you
 | --- | --- |
 | `/tftb` | Open the options panel |
 | `/thankyou` | Emote at and whisper your current target |
+
+<img width="800" src="https://github.com/user-attachments/assets/a77bd74a-18e4-4e89-bc74-13c5c86052f7" />
 
 ## Testing & Localization Status
 
