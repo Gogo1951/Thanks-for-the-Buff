@@ -16,7 +16,9 @@ L["ADDON_SHORT"] = "TFTB"
 
 -- System
 L["CHAT_LOADED"] =
-	"Versione %s. Le impostazioni (inclusa l'opzione per disabilitare questo messaggio) si trovano in Opzioni > AddOn > Thanks for the Buff. Ti piace l'add-on? Dillo a un amico! (="
+	"Versione %s. Le impostazioni (inclusa l'opzione per disabilitare questo messaggio) si trovano in Opzioni > AddOn > Thanks for the Buff (TFTB). Ti piace l'add-on? Dillo a un amico! (="
+L["CHAT_OPTIONS_IN_COMBAT"] =
+	"Per precauzione, l'interfaccia delle opzioni non può essere aperta durante il combattimento."
 
 -- Buff & gift announcements
 L["MESSAGE_BUFFED"] = "%s ti ha potenziato con %s!"
@@ -59,8 +61,9 @@ L["OPTIONS_CURSEFORGE"] = "CurseForge"
 L["OPTIONS_GITHUB"] = "GitHub"
 L["OPTIONS_DISCORD"] = "Discord"
 L["OPTIONS_WAGO"] = "Wago"
-L["OPTIONS_COMMAND_TFTB"] = "/tftb"
-L["OPTIONS_COMMAND_TFTB_DESCRIPTION"] = "Apre l'interfaccia delle opzioni di Thanks for the Buff."
+L["OPTIONS_COMMANDS_HEADER"] = "/Commands"
+L["OPTIONS_COMMAND"] = "/tftb"
+L["OPTIONS_COMMAND_DESCRIPTION"] = "Apre l'interfaccia delle opzioni di questo add-on."
 L["OPTIONS_COMMAND_THANKYOU"] = "/thankyou"
 L["OPTIONS_COMMAND_THANKYOU_DESCRIPTION"] = "Esegue un'emote e sussurra al tuo bersaglio attuale."
 
@@ -119,7 +122,7 @@ L["PEER_PRESSURE_SOUND_DESCRIPTION"] =
 -- Shared across the combat panels
 L["COMBAT_TRACKED"] = "Abilità Tracciate"
 L["COMBAT_GROUP_ITEMS"] = "Oggetti"
-L["COMBAT_TOGGLE_TRACKING"] = "Attiva/Disattiva tracciamento per %s"
+L["COMBAT_TOGGLE_TRACKING"] = "Attiva/Disattiva tracciamento per %s."
 L["COMBAT_ITEM_PENDING"] = "Oggetto #%d"
 L["COMBAT_SPELL_PENDING"] = "Incantesimo #%d"
 
@@ -143,7 +146,6 @@ L["PRAISE_EMOTES_SELECT"] = "Seleziona Emote"
 L["PRAISE_DELAY_ENABLE"] = "Abilita Ritardo del Ringraziamento"
 L["PRAISE_DELAY_DESCRIPTION"] =
 	"Attende un istante prima del sussurro e dell'emote, così il tuo ringraziamento non arriva nello stesso istante del potenziamento.\n\nLe notifiche non sono influenzate."
-L["PRAISE_DELAY_LENGTH"] = "Ritardo"
 L["PRAISE_DELAY_LENGTH_DESCRIPTION"] = "Quanto attendere prima di ringraziare il giocatore che ti ha potenziato."
 
 L["NOTIFICATIONS_PRINT_ENABLE"] = "Abilita Messaggi Stampati"

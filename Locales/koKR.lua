@@ -16,7 +16,8 @@ L["ADDON_SHORT"] = "TFTB"
 
 -- System
 L["CHAT_LOADED"] =
-	"버전 %s. 설정(이 메시지를 비활성화하는 옵션 포함)은 옵션 > 애드온 > Thanks for the Buff 에서 찾을 수 있습니다. 애드온이 마음에 드시나요? 친구에게 알려주세요! (="
+	"버전 %s. 설정(이 메시지를 비활성화하는 옵션 포함)은 옵션 > 애드온 > Thanks for the Buff (TFTB) 에서 찾을 수 있습니다. 애드온이 마음에 드시나요? 친구에게 알려주세요! (="
+L["CHAT_OPTIONS_IN_COMBAT"] = "안전을 위해 전투 중에는 설정 인터페이스를 열 수 없습니다."
 
 -- Buff & gift announcements
 L["MESSAGE_BUFFED"] = "%s님이 당신에게 %s 버프를 주었습니다!"
@@ -59,8 +60,9 @@ L["OPTIONS_CURSEFORGE"] = "CurseForge"
 L["OPTIONS_GITHUB"] = "GitHub"
 L["OPTIONS_DISCORD"] = "Discord"
 L["OPTIONS_WAGO"] = "Wago"
-L["OPTIONS_COMMAND_TFTB"] = "/tftb"
-L["OPTIONS_COMMAND_TFTB_DESCRIPTION"] = "Thanks for the Buff 설정 인터페이스를 엽니다."
+L["OPTIONS_COMMANDS_HEADER"] = "/Commands"
+L["OPTIONS_COMMAND"] = "/tftb"
+L["OPTIONS_COMMAND_DESCRIPTION"] = "이 애드온의 설정 인터페이스를 엽니다."
 L["OPTIONS_COMMAND_THANKYOU"] = "/thankyou"
 L["OPTIONS_COMMAND_THANKYOU_DESCRIPTION"] = "현재 대상에게 감정표현을 하고 귓속말을 보냅니다."
 
@@ -120,7 +122,7 @@ L["PEER_PRESSURE_SOUND_DESCRIPTION"] =
 -- Shared across the combat panels
 L["COMBAT_TRACKED"] = "추적 중인 능력"
 L["COMBAT_GROUP_ITEMS"] = "아이템"
-L["COMBAT_TOGGLE_TRACKING"] = "%s에 대한 추적 켜기/끄기"
+L["COMBAT_TOGGLE_TRACKING"] = "%s에 대한 추적 켜기/끄기."
 L["COMBAT_ITEM_PENDING"] = "아이템 #%d"
 L["COMBAT_SPELL_PENDING"] = "주문 #%d"
 
@@ -144,7 +146,6 @@ L["PRAISE_EMOTES_SELECT"] = "감정표현 선택"
 L["PRAISE_DELAY_ENABLE"] = "감사 표시 지연 활성화"
 L["PRAISE_DELAY_DESCRIPTION"] =
 	"귓속말과 감정표현 전에 잠시 기다려, 버프와 같은 순간에 감사가 전달되지 않도록 합니다.\n\n알림은 영향을 받지 않습니다."
-L["PRAISE_DELAY_LENGTH"] = "지연 시간"
 L["PRAISE_DELAY_LENGTH_DESCRIPTION"] =
 	"버프를 준 플레이어에게 감사를 표하기 전에 기다릴 시간입니다."
 

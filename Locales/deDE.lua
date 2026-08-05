@@ -16,7 +16,9 @@ L["ADDON_SHORT"] = "TFTB"
 
 -- System
 L["CHAT_LOADED"] =
-	"Version %s. Einstellungen (einschließlich der Option, diese Nachricht zu deaktivieren) finden sich unter Optionen > AddOns > Thanks for the Buff. Gefällt das Add-on? Erzählt einem Freund davon! (="
+	"Version %s. Einstellungen (einschließlich der Option, diese Nachricht zu deaktivieren) finden sich unter Optionen > AddOns > Thanks for the Buff (TFTB). Gefällt das Add-on? Erzählt einem Freund davon! (="
+L["CHAT_OPTIONS_IN_COMBAT"] =
+	"Aus Sicherheitsgründen kann das Optionsmenü während des Kampfes nicht geöffnet werden."
 
 -- Buff & gift announcements
 L["MESSAGE_BUFFED"] = "%s hat Euch mit %s gebufft!"
@@ -59,8 +61,9 @@ L["OPTIONS_CURSEFORGE"] = "CurseForge"
 L["OPTIONS_GITHUB"] = "GitHub"
 L["OPTIONS_DISCORD"] = "Discord"
 L["OPTIONS_WAGO"] = "Wago"
-L["OPTIONS_COMMAND_TFTB"] = "/tftb"
-L["OPTIONS_COMMAND_TFTB_DESCRIPTION"] = "Öffnet das Optionsmenü von Thanks for the Buff."
+L["OPTIONS_COMMANDS_HEADER"] = "/Commands"
+L["OPTIONS_COMMAND"] = "/tftb"
+L["OPTIONS_COMMAND_DESCRIPTION"] = "Öffnet das Optionsmenü dieses Add-ons."
 L["OPTIONS_COMMAND_THANKYOU"] = "/thankyou"
 L["OPTIONS_COMMAND_THANKYOU_DESCRIPTION"] = "Nutzt ein Emote und flüstert Eurem aktuellen Ziel zu."
 
@@ -119,7 +122,7 @@ L["PEER_PRESSURE_SOUND_DESCRIPTION"] =
 -- Shared across the combat panels
 L["COMBAT_TRACKED"] = "Verfolgte Fähigkeiten"
 L["COMBAT_GROUP_ITEMS"] = "Gegenstände"
-L["COMBAT_TOGGLE_TRACKING"] = "Verfolgung umschalten für %s"
+L["COMBAT_TOGGLE_TRACKING"] = "Verfolgung umschalten für %s."
 L["COMBAT_ITEM_PENDING"] = "Gegenstand #%d"
 L["COMBAT_SPELL_PENDING"] = "Zauber #%d"
 
@@ -143,7 +146,6 @@ L["PRAISE_EMOTES_SELECT"] = "Emotes auswählen"
 L["PRAISE_DELAY_ENABLE"] = "Lob-Verzögerung aktivieren"
 L["PRAISE_DELAY_DESCRIPTION"] =
 	"Wartet einen Moment vor dem Flüstern und dem Emote, damit Euer Dank nicht im selben Augenblick wie der Buff eintrifft.\n\nBenachrichtigungen sind davon nicht betroffen."
-L["PRAISE_DELAY_LENGTH"] = "Verzögerung"
 L["PRAISE_DELAY_LENGTH_DESCRIPTION"] =
 	"Wie lange gewartet werden soll, bevor dem Spieler gedankt wird, der Euch gebufft hat."
 

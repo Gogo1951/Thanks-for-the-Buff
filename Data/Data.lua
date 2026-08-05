@@ -62,6 +62,21 @@ ns.OPTIONS_REGISTRY = {
 }
 
 --------------------------------------------------------------------------------
+-- Options Layout
+--------------------------------------------------------------------------------
+
+-- The label-beside-control grid: a label plus its control always total the row width.
+ns.OPTIONS_ROW_WIDTH = 2.6
+ns.OPTIONS_LABEL_WIDTH = 1.3
+ns.OPTIONS_CONTROL_WIDTH = ns.OPTIONS_ROW_WIDTH - ns.OPTIONS_LABEL_WIDTH
+
+-- The item lists' remove column, sized to its icon rather than a caption.
+ns.OPTIONS_REMOVE_ICON_WIDTH = 0.25
+
+-- The blank cell a sub-option row leads with.
+ns.OPTIONS_SUB_INDENT_WIDTH = 0.115
+
+--------------------------------------------------------------------------------
 -- Constants
 --------------------------------------------------------------------------------
 

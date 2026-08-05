@@ -55,7 +55,7 @@ Data/Tracked-Abilities.lua
 Data/Peer-Pressure-Abilities.lua
 Data/Default-Settings.lua
 
-# Features
+# Thanks for the Buff
 Features/Core.lua
 Features/Utilities.lua
 Features/Announcements.lua
@@ -63,8 +63,6 @@ Features/Buff-Tracking.lua
 Features/Peer-Pressure.lua
 Features/Thank-You-Button.lua
 Features/Diagnostics.lua
-
-# Options
 Options/Options-Utilities.lua
 Options/Options-General.lua
 Options/Options-Buffs-from-Strangers.lua

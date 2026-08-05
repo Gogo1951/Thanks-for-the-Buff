@@ -18,10 +18,10 @@ end
 --------------------------------------------------------------------------------
 
 --[[
-    The AceDB-3.0 defaults table. Every user setting lives under `profile`; AceDB
-    applies these via metatables (no hand-rolled merge). `global` is reserved for
-    profile-independent, account-wide state -- this add-on has no minimap button,
-    so it stays empty.
+    The AceDB-3.0 defaults table. Every user setting lives under `profile` -- the
+    shared Default profile holds the whole database. AceDB applies these itself,
+    copying them into the saved table and preserving an explicit false, so there is
+    no hand-rolled merge.
 ]]
 ns.DATABASE_DEFAULTS = {
 	profile = {
@@ -107,5 +107,4 @@ ns.DATABASE_DEFAULTS = {
 		},
 		watchedBuffs = {},
 	},
-	global = {},
 }

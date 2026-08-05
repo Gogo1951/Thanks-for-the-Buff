@@ -2,6 +2,8 @@ local _, ns = ...
 local Data = ns.Data
 local L = ns.L
 
+local GetColor = ns.GetColor
+
 --[[
     The buff-reaction engine behind the Strangers, Teammates, Services, and
     Good News options panels. Watches the combat log, classifies the source,
@@ -356,7 +358,7 @@ local function BuildDisplayGroups()
 	if #itemEntries > 0 then
 		categories[#categories + 1] = {
 			id = "ITEMS",
-			name = "|cff" .. ns.PALETTE.TITLE .. L["COMBAT_GROUP_ITEMS"] .. "|r",
+			name = GetColor("TITLE") .. L["COMBAT_GROUP_ITEMS"] .. "|r",
 			entries = itemEntries,
 		}
 	end

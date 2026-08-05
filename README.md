@@ -2,9 +2,11 @@
 
 Automatically thank players who buff you with emotes, whispers, and chat notifications, whether it's a stranger in the open world or a teammate's cooldown like Power Infusion or Innervate. Get a heads-up for feasts, portals, and same-class cooldowns too.
 
+<img width="800" src="https://github.com/user-attachments/assets/a77bd74a-18e4-4e89-bc74-13c5c86052f7" />
+
 ## Features
 
-🙌 **Every Buff Gets a Thank-You** // Be the player who always says thanks — to the stranger who buffs you in passing and the teammate who burns a cooldown on you — without ever stopping to type it.
+🙌 **Every Buff Gets a Thank-You** // Emote and whisper the stranger who buffed you in passing and the teammate who burned a cooldown on you, with cooldowns and a delay so it never turns into spam.
 
 🍖 **Group Services** // A heads-up the moment someone sets out a feast, drops a soulwell, opens a portal, or puts down a repair bot for the group.
 
@@ -25,7 +27,7 @@ Automatically thank players who buff you with emotes, whispers, and chat notific
 
 ## How It Works
 
-Type `/tftb` to open the options panel. Buffs from strangers, buffs from teammates, and group services each get their own tab, and every tab splits the same way: **Praise Messages & Emotes** is what the player who helped you sees, and **Notifications** is the chat note and sound only you get. Turn on whichever you like, add a short delay so your thanks doesn't land in the same instant as the buff, and set cooldowns so a wave of world buffs never turns into spam. Good News whispers the people you buff, and Peer Pressure pings you when a same-class player pops a cooldown. You can toggle individual abilities and items on or off anywhere they appear.
+Type `/tftb` to open the options panel. Buffs from strangers, buffs from teammates, and group services each get their own tab, and every tab splits the same way: **Praise Messages & Emotes** is what the player who helped you sees, and **Notifications** is the chat note and sound only you get. Turn on whichever you like, add a short delay so your thanks doesn't land in the same instant as the buff, and set cooldowns so a wave of world buffs never turns into spam. Good News whispers the people you buff — everyone, or just your group — and Peer Pressure pings you when a same-class player pops a cooldown. You can toggle individual abilities and items on or off anywhere they appear.
 
 ### Tracked Abilities
 
@@ -52,8 +54,6 @@ Only the abilities your client actually has show up in the options panel, so you
 | --- | --- |
 | `/tftb` | Open the options panel |
 | `/thankyou` | Emote at and whisper your current target |
-
-<img width="800" src="https://github.com/user-attachments/assets/a77bd74a-18e4-4e89-bc74-13c5c86052f7" />
 
 ## Testing & Localization Status
 
@@ -89,21 +89,9 @@ Please reach out if you would like to be involved!
 
 🟢 Pairs With // Gogo1951's [Connoisseur](https://www.curseforge.com/wow/addons/consumable-connoisseur)
 
-🟢 Pairs With // Brylack's [Never Locky](https://www.curseforge.com/wow/addons/never-locky)
-
 🟢 Pairs With // Gogo1951's [Play It Forward](https://www.curseforge.com/wow/addons/play-it-forward)
 
-🟢 Pairs With // Codermik's [SmartBuff](https://www.curseforge.com/wow/addons/smartbuff-retail-burning-crusade-classic)
-
-🟢 Pairs With // CWollinger's [Soulstone Watcher](https://www.curseforge.com/wow/addons/soulstone-watcher)
-
-🟢 Pairs With // GrumpyPlayers's [Stea Summon - Hotfix](https://www.curseforge.com/wow/addons/stea-summon-hotfix)
-
-🟢 Pairs With // Stz's [Warlock Raid Soulstone Assignments](https://www.curseforge.com/wow/addons/warlock-raid-soulstone-assignments)
-
 🟢 Pairs With // Gogo1951's [Water Dispenser](https://www.curseforge.com/wow/addons/water-dispenser-revisited)
-
-🟡 Some Overlap // Romanov_3's [Auto Grats](https://www.curseforge.com/wow/addons/auto-grats)
 
 🟡 Some Overlap // Aszilynn's [InnervateMate](https://www.curseforge.com/wow/addons/innervatemate)
 
