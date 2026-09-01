@@ -31,6 +31,9 @@ Automatically thank players who buff you with emotes, whispers, and chat notific
 
 Type `/tftb` to open the options panel, or find it under Options > AddOns > Thanks for the Buff (TFTB). Every buff tab splits the same way: **Praise Messages & Emotes** is what the player who helped you sees, and **Notifications** is the chat note and sound only you get.
 
+<img width="800" src="https://github.com/user-attachments/assets/73e9cee1-ef63-4b09-84cf-1c2ef19862c8" />
+
+
 - **Stranger Buffs** // Buffs from players outside your group. A praise cooldown, a same-player cooldown, a minimum buff duration, and an optional delay keep a wave of world buffs from turning into spam.
 - **Teammate Buffs** // The buffs and cooldowns your party and raid cast on you, with a checkbox per ability.
 - **Service Alerts** // Feasts, refreshment tables, soulwells, portals, summons, resistance cauldrons, repair bots, and more.
