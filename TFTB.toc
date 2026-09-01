@@ -1,5 +1,5 @@
 ## Title: Thanks for the Buff (TFTB)
-## Notes: Automatically thank players who buff you with emotes, whispers, and chat notifications, whether it's a stranger in the open world or a teammate's cooldown like Power Infusion or Innervate. Get a heads-up for feasts, portals, and same-class cooldowns too.
+## Notes: Automatically thank players who buff you with emotes, whispers, and chat notifications, from open-world buffs to teammate cooldowns like Power Infusion and Innervate. Get alerts for feasts, portals, and same-class cooldowns too.
 ## Author: Gogo1951
 
 ## Category-enUS: Buffs & Debuffs
@@ -22,7 +22,7 @@
 ## X-Curse-Project-ID: 1140285
 ## X-Wago-ID: 5NR8PeK3
 
-## SavedVariables: TFTB_DB
+## SavedVariables: TFTBDB
 
 # Includes
 Includes/Libraries/LibStub/LibStub.lua
@@ -65,10 +65,10 @@ Features/Thank-You-Button.lua
 Features/Diagnostics.lua
 Options/Options-Utilities.lua
 Options/Options-General.lua
-Options/Options-Buffs-from-Strangers.lua
-Options/Options-Buffs-from-Teammates.lua
-Options/Options-Buff-Services.lua
-Options/Options-Good-News.lua
+Options/Options-Stranger-Buffs.lua
+Options/Options-Teammate-Buffs.lua
+Options/Options-Send-Good-News.lua
+Options/Options-Service-Alerts.lua
 Options/Options-Peer-Pressure.lua
 Options/Options-Thank-You-Button.lua
 Options/Options-Profiles.lua

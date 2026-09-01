@@ -167,8 +167,9 @@ local function BuildLookups()
 							-- What to read the recipient's remaining duration with.
 							-- Deliberately absent for a cast that leaves no aura and
 							-- for a `noDuration` entry (Fear Ward, Misdirection):
-							-- nothing to read is what drops the "for 10 minutes"
-							-- clause from their message.
+							-- nothing to read is what drops the duration clause from
+							-- their message. A duration that IS read still has to
+							-- clear the under-a-minute cap in BuildGoodNewsMessage.
 							auraId = (entry.detect == Data.DETECT.AURA and not entry.noDuration) and watched or nil,
 						}
 					end
@@ -302,7 +303,7 @@ local function BuildDisplayGroups()
 
 			if #ids > 0 then
 				entriesLive = entriesLive + 1
-				local name = entry.name or GetSpellName(abilities[1]) or L["COMBAT_SPELL_PENDING"]:format(abilities[1])
+				local name = entry.name or GetSpellName(abilities[1]) or L["TRACKED_SPELL_PENDING"]:format(abilities[1])
 
 				-- One TRACKED entry == one toggle.
 				local toggle = { ids = ids }
@@ -350,7 +351,7 @@ local function BuildDisplayGroups()
 	end
 	table.sort(classNames)
 	for _, class in ipairs(classNames) do
-		local color = Data.CLASS_COLORS[class] or "FFFFFF"
+		local color = Data.CLASS_COLORS[class] or ns.PALETTE.TEXT
 		local label = "|cff" .. color .. (LOCALIZED_CLASS_NAMES_MALE[class] or class) .. "|r"
 		categories[#categories + 1] = { id = class, name = label, entries = classBuckets[class] }
 	end
@@ -358,7 +359,7 @@ local function BuildDisplayGroups()
 	if #itemEntries > 0 then
 		categories[#categories + 1] = {
 			id = "ITEMS",
-			name = GetColor("TITLE") .. L["COMBAT_GROUP_ITEMS"] .. "|r",
+			name = GetColor("TITLE") .. L["TRACKED_GROUP_ITEMS"] .. "|r",
 			entries = itemEntries,
 		}
 	end
@@ -403,7 +404,7 @@ end
     print credits an animal; and because a pet inherits its owner's PARTY/RAID
     affiliation, nothing downstream would catch it.
 ]]
-local function ResolveSource(sourceGUID, sourceName, sourceFlags)
+local function ResolveSource(sourceGUID, sourceName)
 	if ns.IsPlayerGUID(sourceGUID) then
 		return sourceGUID, sourceName
 	end
@@ -448,18 +449,57 @@ local function ResolveEmoteUnit(guid)
 end
 
 --[[
+    Could this unit actually witness an emote? Holding a unit token proves the
+    buffer exists, not that they are anywhere near you -- a party member who
+    zoned into a dungeon, or ran two zones ahead, is still "party2".
+
+    Two gates, both cheap. UnitIsVisible is the coarse one: it goes false the
+    moment the client stops tracking the object, which is exactly the different
+    zone / different instance / different continent case. UnitInRange is the
+    tighter one at roughly spell range, but it answers only for group members --
+    its second return says whether it checked at all, so a stranger falls
+    through to the visibility verdict instead of to a bogus false.
+
+    Deliberately looser than true emote range (emote text broadcasts at say
+    range, far shorter than either check). Nothing in the API measures that, and
+    erring loose costs an emote nobody sees, while erring tight silently drops
+    thanks the buffer WAS standing there for -- the worse failure for an addon
+    whose whole job is thanking people.
+]]
+local function CanWitnessEmote(unit)
+	if not UnitExists(unit) or not UnitIsVisible(unit) then
+		return false
+	end
+	local inRange, checkedRange = UnitInRange(unit)
+	if checkedRange then
+		return inRange
+	end
+	return true
+end
+
+--[[
     Best emote direction for a buffer: their unit token when we hold one, else
     their bare character name. The client resolves a name to any player it can
     currently see -- but only the bare form, never the combat log's cross-realm
-    "Name-Realm", so the realm is stripped. This fallback is strictly safe:
-    DoEmote treats a name it can't resolve exactly like "none" (the undirected
-    emote), never the current target. Worst realistic miss is two visible
+    "Name-Realm", so the realm is stripped. Worst realistic miss is two visible
     same-named players from different realms, which just salutes the wrong twin.
+
+    Returning nil means "do not emote", not "emote undirected" -- DoRandomEmote
+    enforces that. A unit token we hold but that cannot witness the emote is
+    dropped here rather than degraded, because degrading it produces "You thank
+    everyone around you." aimed at nobody.
+
+    Caveat on the name branch: no API pre-tests whether a name will resolve, and
+    DoEmote reports nothing about what it did, so an absent stranger still
+    reaches DoEmote as a name and still degrades to the undirected emote. That
+    hole closes only by dropping the name fallback entirely, which would also
+    drop the ordinary case of a stranger buffing you while standing right there
+    untargeted -- the addon's most common thank of all.
 ]]
 local function ResolveEmoteTarget(guid, name)
 	local unit = ResolveEmoteUnit(guid)
 	if unit then
-		return unit
+		return CanWitnessEmote(unit) and unit or nil
 	end
 	if name then
 		return Ambiguate(name, "short")
@@ -484,7 +524,8 @@ end
     back a live unit token, and "target", "focus", and "mouseover" all name
     whoever you are pointing at in that instant -- resolve it early and a delayed
     emote thanks whoever you moved on to. An unresolvable buffer degrades to
-    their bare name, then to the undirected emote.
+    their bare name, and from there to no emote at all -- never to the
+    undirected one.
 ]]
 local function DeliverPraise(db, guid, name, link, whisperAllowed, emoteAllowed)
 	local function Praise()
@@ -510,7 +551,7 @@ end
     whisper is the exception -- it is throttled per-recipient (TryWhisperCooldown)
     so a teammate who repeatedly buffs you in a raid isn't whisper-spammed.
 ]]
-local function HandleTracked(entry, spellID, creditGUID, creditName, destGUID, playerGUID)
+local function HandleTracked(entry, spellID, creditGUID, creditName, destGUID)
 	if entry.type == Data.BUFF.SERVICE then
 		-- A service set out for the group: no per-you dest, just don't self-credit.
 		if creditGUID == playerGUID then
@@ -528,6 +569,11 @@ local function HandleTracked(entry, spellID, creditGUID, creditName, destGUID, p
 	-- No-aura raid help reacts with the Group Services settings; everything cast
 	-- on you (SOLO / GROUP) uses the Buffs from Teammates settings.
 	local db = (entry.type == Data.BUFF.SERVICE) and ns.db.profile.services or ns.db.profile.teammates
+	-- Each panel's master switch, checked once here rather than at each of the
+	-- four outputs below.
+	if not db.enabled then
+		return
+	end
 	local link = ns.GetBuffLink(entry, spellID)
 
 	if db.printEnabled then
@@ -540,7 +586,8 @@ local function HandleTracked(entry, spellID, creditGUID, creditName, destGUID, p
 		ns.PlayBuffSound()
 	end
 
-	-- Emotes are visible and social, so they are held back until you leave combat.
+	-- Emotes are visible and social, so a buff that lands while you are fighting
+	-- simply goes un-emoted: suppressed, never queued for after combat.
 	local whisperAllowed = db.whisperEnabled and TryWhisperCooldown(creditGUID)
 	local emoteAllowed = db.emotesEnabled and not InCombatLockdown()
 	if whisperAllowed or emoteAllowed then
@@ -549,10 +596,8 @@ local function HandleTracked(entry, spellID, creditGUID, creditName, destGUID, p
 end
 
 local function HandleStrangersBuff(sourceGUID, sourceName, spellID)
-	-- No master on/off switch: the print / whisper / emote / sound toggles are the
-	-- enable. With all four off, every reaction below no-ops, so nothing fires.
 	local db = ns.db.profile.strangers
-	if not db then
+	if not db.enabled then
 		return
 	end
 
@@ -700,8 +745,67 @@ local function AnnounceGivenCast(pending)
 	end)
 end
 
+--[[
+    The other half of a resurrect-detect Good News whisper. UNIT_SPELLCAST_SUCCEEDED
+    parks the record instead of announcing it, because a jumper-cable cast succeeds
+    whether or not the target gets up; this is the combat-log event that only a
+    working jolt produces, so it is what releases the whisper.
+
+    Matched on recipient + spell rather than castGUID, which the combat log does
+    not carry. Swept first so a failed jolt's stale record can never be claimed by
+    a later revive of the same person with the same cables.
+]]
+local function ClaimPendingResurrect(destGUID, spellID)
+	if not destGUID then
+		return
+	end
+	SweepPendingGiven()
+	for castGUID, pending in pairs(pendingGiven) do
+		if pending.guid == destGUID and pending.spellID == spellID then
+			pendingGiven[castGUID] = nil
+			AnnounceGivenCast(pending)
+			return
+		end
+	end
+end
+
+--[[
+    Which tracked entry, if any, this combat-log event proves. The subevent has to
+    match the entry's own detect mode, not merely find an id in a lookup: a
+    resurrect-detect entry shares castLookup with ordinary casts (so the panel,
+    the watched list and the seeds all keep working unchanged) but must ignore the
+    SPELL_CAST_SUCCESS that an ordinary cast entry lives on -- that event is
+    exactly the false positive being fixed. The reverse guard matters too: a
+    CAST entry must not be triggered by a stray SPELL_RESURRECT.
+]]
+local function MatchTracked(spellID, isAura, isCast, isResurrect)
+	if isAura then
+		return auraLookup[spellID]
+	end
+	local entry = castLookup[spellID]
+	if not entry then
+		return nil
+	end
+	if entry.detect == Data.DETECT.RESURRECT then
+		return isResurrect and entry or nil
+	end
+	return isCast and entry or nil
+end
+
+--[[
+    Good News for a cast of yours. "Yours" includes your PET's: Roar of Sacrifice
+    and Battle Squawk are cast by the pet, never by the player, so a bare
+    unit == "player" test silently switched Good News off for every pet-cast
+    entry in the data -- the recipient sees the buff and hears nothing.
+
+    Nothing downstream needs to know which of the two it was. The whisper names
+    the buff, not the caster, and the recipient's experience is identical either
+    way; crediting the owner is the whole point of tracking a pet's cast at all.
+    Events for OTHER people's pets never reach here -- the dispatcher registers
+    UNIT_SPELLCAST_SENT unfiltered, but "pet" means yours.
+]]
 local function OnUnitSpellcastSent(unit, target, castGUID, spellID)
-	if unit ~= "player" or not isReady or not ns.db then
+	if (unit ~= "player" and unit ~= "pet") or not isReady or not ns.db then
 		return
 	end
 	local db = ns.db.profile.goodNews
@@ -759,29 +863,46 @@ local function OnCombatLogEvent()
 	-- emits SPELL_AURA_REFRESH, not APPLIED, and a rebuff earns the same thanks.
 	local isAura = (subEvent == "SPELL_AURA_APPLIED") or (subEvent == "SPELL_AURA_REFRESH")
 	local isCast = (subEvent == "SPELL_CAST_SUCCESS")
-	if not isAura and not isCast then
+	-- The only event that proves a revive actually took: goblin jumper cables and
+	-- Defibrillate report a successful CAST on every attempt, including the ones
+	-- that leave the target dead.
+	local isResurrect = (subEvent == "SPELL_RESURRECT")
+	if not isAura and not isCast and not isResurrect then
 		return
 	end
 
-	-- Diagnostics probe: log raw cast-success events (portals, summons, feasts)
-	-- before the guards below drop anything, so even your own test casts and casts
-	-- that get filtered out are still visible in the event log. See ns:LogCombatCast.
-	if isCast and ns.diagnostics and ns.diagnostics.logging then
+	-- Diagnostics probe: log raw cast-success and resurrect events (portals,
+	-- summons, feasts, jumper cables) before the guards below drop anything, so
+	-- even your own test casts and events that get filtered out are still visible
+	-- in the event log. Resurrects are logged alongside casts specifically so a
+	-- failed jolt and a working one can be told apart by eye -- a cable that
+	-- revives nobody logs CAST with no REZ following it. See ns:LogCombatCast.
+	if (isCast or isResurrect) and ns.diagnostics and ns.diagnostics.logging then
 		ns:LogCombatCast(
 			spellID,
 			sourceName,
 			sourceFlags,
 			castLookup[spellID] ~= nil,
-			ns.db.profile.watchedBuffs and ns.db.profile.watchedBuffs[spellID]
+			ns.db.profile.watchedBuffs and ns.db.profile.watchedBuffs[spellID],
+			isResurrect and "REZ" or "CAST"
 		)
 	end
 
 	-- Peer Pressure: same-class cooldown pops. Sits above the own-source drop below
 	-- because "Trigger on Own Casts" lets your own cooldowns fire the alert too;
-	-- CheckPeerPressure applies that setting itself. A cheap tap -- its first line
-	-- is a lookup that misses for everything untracked.
+	-- CheckPeerPressure applies that setting itself. sourceFlags rides along because
+	-- affiliation is the only reliable read on whether the caster is in your group --
+	-- Era's combat log carries every nearby player, not just yours. A cheap tap --
+	-- its first line is a lookup that misses for everything untracked.
 	if isCast and ns.CheckPeerPressure then
-		ns.CheckPeerPressure(spellID, sourceGUID, sourceName, destGUID, destName)
+		ns.CheckPeerPressure(spellID, sourceGUID, sourceName, sourceFlags, destGUID, destName)
+	end
+
+	-- Good News for a resurrect-detect cast of YOURS. It has to be claimed above
+	-- the own-casts return below, which is otherwise the end of the line for
+	-- anything you did yourself.
+	if isResurrect and sourceGUID == playerGUID then
+		ClaimPendingResurrect(destGUID, spellID)
 	end
 
 	-- Your own casts are Good News's business, and it runs off the cast events
@@ -791,7 +912,7 @@ local function OnCombatLogEvent()
 		return
 	end
 
-	local entry = (isAura and auraLookup[spellID]) or (isCast and castLookup[spellID])
+	local entry = MatchTracked(spellID, isAura, isCast, isResurrect)
 
 	-- Service casts (portals, summons, feasts) are announced from
 	-- UNIT_SPELLCAST_SUCCEEDED instead -- they don't reliably reach the combat log
@@ -826,7 +947,7 @@ local function OnCombatLogEvent()
 		return
 	end
 
-	local creditGUID, creditName = ResolveSource(sourceGUID, sourceName, sourceFlags)
+	local creditGUID, creditName = ResolveSource(sourceGUID, sourceName)
 	if not creditName then
 		return
 	end
@@ -847,7 +968,7 @@ local function OnCombatLogEvent()
 
 	if sourceIsGroupMember then
 		if entry then
-			HandleTracked(entry, spellID, creditGUID, creditName, destGUID, playerGUID)
+			HandleTracked(entry, spellID, creditGUID, creditName, destGUID)
 		end
 	elseif maybeStranger then
 		HandleStrangersBuff(sourceGUID, sourceName, spellID)
@@ -882,8 +1003,17 @@ local function OnUnitSpellcastSucceeded(unitTarget, castGUID, spellID)
 	-- OTHER people's casts.
 	local pending = castGUID and pendingGiven[castGUID]
 	if pending then
-		pendingGiven[castGUID] = nil
-		AnnounceGivenCast(pending)
+		--[[
+            A resurrect-detect cast is left parked instead of announced: the
+            cables succeeding is not the target getting up, and whispering
+            "I revived you" at someone still face-down is the bug. ClaimPending-
+            Resurrect releases it when SPELL_RESURRECT confirms the revive, and
+            SweepPendingGiven discards it when no such event ever arrives.
+        ]]
+		if pending.entry.detect ~= Data.DETECT.RESURRECT then
+			pendingGiven[castGUID] = nil
+			AnnounceGivenCast(pending)
+		end
 	end
 
 	local entry = castLookup[spellID]
@@ -915,7 +1045,7 @@ local function OnUnitSpellcastSucceeded(unitTarget, castGUID, spellID)
 
 	local cooldownKey = "service:" .. creditGUID
 	if not IsOnCooldown(cooldownKey) then
-		HandleTracked(entry, spellID, creditGUID, creditName, nil, playerGUID)
+		HandleTracked(entry, spellID, creditGUID, creditName, nil)
 		SetCooldown(cooldownKey)
 	end
 end

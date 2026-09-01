@@ -14,7 +14,7 @@ local LINK_URL_WIDTH = ns.OPTIONS_ROW_WIDTH - LINK_LABEL_WIDTH
 --------------------------------------------------------------------------------
 
 function ns.BuildGeneralOptions()
-	return {
+	local options = {
 		name = L["ADDON_TITLE"],
 		type = "group",
 		args = {
@@ -41,15 +41,6 @@ function ns.BuildGeneralOptions()
 			descCommands = ns.OptionsDesc(
 				GetColor("INFO") .. L["OPTIONS_COMMAND"] .. "|r" .. "  " .. L["OPTIONS_COMMAND_DESCRIPTION"],
 				8
-			),
-			spaceCommands2 = ns.OptionsSpacer(9),
-			descCommandsAlternate = ns.OptionsDesc(
-				GetColor("INFO")
-					.. L["OPTIONS_COMMAND_THANKYOU"]
-					.. "|r"
-					.. "  "
-					.. L["OPTIONS_COMMAND_THANKYOU_DESCRIPTION"],
-				10
 			),
 			-- Feedback & Support (house order: Discord, GitHub, CurseForge, Wago)
 			spaceLinks0 = ns.OptionsSpacer(69),
@@ -121,4 +112,6 @@ function ns.BuildGeneralOptions()
 			},
 		},
 	}
+
+	return options
 end

@@ -23,15 +23,13 @@ L["CHAT_OPTIONS_IN_COMBAT"] = "Par précaution, l'interface des options ne peut 
 L["MESSAGE_BUFFED"] = "%s vous a amélioré avec %s !"
 L["MESSAGE_GAVE_YOU"] = "%s vous a donné %s !"
 L["MESSAGE_GAVE_GROUP"] = "%s a donné %s à votre groupe !"
-L["MESSAGE_USED_ITEM"] = "%s a utilisé %s %s sur vous !"
-L["MESSAGE_USED_SPELL"] = "%s a utilisé %s sur vous !"
+L["MESSAGE_USED_ITEM"] = "%s a utilisé %s sur vous !"
+L["MESSAGE_USED_SPELL"] = "%s a lancé %s sur vous !"
 L["MESSAGE_SET_OUT"] = "%s a déployé %s !"
 L["MESSAGE_OPENED"] = "%s a ouvert %s !"
 
 -- Thank-you
 L["MESSAGE_WHISPER_THANKS"] = "Merci pour %s !"
-L["MESSAGE_GOOD_NEWS_DURATION"] = "Bonne nouvelle ! Vous avez %s pendant %s !"
-L["MESSAGE_GOOD_NEWS"] = "Bonne nouvelle ! Vous avez %s !"
 L["MESSAGE_PEER_PRESSURE"] = "%s a utilisé %s !"
 L["MESSAGE_PEER_PRESSURE_TARGET"] = "%s a utilisé %s sur %s !"
 L["MESSAGE_SELECT_PLAYER"] = "Sélectionnez un joueur à remercier."
@@ -41,10 +39,6 @@ L["MESSAGE_CANT_THANK_SELF"] = "Vous ne pouvez pas vous remercier vous-même !"
 -- Text Fragments
 --------------------------------------------------------------------------------
 
--- Pronouns substituted into MESSAGE_USED_ITEM by the buffer's gender.
-L["PRONOUN_HIS"] = "son"
-L["PRONOUN_HER"] = "son"
-L["PRONOUN_THEIR"] = "leur"
 L["UNKNOWN_SPELL"] = "Sort inconnu"
 
 --------------------------------------------------------------------------------
@@ -54,8 +48,8 @@ L["UNKNOWN_SPELL"] = "Sort inconnu"
 L["OPTIONS_WELCOME_TOGGLE"] = "Activer le message de bienvenue"
 L["OPTIONS_WELCOME_DESCRIPTION"] = "Affiche un message dans la discussion à la connexion."
 L["OPTIONS_DESCRIPTION"] =
-	"Remerciez automatiquement les joueurs qui vous améliorent avec des emotes, des chuchotements et des notifications, que ce soit un inconnu dans le monde ouvert ou le temps de recharge d'un coéquipier comme Power Infusion ou Innervate. Soyez aussi averti des festins, des portails et des cooldowns de votre classe."
-L["OPTIONS_SUPPORT"] = "Commentaires et Assistance"
+	"Remerciez automatiquement les joueurs qui vous améliorent avec des emotes, des chuchotements et des notifications, que ce soit un inconnu dans le monde ouvert ou le temps de recharge d'un coéquipier comme Infusion de puissance ou Innervation. Soyez aussi averti des festins, des portails et des temps de recharge de votre propre classe."
+L["OPTIONS_SUPPORT"] = "Commentaires et assistance"
 L["OPTIONS_CURSEFORGE"] = "CurseForge"
 L["OPTIONS_GITHUB"] = "GitHub"
 L["OPTIONS_DISCORD"] = "Discord"
@@ -63,91 +57,114 @@ L["OPTIONS_WAGO"] = "Wago"
 L["OPTIONS_COMMANDS_HEADER"] = "/Commands"
 L["OPTIONS_COMMAND"] = "/tftb"
 L["OPTIONS_COMMAND_DESCRIPTION"] = "Ouvre l'interface des options de cet add-on."
-L["OPTIONS_COMMAND_THANKYOU"] = "/thankyou"
-L["OPTIONS_COMMAND_THANKYOU_DESCRIPTION"] = "Fait une emote et chuchote à votre cible actuelle."
 
 --------------------------------------------------------------------------------
 -- Options: Buffs from Strangers
 --------------------------------------------------------------------------------
 
-L["TAB_STRANGERS"] = "Améliorations d'Inconnus"
-L["STRANGERS_DESCRIPTION"] = "Une amélioration sur vous d'un joueur en dehors de votre groupe (monde ouvert)."
-L["STRANGERS_OVERALL_COOLDOWN"] = "Temps de recharge des remerciements (Secondes)"
+L["TAB_STRANGERS"] = "Améliorations d'inconnus"
+L["STRANGERS_ENABLE"] = "Activer les remerciements pour les améliorations d'inconnus"
+L["STRANGERS_DESCRIPTION"] = "Remerciez les joueurs hors de votre groupe quand ils vous améliorent en monde ouvert."
+--[[
+    The dropdown values carry the unit, so these labels do not repeat it. Each
+    description is one line because it renders as visible help under its control
+    rather than behind a hover.
+]]
+L["STRANGERS_OVERALL_COOLDOWN"] = "Délai entre deux remerciements"
 L["STRANGERS_OVERALL_COOLDOWN_DESCRIPTION"] =
-	"Fréquence maximale à laquelle remercier qui que ce soit, quelle que soit la provenance de l'amélioration.\n\nMettez 0 pour désactiver cette limite. Les notifications ne sont pas affectées."
-L["STRANGERS_SOURCE_COOLDOWN"] = "Temps de recharge par joueur (Secondes)"
+	"Délai entre un remerciement et le suivant, quel que soit celui qui vous a amélioré. Mettez zéro pour remercier chaque amélioration."
+L["STRANGERS_SOURCE_COOLDOWN"] = "Délai de remerciement pour un même joueur"
 L["STRANGERS_SOURCE_COOLDOWN_DESCRIPTION"] =
-	"Fréquence maximale à laquelle remercier le même joueur.\n\nLes notifications ne sont pas affectées."
-L["STRANGERS_MIN_DURATION"] = "Durée minimale de l'amélioration (Secondes)"
+	"Délai entre les remerciements destinés au même joueur. Mettez zéro pour remercier chaque amélioration."
+L["STRANGERS_MIN_DURATION"] = "Durée minimale de l'amélioration"
 L["STRANGERS_MIN_DURATION_DESCRIPTION"] =
-	"Durée minimale que l'amélioration doit avoir pour mériter une réaction.\n\nFiltre les soins sur la durée courts comme Rénovation ou Récupération. Les notifications sont également affectées ; une amélioration en dessous de ce seuil est entièrement ignorée, sans message, son, chuchotement ni emote."
+	"Ignore les améliorations plus courtes que ceci. Mettez zéro pour réagir à chaque amélioration."
 
 --------------------------------------------------------------------------------
--- Options: Combat Buff Panels
+-- Options: Buff Panels
 --------------------------------------------------------------------------------
 
 -- Buffs from Teammates
-L["TAB_TEAMMATES"] = "Améliorations de Coéquipiers"
+L["TAB_TEAMMATES"] = "Améliorations de coéquipiers"
+L["TEAMMATES_ENABLE"] = "Activer les remerciements pour les améliorations de coéquipiers"
 L["TEAMMATES_DESCRIPTION"] =
-	"Une amélioration ou un temps de recharge d'un membre du groupe ou du raid lancé sur vous."
+	"Remerciez les membres du groupe et du raid pour les améliorations et capacités qu'ils vous lancent."
 
--- Group Services
-L["TAB_SERVICES"] = "Services de Groupe"
+-- Service Alerts
+L["TAB_SERVICES"] = "Alertes de services"
+L["SERVICES_ENABLE"] = "Activer les alertes de services"
 L["SERVICES_DESCRIPTION"] =
-	"Aide à l'échelle du raid d'un membre du groupe ou du raid : festins, puits des âmes, portails, robots de réparation."
+	"Réagissez à l'aide à l'échelle du raid de votre groupe : festins, puits des âmes, portails, robots de réparation."
 
 -- Good News (buffs you cast on others)
-L["TAB_GOOD_NEWS"] = "Bonne Nouvelle"
+L["TAB_GOOD_NEWS"] = "Envoyer une bonne nouvelle"
 L["GOOD_NEWS_DESCRIPTION"] = "Informez les joueurs que vous améliorez de ce que vous leur avez lancé et de sa durée."
-L["GOOD_NEWS_WHISPER_ENABLE"] = "Activer Bonne Nouvelle"
+L["GOOD_NEWS_WHISPER_ENABLE"] = "Activer les bonnes nouvelles"
 L["GOOD_NEWS_WHISPER_DESCRIPTION"] =
 	"Chuchote au joueur que vous avez amélioré pour lui dire ce qu'il a reçu et pour combien de temps."
 L["GOOD_NEWS_SCOPE_ALWAYS"] = "Quiconque vous améliorez"
 L["GOOD_NEWS_SCOPE_GROUP"] = "Membres du groupe uniquement"
+L["GOOD_NEWS_MESSAGES_HEADER"] = "Messages de bonne nouvelle"
+L["GOOD_NEWS_MESSAGE"] = "Message chuchoté"
+--[[
+    Two halves so the number stays authoritative: LIMIT's %d is a real placeholder
+    and gets formatted, TOKENS carries a literal %a for the reader to copy and so
+    must never reach string.format. Joined into one line at the point of use.
+]]
+L["GOOD_NEWS_MESSAGE_LIMIT"] = "Longueur maximale : %d."
+L["GOOD_NEWS_MESSAGE_TOKENS"] = "%a devient le lien de la capacité."
+--[[
+    Appended to the ability link inside %a when the buff has a readable duration.
+    A whole clause rather than a bare number so it can be reworded per language.
+]]
+L["GOOD_NEWS_DURATION_CLAUSE"] = "pendant %s"
 
 -- Peer Pressure
-L["TAB_PEER_PRESSURE"] = "Pression Sociale"
+L["TAB_PEER_PRESSURE"] = "Pression sociale"
 L["PEER_PRESSURE_DESCRIPTION"] =
-	"Soyez averti quand d'autres joueurs de votre classe utilisent leurs temps de recharge, pour céder à la pression sociale."
-L["PEER_PRESSURE_ENABLE"] = "Activer Peer Pressure"
+	"Soyez averti quand d'autres joueurs de votre classe utilisent leurs capacités à temps de recharge, pour céder à la pression sociale."
+L["PEER_PRESSURE_ENABLE"] = "Activer la pression sociale"
 L["PEER_PRESSURE_PRINT_DESCRIPTION"] =
-	"Affiche un message dans votre propre discussion quand un temps de recharge de votre classe est utilisé. Vous seul le voyez."
+	"Affiche un message dans votre propre discussion quand une capacité de votre classe est utilisée. Vous seul le voyez."
 L["PEER_PRESSURE_OWN_CASTS"] = "Déclencher sur vos propres sorts"
 L["PEER_PRESSURE_OWN_CASTS_DESCRIPTION"] =
-	"Déclenche l'alerte aussi lorsque vous utilisez vos propres temps de recharge, pas seulement ceux des autres joueurs."
+	"Se déclenche aussi lorsque vous utilisez vos propres capacités, pas seulement celles des autres joueurs."
 L["PEER_PRESSURE_SOUND_DESCRIPTION"] =
-	"Joue un son quand un temps de recharge de votre classe est utilisé. Vous seul l'entendez."
+	"Joue un son quand une capacité de votre classe est utilisée. Vous seul l'entendez."
 
--- Shared across the combat panels
-L["COMBAT_TRACKED"] = "Capacités suivies"
-L["COMBAT_GROUP_ITEMS"] = "Objets"
-L["COMBAT_TOGGLE_TRACKING"] = "Basculer le suivi pour %s."
-L["COMBAT_ITEM_PENDING"] = "Objet #%d"
-L["COMBAT_SPELL_PENDING"] = "Sort #%d"
+-- Shared across the buff panels
+L["TRACKED_HEADER"] = "Capacités suivies"
+L["TRACKED_GROUP_ITEMS"] = "Objets"
+L["TRACKED_TOGGLE_DESCRIPTION"] = "Basculer le suivi pour %s."
+L["TRACKED_ITEM_PENDING"] = "Objet #%d"
+L["TRACKED_SPELL_PENDING"] = "Sort #%d"
 
 --------------------------------------------------------------------------------
 -- Shared: Praise and Notifications
 --------------------------------------------------------------------------------
 
--- The two section headers every buff panel is built from: what the other player
--- sees, then what only you get. Peer Pressure sends nothing outward, so it
--- carries the Notifications header alone. Key prefixes match the header the
--- control appears under.
+--[[
+    The two section headers every buff panel is built from: what the other player
+    sees, then what only you get. Peer Pressure sends nothing outward, so it
+    carries the Notifications header alone. Key prefixes match the header the
+    control appears under.
+]]
 L["PRAISE_HEADER"] = "Messages de remerciement et emotes"
 L["NOTIFICATIONS_HEADER"] = "Notifications"
 
 L["PRAISE_WHISPER_ENABLE"] = "Activer les chuchotements de remerciement"
 L["PRAISE_WHISPER_DESCRIPTION"] = "Chuchote un remerciement au joueur qui vous a amélioré."
-L["PRAISE_EMOTES_ENABLE"] = "Activer les Emotes (Hors combat)"
+L["PRAISE_EMOTES_ENABLE"] = "Activer les emotes"
 L["PRAISE_EMOTES_DESCRIPTION"] =
-	"Exprimez votre appréciation par une emote. Les emotes sont retenues pendant que vous êtes en combat."
-L["PRAISE_EMOTES_SELECT"] = "Sélectionner des Emotes"
+	"Exprimez votre reconnaissance par une emote. Les emotes sont retenues tant que vous êtes en combat."
+L["PRAISE_EMOTES_SELECT"] = "Sélectionner des emotes"
 L["PRAISE_DELAY_ENABLE"] = "Activer le délai de remerciement"
 L["PRAISE_DELAY_DESCRIPTION"] =
-	"Attend un instant avant le chuchotement et l'emote, afin que votre remerciement n'arrive pas au même instant que l'amélioration.\n\nLes notifications ne sont pas affectées."
-L["PRAISE_DELAY_LENGTH_DESCRIPTION"] = "Combien de temps attendre avant de remercier le joueur qui vous a amélioré."
+	"Attend un instant avant le chuchotement et l'emote, afin que votre remerciement n'arrive pas au même instant que l'amélioration. Les notifications ne sont pas affectées."
+L["PRAISE_DELAY_HELP"] =
+	"Attendez avant de remercier, afin que votre remerciement n'arrive pas au même instant que l'amélioration."
 
-L["NOTIFICATIONS_PRINT_ENABLE"] = "Activer les messages imprimés"
+L["NOTIFICATIONS_PRINT_ENABLE"] = "Activer les messages de discussion"
 L["NOTIFICATIONS_PRINT_DESCRIPTION"] =
 	"Affiche un message dans votre propre discussion lorsque vous recevez une amélioration. Vous seul le voyez."
 L["NOTIFICATIONS_SOUND_ENABLE"] = "Activer les effets sonores"
@@ -157,8 +174,10 @@ L["NOTIFICATIONS_SOUND_DESCRIPTION"] = "Joue un son lorsque vous recevez une am�
 -- Tracked Ability Groups
 --------------------------------------------------------------------------------
 
--- Labels for multi-member tracked groups (Data/Tracked-Abilities.lua). Single
--- spells and items take their names from the client and need no key here.
+--[[
+    Labels for multi-member tracked groups (Data/Tracked-Abilities.lua). Single
+    spells and items take their names from the client and need no key here.
+]]
 L["GROUP_PORTALS"] = "Portails"
 L["GROUP_SOULSTONE"] = "Pierre d'âme"
 L["GROUP_RESISTANCE_CAULDRONS"] = "Chaudrons de résistance"
@@ -175,19 +194,35 @@ L["GROUP_JUMPER_CABLES"] = "Câbles de démarrage"
 -- Options: Thank You Button
 --------------------------------------------------------------------------------
 
-L["TAB_THANK_YOU_BUTTON"] = "Bouton de Remerciement"
-L["BUTTON_DESCRIPTION"] = "Remerciez votre cible actuelle avec une emote et un chuchotement."
-L["BUTTON_CREATE_MACRO"] = "Créer une Macro"
-L["BUTTON_CREATE_MACRO_DESCRIPTION"] = "Crée automatiquement une macro nommée %s à la connexion."
-L["BUTTON_WHISPER"] = "Message de Chuchotement"
+L["TAB_THANK_YOU_BUTTON"] = "Bouton de remerciement"
+L["BUTTON_DESCRIPTION"] =
+	"La courtoisie, automatisée. Chaque bouton chuchote à votre cible actuelle et peut aussi lui adresser une emote : demander de l'eau à un mage, remercier quelqu'un pour un portail, féliciter un ami en plein combat pour une provocation bien placée. Écrivez le message une fois et il ne vous reste plus qu'une touche à presser."
+-- One heading per button, numbered; %d is the button's position in the list.
+L["BUTTON_SECTION"] = "Bouton TFTB %d"
+L["BUTTON_EMOTE"] = "Emote"
+L["BUTTON_EMOTE_NONE"] = "Aucune"
+--[[
+    The toggle owns the macro in both directions, so the label is ENABLE rather
+    than CREATE. Both strings carry the macro's name: with five buttons stacked,
+    "which macro is this one?" should not need a hover.
+]]
+L["BUTTON_MACRO_ENABLE"] = 'Activer la macro "%s"'
+L["BUTTON_MACRO_ENABLE_DESCRIPTION"] =
+	"Crée une macro nommée %s, et la supprime de nouveau quand vous désactivez ceci."
+L["BUTTON_WHISPER"] = "Message chuchoté"
 L["BUTTON_RESET"] = "Réinitialiser"
-L["BUTTON_RESET_DESCRIPTION"] = "Réinitialise le message de chuchotement au texte par défaut."
+L["BUTTON_RESET_DESCRIPTION"] = "Réinitialise le message chuchoté au texte par défaut."
 
 --------------------------------------------------------------------------------
 -- Defaults
 --------------------------------------------------------------------------------
 
 L["DEFAULT_WHISPER"] = "Merci, t'es le meilleur ! (="
+--[[
+    The star marker and "TFTB // " prefix are added by the builder and are not
+    part of the editable text.
+]]
+L["DEFAULT_GOOD_NEWS"] = "Vous avez %a !"
 
 --------------------------------------------------------------------------------
 -- Emotes

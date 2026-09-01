@@ -47,6 +47,7 @@ Data.PEER_PRESSURE = {
 	{ "DRUID", { 29166 }, 1, 1, 1 }, -- Innervate
 	{ "DRUID", { 61336 }, 0, 0, 0 }, -- Survival Instincts
 	-- Hunter --------------------------------------------------------------------
+	{ "HUNTER", { 19574 }, 1, 1, 1 }, -- Bestial Wrath
 	{ "HUNTER", { 34477 }, 1, 1, 1 }, -- Misdirection
 	{ "HUNTER", { 3045 }, 1, 1, 1 }, -- Rapid Fire
 	{ "HUNTER", { 23989 }, 1, 1, 1 }, -- Readiness

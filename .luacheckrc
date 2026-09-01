@@ -1,7 +1,9 @@
 std = "lua51"
 max_line_length = false -- StyLua owns formatting
-ignore = { "212/self", "611", "612", "613", "614", "621" } -- implicit self (house ns: methods) + whitespace — StyLua owns the latter
+ignore = { "212/self", "611", "612", "613", "614", "621" } -- implicit self (house ns: methods) + whitespace
 exclude_files = { "Includes/" } -- vendored, never linted
+
+-- The WoW API surface this add-on reads and never writes.
 read_globals = {
 	"Ambiguate",
 	"COMBATLOG_OBJECT_AFFILIATION_MINE",
@@ -43,7 +45,6 @@ read_globals = {
 	"GetTime",
 	"GetUnitName",
 	"InCombatLockdown",
-	"InterfaceOptionsFrame_OpenToCategory",
 	"IsAddOnLoaded",
 	"IsInGroup",
 	"IsInRaid",
@@ -56,7 +57,6 @@ read_globals = {
 	"SetCVar",
 	"Settings",
 	"TextEmoteSpeechList",
-	"UnitAura",
 	"UnitClass",
 	"UnitExists",
 	"UnitFactionGroup",
@@ -73,13 +73,11 @@ read_globals = {
 	"bit",
 	"wipe",
 }
+
+-- The closed set of globals this add-on owns: its SavedVariables table and its
+-- slash registrations.
 globals = {
+	"TFTBDB",
 	"SLASH_TFTB_CONFIG1",
-	"SLASH_TFTB_THANKYOU11",
-	"SLASH_TFTB_THANKYOU21",
-	"SLASH_TFTB_THANKYOU31",
-	"SLASH_TFTB_THANKYOU41",
-	"SLASH_TFTB_THANKYOU51",
 	"SlashCmdList",
-	"TFTB_DB",
 }

@@ -81,12 +81,52 @@ ns.OPTIONS_SUB_INDENT_WIDTH = 0.115
 --------------------------------------------------------------------------------
 
 Data.SAFETY_PAUSE = 3
-Data.MACRO_NAME = "- Thank"
+
+-- SendChatMessage rejects a longer body outright, and the ceiling is bytes: a
+-- non-Latin locale spends 2-3 of them per character.
+ns.CHAT_MESSAGE_MAX_LENGTH = 255
+--[[
+    The Thank You buttons. One row each: the settings key it stores under, the
+    macro it offers to create, and the slash command that macro runs.
+
+    Everything else about a button -- its options section, its macro, its command
+    -- is generated from this list, so the count is a property of the data rather
+    than of five copied blocks. Button 1 is the original and keeps its "- Thank"
+    macro name (the leading dash sorts it to the top of the macro list) and its
+    on-by-default settings; 2 through 5 were added later and start switched off,
+    so nobody's existing behaviour changes. They share the leading-dash naming so
+    the whole family sorts together at the top of the macro list.
+]]
+Data.THANK_YOU_BUTTONS = {
+	-- singleEmote: the button fires ONE chosen emote, picked from a dropdown,
+	-- instead of a random one from a checklist. It changes the stored shape too --
+	-- `emote` (a single token) rather than `emotes` (a set) -- which is what the
+	-- options panel and RunThankYou branch on. Button 1 keeps the original
+	-- pick-a-random-one-from-your-selection behaviour.
+	{ profileKey = "slash", macroName = "- Thank", command = "/thankyou" },
+	{ profileKey = "slash2", macroName = "- TFTB 2", command = "/thankyou2", singleEmote = true },
+	{ profileKey = "slash3", macroName = "- TFTB 3", command = "/thankyou3", singleEmote = true },
+	{ profileKey = "slash4", macroName = "- TFTB 4", command = "/thankyou4", singleEmote = true },
+	{ profileKey = "slash5", macroName = "- TFTB 5", command = "/thankyou5", singleEmote = true },
+}
 
 -- Praise Delay lengths, in seconds. Doubles as the dropdown's display order; the
 -- labels themselves come from the client's own duration strings at panel-build
 -- time (see ns.DefinePraiseDelaySelect).
 Data.PRAISE_DELAY_CHOICES = { 1, 2, 3, 4 }
+
+--[[
+    The seconds scale behind the cooldown and duration dropdowns.
+
+    Straight Fibonacci, and every entry is labelled in SECONDS -- 144 stays 144,
+    not "2 Minutes". Mixing units inside one list makes two adjacent options look
+    like different kinds of thing, and the reader has to convert to compare them.
+
+    The point of the curve is resolution where the choice matters: the difference
+    between 1 and 2 seconds is a real decision, the difference between 88 and 89
+    is not, and a slider spent 145 steps pretending otherwise.
+]]
+Data.SECONDS_CHOICES = { 0, 1, 2, 3, 5, 8, 13, 21, 34, 55, 89, 144 }
 
 --[[
     {rt1} Star, {rt2} Circle, {rt3} Diamond, {rt4} Triangle,
@@ -114,6 +154,9 @@ Data.BUFF = {
 Data.DETECT = {
 	AURA = "AURA", -- SPELL_AURA_APPLIED lands on you
 	CAST = "CAST", -- SPELL_CAST_SUCCESS fires
+	-- SPELL_RESURRECT fires. For the ones that can FAIL: a cast succeeding only
+	-- means the attempt happened, so the cast event proves nothing worth saying.
+	RESURRECT = "RESURRECT",
 }
 
 --------------------------------------------------------------------------------
@@ -132,5 +175,8 @@ Data.EMOTES = {
 	{ cmd = "THANK", displayName = "/thank", desc = L["EMOTE_THANK_DESCRIPTION"] },
 	{ cmd = "WHOA", displayName = "/whoa", desc = L["EMOTE_WHOA_DESCRIPTION"] },
 	{ cmd = "WINK", displayName = "/wink", desc = L["EMOTE_WINK_DESCRIPTION"] },
-	{ cmd = "YES", displayName = "/yes", desc = L["EMOTE_YES_DESCRIPTION"] },
+	-- Token is NOD, not YES: /yes is one of NOD's command aliases, and there is no
+	-- YES token on any client (verified against a full EMOTE<n>_TOKEN dump). The
+	-- displayName stays /yes because that is the command players know.
+	{ cmd = "NOD", displayName = "/yes", desc = L["EMOTE_YES_DESCRIPTION"] },
 }

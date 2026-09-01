@@ -17,6 +17,89 @@ function ns.GetColor(key)
 end
 
 --------------------------------------------------------------------------------
+-- Client Emote Catalog
+--------------------------------------------------------------------------------
+
+--[[
+    Every emote the RUNNING client can perform, read from its own EMOTE<n>_TOKEN
+    and EMOTE<n>_CMD<n> globals rather than from a list kept in this add-on.
+
+    Deliberately not a data file. The set differs per expansion, so a
+    hand-maintained copy would be correct on exactly one client and quietly wrong
+    on the others -- and it is a long list to get wrong. Reading the client means
+    a dropdown built from this offers precisely what this build can perform, and
+    Diagnostics can export the same list from any flavour without a code change.
+
+    Two traps the scan has to respect. Indices are SPARSE (Era jumps 171 -> 304),
+    so it cannot stop at the first gap. And a few tokens appear twice under
+    different indices (INCOMING, FLEE), so tokens are deduped -- the dropdown
+    should not offer the same emote twice.
+
+    Sorted by the slash command players recognise, not by token or index. Built
+    once on demand; these globals do not change during a session.
+]]
+local EMOTE_SCAN_CEILING = 1000 -- backstop only, for a client without MAXEMOTEINDEX
+
+local emoteCatalog, emoteTokens
+
+local function BuildEmoteCatalog()
+	emoteCatalog, emoteTokens = {}, {}
+
+	-- The client's own list of emotes that play a voice line. Absent on some
+	-- builds, in which case the voice column simply reads unknown.
+	local voice = {}
+	if type(TextEmoteSpeechList) == "table" then
+		for _, entry in pairs(TextEmoteSpeechList) do
+			voice[tostring(entry)] = true
+		end
+	end
+
+	for index = 1, (MAXEMOTEINDEX or EMOTE_SCAN_CEILING) do
+		local token = _G["EMOTE" .. index .. "_TOKEN"]
+		if token and not emoteTokens[token] then
+			-- CMD1 is the primary; the rest are aliases, and the client repeats the
+			-- whole set once per locale, so exact repeats are dropped.
+			local aliases, seen = {}, {}
+			for c = 1, 8 do
+				local cmd = _G["EMOTE" .. index .. "_CMD" .. c]
+				if cmd and cmd ~= "" and not seen[cmd] then
+					seen[cmd] = true
+					aliases[#aliases + 1] = cmd
+				end
+			end
+			emoteTokens[token] = true
+			emoteCatalog[#emoteCatalog + 1] = {
+				index = index,
+				token = token,
+				command = aliases[1] or ("/" .. token:lower()),
+				aliases = table.concat(aliases, " "),
+				voice = voice[token] == true,
+			}
+		end
+	end
+
+	table.sort(emoteCatalog, function(a, b)
+		return a.command < b.command
+	end)
+end
+
+-- Every client emote, sorted by slash command.
+function ns.GetEmoteCatalog()
+	if not emoteCatalog then
+		BuildEmoteCatalog()
+	end
+	return emoteCatalog
+end
+
+-- Is this token something the running client can actually perform?
+function ns.IsClientEmote(token)
+	if not emoteTokens then
+		BuildEmoteCatalog()
+	end
+	return token ~= nil and emoteTokens[token] == true
+end
+
+--------------------------------------------------------------------------------
 -- Spell API Compatibility
 --------------------------------------------------------------------------------
 
@@ -42,6 +125,26 @@ else
 	end
 end
 
+--[[
+    Ask the client to stream in a spell's tooltip text. Classic keeps description
+    data only for spells the character has actually known, which is why a panel
+    listing all nine classes' cooldowns reads blank for eight of them -- the id is
+    valid and GetSpellName answers fine, but GetSpellDescription returns "".
+
+    Fire and forget: the data arrives asynchronously and the next tooltip draw
+    picks it up. Absent on any client that never gained the API, in which case
+    callers keep whatever fallback text they already had.
+]]
+local RequestLoadSpellData = C_Spell and C_Spell.RequestLoadSpellData
+function ns.RequestSpellData(ids)
+	if not RequestLoadSpellData or not ids then
+		return
+	end
+	for i = 1, #ids do
+		RequestLoadSpellData(ids[i])
+	end
+end
+
 if C_Spell and C_Spell.DoesSpellExist then
 	ns.DoesSpellExist = C_Spell.DoesSpellExist
 else
@@ -62,11 +165,16 @@ end
     Native is only a last resort, for the rare spell whose name won't resolve (so we
     can't build the link text ourselves) -- at least it gives something on screen.
 ]]
+-- The client's own spell-link blue, verbatim. Not a palette role, so it is kept
+-- separate; the exact literal is preserved because this string is handed to
+-- SendChatMessage's hyperlink validator (see ns.GetSpellLink below).
+local C_SPELL_LINK = "71d5ff"
+
 local NativeGetSpellLink = (C_Spell and C_Spell.GetSpellLink) or GetSpellLink
 function ns.GetSpellLink(spellId)
 	local name = ns.GetSpellName(spellId)
 	if name then
-		return ("|cff71d5ff|Hspell:%d:0|h[%s]|h|r"):format(spellId, name)
+		return ("|cff" .. C_SPELL_LINK .. "|Hspell:%d:0|h[%s]|h|r"):format(spellId, name)
 	end
 	local link = NativeGetSpellLink and NativeGetSpellLink(spellId)
 	if link and link ~= "" then
@@ -125,35 +233,19 @@ end
 --[[
     Duration of a HELPFUL aura on `unit` for `spellId`, or nil when absent. A live
     buff can legitimately report 0 (no timer), so callers must nil-check the result,
-    not test it for truthiness. Prefers C_UnitAuras.GetBuffDataByIndex, falling back
-    to the legacy UnitAura scan; 40 is the aura cap the client exposes.
+    not test it for truthiness. 40 is the aura cap the client exposes.
 ]]
-if C_UnitAuras and C_UnitAuras.GetBuffDataByIndex then
-	ns.GetBuffDuration = function(unit, spellId)
-		for i = 1, 40 do
-			local data = C_UnitAuras.GetBuffDataByIndex(unit, i, "HELPFUL")
-			if not data then
-				return nil
-			end
-			if data.spellId == spellId then
-				return data.duration or 0
-			end
+function ns.GetBuffDuration(unit, spellId)
+	for i = 1, 40 do
+		local data = C_UnitAuras.GetBuffDataByIndex(unit, i, "HELPFUL")
+		if not data then
+			return nil
 		end
-		return nil
-	end
-else
-	ns.GetBuffDuration = function(unit, spellId)
-		for i = 1, 40 do
-			local name, _, _, _, duration, _, _, _, _, auraSpellId = UnitAura(unit, i, "HELPFUL")
-			if not name then
-				return nil
-			end
-			if auraSpellId == spellId then
-				return duration or 0
-			end
+		if data.spellId == spellId then
+			return data.duration or 0
 		end
-		return nil
 	end
+	return nil
 end
 
 --------------------------------------------------------------------------------

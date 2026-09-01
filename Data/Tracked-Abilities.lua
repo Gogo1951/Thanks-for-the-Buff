@@ -18,13 +18,20 @@ local L = ns.L
       class     class bucket for the Buffs-from-Teammates panel. Omit for the
                 generic Items / Group Services lists.
       type      SOLO | GROUP | SERVICE (locals for Data.BUFF.*)
-      detect    AURA | CAST (locals for Data.DETECT.*)
+      detect    AURA | CAST | RESURRECT (locals for Data.DETECT.*). RESURRECT
+                is for a cast that can FAIL: goblin jumper cables emit
+                SPELL_CAST_SUCCESS for every jolt, revived or not, so only the
+                SPELL_RESURRECT that a working jolt produces is worth a message.
       opened    SERVICE only: announce as "opened" (portals, summons) instead of
                 the default "set out" (feasts, soulwells, repair bots).
       noDuration  the buff is spent by an event, not by time, so its remaining
                 duration says nothing useful -- Fear Ward lasts until the next
                 fear, Misdirection until the next few attacks. Set it and the
-                Good News message drops its "for 10 minutes" clause.
+                Good News message drops its duration clause. It earns its keep on
+                the SHORT ones (Misdirection, Tricks of the Trade, Intervene),
+                which would otherwise clear the under-a-minute cap and whisper a
+                countdown that means nothing; a long one like Fear Ward is caught
+                by that cap regardless, and carries the flag because it is true.
       received  { Era, TBC, Wrath } default for the shared thank-you list
                 (watchedBuffs) behind the Teammates and Group Services panels:
                   1   tracked, checkbox seeds checked
@@ -53,7 +60,7 @@ local L = ns.L
     file.
 ]]
 local SOLO, GROUP, SERVICE = Data.BUFF.SOLO, Data.BUFF.GROUP, Data.BUFF.SERVICE
-local AURA, CAST = Data.DETECT.AURA, Data.DETECT.CAST
+local AURA, CAST, RESURRECT = Data.DETECT.AURA, Data.DETECT.CAST, Data.DETECT.RESURRECT
 
 Data.TRACKED = {
 	-- Death Knight --------------------------------------------------------------
@@ -561,12 +568,47 @@ Data.TRACKED = {
 	}, -- Repair Bots
 	{ type = SERVICE, detect = CAST, received = { 1, 1, 1 }, triggers = { { item = 40768, spell = 54710 } } }, -- MOLL-E
 	{ type = SERVICE, detect = CAST, received = { 1, 1, 1 }, triggers = { { item = 10725, spell = 23133 } } }, -- Gnomish Battle Chicken
+	--[[
+        Battle Squawk is what the summoned chicken casts on people, as opposed
+        to the Gnomish Battle Chicken row above, which is the trinket being used
+        to set the chicken out. Two rows because they are two different events
+        to two different audiences: the summon is a Group Service ("set out a
+        ..."), the squawk is a buff that lands on one person.
+
+        Deliberately carries no item id even though item 10725 is what starts
+        the chain. An item id would relabel this toggle as the trinket -- a
+        second "Gnomish Battle Chicken" checkbox -- and reword the message into
+        "used their Gnomish Battle Chicken on you", which is not what happened:
+        the chicken was already out, and it is the bird that cast this.
+
+        The CASTER IS THE PET, not its owner. Credit reaches the owner through
+        ResolveSource for a received buff, and through the pet branch of
+        OnUnitSpellcastSent for Good News.
+    ]]
+	{
+		type = SOLO,
+		detect = AURA,
+		received = { 1, 1, 1 },
+		given = { 1, 1, 1 },
+		triggers = { { spell = 23060 } },
+	}, -- Battle Squawk
 	{
 		name = L["GROUP_JUMPER_CABLES"],
 		type = SOLO,
-		detect = CAST,
+		-- Not CAST: the cables fire SPELL_CAST_SUCCESS whether or not the target
+		-- gets up, so tracking the cast thanked people for a failed jolt.
+		detect = RESURRECT,
 		received = { 1, 1, 1 },
 		given = { 1, 1, 1 },
-		triggers = { { item = 7148, spell = 8342 }, { item = 18587, spell = 22999 }, { item = 40772, spell = 54732 } },
+		-- All four cast a spell named "Defibrillate"; only the ITEM names differ,
+		-- which is why this group carries an explicit name. 114943 / 164729 is far
+		-- past Wrath and so exists on no supported client -- it is pruned at login
+		-- like any other absent id, and is here so the set is complete.
+		triggers = {
+			{ item = 7148, spell = 8342 },
+			{ item = 18587, spell = 22999 },
+			{ item = 40772, spell = 54732 },
+			{ item = 114943, spell = 164729 },
+		},
 	}, -- Jumper Cables
 }
