@@ -4,10 +4,15 @@ local L = ns.L
 
 --[[
     Peer Pressure -- the same-class cooldown alert.
-    When ANOTHER player of YOUR class uses a cooldown from Data.PEER_PRESSURE
-    (Data/Peer-Pressure-Abilities.lua), print a message and/or play the Thunder
-    sound so you can join in. With "Trigger on Own Casts" turned on
-    (default off), your own cooldowns fire it too.
+    When another player of YOUR class IN YOUR GROUP uses a cooldown from
+    Data.PEER_PRESSURE (Data/Peer-Pressure-Abilities.lua), print a message
+    and/or play the Thunder sound so you can join in. With "Trigger on Own
+    Casts" turned on (default off), your own cooldowns fire it too.
+
+    The group scope is a real filter, not a description of who happens to be
+    nearby: Era's combat log is proximity-scoped, not group-scoped, so a paladin
+    popping Lay on Hands across a capital city arrives here exactly like a raid
+    member's cast. See IsGroupAffiliated.
 
     The combat log tap arrives via ns.CheckPeerPressure, called from Buff-Tracking's
     OnCombatLogEvent -- Core's rule is one owner per event, and
@@ -105,7 +110,7 @@ local function BuildCategories()
 			local bucket = buckets[class]
 			bucket[#bucket + 1] = {
 				ids = ids,
-				spellName = GetSpellName(ids[1]) or L["COMBAT_SPELL_PENDING"]:format(ids[1]),
+				spellName = GetSpellName(ids[1]) or L["TRACKED_SPELL_PENDING"]:format(ids[1]),
 			}
 		end
 	end
@@ -118,7 +123,7 @@ local function BuildCategories()
 
 	local categories = {}
 	for _, class in ipairs(classNames) do
-		local color = Data.CLASS_COLORS[class] or "FFFFFF"
+		local color = Data.CLASS_COLORS[class] or ns.PALETTE.TEXT
 		local label = "|cff" .. color .. (LOCALIZED_CLASS_NAMES_MALE[class] or class) .. "|r"
 		categories[#categories + 1] = { id = class, name = label, entries = buckets[class] }
 	end
@@ -130,13 +135,36 @@ end
 --------------------------------------------------------------------------------
 
 --[[
+    Is this caster someone whose cooldown is any of your business? Affiliation
+    flags decide, never a name or GUID lookup: cross-realm sources arrive as
+    "Name-Realm" and never resolve, and the group unit tokens would have to be
+    walked on every tracked cast.
+
+    MINE, PARTY and RAID are the whole in-group set; OUTSIDER is the flag every
+    passerby carries and the one being dropped. MINE also covers your own casts,
+    which is deliberate -- it lets them through to the "Trigger on Own Casts"
+    check in the caller, which is what actually owns that decision.
+
+    Same three-flag test Buff-Tracking uses to separate teammates from
+    strangers, minus its self-exclusion; kept local rather than shared because
+    the two disagree on purpose about whether you count as your own group.
+]]
+local function IsGroupAffiliated(sourceFlags)
+	local flags = sourceFlags or 0
+	return bit.band(flags, COMBATLOG_OBJECT_AFFILIATION_MINE) > 0
+		or bit.band(flags, COMBATLOG_OBJECT_AFFILIATION_PARTY) > 0
+		or bit.band(flags, COMBATLOG_OBJECT_AFFILIATION_RAID) > 0
+end
+
+--[[
     Called by Buff-Tracking for every SPELL_CAST_SUCCESS -- including your own,
-    which count only while "Trigger on Own Casts" is enabled. First line is the
-    lookup miss, so untracked casts cost one table probe. The "on Sally" flavor
+    which count only while "Trigger on Own Casts" is enabled, and including
+    every passerby's, which IsGroupAffiliated drops. First line is the lookup
+    miss, so untracked casts cost one table probe. The "on Sally" flavor
     is used only when the cast had a target who is a real player other than the
     caster -- self-buffs and pet targets read as plain.
 ]]
-function ns.CheckPeerPressure(spellID, sourceGUID, sourceName, destGUID, destName)
+function ns.CheckPeerPressure(spellID, sourceGUID, sourceName, sourceFlags, destGUID, destName)
 	local entry = lookup[spellID]
 	if not entry or entry[1] ~= playerClass then
 		return
@@ -149,6 +177,9 @@ function ns.CheckPeerPressure(spellID, sourceGUID, sourceName, destGUID, destNam
 		return
 	end
 	if not sourceGUID or not sourceName or not ns.IsPlayerGUID(sourceGUID) then
+		return
+	end
+	if not IsGroupAffiliated(sourceFlags) then
 		return
 	end
 	if sourceGUID == playerGUID and not db.triggerOnOwnCasts then

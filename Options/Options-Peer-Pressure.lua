@@ -20,6 +20,12 @@ function ns.BuildPeerPressureOptions()
 	local function PeerPressureHidden()
 		return not ns.db.profile.peerPressure.enabled
 	end
+	-- The sample illustrates the PRINT, so it follows that toggle as well as the
+	-- master: showing an example of a message that is switched off reads as a
+	-- promise the add-on is not keeping.
+	local function SampleHidden()
+		return PeerPressureHidden() or not ns.db.profile.peerPressure.printEnabled
+	end
 
 	local options = {
 		name = L["TAB_PEER_PRESSURE"],
@@ -39,14 +45,34 @@ function ns.BuildPeerPressureOptions()
 					ns.db.profile.peerPressure.enabled = val
 				end,
 			},
-			sampleSpacer = { type = "description", name = " ", order = 4, hidden = PeerPressureHidden },
+			space1 = { type = "description", name = " ", order = 4, hidden = PeerPressureHidden },
+
+			headerNotifications = ns.OptionsHeader(L["NOTIFICATIONS_HEADER"], 5, PeerPressureHidden),
+			space2 = { type = "description", name = " ", order = 6, hidden = PeerPressureHidden },
+			printOut = {
+				type = "toggle",
+				name = L["NOTIFICATIONS_PRINT_ENABLE"],
+				desc = L["PEER_PRESSURE_PRINT_DESCRIPTION"],
+				width = "full",
+				order = 7,
+				hidden = PeerPressureHidden,
+				get = function()
+					return ns.db.profile.peerPressure.printEnabled
+				end,
+				set = function(_, val)
+					ns.db.profile.peerPressure.printEnabled = val
+				end,
+			},
+			sampleSpacer = { type = "description", name = " ", order = 8, hidden = SampleHidden },
 			--[[
                 A sample of the alert, built by the SAME pipeline as the real
                 print (prefix, class color, spell link), so it can never drift
                 from what actually shows in chat: rogue-colored body, link-blue
-                spell link. Blade Flurry (13877) is live on every flavor. Sits
-                directly under the enable toggle so turning the feature on shows
-                you what you just signed up for.
+                spell link. Blade Flurry (13877) is live on every flavor.
+
+                Sits under the PRINT toggle, not the master enable, because the
+                print is the only setting it illustrates -- next to the master it
+                read as a sample of the whole feature, sound and all.
             ]]
 			sampleMessage = {
 				type = "description",
@@ -57,26 +83,8 @@ function ns.BuildPeerPressureOptions()
 						.. "\n"
 				end,
 				fontSize = "medium",
-				order = 5,
-				hidden = PeerPressureHidden,
-			},
-			space1 = { type = "description", name = " ", order = 6, hidden = PeerPressureHidden },
-
-			headerNotifications = ns.OptionsHeader(L["NOTIFICATIONS_HEADER"], 7, PeerPressureHidden),
-			space2 = { type = "description", name = " ", order = 8, hidden = PeerPressureHidden },
-			printOut = {
-				type = "toggle",
-				name = L["NOTIFICATIONS_PRINT_ENABLE"],
-				desc = L["PEER_PRESSURE_PRINT_DESCRIPTION"],
-				width = "full",
 				order = 9,
-				hidden = PeerPressureHidden,
-				get = function()
-					return ns.db.profile.peerPressure.printEnabled
-				end,
-				set = function(_, val)
-					ns.db.profile.peerPressure.printEnabled = val
-				end,
+				hidden = SampleHidden,
 			},
 			space3 = { type = "description", name = " ", order = 10, hidden = PeerPressureHidden },
 			ownCasts = {
@@ -111,7 +119,7 @@ function ns.BuildPeerPressureOptions()
 			soundPreview = ns.DefineSoundPreview(ns.PlayPeerPressureSound, 14, PeerPressureHidden),
 			space5 = { type = "description", name = " ", order = 15, hidden = PeerPressureHidden },
 
-			headerTracked = ns.OptionsHeader(L["COMBAT_TRACKED"], 16, PeerPressureHidden),
+			headerTracked = ns.OptionsHeader(L["TRACKED_HEADER"], 16, PeerPressureHidden),
 			space6 = { type = "description", name = " ", order = 17, hidden = PeerPressureHidden },
 		},
 	}

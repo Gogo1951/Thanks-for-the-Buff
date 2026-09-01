@@ -79,25 +79,62 @@ end
     Perform a random enabled emote from the given selection. `target` is what to
     direct the emote at: a live unit token ("target", "party3") when the caller
     holds one, else a bare character name the client may resolve to a visible
-    player (never the combat log's "Name-Realm" form -- callers strip the realm),
-    else nil to emote undirected. Trap: DoEmote(cmd, nil) is NOT undirected -- it
-    falls back to your CURRENT TARGET, thanking a bystander when the buffer
-    couldn't be resolved. "none" matches no unit, which is what actually forces
-    the undirected flavor; an unresolvable name degrades the same way.
+    player (never the combat log's "Name-Realm" form -- callers strip the realm).
+
+    No target means NO emote. The undirected flavor ("You thank everyone around
+    you.") is never what a caller wants here: it fires precisely when the buffer
+    could not be resolved, and failing to resolve them is itself the evidence
+    they are gone -- so it thanks an empty room and reads as a bug. Refusing it
+    at the chokepoint instead of at each call site keeps the promise in one
+    place: this addon does not emote into the void.
+
+    Trap for anyone tempted to pass a target straight through: DoEmote(cmd, nil)
+    is NOT undirected -- it falls back to your CURRENT TARGET, thanking whatever
+    bystander you happen to be pointing at. "none" is what actually forces the
+    undirected flavor, and an unresolvable name degrades to it the same way,
+    which is why neither is reachable from here any more.
 ]]
 function ns:DoRandomEmote(emotes, target)
-	if not emotes then
+	if not emotes or not target then
 		return
 	end
+	--[[
+        Driven by Data.EMOTES rather than by the saved table's own keys, so a key
+        that is no longer a real emote can never be picked. Saved settings outlive
+        the list: renaming the /yes toggle from the bogus "YES" to its true NOD
+        token leaves "YES" sitting in every existing profile, and iterating the
+        saved table would keep offering it -- a silent no-op every time the random
+        pick landed on it.
+    ]]
 	local available = {}
-	for cmd, enabled in pairs(emotes) do
-		if enabled then
-			available[#available + 1] = cmd
+	for _, data in ipairs(Data.EMOTES) do
+		if emotes[data.cmd] then
+			available[#available + 1] = data.cmd
 		end
 	end
 	if #available > 0 then
-		DoEmote(available[math.random(#available)], target or "none")
+		DoEmote(available[math.random(#available)], target)
 	end
+end
+
+--[[
+    Perform ONE specific emote, for the buttons that choose from a dropdown
+    instead of randomising over a checklist.
+
+    Validated against the CLIENT catalog rather than Data.EMOTES: that dropdown
+    offers every emote this build has, which is far more than the twelve the
+    praise panels curate. An unknown token is dropped rather than handed on,
+    because DoEmote given a bad token is a silent no-op -- indistinguishable, to
+    whoever pressed the button, from the button being broken.
+]]
+function ns:DoEmoteToken(token, target)
+	if not token or token == "" or not target then
+		return
+	end
+	if not ns.IsClientEmote(token) then
+		return
+	end
+	DoEmote(token, target)
 end
 
 --------------------------------------------------------------------------------
@@ -113,16 +150,6 @@ local function ColorName(guid, name)
 		end
 	end
 	return name
-end
-
-local function Possessive(guid)
-	local sex = guid and select(5, GetPlayerInfoByGUID(guid))
-	if sex == 2 then
-		return L["PRONOUN_HIS"]
-	elseif sex == 3 then
-		return L["PRONOUN_HER"]
-	end
-	return L["PRONOUN_THEIR"]
 end
 
 --[[
@@ -145,8 +172,8 @@ end
 --[[
     The chat line for a tracked teammate buff or group service. The verb comes
     from the entry's type/detect: a solo buff "gave you", a group buff "gave your
-    group", a service "set out", an item used on you "used [their] X on you", a
-    cast "used X on you".
+    group", a service "set out", an item used on you "used X on you", a cast
+    "used X on you".
 ]]
 function ns:AnnounceTracked(entry, creditGUID, creditName, link)
 	local name = ColorName(creditGUID, creditName)
@@ -156,7 +183,7 @@ function ns:AnnounceTracked(entry, creditGUID, creditName, link)
 	elseif entry.type == Data.BUFF.GROUP then
 		message = L["MESSAGE_GAVE_GROUP"]:format(name, link)
 	elseif entry.itemId then
-		message = L["MESSAGE_USED_ITEM"]:format(name, Possessive(creditGUID), link)
+		message = L["MESSAGE_USED_ITEM"]:format(name, link)
 	elseif entry.detect == Data.DETECT.CAST then
 		message = L["MESSAGE_USED_SPELL"]:format(name, link)
 	else
@@ -186,7 +213,7 @@ end
     builder/announcer so the options panel can show a pipeline-true sample.
 ]]
 function ns:BuildPeerPressureMessage(class, sourceName, spellID, targetName, targetClass)
-	local color = "|cff" .. (Data.CLASS_COLORS[class] or "FFFFFF")
+	local color = "|cff" .. (Data.CLASS_COLORS[class] or ns.PALETTE.TEXT)
 	local link = (ns.GetSpellLink(spellID) or L["UNKNOWN_SPELL"]) .. color
 	local body
 	if targetName then
@@ -284,15 +311,26 @@ local function ResolvePlurals(text)
 	)
 end
 
--- Tracked buffs run to round durations (15 seconds, 10 minutes, 30 minutes), so
--- the largest whole unit states one exactly. Exposed on ns so the Good News
--- options panel can render its sample message through the real pipeline.
-local function FormatDuration(seconds)
+--[[
+    Durations run to round numbers, so the largest whole unit states one exactly.
+    Exposed on ns so the Good News options panel can render its sample message
+    through the real pipeline. `forceSeconds` keeps the seconds wording whatever
+    the size: the rounding is right for a duration read as a length ("1 Minute"
+    for 89s) but wrong for a fixed menu choice, where 89 would print as "1
+    Minute" directly beneath "55 Seconds".
+
+    No caller reaches the minute or hour rung today -- Good News caps its clause
+    below a minute (GOOD_NEWS_MAX_SECONDS) and both dropdowns list seconds. They
+    stay because this formats whatever duration it is handed, and a later caller
+    re-deriving the ladder would walk back into the plural-escape trap that
+    ResolvePlurals exists to solve.
+]]
+local function FormatDuration(seconds, forceSeconds)
 	seconds = math.floor((seconds or 0) + 0.5)
 	local template, count
-	if seconds >= 3600 then
+	if not forceSeconds and seconds >= 3600 then
 		template, count = D_HOURS, math.floor(seconds / 3600 + 0.5)
-	elseif seconds >= 60 then
+	elseif not forceSeconds and seconds >= 60 then
 		template, count = D_MINUTES, math.floor(seconds / 60 + 0.5)
 	else
 		template, count = D_SECONDS, seconds
@@ -302,19 +340,64 @@ end
 ns.FormatDuration = FormatDuration
 
 --[[
-    Tell the player YOU just buffed what they got: with a readable duration,
-    "Good News! You have X for 30 min!"; without one (no-aura casts like
-    Rebirth, or a recipient we hold no unit for), just "Good News! You have
-    X!".
+    Only a SHORT duration is worth stating. "for 15 Seconds" tells the recipient
+    to spend it now; "for 10 Minutes" is a number nobody acts on, and it pushes
+    the ability name further from the front of a whisper that has one job. So the
+    clause is capped: under a minute it prints, a minute or longer it is dropped
+    and the whisper is just the ability.
+
+    This cap is the LAST of the three ways a message ends up clause-less, and the
+    only one that a real ticking timer can fail. The other two are settled before
+    the duration ever reaches here, in Buff-Tracking's givenLookup: a cast that
+    leaves no aura (Rebirth, Lay on Hands, jumper cables) and a `noDuration`
+    entry spent by an event rather than by time (Fear Ward, Misdirection) both
+    carry no auraId at all, so nothing is ever read for them.
 ]]
+local GOOD_NEWS_MAX_SECONDS = 60
+
+--[[
+    Build the Good News whisper from the player's own template.
+
+    ONE token, %a, carrying the whole ability phrase: "[Power Infusion] for 15
+    Seconds" when the buff has a short readable timer, plain "[Rebirth]" when it
+    does not. Folding the duration in rather than exposing it as a second token
+    is what lets a single template cover both cases -- there is no clause left
+    dangling when a one-shot cast has no duration to report, so the template
+    needs no conditional and the player needs no second variable.
+
+    Substitution is gsub with a replacement FUNCTION, never string.format. The
+    template is user-editable, so a stray % in it would make format raise an
+    error mid-whisper; a replacement function also stops a % inside a spell link
+    from being read back as a capture reference.
+]]
+function ns:BuildGoodNewsMessage(link, duration)
+	local db = ns.db and ns.db.profile.goodNews
+	local template = db and db.message
+	if type(template) ~= "string" or template:match("^%s*$") then
+		template = L["DEFAULT_GOOD_NEWS"]
+	end
+
+	local ability = link or ""
+	if duration and duration > 0 then
+		-- Rounded up front, the same way FormatDuration would round it, so a 59.7s
+		-- aura is tested as the "60 Seconds" it would print as instead of slipping
+		-- under the cap and printing a full minute in seconds.
+		local whole = math.floor(duration + 0.5)
+		if whole < GOOD_NEWS_MAX_SECONDS then
+			ability = ability .. " " .. string.format(L["GOOD_NEWS_DURATION_CLAUSE"], FormatDuration(whole))
+		end
+	end
+
+	local body = template:gsub("%%a", function()
+		return ability
+	end)
+
+	return ns.TARGET_MARKER .. " " .. L["ADDON_SHORT"] .. " // " .. body
+end
+
 function ns:AnnounceGoodNews(entry, destName, spellID, duration)
 	local link = ns.GetBuffLink(entry, spellID)
-	local message
-	if duration and duration > 0 then
-		message = ns:BuildAnnounceMessage("MESSAGE_GOOD_NEWS_DURATION", link, FormatDuration(duration))
-	else
-		message = ns:BuildAnnounceMessage("MESSAGE_GOOD_NEWS", link)
-	end
+	local message = ns:BuildGoodNewsMessage(link, duration)
 	if message then
 		QueueWhisper(destName, message)
 	end

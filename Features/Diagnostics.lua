@@ -37,6 +37,9 @@ ns.DiagnosticsStrings = {
 	EVENT_LOG_STOP = "Stop Logging",
 	EVENT_LOG_SHOW = "Show Log",
 	EVENT_LOG_HINT = "Records the most recent events the add-on saw, with their arguments, plus every nearby spell cast (SPELL_CAST_SUCCESS) so you can see whether a portal, summon, or feast reaches the add-on and with what spell id.",
+	EMOTES_TITLE = "Emote Extract",
+	EMOTES_BUTTON = "Extract Emotes",
+	EMOTES_HINT = "Lists every emote this client build can perform, read from the client itself -- so running it on another expansion gives that expansion's list. Tab-separated: index, token, slash commands, and whether the emote plays a voice line.",
 	EVENTS_TITLE = "Event Registration",
 	EVENTS_BUTTON = "Run Event Checks",
 	API_TITLE = "API Endpoints",
@@ -135,6 +138,12 @@ ns.DIAGNOSTIC_API_CHECKS = {
 		end,
 	},
 	{
+		"C_Spell.RequestLoadSpellData",
+		function()
+			return type(C_Spell) == "table" and type(C_Spell.RequestLoadSpellData) == "function"
+		end,
+	},
+	{
 		"C_Spell.GetSpellTexture",
 		function()
 			return type(C_Spell) == "table" and type(C_Spell.GetSpellTexture) == "function"
@@ -189,12 +198,6 @@ ns.DIAGNOSTIC_API_CHECKS = {
 		end,
 	},
 	{
-		"UnitAura (legacy)",
-		function()
-			return type(UnitAura) == "function"
-		end,
-	},
-	{
 		"CombatLogGetCurrentEventInfo",
 		function()
 			return type(CombatLogGetCurrentEventInfo) == "function"
@@ -213,6 +216,18 @@ ns.DIAGNOSTIC_API_CHECKS = {
 		end,
 	},
 	{
+		"UnitIsVisible",
+		function()
+			return type(UnitIsVisible) == "function"
+		end,
+	},
+	{
+		"UnitInRange",
+		function()
+			return type(UnitInRange) == "function"
+		end,
+	},
+	{
 		"SendChatMessage",
 		function()
 			return type(SendChatMessage) == "function"
@@ -222,6 +237,12 @@ ns.DIAGNOSTIC_API_CHECKS = {
 		"CreateMacro",
 		function()
 			return type(CreateMacro) == "function"
+		end,
+	},
+	{
+		"DeleteMacro",
+		function()
+			return type(DeleteMacro) == "function"
 		end,
 	},
 	{
@@ -246,12 +267,6 @@ ns.DIAGNOSTIC_API_CHECKS = {
 		"Settings.OpenToCategory",
 		function()
 			return type(Settings) == "table" and type(Settings.OpenToCategory) == "function"
-		end,
-	},
-	{
-		"InterfaceOptionsFrame_OpenToCategory (legacy)",
-		function()
-			return type(InterfaceOptionsFrame_OpenToCategory) == "function"
 		end,
 	},
 	{
@@ -365,7 +380,7 @@ end
     problem); tracked=true watched=true means the cast reached us and the issue is
     downstream.
 ]]
-function ns:LogCombatCast(spellID, sourceName, sourceFlags, tracked, watched)
+function ns:LogCombatCast(spellID, sourceName, sourceFlags, tracked, watched, label)
 	local log = ns.diagnostics.log
 	if not log then
 		return
@@ -383,8 +398,9 @@ function ns:LogCombatCast(spellID, sourceName, sourceFlags, tracked, watched)
 	local spellName = (ns.GetSpellName and ns.GetSpellName(spellID)) or "?"
 
 	local entry = string.format(
-		"%.3f  CAST  %s [%s]  from %s  player=%s friendly=%s aff=%s  tracked=%s watched=%s",
+		"%.3f  %-4s  %s [%s]  from %s  player=%s friendly=%s aff=%s  tracked=%s watched=%s",
 		GetTime(),
+		label or "CAST",
 		tostring(spellID),
 		tostring(spellName),
 		tostring(sourceName),
@@ -423,6 +439,32 @@ local function GetProbeFrame()
 		probeFrame = CreateFrame("Frame")
 	end
 	return probeFrame
+end
+
+--[[
+    Every emote this client can perform, as a tab-separated table.
+
+    The point is portability: the catalog is read from the running client's own
+    globals, so running this on TBC or Wrath extracts that build's list with no
+    code change. The voice column comes from the client's speech list, which is
+    the only place that information is exposed to an add-on at all -- nothing in
+    the API reports it per emote.
+]]
+function ns:BuildEmoteReport()
+	local catalog = ns.GetEmoteCatalog()
+	local lines = { GetClientHeader() }
+	lines[#lines + 1] = ("%d emotes"):format(#catalog)
+	lines[#lines + 1] = ""
+	lines[#lines + 1] = "index\ttoken\tcommands\tvoice"
+	for _, emote in ipairs(catalog) do
+		lines[#lines + 1] = ("%d\t%s\t%s\t%s"):format(
+			emote.index,
+			emote.token,
+			emote.aliases,
+			emote.voice and "voice" or ""
+		)
+	end
+	return table.concat(lines, "\n")
 end
 
 function ns:RunEventChecks()
@@ -643,9 +685,9 @@ local function DumpTable(value, indent, depth, lines)
 end
 
 function ns:BuildSavedVariablesReport()
-	local lines = { GetClientHeader(), "", "TFTB_DB = {" }
-	if type(TFTB_DB) == "table" then
-		DumpTable(TFTB_DB, "    ", 1, lines)
+	local lines = { GetClientHeader(), "", "TFTBDB = {" }
+	if type(TFTBDB) == "table" then
+		DumpTable(TFTBDB, "    ", 1, lines)
 	end
 	lines[#lines + 1] = "}"
 	return table.concat(lines, "\n")

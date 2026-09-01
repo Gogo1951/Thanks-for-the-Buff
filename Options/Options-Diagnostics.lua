@@ -105,6 +105,20 @@ function ns.BuildDiagnosticsOptions()
 				order = 11,
 				hidden = Hidden,
 			},
+			-- Emote Extract
+			headerEmotes = SectionHeader(S.EMOTES_TITLE, 12.1),
+			hintEmotes = { type = "description", name = S.EMOTES_HINT, order = 12.2, hidden = Hidden },
+			buttonEmotes = {
+				type = "execute",
+				name = S.EMOTES_BUTTON,
+				order = 12.3,
+				hidden = Hidden,
+				func = function()
+					ns.diagnostics.emoteReport = ns:BuildEmoteReport()
+					Refresh()
+				end,
+			},
+			outputEmotes = ReportOutput("emoteReport", 12.4),
 			-- Event Registration
 			headerEvents = SectionHeader(S.EVENTS_TITLE, 13),
 			spaceEvents = SectionSpacer(14),

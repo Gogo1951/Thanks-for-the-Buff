@@ -25,8 +25,105 @@ function ns.OptionsDesc(text, order)
 	return { type = "description", name = text, fontSize = "medium", order = order }
 end
 
+--[[
+    Silver helper text, for a line of explanation sitting under the control it
+    explains rather than hidden behind a hover. HELP is the palette's colour for
+    exactly this.
+]]
+function ns.OptionsHelp(text, order, hidden)
+	return {
+		type = "description",
+		name = GetColor("HELP") .. text .. "|r",
+		fontSize = "medium",
+		order = order,
+		hidden = hidden,
+	}
+end
+
+-- Always seconds. FormatDuration switches to minutes above 60 and rounds, which
+-- is right for a buff ticking down and wrong for a fixed list: it would print 89
+-- as "1 Minute" and 144 as "2 Minutes", two units in one dropdown.
+local function FormatChoice(seconds)
+	return ns.FormatDuration(seconds, true)
+end
+
+-- The listed value closest to what is stored.
+local function NearestChoice(value)
+	local best, bestGap
+	for _, choice in ipairs(Data.SECONDS_CHOICES) do
+		local gap = math.abs(choice - (value or 0))
+		if not bestGap or gap < bestGap then
+			best, bestGap = choice, gap
+		end
+	end
+	return best
+end
+
+--[[
+    A seconds dropdown over Data.SECONDS_CHOICES, replacing the sliders these
+    settings used to use.
+
+    `get` snaps to the NEAREST listed value rather than returning what is stored.
+    The sliders could store any integer -- 25, 47 -- and AceConfig renders a
+    select whose value is missing from `values` as an empty box, which a player
+    cannot fix without guessing that re-picking is what it wants. Snapping shows
+    the closest real option; the stored number is left alone until they choose,
+    so nobody's setting is silently rewritten by opening the panel.
+]]
+function ns.DefineSecondsSelect(settings, key, order)
+	return {
+		type = "select",
+		-- The right half of a label-beside-control row: the caller pairs this with
+		-- ns.OptionsRowLabel, the same way every other dropdown in the add-on is
+		-- built. A select carrying its own `name` stacks the label above itself in
+		-- header gold, which is not how this UI reads a setting.
+		name = "",
+		width = ns.OPTIONS_CONTROL_WIDTH,
+		order = order,
+		sorting = Data.SECONDS_CHOICES,
+		values = function()
+			local values = {}
+			for _, seconds in ipairs(Data.SECONDS_CHOICES) do
+				values[seconds] = FormatChoice(seconds)
+			end
+			return values
+		end,
+		get = function()
+			return NearestChoice(settings()[key])
+		end,
+		set = function(_, val)
+			settings()[key] = val
+		end,
+	}
+end
+
 function ns.OptionsSpacer(order)
 	return { type = "description", name = " ", order = order }
+end
+
+--[[
+    Cut to a byte budget without splitting a multi-byte character. The cap is
+    counted in bytes, not characters, because what it really protects is the
+    chat line: WoW measures that in bytes too, and one ability link already
+    spends a good part of it. For English the two are the same number.
+
+    A cut landing mid-character would leave a broken tail byte that renders as a
+    replacement glyph, so step back off any UTF-8 continuation byte (0x80-0xBF)
+    sitting at the cut.
+]]
+function ns.TrimToBytes(text, maxBytes)
+	if #text <= maxBytes then
+		return text
+	end
+	local cut = maxBytes
+	while cut > 0 do
+		local b = text:byte(cut + 1)
+		if not b or b < 128 or b >= 192 then
+			break
+		end
+		cut = cut - 1
+	end
+	return text:sub(1, cut)
 end
 
 --[[
@@ -34,14 +131,51 @@ end
     name = "" and ns.OPTIONS_CONTROL_WIDTH, so the two total one row and flow onto
     the same line. A row whose control needs more room passes its own width here.
 ]]
-function ns.OptionsRowLabel(text, order, width)
+function ns.OptionsRowLabel(text, order, width, hidden)
 	return {
 		type = "description",
 		name = text,
 		fontSize = "medium",
 		width = width or ns.OPTIONS_LABEL_WIDTH,
 		order = order,
+		-- A label has no state of its own, so nothing hides it unless it is told
+		-- to: on a panel behind a master switch, one left out is the caption that
+		-- stays floating after everything it described has gone.
+		hidden = hidden,
 	}
+end
+
+--[[
+    Hide every control on a panel behind its master switch.
+
+    Applied to the finished args table rather than threaded through every shared
+    Define* builder. The rule is positional -- everything except the intro text
+    and the switch itself -- so a control added later is covered automatically
+    instead of depending on someone remembering to pass a flag down.
+
+    Existing `hidden` values are COMPOSED, not replaced. Several controls already
+    hide for their own reasons (the emote grid follows its own toggle), and
+    overwriting that would leave the grid showing whenever the master was on.
+]]
+function ns.HideAllExcept(args, isHidden, keep)
+	for key, option in pairs(args) do
+		if not keep[key] then
+			local own = option.hidden
+			if own == nil then
+				option.hidden = isHidden
+			else
+				option.hidden = function(info)
+					if isHidden(info) then
+						return true
+					end
+					if type(own) == "function" then
+						return own(info)
+					end
+					return own
+				end
+			end
+		end
+	end
 end
 
 --------------------------------------------------------------------------------
@@ -86,7 +220,7 @@ function ns.DefineEntryToggle(entry, order, watched)
 		local itemId = entry.itemId
 		local groupLabel = entry.label
 		nameField = function()
-			local shown = groupLabel or ns.GetItemInfo(itemId) or L["COMBAT_ITEM_PENDING"]:format(itemId)
+			local shown = groupLabel or ns.GetItemInfo(itemId) or L["TRACKED_ITEM_PENDING"]:format(itemId)
 			local texture = ns.GetItemIcon and ns.GetItemIcon(itemId)
 			if texture then
 				return "|T" .. texture .. ":16|t " .. shown
@@ -99,7 +233,7 @@ function ns.DefineEntryToggle(entry, order, watched)
 			if entry.itemIds and #entry.itemIds > 1 then
 				local lines = {}
 				for _, id in ipairs(entry.itemIds) do
-					lines[#lines + 1] = (select(2, ns.GetItemInfo(id))) or L["COMBAT_ITEM_PENDING"]:format(id)
+					lines[#lines + 1] = (select(2, ns.GetItemInfo(id))) or L["TRACKED_ITEM_PENDING"]:format(id)
 				end
 				return table.concat(lines, "\n")
 			end
@@ -122,20 +256,53 @@ function ns.DefineEntryToggle(entry, order, watched)
 			descField = function()
 				local names = {}
 				for _, id in ipairs(entry.spellIds) do
-					names[#names + 1] = GetSpellName(id) or L["COMBAT_SPELL_PENDING"]:format(id)
+					names[#names + 1] = GetSpellName(id) or L["TRACKED_SPELL_PENDING"]:format(id)
 				end
 				table.sort(names)
 				return table.concat(names, "\n")
 			end
 		else
-			local desc = string.format(L["COMBAT_TOGGLE_TRACKING"], name)
-			if primary then
-				local spellDesc = GetSpellDescription and GetSpellDescription(primary)
-				if spellDesc and spellDesc ~= "" then
-					desc = spellDesc
-				end
+			--[[
+                The ability's own tooltip text, preferred over the generic
+                "Toggle tracking for X." line, and taken from the HIGHEST id in
+                the entry: a rank group collapses to one name but not to one set
+                of numbers, and the tooltip should quote the rank you actually
+                cast, not rank 1. The ids are sorted here rather than trusted in
+                data order -- rows are not reliably rank-ordered (Combustion is
+                { 29977, 11129 }, Vanish { 1856, 1857, 27617, 26889, 44290 }).
+                Walking down from the top also skips any id that is dead on this
+                client, so a row spanning flavors still describes itself.
+
+                A function, not a baked string, for the same reason the item
+                branch above uses one: descriptions arrive asynchronously.
+                Classic holds tooltip data only for spells the character has
+                known, and this panel lists every class, so the first look at
+                another class's cooldown legitimately has nothing to show. The
+                request below asks for it when the panel is built and the draw
+                re-asks each time, so the real text appears once it lands.
+            ]]
+			local ranked = {}
+			for i = 1, #ids do
+				ranked[i] = ids[i]
 			end
-			descField = desc
+			table.sort(ranked)
+
+			if ns.RequestSpellData then
+				ns.RequestSpellData(ranked)
+			end
+
+			local fallback = string.format(L["TRACKED_TOGGLE_DESCRIPTION"], name)
+			descField = function()
+				if GetSpellDescription then
+					for i = #ranked, 1, -1 do
+						local spellDesc = GetSpellDescription(ranked[i])
+						if spellDesc and spellDesc ~= "" then
+							return spellDesc
+						end
+					end
+				end
+				return fallback
+			end
 		end
 	end
 
@@ -347,6 +514,13 @@ function ns.DefinePraiseDelayToggle(settings, order)
 	}
 end
 
+-- Sits under the toggle and its dropdown, and stays put when the delay is off:
+-- it is the reason to switch the delay on, so it is exactly then that it is worth
+-- reading.
+function ns.DefinePraiseDelayHelp(order)
+	return ns.OptionsHelp(L["PRAISE_DELAY_HELP"], order)
+end
+
 -- Nothing to set while the delay is off, so the dropdown only appears with it.
 -- Its labels come from the client's own duration strings (ns.FormatDuration), so
 -- "2 seconds" reads correctly in every language without TFTB shipping a string
@@ -355,7 +529,6 @@ function ns.DefinePraiseDelaySelect(settings, order)
 	return {
 		type = "select",
 		name = "",
-		desc = L["PRAISE_DELAY_LENGTH_DESCRIPTION"],
 		width = ns.OPTIONS_CONTROL_WIDTH,
 		order = order,
 		hidden = function()
