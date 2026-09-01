@@ -63,16 +63,6 @@ Emotes are held back while you are in combat, and thank-you whispers are throttl
 
 Only the abilities your client actually has show up in the options panel, so you never get a checkbox for something that doesn't exist in your game yet. Peer Pressure keeps its own, much longer list of class cooldowns on its own tab.
 
-### Slash Commands
-
-| Command | Effect |
-| --- | --- |
-| `/tftb` | Open the options panel |
-| `/thankyou` | Emote at and whisper your current target |
-| `/thankyou2` to `/thankyou5` | The same, for your four extra buttons |
-
-<img width="800" src="https://github.com/user-attachments/assets/a77bd74a-18e4-4e89-bc74-13c5c86052f7" />
-
 ## Testing & Localization Status
 
 🟢 World of Warcraft Classic (🟡 Season of Discovery) // WoW 1.15.9
