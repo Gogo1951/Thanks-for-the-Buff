@@ -10,7 +10,8 @@ The repo root *is* the add-on folder; the packager renames it to `TFTB` on relea
 Thanks-for-the-Buff/
 ├── .github/
 │   └── workflows/
-│       └── package.yml               Release packaging (repo only)
+│       ├── ci.yml                    Calls Common-Core: Lua 5.1 syntax, luacheck, StyLua and tests on every PR (repo only)
+│       └── package.yml               Calls Common-Core: Release packaging (repo only)
 ├── .gitattributes                    LF normalization (repo only)
 ├── .gitignore                        Dev-clutter ignore list (repo only)
 ├── .luacheckrc                       Lint config (repo only)
