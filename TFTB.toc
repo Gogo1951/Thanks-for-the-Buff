@@ -17,7 +17,7 @@
 ## IconTexture: Interface/AddOns/TFTB/Includes/Images/Thanks-for-the-Buff.tga
 ## X-License: MIT
 
-## Interface: 11509, 20506
+## Interface: 11509, 20506, 16001
 ## Version: @project-version@
 ## X-Curse-Project-ID: 1140285
 ## X-Wago-ID: 5NR8PeK3
