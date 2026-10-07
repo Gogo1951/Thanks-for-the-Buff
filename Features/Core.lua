@@ -77,11 +77,19 @@ end
 ns.EVENT_NAMES = {
 	"PLAYER_LOGIN",
 	"PLAYER_ENTERING_WORLD",
-	"COMBAT_LOG_EVENT_UNFILTERED",
 	"UNIT_SPELLCAST_SENT",
 	"UNIT_SPELLCAST_SUCCEEDED",
 	"LOADING_SCREEN_DISABLED",
 }
+
+-- Forever shares Mainline's WOW_PROJECT_ID, so detect it by the missing combat log API.
+ns.isForever = CombatLogGetCurrentEventInfo == nil
+
+if ns.isForever then
+	table.insert(ns.EVENT_NAMES, "UNIT_AURA")
+else
+	table.insert(ns.EVENT_NAMES, "COMBAT_LOG_EVENT_UNFILTERED")
+end
 
 --[[
     Every event routes through this one dispatcher, which is what lets the

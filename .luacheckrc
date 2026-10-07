@@ -66,6 +66,7 @@ read_globals = {
 	"UnitInParty",
 	"UnitInRaid",
 	"UnitInRange",
+	"UnitIsFriend",
 	"UnitIsPlayer",
 	"UnitIsUnit",
 	"UnitIsVisible",

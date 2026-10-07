@@ -68,6 +68,10 @@ PLAYER_LOGIN · PLAYER_ENTERING_WORLD · COMBAT_LOG_EVENT_UNFILTERED
 UNIT_SPELLCAST_SENT · UNIT_SPELLCAST_SUCCEEDED · LOADING_SCREEN_DISABLED
 ```
 
+Forever has no combat log API (`CombatLogGetCurrentEventInfo` is nil, and it shares Mainline's `WOW_PROJECT_ID`), so `ns.isForever` swaps `COMBAT_LOG_EVENT_UNFILTERED` for `UNIT_AURA` at load, since registering the former errors there. Peer Pressure taps the combat log and is therefore inert on Forever.
+
+Forever also hands out *secret values* in places. `ns.IsPlain` guards anything that is compared, concatenated, sent, or used as a table key, and `ns.SendChatMessage` resolves to `C_ChatInfo.SendChatMessage` where the global is gone.
+
 Feature modules attach handlers by name with `ns.SetEventHandler(event, handler)`. Attaching the same event twice replaces the earlier handler, so there is exactly one owner per event. Every event first passes through `ns:LogEvent` when diagnostics logging is active, then to its handler.
 
 `PLAYER_LOGIN` runs the whole setup sequence in order, and the order is load-bearing: `AceDB:New` first (nothing may read a setting before it exists), then `ns.SetupBuffTracking` and `ns.SetupPeerPressure` (which need the spell and item APIs live), then `ns.SetupOptions` (whose panels render the display groups those two just built), then `ns:CreateAutoMacro`. The welcome message rides `PLAYER_ENTERING_WORLD` behind a once-per-session flag, since that event refires on every loading screen.
@@ -150,6 +154,8 @@ Why the same feature set reads three different event streams:
 - **Buffs on you (Stranger Buffs, Teammate Buffs)** ride the combat log. `SPELL_AURA_APPLIED` and `SPELL_AURA_REFRESH` tell you a buff landed and on whom.
 - **Group services (feasts, soulwells, portals, repair bots)** ride `UNIT_SPELLCAST_SUCCEEDED`, *not* the combat log. These utility casts do not reliably emit `SPELL_CAST_SUCCESS` in `COMBAT_LOG_EVENT_UNFILTERED`, but they do fire the unit event for any unit the client tracks. A service has no per-you destination, so crediting the casting unit is all that is needed. Because the event's reach (target, focus, nameplates) is far wider than the feature's, the caster is filtered to `UnitInParty` / `UnitInRaid`, and `UnitIsPlayer` drops group pets; otherwise a stranger opening a portal across a capital city announces as a service.
 - **Good News (buffs you cast on others)** rides `UNIT_SPELLCAST_SENT` plus `UNIT_SPELLCAST_SUCCEEDED`. The combat log is scoped to you, your group, and units in combat, so buffing a player *outside* your group produces no `SPELL_AURA_APPLIED` at all, and that is the most common case for this feature. `SENT` is also the only event that names the recipient; `SUCCEEDED` confirms the cast went off, so an interrupted cast stays silent.
+
+On Forever, **buffs on you** ride `UNIT_AURA` instead (`OnUnitAura`). Only newly added auras count and nothing is read in combat, so a buff that lands mid-fight, or a recast of one you already hold, is not seen. The caster comes from the aura's `sourceUnit`, so a stranger without a nameplate cannot be credited.
 
 The one deliberate crossover is the `RESURRECT` detect mode. Goblin jumper cables and Defibrillate report `SPELL_CAST_SUCCESS` on every jolt, revived or not, so a Good News record for one of those casts is *parked* at `SUCCEEDED` instead of announced, and only the `SPELL_RESURRECT` a working jolt produces releases it (`ClaimPendingResurrect`). A jolt that never revives anyone is swept by `PENDING_TTL` and stays silent.
 

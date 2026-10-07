@@ -6,7 +6,7 @@ local GetColor = ns.GetColor
 
 --[[
     The buff-reaction engine behind the Strangers, Teammates, Services, and
-    Good News options panels. Watches the combat log, classifies the source,
+    Good News options panels. Watches the combat log (UNIT_AURA on Forever), classifies the source,
     and routes to the announcement helpers. Owns its own lookups, caches,
     cooldowns, and timers; its event handlers attach through Core's dispatcher
     (ns.SetEventHandler), and the events themselves are declared in Core's
@@ -1055,6 +1055,69 @@ local function OnUnitSpellcastSucceeded(unitTarget, castGUID, spellID)
 	end
 end
 
+--[[
+    Forever has no combat log, so buffs on you are read from UNIT_AURA instead. Aura
+    data is secret in combat, so a buff that lands mid-fight is skipped, never
+    queued. The caster comes from the aura's sourceUnit: a group token for
+    teammates, a nameplate token for a stranger (so a stranger without a nameplate
+    can't be credited). Only newly added auras count; a recast of a buff you
+    already have is not seen.
+]]
+local function HandleAddedAura(aura)
+	local spellID, sourceUnit = aura.spellId, aura.sourceUnit
+	if not (sourceUnit and ns.IsPlain(spellID) and ns.IsPlain(sourceUnit) and ns.IsPlain(aura.isHelpful)) then
+		return
+	end
+	if not aura.isHelpful then
+		return
+	end
+
+	local sourceGUID = UnitGUID(sourceUnit)
+	if not sourceGUID or not ns.IsPlain(sourceGUID) then
+		return
+	end
+
+	-- A pet or guardian is credited to its owner, and dropped when no owner resolves.
+	local creditUnit = ns.IsPlayerGUID(sourceGUID) and sourceUnit or GetPetOwnerUnit(sourceGUID)
+	local creditGUID = creditUnit and UnitGUID(creditUnit)
+	local creditName = creditUnit and GetUnitName(creditUnit, true)
+	if not (creditGUID and creditName and ns.IsPlain(creditGUID) and ns.IsPlain(creditName)) then
+		return
+	end
+	if creditGUID == playerGUID then
+		return
+	end
+
+	if UnitInParty(creditUnit) or UnitInRaid(creditUnit) then
+		local entry = auraLookup[spellID]
+		if entry and entry.type ~= Data.BUFF.SERVICE then
+			HandleTracked(entry, spellID, creditGUID, creditName, playerGUID)
+		end
+	elseif ns.IsPlayerGUID(creditGUID) then
+		local isFriend = UnitIsFriend("player", creditUnit)
+		if ns.IsPlain(isFriend) and isFriend then
+			HandleStrangersBuff(creditGUID, creditName, spellID)
+		end
+	end
+end
+
+local function OnUnitAura(unit, updateInfo)
+	if unit ~= "player" or not isReady or not ns.db or InCombatLockdown() then
+		return
+	end
+	if not updateInfo or not ns.IsPlain(updateInfo.isFullUpdate) or updateInfo.isFullUpdate then
+		return
+	end
+	local added = updateInfo.addedAuras
+	if not added or not ns.IsPlain(added) then
+		return
+	end
+
+	for _, aura in ipairs(added) do
+		HandleAddedAura(aura)
+	end
+end
+
 local function OnLoadingScreenDisabled()
 	StartSafetyTimer(Data.SAFETY_PAUSE)
 end
@@ -1078,6 +1141,9 @@ function ns.SetupBuffTracking()
 end
 
 ns.SetEventHandler("COMBAT_LOG_EVENT_UNFILTERED", OnCombatLogEvent)
+if ns.isForever then
+	ns.SetEventHandler("UNIT_AURA", OnUnitAura)
+end
 ns.SetEventHandler("UNIT_SPELLCAST_SENT", OnUnitSpellcastSent)
 ns.SetEventHandler("UNIT_SPELLCAST_SUCCEEDED", OnUnitSpellcastSucceeded)
 ns.SetEventHandler("LOADING_SCREEN_DISABLED", OnLoadingScreenDisabled)
