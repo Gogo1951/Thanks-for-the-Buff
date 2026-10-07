@@ -228,9 +228,9 @@ ns.DIAGNOSTIC_API_CHECKS = {
 		end,
 	},
 	{
-		"SendChatMessage",
+		"SendChatMessage (C_ChatInfo or legacy)",
 		function()
-			return type(SendChatMessage) == "function"
+			return type(ns.SendChatMessage) == "function"
 		end,
 	},
 	{
@@ -304,7 +304,7 @@ ns.DIAGNOSTIC_TRACKED = { entriesLive = 0, entriesTotal = 0, auraIds = 0, castId
 local function GetClientHeader()
 	local version, build, _, tocVersion = GetBuildInfo()
 	return string.format(
-		"%s %s // Client %s // Build %s // TOC %s // Locale %s // Project %s",
+		"%s %s // Client %s // Build %s // TOC %s // Locale %s // Project %s" .. (ns.isForever and " (Forever)" or ""),
 		ns.L["ADDON_TITLE"],
 		ns.Version or "Dev",
 		tostring(version),
