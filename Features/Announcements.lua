@@ -56,7 +56,7 @@ function ns:Announce(channel, target, formatKey, ...)
 	if not message then
 		return
 	end
-	SendChatMessage(message, channel, nil, target)
+	ns.SendChatMessage(message, channel, nil, target)
 end
 
 --[[
@@ -68,7 +68,7 @@ function ns:Whisper(target, message)
 	if not target or not message or message == "" then
 		return
 	end
-	SendChatMessage(message, "WHISPER", nil, target)
+	ns.SendChatMessage(message, "WHISPER", nil, target)
 end
 
 --------------------------------------------------------------------------------
@@ -259,10 +259,10 @@ local function QueueWhisper(target, message)
 	end
 	nextWhisperAt = now + delay + WHISPER_GAP
 	if delay == 0 then
-		SendChatMessage(message, "WHISPER", nil, target)
+		ns.SendChatMessage(message, "WHISPER", nil, target)
 	else
 		C_Timer.After(delay, function()
-			SendChatMessage(message, "WHISPER", nil, target)
+			ns.SendChatMessage(message, "WHISPER", nil, target)
 		end)
 	end
 end

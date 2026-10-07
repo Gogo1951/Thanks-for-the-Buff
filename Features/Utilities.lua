@@ -100,6 +100,18 @@ function ns.IsClientEmote(token)
 end
 
 --------------------------------------------------------------------------------
+-- Chat and Secret Value Compatibility
+--------------------------------------------------------------------------------
+
+-- The global SendChatMessage was removed on Forever; the namespaced form takes the same arguments.
+ns.SendChatMessage = (C_ChatInfo and C_ChatInfo.SendChatMessage) or SendChatMessage
+
+-- True when a value is safe to compare, concatenate, or send; secret values error on all three.
+function ns.IsPlain(value)
+	return not (issecretvalue and issecretvalue(value))
+end
+
+--------------------------------------------------------------------------------
 -- Spell API Compatibility
 --------------------------------------------------------------------------------
 
