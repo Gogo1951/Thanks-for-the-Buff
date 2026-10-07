@@ -359,7 +359,8 @@ function ns:LogEvent(event, ...)
 		if index > EVENT_LOG_MAX_ARGS then
 			break
 		end
-		local raw = string.sub(tostring((select(index, ...))), 1, EVENT_LOG_MAX_ARG_LENGTH)
+		local value = select(index, ...)
+		local raw = ns.IsPlain(value) and string.sub(tostring(value), 1, EVENT_LOG_MAX_ARG_LENGTH) or "<secret>"
 		parts[index] = (raw:gsub("|", "||"))
 	end
 	local log = ns.diagnostics.log

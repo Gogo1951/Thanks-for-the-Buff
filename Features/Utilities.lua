@@ -253,7 +253,7 @@ function ns.GetBuffDuration(unit, spellId)
 		if not data then
 			return nil
 		end
-		if data.spellId == spellId then
+		if ns.IsPlain(data.spellId) and data.spellId == spellId then
 			return data.duration or 0
 		end
 	end

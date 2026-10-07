@@ -998,6 +998,11 @@ local function OnUnitSpellcastSucceeded(unitTarget, castGUID, spellID)
 		return
 	end
 
+	-- Other players' casts on nameplates and the like arrive with secret ids that can't key a table.
+	if not (ns.IsPlain(spellID) and ns.IsPlain(castGUID) and ns.IsPlain(unitTarget)) then
+		return
+	end
+
 	-- Good News: this cast is one of yours, and SENT already vetted and named
 	-- the recipient. Claimed before the service check below, which is about
 	-- OTHER people's casts.
