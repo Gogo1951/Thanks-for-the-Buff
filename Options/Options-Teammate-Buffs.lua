@@ -2,14 +2,14 @@ local _, ns = ...
 local L = ns.L
 
 --[[
-    "Buffs from Teammates" panel -- party/raid buffs & cooldowns cast on you. Two
-    sections, as on Buffs from Strangers: Praise (what the teammate sees) and
+    "Teammate Buffs" panel -- party/raid buffs & cooldowns cast on you. Two
+    sections, as on Stranger Buffs: Praise (what the teammate sees) and
     Notifications (the chat line and sound only you get), then one inline group of
     tracked abilities per class category, built at login. The controls come from
     the shared factories in Options-Utilities.lua (ns.Define* / ns.SortedEntries /
     ns.DefineEntryToggle).
 
-    No cooldown sliders here, unlike Strangers: a teammate's cooldown is worth
+    No cooldown dropdowns here, unlike Strangers: a teammate's cooldown is worth
     acknowledging every single time it lands, so only the outgoing whisper is
     rate-limited, and that happens in the engine rather than as a setting.
 ]]
@@ -27,33 +27,22 @@ function ns.BuildTeammatesOptions()
 			space0 = ns.OptionsSpacer(2),
 
 			-- Master switch: everything below it hides when off, and the feature
-			-- itself stops -- see the `enabled` gate in Buff-Tracking. Fractional
-			-- orders keep it above the first header without renumbering the panel.
-			enable = {
-				type = "toggle",
-				name = L["TEAMMATES_ENABLE"],
-				width = "full",
-				order = 2.5,
-				get = function()
-					return settings().enabled
-				end,
-				set = function(_, val)
-					settings().enabled = val
-				end,
-			},
-			enableSpacer = { type = "description", name = " ", order = 2.6 },
+			-- itself stops -- see the `enabled` gate in Praise. Its twin sits in
+			-- the General panel's Features section. Fractional orders keep it above
+			-- the first header without renumbering the panel.
+			enable = ns.OptionsFeatureToggle(ns.GetFeatureSwitch("teammates"), 2.5),
+			enableSpacer = ns.OptionsSpacer(2.6),
 
 			headerPraise = ns.OptionsHeader(L["PRAISE_HEADER"], 3),
 			space1 = ns.OptionsSpacer(4),
 			emotes = ns.DefineEmotesToggle(settings, 5),
-			emoteSpacer = { type = "description", name = " ", order = 6, hidden = ns.EmotesHidden(settings) },
+			emoteSpacer = ns.OptionsSpacer(6, ns.EmotesHidden(settings)),
 			emoteGroup = ns.DefineEmoteGroup(settings, 7),
 			space2 = ns.OptionsSpacer(8),
 			whisper = ns.DefineWhisperToggle(settings, 9),
 			space3 = ns.OptionsSpacer(10),
 			praiseDelay = ns.DefinePraiseDelayToggle(settings, 11),
 			praiseDelayLength = ns.DefinePraiseDelaySelect(settings, 12),
-			praiseDelayHelp = ns.DefinePraiseDelayHelp(12.5),
 			space4 = ns.OptionsSpacer(13),
 
 			headerNotifications = ns.OptionsHeader(L["NOTIFICATIONS_HEADER"], 14),

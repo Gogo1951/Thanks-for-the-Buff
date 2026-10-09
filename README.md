@@ -1,110 +1,110 @@
 # Thanks for the Buff (TFTB)
 
-Automatically thank players who buff you with emotes, whispers, and chat notifications, from open-world buffs to teammate cooldowns like Power Infusion and Innervate. Get alerts for feasts, portals, and same-class cooldowns too.
+Automatically thank players who buff you with a whisper or emote, and announce the buffs you cast, like Power Infusion, Innervate, and Soulstone. Get alerts for feasts, portals, summons, soulwells, and class cooldowns too. Manners, automated.
 
-**TL;DR:** Never miss a buff, cooldown, or free utility again. Automatically thank the player who helped you, and get a heads-up when someone drops something useful for the group.
+**TL;DR**: For players who want to be polite without stopping what they're doing. Keep questing, farming, or raiding, and every buff still gets a proper thank-you.
 
 ## Features
 
-🙌 **Every Buff Gets a Thank-You** // Emote and whisper the stranger who buffs you in passing or the teammate who burns a cooldown on you, with cooldowns and a delay so it never turns into spam.
+🙌 **Every Buff Gets a Thank-You** // Emote and whisper the stranger who buffs you in passing or the teammate who burns a cooldown on you, without it ever turning into spam.
 
-📣 **Send Good News** // Whisper the players you buff to tell them what they got and how long it lasts, in your own words. Perfect for Power Infusion, a clutch Innervate, or a soulstone before the pull.
+📣 **Send Good News** // Whisper the players you buff with what they got and how long it lasts, perfect for Power Infusion, a clutch Innervate, or a soulstone before the pull.
 
 🚂 **Feel Peer Pressure** // Get pinged the moment another player of your class pops a cooldown, so you can stack yours on top.
 
-🍖 **Service Alerts** // Get a heads-up the moment someone sets out a feast, drops a soulwell, opens a portal, or puts down a repair bot for the group.
+🚪 **Service Alerts** // Get a heads-up the moment someone sets out a feast, drops a soulwell, opens a portal, or puts down a repair bot for the group.
 
-🙏 **Thank You Buttons** // Up to five one-click macros that emote at your target and whisper them a message you wrote: thank the healer, ask a mage for water, or heckle a guildie.
+🙏 **Thank You Buttons** // Up to five one-click macros that emote at your target and whisper your own words: thank the healer, ask a mage for water, or heckle a guildie.
 
 ## Setup
 
 1. Install the add-on, ideally using [CurseForge](https://www.curseforge.com/wow/addons/thanks-for-the-buff-revisited) or [Wago](https://addons.wago.io/addons/thanks-for-the-buff).
-2. Log in. Sensible defaults are already on, so a teammate's buffs start printing to your chat right away.
-3. Type `/tftb` to choose how you react to each kind of buff, whether that's a chat note, a whisper, an emote, a sound, or any mix, and pick which emotes to use.
-4. Out in the world, strangers' buffs get an automatic emote. Tune the cooldowns, the minimum buff duration, and an optional delay so it stays classy.
-5. On the Thank You Button tab, switch on the `- Thank` macro and drag it to your action bar to thank your target on demand.
-6. *"Manners maketh the raid."*
+2. Log in. Strangers who buff you start getting thanked right away.
+3. Type `/tftb` to pick your emotes, write your whispers, and switch on teammate cooldowns, Service Alerts, and Send Good News.
+4. On the Thank You Button tab, switch on the `- Thank` macro and drag it to your action bar.
+5. _"Manners maketh the raid."_
 
 ## How It Works
 
 ### Options
 
-Type `/tftb` to open the options panel, or find it under Options > AddOns > Thanks for the Buff (TFTB). Every buff tab splits the same way: **Praise Messages & Emotes** is what the player who helped you sees, and **Notifications** is the chat note and sound only you get.
-
 <img width="800" src="https://github.com/user-attachments/assets/73e9cee1-ef63-4b09-84cf-1c2ef19862c8" />
 
-
-- **Stranger Buffs** // Buffs from players outside your group. A praise cooldown, a same-player cooldown, a minimum buff duration, and an optional delay keep a wave of world buffs from turning into spam.
-- **Teammate Buffs** // The buffs and cooldowns your party and raid cast on you, with a checkbox per ability.
-- **Service Alerts** // Feasts, refreshment tables, soulwells, portals, summons, resistance cauldrons, repair bots, and more.
-- **Send Good News** // Whispers for the buffs you cast on other players, either anyone you buff or group members only. Write your own message and see a live preview of it.
-- **Peer Pressure** // A chat alert and a sound when another player of your class uses a cooldown, with an option to fire on your own casts too.
-- **Thank You Button** // Five independent buttons, each with its own macro, whisper message, and emote.
-- **Profiles** // Copy one character's setup onto another, or reset one back to defaults.
-
-Emotes are held back while you are in combat, and thank-you whispers are throttled per player, so a friend who rebuffs you five times still only hears from you once.
+* **Stranger Buffs** // Thank players outside your group for their buffs, without a wave of world buffs turning into spam.
+* **Teammate Buffs** // Thank your party and raid for the cooldowns they burn on you, ability by ability.
+* **Service Alerts** // Know the moment a feast, soulwell, portal, summon, or repair bot goes down.
+* **Send Good News** // Tell the players you buff what they just got, in your own words.
+* **Peer Pressure** // Get pinged when another player of your class pops a cooldown.
+* **Thank You Button** // Five buttons, each with its own whisper and emote.
+* **Profiles** // Copy a setup to another character, or reset to defaults.
 
 ### Tracked Abilities
 
 | Class | Buffs & Cooldowns |
 | --- | --- |
-| Death Knight | Unholy Frenzy |
 | Druid | Innervate, Rebirth |
-| Hunter | Master's Call, Misdirection, Roar of Sacrifice |
-| Mage | Amplify Magic, Dampen Magic, Focus Magic |
-| Paladin | Beacon of Light, Divine Intervention, Hand of Freedom, Hand of Protection, Hand of Sacrifice, Lay on Hands |
-| Priest | Fear Ward, Guardian Spirit, Pain Suppression, Power Infusion |
-| Rogue | Tricks of the Trade |
+| Hunter | Misdirection |
+| Mage | Amplify Magic, Dampen Magic |
+| Paladin | Blessing of Freedom, Blessing of Protection, Blessing of Sacrifice, Divine Intervention, Lay on Hands |
+| Priest | Fear Ward, Pain Suppression, Power Infusion |
 | Shaman | Bloodlust, Heroism, Water Breathing, Water Walking |
 | Warlock | Soulstone, Unending Breath |
-| Warrior | Intervene, Vigilance |
+| Warrior | Intervene |
 | Items | Drums, Scrolls, Jumper Cables, Battle Squawk |
-| Service Alerts | Feasts, Refreshment Tables, Soulwells, Portals, Summons, Resistance Cauldrons, Repair Bots, MOLL-E, Battle Chickens |
+| Service Alerts | Feasts, Refreshment Tables, Soulwells, Portals, Summons, Resistance Cauldrons, Repair Bots |
 
-Only the abilities your client actually has show up in the options panel, so you never get a checkbox for something that doesn't exist in your game yet. Peer Pressure keeps its own, much longer list of class cooldowns on its own tab.
+You only see the ones your game client actually has.
 
 ## Testing & Localization Status
 
-🟢 World of Warcraft Classic (🟡 Season of Discovery) // WoW 1.15.9
+🔴 World of Warcraft // 12.1.0
 
-🟢 Burning Crusade Anniversary // WoW 2.5.6
+🔴 Mists of Pandaria Classic // 5.5.4
 
-🔴 Mists of Pandaria Classic // WoW 5.5.4
+🟢 Burning Crusade Anniversary // 2.5.6
 
-🔴 World of Warcraft // WoW 12.1.0
+🟡 World of Warcraft: Forever // 1.60.1
 
-**Localization Status** // Works with all Classic WoW Locales (enUS, deDE, esES, esMX, frFR, itIT, koKR, ptBR, ruRU, zhCN, zhTW).
+🟡 World of Warcraft: Season of Discovery // 1.15.9
 
-Please reach out if you would like to be involved!
+🟢 World of Warcraft: Classic // 1.15.9
 
-## Links
+**Available Locales** // enUS, deDE, esES, esMX, frFR, itIT, koKR, ptBR, ruRU, zhCN, zhTW
 
-- [GitHub](https://github.com/Gogo1951/Thanks-for-the-Buff)
-- [Discord](https://discord.gg/eh8hKq992Q)
-
-## History
+## Appreciation & History
 
 👾 **I didn't create this add-on, I just updated it.**
 
-- Runew0lf's [Thanks For The Buff](https://www.curseforge.com/wow/addons/thanks-for-the-buff)
-- vbezhenar's [Thank For Buff](https://www.curseforge.com/wow/addons/thank-for-buff)
+* Runew0lf's [Thanks For The Buff](https://www.curseforge.com/wow/addons/thanks-for-the-buff)
+* vbezhenar's [Thank For Buff](https://www.curseforge.com/wow/addons/thank-for-buff)
+
+## Get Involved
+
+❤️ **You can help make this better!** Feedback, code contributions, testing, and localization assistance are always appreciated. If you'd like to get involved, please reach out.
+
+* [GitHub](https://github.com/Gogo1951/Thanks-for-the-Buff)
+* [Discord](https://discord.gg/eh8hKq992Q)
 
 ## Related Add-ons
 
-🟢 Pairs With // kvakvs's [Buffomat Classic](https://www.curseforge.com/wow/addons/buffomat-classic)
+### 🟢 Pairs With
 
-🟢 Pairs With // Pupp3h's [Buffwatch Classic](https://www.curseforge.com/wow/addons/buffwatch-classic)
+* Pupp3h's [Buffwatch Classic](https://www.curseforge.com/wow/addons/buffwatch-classic)
+* Gogo1951's [Connoisseur & Restocker](https://www.curseforge.com/wow/addons/consumable-connoisseur)
+* aznamir's [PallyPower](https://www.curseforge.com/wow/addons/pally-power)
+* Gogo1951's [Play It Forward](https://www.curseforge.com/wow/addons/play-it-forward)
+* Gogo1951's [Water Dispenser](https://www.curseforge.com/wow/addons/water-dispenser-revisited)
 
-🟢 Pairs With // Gogo1951's [Connoisseur](https://www.curseforge.com/wow/addons/consumable-connoisseur)
+### 🟡 Overlaps
 
-🟢 Pairs With // Gogo1951's [Play It Forward](https://www.curseforge.com/wow/addons/play-it-forward)
+* K1DW1K's [BuffBack](https://www.curseforge.com/wow/addons/buffback)
+* lumumba's [MageSphere](https://www.curseforge.com/wow/addons/magesphere)
+* fpsacha's [Manners](https://www.curseforge.com/wow/addons/manners)
+* noobsgonewild's [Summon announcer](https://www.curseforge.com/wow/addons/summon-announcer)
+* Nitrak's [Vocal Raid Assistant](https://www.curseforge.com/wow/addons/vocalraidassistant)
 
-🟢 Pairs With // Gogo1951's [Water Dispenser](https://www.curseforge.com/wow/addons/water-dispenser-revisited)
+### 🔴 Alternatives
 
-🟡 Some Overlap // Aszilynn's [InnervateMate](https://www.curseforge.com/wow/addons/innervatemate)
-
-🟡 Some Overlap // Azotorp's [PI Assign](https://www.curseforge.com/wow/addons/pi-assign)
-
-🟡 Some Overlap // noobsgonewild's [Summon announcer](https://www.curseforge.com/wow/addons/summon-announcer)
-
-🟡 Some Overlap // Nitrak's [Vocal Raid Assistant](https://www.curseforge.com/wow/addons/vocalraidassistant)
+* esNaglfar's [AutoThank](https://www.curseforge.com/wow/addons/autothank)
+* tf4482's [BuffResponder](https://www.curseforge.com/wow/addons/buffresponder)
+* Iamthedot's [Kindred](https://www.curseforge.com/wow/addons/kindred)

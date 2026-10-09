@@ -37,7 +37,7 @@ function ns.ReconcileMacros()
 	for _, button in ipairs(Data.THANK_YOU_BUTTONS) do
 		local config = ns.db.profile[button.profileKey]
 		if config and config.createMacro then
-			if GetMacroIndexByName(button.macroName) == 0 and GetNumMacros() < 120 then
+			if GetMacroIndexByName(button.macroName) == 0 and GetNumMacros() < Data.MAX_GLOBAL_MACROS then
 				CreateMacro(button.macroName, 134411, button.command, nil)
 			end
 		elseif config then
@@ -86,11 +86,14 @@ end
     falls back to the original button rather than erroring.
 ]]
 function ns.RunThankYou(button)
-	if not UnitExists("target") or not UnitIsPlayer("target") then
+	-- A target whose identity is secret can't be checked or whispered, but the
+	-- emote only needs the "target" token.
+	local identitySecret = ns.IsUnitIdentitySecret("target")
+	if not UnitExists("target") or (not identitySecret and not UnitIsPlayer("target")) then
 		ns:PrintMessage(L["MESSAGE_SELECT_PLAYER"])
 		return
 	end
-	if UnitIsUnit("target", "player") then
+	if not identitySecret and UnitIsUnit("target", "player") then
 		ns:PrintMessage(L["MESSAGE_CANT_THANK_SELF"])
 		return
 	end
@@ -109,7 +112,12 @@ function ns.RunThankYou(button)
 		ns:DoRandomEmote(db.emotes, "target")
 	end
 
-	if UnitFactionGroup("player") == UnitFactionGroup("target") and db.message and db.message ~= "" then
+	if
+		not identitySecret
+		and UnitFactionGroup("player") == UnitFactionGroup("target")
+		and db.message
+		and db.message ~= ""
+	then
 		ns:Whisper(GetUnitName("target", true), db.message)
 	end
 end

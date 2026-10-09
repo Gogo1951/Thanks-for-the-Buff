@@ -1,20 +1,21 @@
 local _, ns = ...
 local L = ns.L
 
-local GetColor = ns.GetColor
-
--- The message row mirrors the Thank You Button's: a caption-sized label so the
--- edit box keeps the rest of the row and a whole sentence stays readable.
+-- The message row mirrors the Thank You Button's: a caption-sized label, the
+-- edit box, and the Reset button, together one row, so a whole sentence stays
+-- readable.
 local MESSAGE_LABEL_WIDTH = 0.9
-local MESSAGE_INPUT_WIDTH = ns.OPTIONS_ROW_WIDTH - MESSAGE_LABEL_WIDTH
+local RESET_WIDTH = 0.5
+local MESSAGE_INPUT_WIDTH = ns.OPTIONS_ROW_WIDTH - MESSAGE_LABEL_WIDTH - RESET_WIDTH
 
 --[[
     "Good News" panel -- whispers for tracked buffs YOU cast on other players
-    (settings live under goodNews). It renders the same class categories as
-    Buffs from Teammates (ns.TeammateCategories -- services have no per-person
-    recipient and are absent by construction), but its toggles bind to the
-    independent goodNews.watched list, so "thank for it" and "announce it"
-    stay separate choices on the same ids. Registered as a function, like
+    (settings live under goodNews). It renders its own class categories
+    (ns.GoodNewsCategories: the teammate list plus any row this client can't
+    see landing on you; services have no per-person recipient and are absent
+    by construction), and its toggles bind to the independent goodNews.watched
+    list, so "thank for it" and "announce it" stay separate choices on the same
+    ids. Registered as a function, like
     Teammates, so the tracked list is rebuilt on open once lazily-loaded item
     names are cached.
 ]]
@@ -44,25 +45,14 @@ function ns.BuildGoodNewsOptions()
 		args = {
 			descIntro = ns.OptionsDesc(L["GOOD_NEWS_DESCRIPTION"], 1),
 			space0 = ns.OptionsSpacer(2),
-			enable = {
-				type = "toggle",
-				name = L["GOOD_NEWS_WHISPER_ENABLE"],
-				desc = L["GOOD_NEWS_WHISPER_DESCRIPTION"],
-				width = ns.OPTIONS_LABEL_WIDTH,
-				order = 3,
-				get = function()
-					return ns.db.profile.goodNews.whisperEnabled
-				end,
-				set = function(_, val)
-					ns.db.profile.goodNews.whisperEnabled = val
-				end,
-			},
-			-- Who gets whispered, on the master's row. Unlabeled on purpose: the
-			-- values are self-describing, and the enable toggle beside it reads as
-			-- the caption. Takes the control half of the row so neither value clips.
+			enable = ns.OptionsFeatureToggle(ns.GetFeatureSwitch("goodNews"), 3),
+			spaceScope = ns.OptionsSpacer(3.5, GoodNewsHidden),
+			-- Who gets whispered, on its own label-beside-control row.
+			scopeLabel = ns.OptionsRowLabel(L["GOOD_NEWS_SCOPE"], 3.6, nil, GoodNewsHidden),
 			scope = {
 				type = "select",
 				name = "",
+				desc = L["GOOD_NEWS_SCOPE_DESCRIPTION"],
 				width = ns.OPTIONS_CONTROL_WIDTH,
 				order = 4,
 				hidden = GoodNewsHidden,
@@ -80,15 +70,15 @@ function ns.BuildGoodNewsOptions()
 					ns.db.profile.goodNews.scope = val
 				end,
 			},
-			space1 = { type = "description", name = " ", order = 5, hidden = GoodNewsHidden },
+			space1 = ns.OptionsSpacer(5, GoodNewsHidden),
 			headerMessages = ns.OptionsHeader(L["GOOD_NEWS_MESSAGES_HEADER"], 6, GoodNewsHidden),
-			space2 = { type = "description", name = " ", order = 7, hidden = GoodNewsHidden },
-			messageLabel = ns.OptionsRowLabel(L["GOOD_NEWS_MESSAGE"], 8, MESSAGE_LABEL_WIDTH, GoodNewsHidden),
+			space2 = ns.OptionsSpacer(7, GoodNewsHidden),
+			messageLabel = ns.OptionsRowLabel(L["WHISPER_MESSAGE"], 8, MESSAGE_LABEL_WIDTH, GoodNewsHidden),
 			--[[
-                The editable body only. The star marker and the "TFTB // " prefix
-                are added by ns:BuildGoodNewsMessage and are deliberately out of
-                reach: they are how a recipient recognizes where the whisper came
-                from.
+                The editable body only. The star marker (left off on WoW Forever)
+                and the " // TFTB" sign-off are added by ns:BuildGoodNewsMessage and
+                are deliberately out of reach: they are how a recipient recognizes
+                where the whisper came from.
 
                 Emptying the box restores the default rather than sending a
                 prefix with nothing after it -- turning the feature off is what
@@ -117,37 +107,29 @@ function ns.BuildGoodNewsOptions()
 			-- affordance and should not look like two different features.
 			resetMessage = {
 				type = "execute",
-				name = L["BUTTON_RESET"],
-				desc = L["BUTTON_RESET_DESCRIPTION"],
-				width = "half",
+				name = L["WHISPER_MESSAGE_RESET"],
+				desc = L["WHISPER_MESSAGE_RESET_DESCRIPTION"],
+				width = RESET_WIDTH,
 				order = 10,
 				hidden = GoodNewsHidden,
 				func = function()
 					ns.db.profile.goodNews.message = L["DEFAULT_GOOD_NEWS"]
 				end,
 			},
-			-- Silver, one line, below the row it explains: the palette's HELP is
-			-- the addon's colour for exactly this kind of aside.
-			messageHelp = {
-				type = "description",
-				name = GetColor("HELP") .. MessageHelp() .. "|r",
-				fontSize = "medium",
-				order = 11,
-				hidden = GoodNewsHidden,
-			},
 			--[[
                 A sample of the outgoing whisper, built by the SAME pipeline that
                 sends the real one (their template, spell link, localized
                 duration), so it can never drift from what recipients actually
                 get -- and so an edit above is visible here immediately. Only the
-                {rt1} chat marker is swapped for its texture: chat renders the
-                marker as the Star icon, but options-panel text does not.
+                {rt1} chat marker is swapped for its texture, where the flavor
+                sends one: chat renders the marker as the Star icon, but
+                options-panel text does not.
             ]]
-			sampleSpacer = { type = "description", name = " ", order = 12, hidden = GoodNewsHidden },
+			sampleSpacer = ns.OptionsSpacer(12, GoodNewsHidden),
 			sampleMessage = {
 				type = "description",
 				name = function()
-					local link = ns.GetSpellLink(10060) or "" -- Power Infusion
+					local link = ns.GetSpellLink(ns.GAME_IDS.SAMPLE_GOOD_NEWS_SPELL_ID) or ""
 					local message = ns:BuildGoodNewsMessage(link, 15)
 					return "   "
 						.. message:gsub(ns.TARGET_MARKER, "|TInterface\\TargetingFrame\\UI-RaidTargetingIcon_1:14|t", 1)
@@ -157,14 +139,14 @@ function ns.BuildGoodNewsOptions()
 				order = 13,
 				hidden = GoodNewsHidden,
 			},
-			space3 = { type = "description", name = " ", order = 14, hidden = GoodNewsHidden },
+			space3 = ns.OptionsSpacer(14, GoodNewsHidden),
 			headerTracked = ns.OptionsHeader(L["TRACKED_HEADER"], 15, GoodNewsHidden),
-			space4 = { type = "description", name = " ", order = 16, hidden = GoodNewsHidden },
+			space4 = ns.OptionsSpacer(16, GoodNewsHidden),
 		},
 	}
 
 	local categoryOrder = 20
-	for _, category in ipairs(ns.TeammateCategories or {}) do
+	for _, category in ipairs(ns.GoodNewsCategories or {}) do
 		local groupKey = "cat_" .. category.id
 		options.args[groupKey] = {
 			type = "group",

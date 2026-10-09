@@ -3,9 +3,9 @@ local Data = ns.Data
 local L = ns.L
 
 local GetColor = ns.GetColor
-local GetSpellName = ns.GetSpellName
-local GetSpellDescription = ns.GetSpellDescription
-local GetSpellTexture = ns.GetSpellTexture
+local GetSpellName = C_Spell.GetSpellName
+local GetSpellDescription = C_Spell.GetSpellDescription
+local GetSpellTexture = C_Spell.GetSpellTexture
 
 --------------------------------------------------------------------------------
 -- Shared Options Helpers
@@ -23,21 +23,6 @@ end
 
 function ns.OptionsDesc(text, order)
 	return { type = "description", name = text, fontSize = "medium", order = order }
-end
-
---[[
-    Silver helper text, for a line of explanation sitting under the control it
-    explains rather than hidden behind a hover. HELP is the palette's colour for
-    exactly this.
-]]
-function ns.OptionsHelp(text, order, hidden)
-	return {
-		type = "description",
-		name = GetColor("HELP") .. text .. "|r",
-		fontSize = "medium",
-		order = order,
-		hidden = hidden,
-	}
 end
 
 -- Always seconds. FormatDuration switches to minutes above 60 and rounds, which
@@ -60,19 +45,19 @@ local function NearestChoice(value)
 end
 
 --[[
-    A seconds dropdown over Data.SECONDS_CHOICES, replacing the sliders these
-    settings used to use.
+    A seconds dropdown over Data.SECONDS_CHOICES.
 
     `get` snaps to the NEAREST listed value rather than returning what is stored.
-    The sliders could store any integer -- 25, 47 -- and AceConfig renders a
+    A saved value can sit off the scale -- 25, 47 -- and AceConfig renders a
     select whose value is missing from `values` as an empty box, which a player
     cannot fix without guessing that re-picking is what it wants. Snapping shows
     the closest real option; the stored number is left alone until they choose,
     so nobody's setting is silently rewritten by opening the panel.
 ]]
-function ns.DefineSecondsSelect(settings, key, order)
+function ns.DefineSecondsSelect(settings, key, order, desc)
 	return {
 		type = "select",
+		desc = desc,
 		-- The right half of a label-beside-control row: the caller pairs this with
 		-- ns.OptionsRowLabel, the same way every other dropdown in the add-on is
 		-- built. A select carrying its own `name` stacks the label above itself in
@@ -97,8 +82,8 @@ function ns.DefineSecondsSelect(settings, key, order)
 	}
 end
 
-function ns.OptionsSpacer(order)
-	return { type = "description", name = " ", order = order }
+function ns.OptionsSpacer(order, hidden)
+	return { type = "description", name = " ", order = order, hidden = hidden }
 end
 
 --[[
@@ -179,12 +164,108 @@ function ns.HideAllExcept(args, isHidden, keep)
 end
 
 --------------------------------------------------------------------------------
+-- Feature Switches
+--------------------------------------------------------------------------------
+
+--[[
+    Every feature's on/off switch, built once here and placed twice: at the top
+    of the feature's own panel and in the General panel's Features section. Both
+    copies bind the same setting and carry the same caption and tooltip, and
+    flipping either repaints every panel so the other copy and the settings it
+    hides follow at once.
+]]
+ns.FEATURE_SWITCHES = {
+	-- key: the profile subtable, setting: its on/off field, name/desc: locale keys,
+	-- loaded: present only for a feature a flavor's TOC can leave out.
+	{ key = "strangers", setting = "enabled", name = "STRANGERS_ENABLE", desc = "STRANGERS_ENABLE_DESCRIPTION" },
+	{ key = "teammates", setting = "enabled", name = "TEAMMATES_ENABLE", desc = "TEAMMATES_ENABLE_DESCRIPTION" },
+	{
+		key = "goodNews",
+		setting = "whisperEnabled",
+		name = "GOOD_NEWS_WHISPER_ENABLE",
+		desc = "GOOD_NEWS_WHISPER_DESCRIPTION",
+	},
+	{ key = "services", setting = "enabled", name = "SERVICES_ENABLE", desc = "SERVICES_ENABLE_DESCRIPTION" },
+	{
+		key = "peerPressure",
+		setting = "enabled",
+		name = "PEER_PRESSURE_ENABLE",
+		desc = "PEER_PRESSURE_ENABLE_DESCRIPTION",
+		loaded = function()
+			return ns.BuildPeerPressureOptions ~= nil
+		end,
+	},
+}
+
+local function NotifyAllPanels()
+	local registry = LibStub("AceConfigRegistry-3.0")
+	for _, name in pairs(ns.OPTIONS_REGISTRY) do
+		registry:NotifyChange(name)
+	end
+end
+
+function ns.OptionsFeatureToggle(feature, order, width)
+	return {
+		type = "toggle",
+		name = L[feature.name],
+		desc = L[feature.desc],
+		width = width or "full",
+		order = order,
+		get = function()
+			return ns.db.profile[feature.key][feature.setting]
+		end,
+		set = function(_, value)
+			ns.db.profile[feature.key][feature.setting] = value
+			NotifyAllPanels()
+		end,
+	}
+end
+
+function ns.GetFeatureSwitch(key)
+	for _, feature in ipairs(ns.FEATURE_SWITCHES) do
+		if feature.key == key then
+			return feature
+		end
+	end
+	return nil
+end
+
+--[[
+    Lays toggles out two to a line, each pair in its own unnamed inline group so
+    every pair pins its own row. The widths leave slack under
+    ns.OPTIONS_ROW_WIDTH: a row summing exactly to the pane sits on the wrap
+    boundary and can drop its second toggle onto a line of its own.
+]]
+local TOGGLE_PAIR_WIDTH = (ns.OPTIONS_ROW_WIDTH - 0.2) / 2
+
+function ns.OptionsTogglePairs(args, keyPrefix, startOrder, toggles)
+	for index = 1, #toggles, 2 do
+		local pair = {}
+		for offset = 0, 1 do
+			local toggle = toggles[index + offset]
+			if toggle then
+				toggle.width = TOGGLE_PAIR_WIDTH
+				toggle.order = offset + 1
+				pair["toggle" .. (offset + 1)] = toggle
+			end
+		end
+		args[keyPrefix .. index] = {
+			type = "group",
+			name = "",
+			inline = true,
+			order = startOrder + index,
+			args = pair,
+		}
+	end
+end
+
+--------------------------------------------------------------------------------
 -- Shared Buff-Panel Builders
 --------------------------------------------------------------------------------
 
 --[[
-    Widget factories shared by the three buff panels (Buffs from Strangers, Buffs
-    from Teammates, Group Services). Each panel file owns its own layout and order
+    Widget factories shared by the three buff panels (Stranger Buffs, Teammate
+    Buffs, Service Alerts). Each panel file owns its own layout and order
     numbers, since the three no longer share one shape, and draws its controls
     from here. Every factory takes a `settings` accessor returning the profile
     subtable the control binds to (ns.db.profile.strangers / .teammates /
@@ -197,9 +278,9 @@ end
     One toggle per tracked entry. Spell entries carry a resolved name (ranks were
     already collapsed at build time); item entries carry an itemId whose name and
     icon resolve lazily, so a cold item cache fills the label in by the time the
-    panel is viewed. Grouped items (Soulstone ranks, Scroll of Agility ranks...)
-    also carry an explicit `label` naming the whole group, since their per-rank
-    item names differ. Either way the toggle flips every watched id in the entry
+    panel is viewed. Grouped items carry a name for the whole group, since their
+    per-rank item names differ: either our own `label` (Repair Bots) or a
+    `labelItem` whose client name is the group's (Soulstone, Scroll of Agility). Either way the toggle flips every watched id in the entry
     and reads its state from the first.
 
     `watched` is an optional accessor returning the id->bool table the toggle
@@ -219,9 +300,10 @@ function ns.DefineEntryToggle(entry, order, watched)
 	if entry.itemId then
 		local itemId = entry.itemId
 		local groupLabel = entry.label
+		local labelItem = entry.labelItem or itemId
 		nameField = function()
-			local shown = groupLabel or ns.GetItemInfo(itemId) or L["TRACKED_ITEM_PENDING"]:format(itemId)
-			local texture = ns.GetItemIcon and ns.GetItemIcon(itemId)
+			local shown = groupLabel or C_Item.GetItemInfo(labelItem) or L["TRACKED_ITEM_PENDING"]:format(labelItem)
+			local texture = C_Item.GetItemIconByID(itemId)
 			if texture then
 				return "|T" .. texture .. ":16|t " .. shown
 			end
@@ -233,17 +315,17 @@ function ns.DefineEntryToggle(entry, order, watched)
 			if entry.itemIds and #entry.itemIds > 1 then
 				local lines = {}
 				for _, id in ipairs(entry.itemIds) do
-					lines[#lines + 1] = (select(2, ns.GetItemInfo(id))) or L["TRACKED_ITEM_PENDING"]:format(id)
+					lines[#lines + 1] = (select(2, C_Item.GetItemInfo(id))) or L["TRACKED_ITEM_PENDING"]:format(id)
 				end
 				return table.concat(lines, "\n")
 			end
-			return (select(2, ns.GetItemInfo(itemId))) or ""
+			return (select(2, C_Item.GetItemInfo(itemId))) or ""
 		end
 	else
 		local name = entry.spellName
 		local displayName = name
 		if primary then
-			local texture = GetSpellTexture and GetSpellTexture(primary)
+			local texture = GetSpellTexture(primary)
 			if texture then
 				displayName = "|T" .. texture .. ":16|t " .. name
 			end
@@ -287,18 +369,16 @@ function ns.DefineEntryToggle(entry, order, watched)
 			end
 			table.sort(ranked)
 
-			if ns.RequestSpellData then
-				ns.RequestSpellData(ranked)
+			for i = 1, #ranked do
+				C_Spell.RequestLoadSpellData(ranked[i])
 			end
 
 			local fallback = string.format(L["TRACKED_TOGGLE_DESCRIPTION"], name)
 			descField = function()
-				if GetSpellDescription then
-					for i = #ranked, 1, -1 do
-						local spellDesc = GetSpellDescription(ranked[i])
-						if spellDesc and spellDesc ~= "" then
-							return spellDesc
-						end
+				for i = #ranked, 1, -1 do
+					local spellDesc = GetSpellDescription(ranked[i])
+					if spellDesc and spellDesc ~= "" then
+						return spellDesc
 					end
 				end
 				return fallback
@@ -328,7 +408,7 @@ end
 local function EntrySortKey(entry)
 	local name = entry.label or entry.spellName
 	if not name and entry.itemId then
-		name = ns.GetItemInfo(entry.itemId)
+		name = C_Item.GetItemInfo(entry.labelItem or entry.itemId)
 	end
 	return (name or ""):lower()
 end
@@ -383,6 +463,7 @@ function ns.DefineSoundPreview(playSound, order, hidden)
 	return {
 		type = "execute",
 		name = "",
+		desc = L["NOTIFICATIONS_SOUND_PREVIEW_DESCRIPTION"],
 		image = "Interface\\Common\\VoiceChat-Speaker",
 		imageWidth = 18,
 		imageHeight = 18,
@@ -464,7 +545,7 @@ end
 function ns.DefineEmoteGroup(settings, order)
 	local group = {
 		type = "group",
-		name = L["PRAISE_EMOTES_SELECT"],
+		name = L["EMOTES_SELECT"],
 		order = order,
 		inline = true,
 		hidden = ns.EmotesHidden(settings),
@@ -514,13 +595,6 @@ function ns.DefinePraiseDelayToggle(settings, order)
 	}
 end
 
--- Sits under the toggle and its dropdown, and stays put when the delay is off:
--- it is the reason to switch the delay on, so it is exactly then that it is worth
--- reading.
-function ns.DefinePraiseDelayHelp(order)
-	return ns.OptionsHelp(L["PRAISE_DELAY_HELP"], order)
-end
-
 -- Nothing to set while the delay is off, so the dropdown only appears with it.
 -- Its labels come from the client's own duration strings (ns.FormatDuration), so
 -- "2 seconds" reads correctly in every language without TFTB shipping a string
@@ -529,6 +603,7 @@ function ns.DefinePraiseDelaySelect(settings, order)
 	return {
 		type = "select",
 		name = "",
+		desc = L["PRAISE_DELAY_LENGTH_DESCRIPTION"],
 		width = ns.OPTIONS_CONTROL_WIDTH,
 		order = order,
 		hidden = function()

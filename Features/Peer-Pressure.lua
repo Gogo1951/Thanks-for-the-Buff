@@ -5,7 +5,7 @@ local L = ns.L
 --[[
     Peer Pressure -- the same-class cooldown alert.
     When another player of YOUR class IN YOUR GROUP uses a cooldown from
-    Data.PEER_PRESSURE (Data/Peer-Pressure-Abilities.lua), print a message
+    ns.PEER_PRESSURE_ABILITIES (this client's Data folder), print a message
     and/or play the Thunder sound so you can join in. With "Trigger on Own
     Casts" turned on (default off), your own cooldowns fire it too.
 
@@ -15,7 +15,7 @@ local L = ns.L
     member's cast. See IsGroupAffiliated.
 
     The combat log tap arrives via ns.CheckPeerPressure, called from Buff-Tracking's
-    OnCombatLogEvent -- Core's rule is one owner per event, and
+    OnCombatLogEventUnfiltered -- Core's rule is one owner per event, and
     COMBAT_LOG_EVENT_UNFILTERED belongs to Buff-Tracking. Spells are class-locked,
     so "the caster is your class" needs no GUID inspection: the entry's class tag
     against your own class is the whole test.
@@ -25,50 +25,38 @@ local L = ns.L
 -- State
 --------------------------------------------------------------------------------
 
-local lookup = {} -- live spell id -> its Data.PEER_PRESSURE entry
+local lookup = {} -- live spell id -> its ns.PEER_PRESSURE_ABILITIES entry
 local playerGUID, playerClass
 
 --------------------------------------------------------------------------------
 -- Lookups & Watched List
 --------------------------------------------------------------------------------
 
---[[
-    Rows are positional (see the data file header): [1] class, [2] spell ids,
-    [3][4][5] the default checkbox state on Era / TBC / Wrath. The applicable
-    slot comes from the shared ns.FLAVOR_INDEX (Features/Utilities.lua).
-]]
-local FLAVOR_SLOT = 2 + ns.FLAVOR_INDEX
+-- Rows are positional (see the data file header): [1] class, [2] spell ids,
+-- [3] the default checkbox state.
+local DEFAULT_SLOT = 3
 
 local function BuildLookup()
-	local DoesSpellExist = ns.DoesSpellExist
+	local DoesSpellExist = C_Spell.DoesSpellExist
 	wipe(lookup)
-	for _, entry in ipairs(Data.PEER_PRESSURE) do
-		--[[
-            "-" in the flavor slot: this row does not exist on this flavor at
-            all. That is a stronger statement than DoesSpellExist can make --
-            Blizzard REUSES ids across flavors for different abilities (12472
-            is Cold Snap on Era but Icy Veins in TBC+), so the id existing
-            proves nothing about which ability it is here. See the data header.
-        ]]
-		if entry[FLAVOR_SLOT] ~= "-" then
-			for _, id in ipairs(entry[2]) do
-				if DoesSpellExist(id) then
-					lookup[id] = entry
-				end
+	for _, entry in ipairs(ns.PEER_PRESSURE_ABILITIES) do
+		for _, id in ipairs(entry[2]) do
+			if DoesSpellExist(id) then
+				lookup[id] = entry
 			end
 		end
 	end
 end
 
 -- Same contract as PopulateWatchedBuffs, except the seeded state comes from
--- the row's digit for the running flavor (0 seeds off, anything else on).
+-- the row's default digit (0 seeds off, anything else on).
 -- Dead ids are pruned so the saved list stays client-real, and a user's own
 -- choices are never overwritten. Re-run on profile changes.
 local function PopulatePeerPressureWatched()
 	local watched = ns.db.profile.peerPressure.watched
 	for id, entry in pairs(lookup) do
 		if watched[id] == nil then
-			watched[id] = entry[FLAVOR_SLOT] ~= 0
+			watched[id] = entry[DEFAULT_SLOT] ~= 0
 		end
 	end
 	for id in pairs(watched) do
@@ -78,6 +66,11 @@ local function PopulatePeerPressureWatched()
 	end
 end
 ns.PopulatePeerPressureWatched = PopulatePeerPressureWatched
+
+-- Diagnostics reads this to log a Peer Pressure cooldown in full rather than count it as untracked.
+function ns.IsPeerPressureSpell(spellID)
+	return lookup[spellID] ~= nil
+end
 
 --------------------------------------------------------------------------------
 -- Display Categories
@@ -90,17 +83,16 @@ ns.PopulatePeerPressureWatched = PopulatePeerPressureWatched
     when the spell APIs return real data.
 ]]
 local function BuildCategories()
-	local GetSpellName = ns.GetSpellName
+	local GetSpellName = C_Spell.GetSpellName
 	local buckets = {}
 
-	for _, entry in ipairs(Data.PEER_PRESSURE) do
+	for _, entry in ipairs(ns.PEER_PRESSURE_ABILITIES) do
 		local class = entry[1]
 		local ids = {}
 		for _, id in ipairs(entry[2]) do
 			-- Ownership, not mere existence: an id belongs to THIS row's toggle
-			-- only if the lookup credits it here. A row hidden on this flavor
-			-- ("-") owns nothing, so it renders nothing -- even when another
-			-- live row legitimately claims the same id.
+			-- only if the lookup credits it here, so an id two rows share
+			-- renders under one of them only.
 			if lookup[id] == entry then
 				ids[#ids + 1] = id
 			end

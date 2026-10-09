@@ -2,6 +2,10 @@ local _, ns = ...
 local Data = ns.Data
 local L = ns.L
 
+if not ns.IS_DISCOVERY then
+	return
+end
+
 --[[
     Tracked reactions: the buffs, cooldowns, and services other players spend on
     you, powering the Buffs from Teammates, Group Services, and Good News
@@ -15,6 +19,9 @@ local L = ns.L
       name      display label, a locale string (L["GROUP_*"]). Omit to use the
                 (localized) name of the first trigger -- set it only for a
                 group whose members differ (Portals).
+      labelItem  item id whose client name labels a group named after one of
+                its own items (Soulstone, the stat scrolls). Takes the place of
+                `name`, so the label is the game's own in every locale.
       class     class bucket for the Buffs-from-Teammates panel. Omit for the
                 generic Items / Group Services lists.
       type      SOLO | GROUP | SERVICE (locals for Data.BUFF.*)
@@ -32,21 +39,13 @@ local L = ns.L
                 which would otherwise clear the under-a-minute cap and whisper a
                 countdown that means nothing; a long one like Fear Ward is caught
                 by that cap regardless, and carries the flag because it is true.
-      received  { Era, TBC, Wrath } default for the shared thank-you list
-                (watchedBuffs) behind the Teammates and Group Services panels:
-                  1   tracked, checkbox seeds checked
-                  0   tracked, checkbox seeds unchecked
-                  "-" does not exist on this flavor: no checkbox, never fires.
-                A user's own checkbox choice is never overwritten, and anything
-                past Wrath reads the Wrath slot. "-" exists because Blizzard
-                REUSES spell ids across flavors for entirely different
-                abilities, which DoesSpellExist can't detect (see
-                Data/Peer-Pressure-Abilities.lua for worked examples).
-      given     { Era, TBC, Wrath } default for the independent Good News list
-                (goodNews.watched), digits 1/0 with the same meaning; the
-                row-level "-" lives only in received. Omitted on SERVICE
-                entries -- a service has no per-person recipient, so it never
-                reaches Good News.
+      received  default for the shared thank-you list (watchedBuffs) behind
+                the Teammates and Group Services panels: 1 seeds the checkbox
+                checked, 0 unchecked. A user's own choice is never overwritten.
+      given     default for the independent Good News list (goodNews.watched),
+                1 or 0 with the same meaning. Omitted on SERVICE entries -- a
+                service has no per-person recipient, so it never reaches Good
+                News.
       triggers  the rank(s) / variant(s) this one toggle covers. Each is:
                   { spell = id }              a tracked spell
                   { spell = id, aura = id }   aura id differs from the cast id
@@ -56,20 +55,20 @@ local L = ns.L
 
     The name at the end of a row is a comment for humans; the panels pull names,
     icons, and tooltips from the game. This file is deliberately self-contained
-    data -- tune a default by editing digits here without touching any other
+    data -- tune a default by editing a digit here without touching any other
     file.
 ]]
 local SOLO, GROUP, SERVICE = Data.BUFF.SOLO, Data.BUFF.GROUP, Data.BUFF.SERVICE
 local AURA, CAST, RESURRECT = Data.DETECT.AURA, Data.DETECT.CAST, Data.DETECT.RESURRECT
 
-Data.TRACKED = {
+ns.TRACKED_ABILITIES = {
 	-- Death Knight --------------------------------------------------------------
 	{
 		class = "DEATHKNIGHT",
 		type = SOLO,
 		detect = AURA,
-		received = { 1, 1, 1 },
-		given = { 1, 1, 1 },
+		received = 1,
+		given = 1,
 		triggers = { { spell = 49016 } },
 	}, -- Unholy Frenzy
 	-- Druid ---------------------------------------------------------------------
@@ -77,16 +76,16 @@ Data.TRACKED = {
 		class = "DRUID",
 		type = SOLO,
 		detect = AURA,
-		received = { 1, 1, 1 },
-		given = { 1, 1, 1 },
+		received = 1,
+		given = 1,
 		triggers = { { spell = 29166 } },
 	}, -- Innervate
 	{
 		class = "DRUID",
 		type = SOLO,
 		detect = CAST,
-		received = { 1, 1, 1 },
-		given = { 1, 1, 1 },
+		received = 1,
+		given = 1,
 		triggers = {
 			{ spell = 20484 },
 			{ spell = 20739 },
@@ -102,8 +101,8 @@ Data.TRACKED = {
 		class = "HUNTER",
 		type = SOLO,
 		detect = AURA,
-		received = { 1, 1, 1 },
-		given = { 1, 1, 1 },
+		received = 1,
+		given = 1,
 		triggers = { { spell = 53271 } },
 	}, -- Master's Call
 	{
@@ -111,16 +110,16 @@ Data.TRACKED = {
 		type = SOLO,
 		detect = AURA,
 		noDuration = true,
-		received = { 1, 1, 1 },
-		given = { 1, 1, 1 },
+		received = 1,
+		given = 1,
 		triggers = { { spell = 34477, aura = 35079 } },
 	}, -- Misdirection
 	{
 		class = "HUNTER",
 		type = SOLO,
 		detect = AURA,
-		received = { 1, 1, 1 },
-		given = { 1, 1, 1 },
+		received = 1,
+		given = 1,
 		triggers = { { spell = 53480 } },
 	}, -- Roar of Sacrifice
 	-- Mage ----------------------------------------------------------------------
@@ -128,8 +127,8 @@ Data.TRACKED = {
 		class = "MAGE",
 		type = SOLO,
 		detect = AURA,
-		received = { 1, 1, 1 },
-		given = { 1, 1, 1 },
+		received = 1,
+		given = 1,
 		triggers = {
 			{ spell = 1008 },
 			{ spell = 8455 },
@@ -143,8 +142,8 @@ Data.TRACKED = {
 		class = "MAGE",
 		type = SOLO,
 		detect = AURA,
-		received = { 1, 1, 1 },
-		given = { 1, 1, 1 },
+		received = 1,
+		given = 1,
 		triggers = {
 			{ spell = 604 },
 			{ spell = 8450 },
@@ -159,15 +158,15 @@ Data.TRACKED = {
 		class = "MAGE",
 		type = SOLO,
 		detect = AURA,
-		received = { 1, 1, 1 },
-		given = { 1, 1, 1 },
+		received = 1,
+		given = 1,
 		triggers = { { spell = 54646 } },
 	}, -- Focus Magic
 	{
 		class = "MAGE",
 		type = SERVICE,
 		detect = CAST,
-		received = { 1, 1, 1 },
+		received = 1,
 		triggers = { { spell = 43987 }, { spell = 58659 } },
 	}, -- Ritual of Refreshment
 	{
@@ -176,7 +175,7 @@ Data.TRACKED = {
 		type = SERVICE,
 		detect = CAST,
 		opened = true,
-		received = { 1, 1, 1 },
+		received = 1,
 		triggers = {
 			{ spell = 10059 },
 			{ spell = 11416 },
@@ -199,48 +198,48 @@ Data.TRACKED = {
 		class = "PALADIN",
 		type = SOLO,
 		detect = AURA,
-		received = { 1, 1, 1 },
-		given = { 1, 1, 1 },
+		received = 1,
+		given = 1,
 		triggers = { { spell = 53563 } },
 	}, -- Beacon of Light
 	{
 		class = "PALADIN",
 		type = SOLO,
 		detect = AURA,
-		received = { 1, 1, 1 },
-		given = { 1, 1, 1 },
+		received = 1,
+		given = 1,
 		triggers = { { spell = 19752 } },
 	}, -- Divine Intervention
 	{
 		class = "PALADIN",
 		type = SOLO,
 		detect = AURA,
-		received = { 1, 1, 1 },
-		given = { 1, 1, 1 },
+		received = 1,
+		given = 1,
 		triggers = { { spell = 1044 } },
 	}, -- Hand of Freedom
 	{
 		class = "PALADIN",
 		type = SOLO,
 		detect = AURA,
-		received = { 1, 1, 1 },
-		given = { 1, 1, 1 },
+		received = 1,
+		given = 1,
 		triggers = { { spell = 1022 }, { spell = 5599 }, { spell = 10278 } },
 	}, -- Hand of Protection
 	{
 		class = "PALADIN",
 		type = SOLO,
 		detect = AURA,
-		received = { 1, 1, 1 },
-		given = { 1, 1, 1 },
+		received = 1,
+		given = 1,
 		triggers = { { spell = 6940 }, { spell = 20729 }, { spell = 27147 }, { spell = 27148 } },
 	}, -- Hand of Sacrifice
 	{
 		class = "PALADIN",
 		type = SOLO,
 		detect = CAST,
-		received = { 1, 1, 1 },
-		given = { 1, 1, 1 },
+		received = 1,
+		given = 1,
 		triggers = { { spell = 633 }, { spell = 2800 }, { spell = 10310 }, { spell = 27154 }, { spell = 48788 } },
 	}, -- Lay on Hands
 	-- Priest --------------------------------------------------------------------
@@ -249,32 +248,32 @@ Data.TRACKED = {
 		type = SOLO,
 		detect = AURA,
 		noDuration = true,
-		received = { 1, 1, 1 },
-		given = { 1, 1, 1 },
+		received = 1,
+		given = 1,
 		triggers = { { spell = 6346 } },
 	}, -- Fear Ward
 	{
 		class = "PRIEST",
 		type = SOLO,
 		detect = AURA,
-		received = { 1, 1, 1 },
-		given = { 1, 1, 1 },
+		received = 1,
+		given = 1,
 		triggers = { { spell = 47788 } },
 	}, -- Guardian Spirit
 	{
 		class = "PRIEST",
 		type = SOLO,
 		detect = AURA,
-		received = { 1, 1, 1 },
-		given = { 1, 1, 1 },
+		received = 1,
+		given = 1,
 		triggers = { { spell = 33206 } },
 	}, -- Pain Suppression
 	{
 		class = "PRIEST",
 		type = SOLO,
 		detect = AURA,
-		received = { 1, 1, 1 },
-		given = { 1, 1, 1 },
+		received = 1,
+		given = 1,
 		triggers = { { spell = 10060 } },
 	}, -- Power Infusion
 	-- Rogue ---------------------------------------------------------------------
@@ -283,8 +282,8 @@ Data.TRACKED = {
 		type = SOLO,
 		detect = AURA,
 		noDuration = true,
-		received = { 1, 1, 1 },
-		given = { 1, 1, 1 },
+		received = 1,
+		given = 1,
 		triggers = { { spell = 57934, aura = 57933 } },
 	}, -- Tricks of the Trade
 	-- Shaman --------------------------------------------------------------------
@@ -292,32 +291,32 @@ Data.TRACKED = {
 		class = "SHAMAN",
 		type = GROUP,
 		detect = AURA,
-		received = { 1, 1, 1 },
-		given = { 1, 1, 1 },
+		received = 1,
+		given = 1,
 		triggers = { { spell = 2825 } },
 	}, -- Bloodlust
 	{
 		class = "SHAMAN",
 		type = GROUP,
 		detect = AURA,
-		received = { 1, 1, 1 },
-		given = { 1, 1, 1 },
+		received = 1,
+		given = 1,
 		triggers = { { spell = 32182 } },
 	}, -- Heroism
 	{
 		class = "SHAMAN",
 		type = SOLO,
 		detect = AURA,
-		received = { 1, 1, 1 },
-		given = { 1, 1, 1 },
+		received = 1,
+		given = 1,
 		triggers = { { spell = 131 } },
 	}, -- Water Breathing
 	{
 		class = "SHAMAN",
 		type = SOLO,
 		detect = AURA,
-		received = { 1, 1, 1 },
-		given = { 1, 1, 1 },
+		received = 1,
+		given = 1,
 		triggers = { { spell = 546 } },
 	}, -- Water Walking
 	-- Warlock -------------------------------------------------------------------
@@ -325,15 +324,15 @@ Data.TRACKED = {
 		class = "WARLOCK",
 		type = SOLO,
 		detect = AURA,
-		received = { 1, 1, 1 },
-		given = { 1, 1, 1 },
+		received = 1,
+		given = 1,
 		triggers = { { spell = 5697 } },
 	}, -- Unending Breath
 	{
 		class = "WARLOCK",
 		type = SERVICE,
 		detect = CAST,
-		received = { 1, 1, 1 },
+		received = 1,
 		triggers = { { spell = 29893 }, { spell = 58887 } },
 	}, -- Ritual of Souls
 	{
@@ -341,7 +340,7 @@ Data.TRACKED = {
 		type = SERVICE,
 		detect = CAST,
 		opened = true,
-		received = { 1, 1, 1 },
+		received = 1,
 		triggers = { { spell = 698 } },
 	}, -- Ritual of Summoning
 	-- Warrior -------------------------------------------------------------------
@@ -350,83 +349,83 @@ Data.TRACKED = {
 		type = SOLO,
 		detect = AURA,
 		noDuration = true,
-		received = { 1, 1, 1 },
-		given = { 1, 1, 1 },
+		received = 1,
+		given = 1,
 		triggers = { { spell = 3411 } },
 	}, -- Intervene
 	{
 		class = "WARRIOR",
 		type = SOLO,
 		detect = AURA,
-		received = { 1, 1, 1 },
-		given = { 1, 1, 1 },
+		received = 1,
+		given = 1,
 		triggers = { { spell = 50720 } },
 	}, -- Vigilance
 	-- Drums (item) --------------------------------------------------------------
 	{
 		type = GROUP,
 		detect = AURA,
-		received = { 1, 1, 1 },
-		given = { 1, 1, 1 },
+		received = 1,
+		given = 1,
 		triggers = { { item = 29529, spell = 35476 } },
 	}, -- Drums of Battle
 	{
 		type = GROUP,
 		detect = AURA,
-		received = { 1, 1, 1 },
-		given = { 1, 1, 1 },
+		received = 1,
+		given = 1,
 		triggers = { { item = 29531, spell = 35478 } },
 	}, -- Drums of Restoration
 	{
 		type = GROUP,
 		detect = AURA,
-		received = { 1, 1, 1 },
-		given = { 1, 1, 1 },
+		received = 1,
+		given = 1,
 		triggers = { { item = 29530, spell = 35477 } },
 	}, -- Drums of Speed
 	{
 		type = GROUP,
 		detect = AURA,
-		received = { 1, 1, 1 },
-		given = { 1, 1, 1 },
+		received = 1,
+		given = 1,
 		triggers = { { item = 29528, spell = 35475 } },
 	}, -- Drums of War
 	{
 		type = GROUP,
 		detect = AURA,
-		received = { 1, 1, 1 },
-		given = { 1, 1, 1 },
+		received = 1,
+		given = 1,
 		triggers = { { item = 185848, spell = 351355 } },
 	}, -- Greater Drums of Battle
 	{
 		type = GROUP,
 		detect = AURA,
-		received = { 1, 1, 1 },
-		given = { 1, 1, 1 },
+		received = 1,
+		given = 1,
 		triggers = { { item = 185850, spell = 351358 } },
 	}, -- Greater Drums of Restoration
 	{
 		type = GROUP,
 		detect = AURA,
-		received = { 1, 1, 1 },
-		given = { 1, 1, 1 },
+		received = 1,
+		given = 1,
 		triggers = { { item = 185851, spell = 351359 } },
 	}, -- Greater Drums of Speed
 	{
 		type = GROUP,
 		detect = AURA,
-		received = { 1, 1, 1 },
-		given = { 1, 1, 1 },
+		received = 1,
+		given = 1,
 		triggers = { { item = 185852, spell = 351360 } },
 	}, -- Greater Drums of War
 	-- Soulstone (item, Warlock) -------------------------------------------------
 	{
-		name = L["GROUP_SOULSTONE"],
+		labelItem = 16893,
 		class = "WARLOCK",
 		type = SOLO,
 		detect = AURA,
-		received = { 1, 1, 1 },
-		given = { 1, 1, 1 },
+		received = 1,
+		given = 1,
 		triggers = {
 			{ item = 16895, spell = 20764 },
 			{ item = 16892, spell = 20762 },
@@ -436,17 +435,17 @@ Data.TRACKED = {
 		},
 	}, -- Soulstone
 	-- Feasts (item) -------------------------------------------------------------
-	{ type = SERVICE, detect = CAST, received = { 1, 1, 1 }, triggers = { { item = 43015, spell = 57426 } } }, -- Fish Feast
-	{ type = SERVICE, detect = CAST, received = { 1, 1, 1 }, triggers = { { item = 34753, spell = 57301 } } }, -- Great Feast
-	{ type = SERVICE, detect = CAST, received = { 1, 1, 1 }, triggers = { { item = 43478, spell = 58465 } } }, -- Gigantic Feast
-	{ type = SERVICE, detect = CAST, received = { 1, 1, 1 }, triggers = { { item = 46887, spell = 66476 } } }, -- Bountiful Feast
-	{ type = SERVICE, detect = CAST, received = { 1, 1, 1 }, triggers = { { item = 33052, spell = 33258 } } }, -- Fisherman's Feast (TBC)
+	{ type = SERVICE, detect = CAST, received = 1, triggers = { { item = 43015, spell = 57426 } } }, -- Fish Feast
+	{ type = SERVICE, detect = CAST, received = 1, triggers = { { item = 34753, spell = 57301 } } }, -- Great Feast
+	{ type = SERVICE, detect = CAST, received = 1, triggers = { { item = 43478, spell = 58465 } } }, -- Gigantic Feast
+	{ type = SERVICE, detect = CAST, received = 1, triggers = { { item = 46887, spell = 66476 } } }, -- Bountiful Feast
+	{ type = SERVICE, detect = CAST, received = 1, triggers = { { item = 33052, spell = 33258 } } }, -- Fisherman's Feast (TBC)
 	-- Resistance Cauldrons (item) -----------------------------------------------
 	{
 		name = L["GROUP_RESISTANCE_CAULDRONS"],
 		type = SERVICE,
 		detect = CAST,
-		received = { 1, 1, 1 },
+		received = 1,
 		triggers = {
 			{ item = 32839, spell = 41443 },
 			{ item = 32849, spell = 41494 },
@@ -457,11 +456,11 @@ Data.TRACKED = {
 	}, -- Resistance Cauldrons
 	-- Stat Scrolls (item) -------------------------------------------------------
 	{
-		name = L["GROUP_SCROLL_OF_SPIRIT"],
+		labelItem = 1181,
 		type = SOLO,
 		detect = AURA,
-		received = { 1, 1, 1 },
-		given = { 1, 1, 1 },
+		received = 1,
+		given = 1,
 		triggers = {
 			{ item = 1181, spell = 8112 },
 			{ item = 1712, spell = 8113 },
@@ -474,11 +473,11 @@ Data.TRACKED = {
 		},
 	}, -- Scroll of Spirit
 	{
-		name = L["GROUP_SCROLL_OF_STAMINA"],
+		labelItem = 1180,
 		type = SOLO,
 		detect = AURA,
-		received = { 1, 1, 1 },
-		given = { 1, 1, 1 },
+		received = 1,
+		given = 1,
 		triggers = {
 			{ item = 1180, spell = 8099 },
 			{ item = 1711, spell = 8100 },
@@ -491,11 +490,11 @@ Data.TRACKED = {
 		},
 	}, -- Scroll of Stamina
 	{
-		name = L["GROUP_SCROLL_OF_STRENGTH"],
+		labelItem = 954,
 		type = SOLO,
 		detect = AURA,
-		received = { 1, 1, 1 },
-		given = { 1, 1, 1 },
+		received = 1,
+		given = 1,
 		triggers = {
 			{ item = 954, spell = 8118 },
 			{ item = 2289, spell = 8119 },
@@ -508,11 +507,11 @@ Data.TRACKED = {
 		},
 	}, -- Scroll of Strength
 	{
-		name = L["GROUP_SCROLL_OF_PROTECTION"],
+		labelItem = 3013,
 		type = SOLO,
 		detect = AURA,
-		received = { 1, 1, 1 },
-		given = { 1, 1, 1 },
+		received = 1,
+		given = 1,
 		triggers = {
 			{ item = 3013, spell = 8091 },
 			{ item = 1478, spell = 8094 },
@@ -525,11 +524,11 @@ Data.TRACKED = {
 		},
 	}, -- Scroll of Protection
 	{
-		name = L["GROUP_SCROLL_OF_INTELLECT"],
+		labelItem = 955,
 		type = SOLO,
 		detect = AURA,
-		received = { 1, 1, 1 },
-		given = { 1, 1, 1 },
+		received = 1,
+		given = 1,
 		triggers = {
 			{ item = 955, spell = 8096 },
 			{ item = 2290, spell = 8097 },
@@ -542,11 +541,11 @@ Data.TRACKED = {
 		},
 	}, -- Scroll of Intellect
 	{
-		name = L["GROUP_SCROLL_OF_AGILITY"],
+		labelItem = 3012,
 		type = SOLO,
 		detect = AURA,
-		received = { 1, 1, 1 },
-		given = { 1, 1, 1 },
+		received = 1,
+		given = 1,
 		triggers = {
 			{ item = 3012, spell = 8115 },
 			{ item = 1477, spell = 8116 },
@@ -563,11 +562,11 @@ Data.TRACKED = {
 		name = L["GROUP_REPAIR_BOTS"],
 		type = SERVICE,
 		detect = CAST,
-		received = { 1, 1, 1 },
+		received = 1,
 		triggers = { { item = 34113, spell = 44389 }, { item = 18232, spell = 22700 }, { item = 49040, spell = 67826 } },
 	}, -- Repair Bots
-	{ type = SERVICE, detect = CAST, received = { 1, 1, 1 }, triggers = { { item = 40768, spell = 54710 } } }, -- MOLL-E
-	{ type = SERVICE, detect = CAST, received = { 1, 1, 1 }, triggers = { { item = 10725, spell = 23133 } } }, -- Gnomish Battle Chicken
+	{ type = SERVICE, detect = CAST, received = 1, triggers = { { item = 40768, spell = 54710 } } }, -- MOLL-E
+	{ type = SERVICE, detect = CAST, received = 1, triggers = { { item = 10725, spell = 23133 } } }, -- Gnomish Battle Chicken
 	--[[
         Battle Squawk is what the summoned chicken casts on people, as opposed
         to the Gnomish Battle Chicken row above, which is the trinket being used
@@ -588,20 +587,20 @@ Data.TRACKED = {
 	{
 		type = SOLO,
 		detect = AURA,
-		received = { 1, 1, 1 },
-		given = { 1, 1, 1 },
+		received = 1,
+		given = 1,
 		triggers = { { spell = 23060 } },
 	}, -- Battle Squawk
 	{
-		name = L["GROUP_JUMPER_CABLES"],
+		labelItem = 7148,
 		type = SOLO,
 		-- Not CAST: the cables fire SPELL_CAST_SUCCESS whether or not the target
 		-- gets up, so tracking the cast thanked people for a failed jolt.
 		detect = RESURRECT,
-		received = { 1, 1, 1 },
-		given = { 1, 1, 1 },
+		received = 1,
+		given = 1,
 		-- All four cast a spell named "Defibrillate"; only the ITEM names differ,
-		-- which is why this group carries an explicit name. 114943 / 164729 is far
+		-- so the label is item 7148's client name. 114943 / 164729 is far
 		-- past Wrath and so exists on no supported client -- it is pruned at login
 		-- like any other absent id, and is here so the set is complete.
 		triggers = {

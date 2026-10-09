@@ -18,7 +18,7 @@ L["ADDON_SHORT"] = "TFTB"
 L["CHAT_LOADED"] =
 	"Версия %s. Настройки (включая возможность отключить это сообщение) находятся в меню Настройки > Модификации > Thanks for the Buff (TFTB). Нравится аддон? Расскажите о нем друзьям! (="
 L["CHAT_OPTIONS_IN_COMBAT"] =
-	"В целях безопасности настройки нельзя открыть во время боя."
+	"В целях безопасности окно настроек нельзя открыть во время боя."
 
 -- Buff & gift announcements
 L["MESSAGE_BUFFED"] = "%s накладывает на вас %s!"
@@ -30,11 +30,13 @@ L["MESSAGE_SET_OUT"] = "%s ставит %s!"
 L["MESSAGE_OPENED"] = "%s открывает %s!"
 
 -- Thank-you
-L["MESSAGE_WHISPER_THANKS"] = "Спасибо за %s!"
-L["MESSAGE_PEER_PRESSURE"] = "%s применяет %s!"
-L["MESSAGE_PEER_PRESSURE_TARGET"] = "%s применяет %s к %s!"
+L["MESSAGE_WHISPER_THANKS"] = "Спасибо за %s"
 L["MESSAGE_SELECT_PLAYER"] = "Выберите игрока для благодарности."
 L["MESSAGE_CANT_THANK_SELF"] = "Вы не можете благодарить себя!"
+
+-- Peer Pressure
+L["MESSAGE_PEER_PRESSURE"] = "%s применяет %s!"
+L["MESSAGE_PEER_PRESSURE_TARGET"] = "%s применяет %s к %s!"
 
 --------------------------------------------------------------------------------
 -- Text Fragments
@@ -49,67 +51,70 @@ L["UNKNOWN_SPELL"] = "Неизвестное заклинание"
 L["OPTIONS_WELCOME_TOGGLE"] = "Включить приветственное сообщение"
 L["OPTIONS_WELCOME_DESCRIPTION"] = "Выводит сообщение в чат при входе в игру."
 L["OPTIONS_DESCRIPTION"] =
-	"Автоматически благодарите игроков, которые вас баффают, с помощью эмоций, личных сообщений и уведомлений в чате, будь то незнакомец в открытом мире или способность товарища по команде вроде Придания сил или Озарения. Получайте уведомления о пиршествах, порталах и способностях игроков вашего класса."
+	"Автоматически благодарите шепотом или эмоцией игроков, которые накладывают на вас баффы, и объявляйте баффы, которые накладываете сами, например Придание сил, Озарение и Камень души. А еще получайте оповещения о пиршествах, порталах, призывах, колодцах душ и способностях игроков вашего класса. Вежливость на автомате."
 L["OPTIONS_SUPPORT"] = "Отзывы и поддержка"
 L["OPTIONS_CURSEFORGE"] = "CurseForge"
 L["OPTIONS_GITHUB"] = "GitHub"
 L["OPTIONS_DISCORD"] = "Discord"
 L["OPTIONS_WAGO"] = "Wago"
+L["OPTIONS_VERSION"] = "Версия %s"
+L["OPTIONS_FEATURES_HEADER"] = "Функции"
 L["OPTIONS_COMMANDS_HEADER"] = "/Commands"
 L["OPTIONS_COMMAND"] = "/tftb"
-L["OPTIONS_COMMAND_DESCRIPTION"] = "Открывает настройки этого аддона."
-
---------------------------------------------------------------------------------
--- Options: Buffs from Strangers
---------------------------------------------------------------------------------
-
-L["TAB_STRANGERS"] = "Баффы от незнакомцев"
-L["STRANGERS_ENABLE"] = "Включить благодарности за баффы от незнакомцев"
-L["STRANGERS_DESCRIPTION"] =
-	"Благодарите игроков вне вашей группы, когда они накладывают на вас баффы в открытом мире."
---[[
-    The dropdown values carry the unit, so these labels do not repeat it. Each
-    description is one line because it renders as visible help under its control
-    rather than behind a hover.
-]]
-L["STRANGERS_OVERALL_COOLDOWN"] = "Задержка между благодарностями"
-L["STRANGERS_OVERALL_COOLDOWN_DESCRIPTION"] =
-	"Задержка между одной благодарностью и следующей, кто бы вас ни усилил. Установите ноль, чтобы благодарить за каждый бафф."
-L["STRANGERS_SOURCE_COOLDOWN"] = "Задержка благодарности тому же игроку"
-L["STRANGERS_SOURCE_COOLDOWN_DESCRIPTION"] =
-	"Задержка между благодарностями, адресованными одному и тому же игроку. Установите ноль, чтобы благодарить за каждый бафф."
-L["STRANGERS_MIN_DURATION"] = "Минимальная длительность баффа"
-L["STRANGERS_MIN_DURATION_DESCRIPTION"] =
-	"Игнорировать баффы короче этого значения. Установите ноль, чтобы реагировать на каждый бафф."
+L["OPTIONS_COMMAND_DESCRIPTION"] = "Открывает окно настроек этого аддона."
 
 --------------------------------------------------------------------------------
 -- Options: Buff Panels
 --------------------------------------------------------------------------------
 
--- Buffs from Teammates
+-- Stranger Buffs
+L["TAB_STRANGERS"] = "Баффы от незнакомцев"
+L["STRANGERS_ENABLE"] = "Включить благодарности за баффы от незнакомцев"
+L["STRANGERS_ENABLE_DESCRIPTION"] =
+	"Включает благодарности за баффы от игроков вне вашей группы."
+L["STRANGERS_DESCRIPTION"] =
+	"Благодарите игроков вне вашей группы, когда они накладывают на вас баффы в открытом мире."
+-- The dropdown values carry the unit, so these labels do not repeat it.
+L["STRANGERS_OVERALL_COOLDOWN"] = "Задержка между благодарностями"
+L["STRANGERS_OVERALL_COOLDOWN_DESCRIPTION"] =
+	"Задает задержку между одним раундом благодарностей и следующим, кто бы ни наложил на вас бафф. Установите ноль, чтобы благодарить за каждый бафф."
+L["STRANGERS_SOURCE_COOLDOWN"] = "Задержка благодарности тому же игроку"
+L["STRANGERS_SOURCE_COOLDOWN_DESCRIPTION"] =
+	"Задает задержку между благодарностями одному и тому же игроку. Установите ноль, чтобы благодарить за каждый бафф."
+L["STRANGERS_MIN_DURATION"] = "Минимальная длительность баффа"
+L["STRANGERS_MIN_DURATION_DESCRIPTION"] =
+	"Игнорирует баффы короче этого значения. Установите ноль, чтобы реагировать на каждый бафф."
+
+-- Teammate Buffs
 L["TAB_TEAMMATES"] = "Баффы от товарищей по команде"
 L["TEAMMATES_ENABLE"] =
 	"Включить благодарности за баффы от товарищей по команде"
+L["TEAMMATES_ENABLE_DESCRIPTION"] =
+	"Включает благодарности за баффы и способности, которые участники вашей группы или рейда применяют к вам."
 L["TEAMMATES_DESCRIPTION"] =
-	"Благодарите членов группы и рейда за баффы и способности, примененные к вам."
+	"Благодарите участников группы и рейда за баффы и способности, которые они применяют к вам."
 
 -- Service Alerts
 L["TAB_SERVICES"] = "Оповещения об услугах"
 L["SERVICES_ENABLE"] = "Включить оповещения об услугах"
+L["SERVICES_ENABLE_DESCRIPTION"] =
+	"Включает оповещения о пиршествах, колодцах душ, порталах и другой помощи, предоставленной вашей группе."
 L["SERVICES_DESCRIPTION"] =
-	"Реагируйте на помощь для всего рейда от вашей группы: пиршества, колодцы душ, порталы, ремонтные боты."
+	"Реагируйте на помощь для всего рейда от вашей группы: пиршества, колодцы душ, порталы и ремонтные боты."
 
--- Good News (buffs you cast on others)
+-- Send Good News
 L["TAB_GOOD_NEWS"] = "Отправка хороших новостей"
 L["GOOD_NEWS_DESCRIPTION"] =
 	"Сообщайте игрокам, которых вы усилили, что вы на них наложили и как долго это продлится."
 L["GOOD_NEWS_WHISPER_ENABLE"] = "Включить хорошие новости"
 L["GOOD_NEWS_WHISPER_DESCRIPTION"] =
-	"Отправлять игроку, которого вы усилили, личное сообщение о том, что он получил и на какое время."
+	"Отправляет игроку, которого вы усилили, личное сообщение о том, что он получил и на какое время."
+L["GOOD_NEWS_SCOPE"] = "Получатели"
 L["GOOD_NEWS_SCOPE_ALWAYS"] = "Любой, кого вы усилили"
 L["GOOD_NEWS_SCOPE_GROUP"] = "Только участники группы"
-L["GOOD_NEWS_MESSAGES_HEADER"] = "Сообщения хороших новостей"
-L["GOOD_NEWS_MESSAGE"] = "Текст личного сообщения"
+L["GOOD_NEWS_SCOPE_DESCRIPTION"] =
+	"Задает, кто получает личное сообщение с хорошими новостями: любой, кого вы усилили, или только ваша группа или рейд."
+L["GOOD_NEWS_MESSAGES_HEADER"] = "Сообщение с хорошими новостями"
 --[[
     Two halves so the number stays authoritative: LIMIT's %d is a real placeholder
     and gets formatted, TOKENS carries a literal %a for the reader to copy and so
@@ -126,22 +131,30 @@ L["GOOD_NEWS_DURATION_CLAUSE"] = "на %s"
 -- Peer Pressure
 L["TAB_PEER_PRESSURE"] = "Групповое давление"
 L["PEER_PRESSURE_DESCRIPTION"] =
-	"Получайте уведомления, когда другие игроки вашего класса используют свои способности, чтобы поддаться групповому давлению."
+	"Получайте уведомления, когда другие игроки вашего класса используют свои способности, и поддавайтесь групповому давлению."
 L["PEER_PRESSURE_ENABLE"] = "Включить групповое давление"
+L["PEER_PRESSURE_ENABLE_DESCRIPTION"] =
+	"Включает оповещения, когда другой игрок вашего класса использует отслеживаемую способность."
 L["PEER_PRESSURE_PRINT_DESCRIPTION"] =
-	"Выводить сообщение в ваш собственный чат, когда используется способность вашего класса. Видите только вы."
+	"Выводит сообщение в ваш собственный чат, когда используется способность вашего класса. Видите его только вы."
 L["PEER_PRESSURE_OWN_CASTS"] = "Срабатывать на свои заклинания"
 L["PEER_PRESSURE_OWN_CASTS_DESCRIPTION"] =
-	"Срабатывает и тогда, когда способность используете вы сами, а не только другие игроки."
+	"Также срабатывает, когда свои способности используете вы сами, а не только другие игроки."
 L["PEER_PRESSURE_SOUND_DESCRIPTION"] =
-	"Проигрывать звук, когда используется способность вашего класса. Слышите только вы."
+	"Воспроизводит звук, когда используется способность вашего класса. Слышите его только вы."
 
 -- Shared across the buff panels
 L["TRACKED_HEADER"] = "Отслеживаемые способности"
 L["TRACKED_GROUP_ITEMS"] = "Предметы"
-L["TRACKED_TOGGLE_DESCRIPTION"] = "Включить или выключить отслеживание для %s."
+L["TRACKED_TOGGLE_DESCRIPTION"] = "Включает или выключает отслеживание для %s."
 L["TRACKED_ITEM_PENDING"] = "Предмет #%d"
 L["TRACKED_SPELL_PENDING"] = "Заклинание #%d"
+
+-- Shared by Send Good News and the Thank You Button
+L["WHISPER_MESSAGE"] = "Текст личного сообщения"
+L["WHISPER_MESSAGE_RESET"] = "Сбросить"
+L["WHISPER_MESSAGE_RESET_DESCRIPTION"] =
+	"Возвращает текст личного сообщения к стандартному."
 
 --------------------------------------------------------------------------------
 -- Shared: Praise and Notifications
@@ -156,45 +169,42 @@ L["TRACKED_SPELL_PENDING"] = "Заклинание #%d"
 L["PRAISE_HEADER"] = "Благодарности и эмоции"
 L["NOTIFICATIONS_HEADER"] = "Уведомления"
 
+-- Also titles the Thank You Button's emote grid, so it carries no PRAISE_ prefix.
+L["EMOTES_SELECT"] = "Выбор эмоций"
+
 L["PRAISE_WHISPER_ENABLE"] = "Включить благодарственный шепот"
 L["PRAISE_WHISPER_DESCRIPTION"] =
-	"Отправлять личное сообщение с благодарностью игроку, давшему бафф."
+	"Отправляет благодарность шепотом игроку, который наложил на вас бафф."
 L["PRAISE_EMOTES_ENABLE"] = "Включить эмоции"
 L["PRAISE_EMOTES_DESCRIPTION"] =
-	"Выражайте благодарность эмоцией. В бою эмоции задерживаются."
-L["PRAISE_EMOTES_SELECT"] = "Выбрать эмоции"
+	"Выражает вашу благодарность эмоцией. Во время боя эмоции откладываются."
 L["PRAISE_DELAY_ENABLE"] = "Включить задержку благодарности"
 L["PRAISE_DELAY_DESCRIPTION"] =
-	"Немного подождать перед шепотом и эмоцией, чтобы благодарность не пришла в тот же миг, что и бафф. На уведомления это не влияет."
-L["PRAISE_DELAY_HELP"] =
-	"Подождите перед благодарностью, чтобы она не пришла в тот же миг, что и бафф."
+	"Ненадолго откладывает шепот и эмоцию, чтобы благодарность не пришла в тот же миг, что и бафф. На уведомления это не влияет."
+L["PRAISE_DELAY_LENGTH_DESCRIPTION"] =
+	"Задает время ожидания перед отправкой шепота и эмоции."
 
 L["NOTIFICATIONS_PRINT_ENABLE"] = "Включить сообщения в чате"
 L["NOTIFICATIONS_PRINT_DESCRIPTION"] =
-	"Выводить сообщение в ваш собственный чат при получении баффа. Видите только вы."
+	"Выводит сообщение в ваш собственный чат при получении баффа. Видите его только вы."
 L["NOTIFICATIONS_SOUND_ENABLE"] = "Включить звуковые эффекты"
 L["NOTIFICATIONS_SOUND_DESCRIPTION"] =
-	"Проигрывать звук при получении баффа. Слышите только вы."
+	"Воспроизводит звук при получении баффа. Слышите его только вы."
+L["NOTIFICATIONS_SOUND_PREVIEW_DESCRIPTION"] =
+	"Воспроизводит звук, чтобы вы могли услышать его до включения."
 
 --------------------------------------------------------------------------------
 -- Tracked Ability Groups
 --------------------------------------------------------------------------------
 
 --[[
-    Labels for multi-member tracked groups (Data/Tracked-Abilities.lua). Single
-    spells and items take their names from the client and need no key here.
+    Labels for multi-member tracked groups that no single game record names
+    (Data/{Game}/Tracked-Abilities-{Game}.lua). Single spells and items, and a
+    group named after one of its own items, take their names from the client.
 ]]
 L["GROUP_PORTALS"] = "Порталы"
-L["GROUP_SOULSTONE"] = "Камень души"
 L["GROUP_RESISTANCE_CAULDRONS"] = "Котлы сопротивления"
-L["GROUP_SCROLL_OF_SPIRIT"] = "Свиток духа"
-L["GROUP_SCROLL_OF_STAMINA"] = "Свиток выносливости"
-L["GROUP_SCROLL_OF_STRENGTH"] = "Свиток силы"
-L["GROUP_SCROLL_OF_PROTECTION"] = "Свиток защиты"
-L["GROUP_SCROLL_OF_INTELLECT"] = "Свиток интеллекта"
-L["GROUP_SCROLL_OF_AGILITY"] = "Свиток ловкости"
 L["GROUP_REPAIR_BOTS"] = "Ремонтные боты"
-L["GROUP_JUMPER_CABLES"] = "Стартеры"
 
 --------------------------------------------------------------------------------
 -- Options: Thank You Button
@@ -204,8 +214,10 @@ L["TAB_THANK_YOU_BUTTON"] = "Кнопка благодарности"
 L["BUTTON_DESCRIPTION"] =
 	"Вежливость на автомате. Каждая кнопка отправляет личное сообщение вашей текущей цели и может добавить эмоцию: попросить воды у мага, поблагодарить за портал, похвалить друга прямо в бою за своевременную провокацию. Напишите сообщение один раз, и дальше все сводится к одному нажатию."
 -- One heading per button, numbered; %d is the button's position in the list.
-L["BUTTON_SECTION"] = "Кнопка TFTB %d"
+L["BUTTON_SECTION"] = "Кнопка благодарности %d"
 L["BUTTON_EMOTE"] = "Эмоция"
+L["BUTTON_EMOTE_DESCRIPTION"] =
+	"Задает эмоцию, которую эта кнопка адресует вашей цели. Вариант Нет отключает эмоцию."
 L["BUTTON_EMOTE_NONE"] = "Нет"
 --[[
     The toggle owns the macro in both directions, so the label is ENABLE rather
@@ -214,22 +226,21 @@ L["BUTTON_EMOTE_NONE"] = "Нет"
 ]]
 L["BUTTON_MACRO_ENABLE"] = 'Включить макрос "%s"'
 L["BUTTON_MACRO_ENABLE_DESCRIPTION"] =
-	"Создает макрос с именем %s и удаляет его снова, когда вы это отключите."
-L["BUTTON_WHISPER"] = "Текст личного сообщения"
-L["BUTTON_RESET"] = "Сброс"
-L["BUTTON_RESET_DESCRIPTION"] =
-	"Сбрасывает текст личного сообщения к стандартному."
+	"Создает макрос с именем %s и снова удаляет его, когда вы отключаете этот параметр."
+L["BUTTON_WHISPER_DESCRIPTION"] =
+	"Задает текст личного сообщения, которое эта кнопка отправляет вашей цели. Оставьте поле пустым, чтобы не отправлять сообщение."
 
 --------------------------------------------------------------------------------
 -- Defaults
 --------------------------------------------------------------------------------
 
-L["DEFAULT_WHISPER"] = "Спасибо, ты лучший! (="
+L["DEFAULT_WHISPER"] = "Спасибо, ты супер! (="
 --[[
-    The star marker and "TFTB // " prefix are added by the builder and are not
-    part of the editable text.
+    The star marker (left off on WoW Forever) and " // TFTB" sign-off are added
+    by the builder, which also drops the closing punctuation; neither is part of
+    the editable text.
 ]]
-L["DEFAULT_GOOD_NEWS"] = "У вас %a!"
+L["DEFAULT_GOOD_NEWS"] = "У вас %a"
 
 --------------------------------------------------------------------------------
 -- Emotes

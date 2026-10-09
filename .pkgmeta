@@ -28,3 +28,7 @@ ignore:
   - .pkgmeta
   - .vscode
   - LICENSE
+  - Tests
+  - Data/Wrath
+  - Data/Mists
+  - Data/Mainline
