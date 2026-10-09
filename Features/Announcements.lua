@@ -34,18 +34,60 @@ end
 
 --[[
     Branded sent messages for the automated buff/service thank-yous:
-    {rt1} TFTB // Message. BuildAnnounceMessage assembles the decorated string and
+    {rt1} Message // TFTB. BuildAnnounceMessage assembles the decorated string and
     Announce sends it. The body carries a spell/item link and the leading raid-
     target marker; the chat system renders both on send (the marker becomes the
-    Star icon), so the pipes and braces pass through unchanged.
+    Star icon), so the pipes and braces pass through unchanged. WoW Forever blocks
+    raid-marker tokens in chat, so there the marker is left off.
 ]]
+local function MarkerPrefix()
+	if ns.FLAVOR == "Camelot" then
+		return ""
+	end
+	return ns.TARGET_MARKER .. " "
+end
+
+--[[
+    The name signs off a sent message, so the body gives up its closing
+    punctuation: "Thanks for the [Arcane Intellect] // TFTB", never "...! //
+    TFTB". Translations and player-written Good News templates still carry their
+    own (Spanish opens with an inverted mark, CJK closes with a full-width one),
+    so the trim covers those too. Marks are matched as whole UTF-8 sequences,
+    never as a byte class, so a multi-byte character is never cut in half.
+]]
+local CLOSING_MARKS = { "!", ".", "?", "\239\188\129", "\227\128\130", "\239\188\159" } -- ! . ? and full-width ！ 。 ？
+local OPENING_MARKS = { "\194\161", "\194\191" } -- ¡ ¿
+
+local function TrimSentBody(body)
+	local trimmed = true
+	while trimmed do
+		trimmed = false
+		body = body:gsub("%s+$", "")
+		for _, mark in ipairs(CLOSING_MARKS) do
+			if body:sub(-#mark) == mark then
+				body = body:sub(1, -#mark - 1)
+				trimmed = true
+			end
+		end
+	end
+	for _, mark in ipairs(OPENING_MARKS) do
+		if body:sub(1, #mark) == mark then
+			body = body:sub(#mark + 1)
+		end
+	end
+	return body
+end
+
+local function SignOff(body)
+	return MarkerPrefix() .. TrimSentBody(body) .. " // " .. L["ADDON_SHORT"]
+end
+
 function ns:BuildAnnounceMessage(formatKey, ...)
 	local template = L[formatKey]
 	if not template then
 		return nil
 	end
-	local body = string.format(template, ...)
-	return ns.TARGET_MARKER .. " " .. L["ADDON_SHORT"] .. " // " .. body
+	return SignOff(string.format(template, ...))
 end
 
 function ns:Announce(channel, target, formatKey, ...)
@@ -56,7 +98,7 @@ function ns:Announce(channel, target, formatKey, ...)
 	if not message then
 		return
 	end
-	SendChatMessage(message, channel, nil, target)
+	C_ChatInfo.SendChatMessage(message, channel, nil, target)
 end
 
 --[[
@@ -68,12 +110,21 @@ function ns:Whisper(target, message)
 	if not target or not message or message == "" then
 		return
 	end
-	SendChatMessage(message, "WHISPER", nil, target)
+	C_ChatInfo.SendChatMessage(message, "WHISPER", nil, target)
 end
 
 --------------------------------------------------------------------------------
 -- Emotes
 --------------------------------------------------------------------------------
+
+-- The one place an emote reaches the client, through the namespaced call every
+-- target client ships. Returns its success flag, or nil when that comes back secret.
+local function PerformEmote(token, target)
+	local success = C_ChatInfo.PerformEmote(token, target)
+	if ns.IsPlain(success) then
+		return success
+	end
+end
 
 --[[
     Perform a random enabled emote from the given selection. `target` is what to
@@ -88,8 +139,8 @@ end
     at the chokepoint instead of at each call site keeps the promise in one
     place: this addon does not emote into the void.
 
-    Trap for anyone tempted to pass a target straight through: DoEmote(cmd, nil)
-    is NOT undirected -- it falls back to your CURRENT TARGET, thanking whatever
+    Trap for anyone tempted to pass a target straight through:
+    C_ChatInfo.PerformEmote(cmd, nil) is NOT undirected -- it falls back to your CURRENT TARGET, thanking whatever
     bystander you happen to be pointing at. "none" is what actually forces the
     undirected flavor, and an unresolvable name degrades to it the same way,
     which is why neither is reachable from here any more.
@@ -113,7 +164,7 @@ function ns:DoRandomEmote(emotes, target)
 		end
 	end
 	if #available > 0 then
-		DoEmote(available[math.random(#available)], target)
+		PerformEmote(available[math.random(#available)], target)
 	end
 end
 
@@ -124,7 +175,8 @@ end
     Validated against the CLIENT catalog rather than Data.EMOTES: that dropdown
     offers every emote this build has, which is far more than the twelve the
     praise panels curate. An unknown token is dropped rather than handed on,
-    because DoEmote given a bad token is a silent no-op -- indistinguishable, to
+    because C_ChatInfo.PerformEmote given a bad token is a silent no-op --
+    indistinguishable, to
     whoever pressed the button, from the button being broken.
 ]]
 function ns:DoEmoteToken(token, target)
@@ -134,7 +186,7 @@ function ns:DoEmoteToken(token, target)
 	if not ns.IsClientEmote(token) then
 		return
 	end
-	DoEmote(token, target)
+	PerformEmote(token, target)
 end
 
 --------------------------------------------------------------------------------
@@ -161,7 +213,7 @@ end
 ]]
 function ns.GetBuffLink(entry, spellID)
 	if entry and entry.itemId then
-		local link = select(2, ns.GetItemInfo(entry.itemId))
+		local link = select(2, C_Item.GetItemInfo(entry.itemId))
 		if link then
 			return link
 		end
@@ -259,10 +311,10 @@ local function QueueWhisper(target, message)
 	end
 	nextWhisperAt = now + delay + WHISPER_GAP
 	if delay == 0 then
-		SendChatMessage(message, "WHISPER", nil, target)
+		C_ChatInfo.SendChatMessage(message, "WHISPER", nil, target)
 	else
 		C_Timer.After(delay, function()
-			SendChatMessage(message, "WHISPER", nil, target)
+			C_ChatInfo.SendChatMessage(message, "WHISPER", nil, target)
 		end)
 	end
 end
@@ -348,7 +400,7 @@ ns.FormatDuration = FormatDuration
 
     This cap is the LAST of the three ways a message ends up clause-less, and the
     only one that a real ticking timer can fail. The other two are settled before
-    the duration ever reaches here, in Buff-Tracking's givenLookup: a cast that
+    the duration ever reaches here, in Tracked-Lookups' givenLookup: a cast that
     leaves no aura (Rebirth, Lay on Hands, jumper cables) and a `noDuration`
     entry spent by an event rather than by time (Fear Ward, Misdirection) both
     carry no auraId at all, so nothing is ever read for them.
@@ -370,13 +422,7 @@ local GOOD_NEWS_MAX_SECONDS = 60
     error mid-whisper; a replacement function also stops a % inside a spell link
     from being read back as a capture reference.
 ]]
-function ns:BuildGoodNewsMessage(link, duration)
-	local db = ns.db and ns.db.profile.goodNews
-	local template = db and db.message
-	if type(template) ~= "string" or template:match("^%s*$") then
-		template = L["DEFAULT_GOOD_NEWS"]
-	end
-
+local function BuildGoodNewsLine(template, link, duration)
 	local ability = link or ""
 	if duration and duration > 0 then
 		-- Rounded up front, the same way FormatDuration would round it, so a 59.7s
@@ -392,7 +438,26 @@ function ns:BuildGoodNewsMessage(link, duration)
 		return ability
 	end)
 
-	return ns.TARGET_MARKER .. " " .. L["ADDON_SHORT"] .. " // " .. body
+	return SignOff(body)
+end
+
+function ns:BuildGoodNewsMessage(link, duration)
+	local db = ns.db and ns.db.profile.goodNews
+	local template = db and db.message
+	if type(template) ~= "string" or template:match("^%s*$") then
+		template = L["DEFAULT_GOOD_NEWS"]
+	end
+
+	-- SendChatMessage rejects a line over 255 bytes, and %a can repeat, so a long
+	-- line falls back to the default template, then drops the duration; cutting it could break the link.
+	local message = BuildGoodNewsLine(template, link, duration)
+	if #message > ns.CHAT_MESSAGE_MAX_LENGTH then
+		message = BuildGoodNewsLine(L["DEFAULT_GOOD_NEWS"], link, duration)
+	end
+	if #message > ns.CHAT_MESSAGE_MAX_LENGTH then
+		message = BuildGoodNewsLine(L["DEFAULT_GOOD_NEWS"], link, nil)
+	end
+	return message
 end
 
 function ns:AnnounceGoodNews(entry, destName, spellID, duration)

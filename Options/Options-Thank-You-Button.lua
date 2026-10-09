@@ -4,10 +4,13 @@ local L = ns.L
 
 local GetColor = ns.GetColor
 
--- The whisper row: a caption-sized label, so the message box keeps the rest of the
--- row and a full sentence stays readable while it is being edited.
+-- The whisper row: a caption-sized label, the message box and the Reset button,
+-- together one row, so a full sentence stays readable while it is being edited.
+-- The emote row has no button, so its dropdown takes the rest of the row.
 local WHISPER_LABEL_WIDTH = 0.9
-local WHISPER_INPUT_WIDTH = ns.OPTIONS_ROW_WIDTH - WHISPER_LABEL_WIDTH
+local RESET_WIDTH = 0.5
+local WHISPER_INPUT_WIDTH = ns.OPTIONS_ROW_WIDTH - WHISPER_LABEL_WIDTH - RESET_WIDTH
+local EMOTE_SELECT_WIDTH = ns.OPTIONS_ROW_WIDTH - WHISPER_LABEL_WIDTH
 
 --------------------------------------------------------------------------------
 -- Options Table
@@ -96,13 +99,13 @@ local function AddButtonSection(args, button, index)
 		end,
 	}
 
-	args["space_b" .. index] = ns.OptionsSpacer(base + 4)
-	args["space_b" .. index].hidden = sectionHidden
+	args["space_b" .. index] = ns.OptionsSpacer(base + 4, sectionHidden)
 	args["whisperLabel" .. index] =
-		ns.OptionsRowLabel(L["BUTTON_WHISPER"], base + 5, WHISPER_LABEL_WIDTH, sectionHidden)
+		ns.OptionsRowLabel(L["WHISPER_MESSAGE"], base + 5, WHISPER_LABEL_WIDTH, sectionHidden)
 	args["whisperMsg" .. index] = {
 		type = "input",
 		name = "",
+		desc = L["BUTTON_WHISPER_DESCRIPTION"],
 		width = WHISPER_INPUT_WIDTH,
 		order = base + 6,
 		hidden = sectionHidden,
@@ -115,9 +118,9 @@ local function AddButtonSection(args, button, index)
 	}
 	args["resetMsg" .. index] = {
 		type = "execute",
-		name = L["BUTTON_RESET"],
-		desc = L["BUTTON_RESET_DESCRIPTION"],
-		width = "half",
+		name = L["WHISPER_MESSAGE_RESET"],
+		desc = L["WHISPER_MESSAGE_RESET_DESCRIPTION"],
+		width = RESET_WIDTH,
 		order = base + 7,
 		hidden = sectionHidden,
 		func = function()
@@ -125,8 +128,7 @@ local function AddButtonSection(args, button, index)
 		end,
 	}
 
-	args["space_c" .. index] = ns.OptionsSpacer(base + 8)
-	args["space_c" .. index].hidden = sectionHidden
+	args["space_c" .. index] = ns.OptionsSpacer(base + 8, sectionHidden)
 
 	-- A single-emote button gets one dropdown instead of the checklist: there is
 	-- nothing to randomise between, so a grid of checkboxes would be the wrong
@@ -138,7 +140,8 @@ local function AddButtonSection(args, button, index)
 		args["emoteSelect" .. index] = {
 			type = "select",
 			name = "",
-			width = WHISPER_INPUT_WIDTH,
+			desc = L["BUTTON_EMOTE_DESCRIPTION"],
+			width = EMOTE_SELECT_WIDTH,
 			order = base + 10,
 			hidden = sectionHidden,
 			values = values,
@@ -160,7 +163,7 @@ local function AddButtonSection(args, button, index)
 
 	local emoteGroup = {
 		type = "group",
-		name = L["PRAISE_EMOTES_SELECT"],
+		name = L["EMOTES_SELECT"],
 		order = base + 9,
 		inline = true,
 		hidden = sectionHidden,

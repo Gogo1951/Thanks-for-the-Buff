@@ -1,4 +1,4 @@
-local _, ns = ...
+local ADDON_NAME, ns = ...
 
 --------------------------------------------------------------------------------
 -- Color Accessor
@@ -100,59 +100,27 @@ function ns.IsClientEmote(token)
 end
 
 --------------------------------------------------------------------------------
--- Spell API Compatibility
+-- Secret Values
 --------------------------------------------------------------------------------
 
--- Resolve each spell API to a single function by availability, then call once.
-
-ns.GetSpellDescription = (C_Spell and C_Spell.GetSpellDescription) or GetSpellDescription
-ns.GetSpellTexture = (C_Spell and C_Spell.GetSpellTexture) or GetSpellTexture
-
--- Rank-agnostic spell name, used to collapse spell ranks into one tracked group.
-if C_Spell and C_Spell.GetSpellName then
-	ns.GetSpellName = C_Spell.GetSpellName
-elseif C_Spell and C_Spell.GetSpellInfo then
-	ns.GetSpellName = function(spellId)
-		local info = C_Spell.GetSpellInfo(spellId)
-		return info and info.name
-	end
-else
-	ns.GetSpellName = function(spellId)
-		if not GetSpellInfo then
-			return nil
-		end
-		return (GetSpellInfo(spellId))
-	end
+-- True when a value is safe to compare, concatenate, or send; secret values error on all three.
+function ns.IsPlain(value)
+	return not (issecretvalue and issecretvalue(value))
 end
 
---[[
-    Ask the client to stream in a spell's tooltip text. Classic keeps description
-    data only for spells the character has actually known, which is why a panel
-    listing all nine classes' cooldowns reads blank for eight of them -- the id is
-    valid and GetSpellName answers fine, but GetSpellDescription returns "".
-
-    Fire and forget: the data arrives asynchronously and the next tooltip draw
-    picks it up. Absent on any client that never gained the API, in which case
-    callers keep whatever fallback text they already had.
-]]
-local RequestLoadSpellData = C_Spell and C_Spell.RequestLoadSpellData
-function ns.RequestSpellData(ids)
-	if not RequestLoadSpellData or not ids then
-		return
-	end
-	for i = 1, #ids do
-		RequestLoadSpellData(ids[i])
-	end
+-- On WoW Forever, unit identity and aura data go secret in combat. Ask these
+-- before reading either; both are always false on the other flavors.
+function ns.IsUnitIdentitySecret(unit)
+	return ns.FLAVOR == "Camelot" and C_Secrets.ShouldUnitIdentityBeSecret(unit)
 end
 
-if C_Spell and C_Spell.DoesSpellExist then
-	ns.DoesSpellExist = C_Spell.DoesSpellExist
-else
-	local GetSpellInfo = (C_Spell and C_Spell.GetSpellInfo) or GetSpellInfo
-	ns.DoesSpellExist = function(spellId)
-		return GetSpellInfo(spellId) ~= nil
-	end
+function ns.AreAurasSecret()
+	return ns.FLAVOR == "Camelot" and C_Secrets.ShouldAurasBeSecret()
 end
+
+--------------------------------------------------------------------------------
+-- Spell Links
+--------------------------------------------------------------------------------
 
 --[[
     Chat-safe spell link, built by hand the way Control Freak does. We deliberately
@@ -170,27 +138,17 @@ end
 -- SendChatMessage's hyperlink validator (see ns.GetSpellLink below).
 local C_SPELL_LINK = "71d5ff"
 
-local NativeGetSpellLink = (C_Spell and C_Spell.GetSpellLink) or GetSpellLink
 function ns.GetSpellLink(spellId)
-	local name = ns.GetSpellName(spellId)
+	local name = C_Spell.GetSpellName(spellId)
 	if name then
 		return ("|cff" .. C_SPELL_LINK .. "|Hspell:%d:0|h[%s]|h|r"):format(spellId, name)
 	end
-	local link = NativeGetSpellLink and NativeGetSpellLink(spellId)
+	local link = C_Spell.GetSpellLink(spellId)
 	if link and link ~= "" then
 		return link
 	end
 	return nil
 end
-
---------------------------------------------------------------------------------
--- Item API Compatibility
---------------------------------------------------------------------------------
-
--- Both return the same values as the legacy globals, so resolve each to a single
--- function by availability (mirrors the C_Spell shims above).
-ns.GetItemInfo = (C_Item and C_Item.GetItemInfo) or GetItemInfo
-ns.GetItemIcon = (C_Item and C_Item.GetItemIconByID) or GetItemIcon
 
 --------------------------------------------------------------------------------
 -- GUID Helpers
@@ -215,7 +173,7 @@ end
 -- Both sounds play on the Master channel so they stay audible for players who
 -- run with game sound effects turned down. File names must match
 -- Includes/Sounds/ exactly.
-local SOUND_ROOT = "Interface/AddOns/TFTB/Includes/Sounds/"
+local SOUND_ROOT = "Interface/AddOns/" .. ADDON_NAME .. "/Includes/Sounds/"
 
 -- Any buff landing on you shares this one, stranger or teammate alike.
 function ns.PlayBuffSound()
@@ -241,7 +199,7 @@ function ns.GetBuffDuration(unit, spellId)
 		if not data then
 			return nil
 		end
-		if data.spellId == spellId then
+		if ns.IsPlain(data.spellId) and data.spellId == spellId then
 			return data.duration or 0
 		end
 	end
@@ -249,14 +207,61 @@ function ns.GetBuffDuration(unit, spellId)
 end
 
 --------------------------------------------------------------------------------
--- Game Flavor
+-- Unit Resolution
 --------------------------------------------------------------------------------
 
 --[[
-    Which per-flavor default column applies on this client: 1 = Classic Era,
-    2 = TBC, 3 = Wrath, with anything past Wrath reading the Wrath slot. Shared
-    by every data table that carries {Era, TBC, Wrath} columns (Data.TRACKED,
-    Data.PEER_PRESSURE).
+    A buff's combat-log source can be a pet or guardian (a hunter's Roar of
+    Sacrifice, for example). Credit the owner so the message names the player,
+    not the pet — owners are found by matching the pet's GUID to a group pet unit.
 ]]
-local tocVersion = select(4, GetBuildInfo())
-ns.FLAVOR_INDEX = (tocVersion < 20000 and 1) or (tocVersion < 30000 and 2) or 3
+function ns.GetPetOwnerUnit(petGUID)
+	if UnitGUID("pet") == petGUID then
+		return "player"
+	end
+	for i = 1, 4 do
+		if UnitGUID("partypet" .. i) == petGUID then
+			return "party" .. i
+		end
+	end
+	for i = 1, 40 do
+		if UnitGUID("raidpet" .. i) == petGUID then
+			return "raid" .. i
+		end
+	end
+	return nil
+end
+
+--[[
+    A usable emote target must be a live unit token: C_ChatInfo.PerformEmote
+    only directs "you cheer at X" at a real unit, and a combat-log name is not
+    one -- cross-realm sources arrive as "Name-Realm" and never resolve. Map the
+    buffer's GUID to a unit we actually have (the player, a group member, or the
+    current target / focus / mouseover) and return nil when none matches; the
+    emote caller then falls back to the bare name or no emote, never the
+    undirected one.
+]]
+function ns.GetUnitByGUID(guid)
+	if not guid then
+		return nil
+	end
+	if UnitGUID("player") == guid then
+		return "player"
+	end
+	local prefix, count = "party", 4
+	if IsInRaid() then
+		prefix, count = "raid", 40
+	end
+	for i = 1, count do
+		local unit = prefix .. i
+		if UnitExists(unit) and UnitGUID(unit) == guid then
+			return unit
+		end
+	end
+	for _, unit in ipairs({ "target", "focus", "mouseover" }) do
+		if UnitExists(unit) and UnitGUID(unit) == guid then
+			return unit
+		end
+	end
+	return nil
+end

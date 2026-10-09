@@ -60,16 +60,16 @@ ns.DATABASE_DEFAULTS = {
 			message = ns.L["DEFAULT_WHISPER"],
 			emotes = GetDefaultEmoteSettings(true),
 		},
-		-- Buffs from Teammates (party/raid buffs & cooldowns cast on you) and Group
-		-- Services (no-aura raid help) each own their messaging settings, like
+		-- Teammate Buffs (party/raid buffs & cooldowns cast on you) and Service
+		-- Alerts (no-aura raid help) each own their messaging settings, like
 		-- strangers above. The watched-buff list is shared (ids never overlap) and
-		-- seeds from the per-flavor `received` columns in Data/Tracked-Abilities.lua.
+		-- seeds from the `received` defaults in this client's Tracked-Abilities file.
 		-- Teammates offers the same Praise Delay as strangers, but no cooldowns: a
 		-- teammate's cooldown is worth acknowledging every single time it lands.
 		teammates = {
-			-- Master switch for the whole panel. On by default: turning the add-on
-			-- on and getting nothing would read as broken.
-			enabled = true,
+			-- Master switch for the whole panel. Off by default: out of the box
+			-- Stranger Buffs is the one feature that reacts, the rest are opt-in.
+			enabled = false,
 			printEnabled = true,
 			whisperEnabled = true,
 			praiseDelayEnabled = false,
@@ -83,9 +83,8 @@ ns.DATABASE_DEFAULTS = {
 		-- is ambient group help rather than something aimed at you, so it earns a
 		-- chat line by default and nothing louder.
 		services = {
-			-- Master switch for the whole panel. On by default: turning the add-on
-			-- on and getting nothing would read as broken.
-			enabled = true,
+			-- Master switch for the whole panel. Off by default, like teammates.
+			enabled = false,
 			printEnabled = true,
 			whisperEnabled = false,
 			praiseDelayEnabled = false,
@@ -95,12 +94,13 @@ ns.DATABASE_DEFAULTS = {
 			emotes = GetDefaultEmoteSettings(true),
 		},
 		-- Good News: whispers for buffs YOU cast on other players.
-		-- `watched` is its own list (seeded from the per-flavor `given` columns in
-		-- Data/Tracked-Abilities.lua) because its ids are the same teammate buff
+		-- `watched` is its own list (seeded from the `given` defaults in this
+		-- client's Tracked-Abilities file) because its ids are the same teammate buff
 		-- ids -- one shared table couldn't hold independent "thank for it" and
 		-- "announce it" choices.
 		goodNews = {
-			whisperEnabled = true,
+			-- The panel's master switch. Off by default, like teammates.
+			whisperEnabled = false,
 			-- Who gets the whisper: ALWAYS (anyone you buff) or GROUP (your
 			-- party/raid -- a battleground is a raid). Anything unrecognized
 			-- fails closed into the group check.
@@ -108,16 +108,17 @@ ns.DATABASE_DEFAULTS = {
 			-- The editable body of the whisper. ONE token, %a, substituted by
 			-- ns:BuildGoodNewsMessage with the ability link plus -- for a short
 			-- enough buff -- its duration clause. That call also adds the star
-			-- marker and "TFTB // " prefix; neither is editable.
+			-- marker (left off on WoW Forever) and the " // TFTB" sign-off, and
+			-- trims the body's closing punctuation; neither is editable.
 			message = ns.L["DEFAULT_GOOD_NEWS"],
 			watched = {},
 		},
 		-- Peer Pressure: alert when another player of your class pops
-		-- a cooldown from Data.PEER_PRESSURE -- or you do, while triggerOnOwnCasts is on.
+		-- a cooldown from ns.PEER_PRESSURE_ABILITIES -- or you do, while triggerOnOwnCasts is on.
 		-- Self-only reactions, so they default on -- except own casts, which are
 		-- opt-in: you already know what you just pressed, and the point of the
 		-- feature is what everyone else is doing. The watched list seeds from
-		-- the per-flavor digits in Data/Peer-Pressure-Abilities.lua.
+		-- the default digits in this client's Peer-Pressure-Abilities file.
 		peerPressure = {
 			enabled = true,
 			printEnabled = true,

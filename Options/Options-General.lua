@@ -34,13 +34,17 @@ function ns.BuildGeneralOptions()
 					ns.db.profile.showWelcome = val
 				end,
 			},
+			-- Features
+			spaceFeatures0 = ns.OptionsSpacer(10),
+			headerFeatures = ns.OptionsHeader(L["OPTIONS_FEATURES_HEADER"], 11),
+			spaceFeatures1 = ns.OptionsSpacer(12),
 			-- /Commands
-			spaceCommands0 = ns.OptionsSpacer(5),
-			headerCommands = ns.OptionsHeader(L["OPTIONS_COMMANDS_HEADER"], 6),
-			spaceCommands1 = ns.OptionsSpacer(7),
+			spaceCommands0 = ns.OptionsSpacer(60),
+			headerCommands = ns.OptionsHeader(L["OPTIONS_COMMANDS_HEADER"], 61),
+			spaceCommands1 = ns.OptionsSpacer(62),
 			descCommands = ns.OptionsDesc(
 				GetColor("INFO") .. L["OPTIONS_COMMAND"] .. "|r" .. "  " .. L["OPTIONS_COMMAND_DESCRIPTION"],
-				8
+				63
 			),
 			-- Feedback & Support (house order: Discord, GitHub, CurseForge, Wago)
 			spaceLinks0 = ns.OptionsSpacer(69),
@@ -106,12 +110,21 @@ function ns.BuildGeneralOptions()
 			},
 			versionLine = {
 				type = "description",
-				name = GetColor("MUTED") .. "Version " .. ns.Version .. "|r",
+				name = GetColor("MUTED") .. L["OPTIONS_VERSION"]:format(ns.Version) .. "|r",
 				fontSize = "medium",
 				order = 999,
 			},
 		},
 	}
+
+	-- Every feature's switch, two to a line; a feature this flavor's TOC leaves out has none.
+	local toggles = {}
+	for _, feature in ipairs(ns.FEATURE_SWITCHES) do
+		if not feature.loaded or feature.loaded() then
+			toggles[#toggles + 1] = ns.OptionsFeatureToggle(feature)
+		end
+	end
+	ns.OptionsTogglePairs(options.args, "rowFeatures", 12, toggles)
 
 	return options
 end

@@ -12,8 +12,7 @@ local welcomeMessageShown = false
 --------------------------------------------------------------------------------
 
 local function GetVersion()
-	local GetAddOnMetadata = (C_AddOns and C_AddOns.GetAddOnMetadata) or GetAddOnMetadata
-	local version = GetAddOnMetadata and GetAddOnMetadata(ADDON_NAME, "Version")
+	local version = C_AddOns.GetAddOnMetadata(ADDON_NAME, "Version")
 	if not version or version:find("@") then
 		return "Dev"
 	end
@@ -35,7 +34,7 @@ ns.Version = GetVersion()
 --[[
     A profile switch / copy / reset swaps every user setting at once, so re-seed
     the watched-buff lists (a fresh profile starts empty and seeds from the
-    per-flavor default columns in the Data files), bring the Thank You macros in
+    defaults in this client's Data folder), bring the Thank You macros in
     line with the incoming profile, and refresh any open options panels off the
     new values. Settings read live from the database update themselves; anything
     applied imperatively, like a macro on the bars, has to be re-applied here.
@@ -77,10 +76,26 @@ end
 ns.EVENT_NAMES = {
 	"PLAYER_LOGIN",
 	"PLAYER_ENTERING_WORLD",
-	"COMBAT_LOG_EVENT_UNFILTERED",
 	"UNIT_SPELLCAST_SENT",
 	"UNIT_SPELLCAST_SUCCEEDED",
 	"LOADING_SCREEN_DISABLED",
+}
+
+-- Forever has no combat log, and registering COMBAT_LOG_EVENT_UNFILTERED there errors.
+if ns.FLAVOR == "Camelot" then
+	table.insert(ns.EVENT_NAMES, "UNIT_AURA")
+else
+	table.insert(ns.EVENT_NAMES, "COMBAT_LOG_EVENT_UNFILTERED")
+end
+
+--[[
+    Unit events the add-on only ever needs for these units register with
+    RegisterUnitEvent, so the client never wakes the dispatcher for every
+    nameplate and raid member. Every other event registers unfiltered.
+]]
+ns.EVENT_UNITS = {
+	UNIT_AURA = { "player" },
+	UNIT_SPELLCAST_SENT = { "player", "pet" },
 }
 
 --[[
@@ -106,7 +121,12 @@ eventFrame:SetScript("OnEvent", function(_, event, ...)
 end)
 
 for _, event in ipairs(ns.EVENT_NAMES) do
-	eventFrame:RegisterEvent(event)
+	local units = ns.EVENT_UNITS[event]
+	if units then
+		eventFrame:RegisterUnitEvent(event, unpack(units))
+	else
+		eventFrame:RegisterEvent(event)
+	end
 end
 
 --------------------------------------------------------------------------------
@@ -115,12 +135,17 @@ end
 
 --[[
     The login sequence owns ordering: the saved variables must exist before any
-    feature reads them, and the display groups must exist before the options panels
-    that render them. Feature logic lives in the feature modules; Core only calls
-    their setup hooks in the right order.
+    feature reads them or any panel registers (the Profiles panel binds to ns.db).
+    The panels that render the display groups register as builders and draw them
+    on open, so they can register before the groups exist. Feature logic lives in
+    the feature modules; Core only calls their setup hooks in the right order.
 ]]
 local function OnPlayerLogin()
 	InitializeDatabase()
+
+	if ns.RegisterOptionsPanels then
+		ns.RegisterOptionsPanels()
+	end
 
 	if ns.SetupBuffTracking then
 		ns.SetupBuffTracking()
@@ -128,10 +153,6 @@ local function OnPlayerLogin()
 
 	if ns.SetupPeerPressure then
 		ns.SetupPeerPressure()
-	end
-
-	if ns.SetupOptions then
-		ns.SetupOptions()
 	end
 
 	if ns.CreateAutoMacro then

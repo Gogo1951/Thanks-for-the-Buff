@@ -5,7 +5,7 @@ local L = ns.L
 -- Registration
 --------------------------------------------------------------------------------
 
-function ns.SetupOptions()
+function ns.RegisterOptionsPanels()
 	local AceConfig = LibStub("AceConfig-3.0")
 	local AceConfigDialog = LibStub("AceConfigDialog-3.0")
 	local registry = ns.OPTIONS_REGISTRY
@@ -13,32 +13,33 @@ function ns.SetupOptions()
 
 	AceConfig:RegisterOptionsTable(registry.General, ns.BuildGeneralOptions())
 	-- AddToBlizOptions returns (frame, categoryID). Both are kept: the opener
-	-- routes by the captured id, then by the captured frame, and never resolves
-	-- the panel by title -- a name lookup returns nil on clients that carry the
-	-- Settings API, which is what makes the panel open as a floating window.
+	-- routes by the captured id, falling back to AceConfigDialog:Open, and never
+	-- resolves the panel by title -- a name lookup returns nil on clients that
+	-- carry the Settings API, which is what makes the panel open as a floating
+	-- window.
 	local mainPanel, mainCategoryID = AceConfigDialog:AddToBlizOptions(registry.General, parent)
 	ns.optionsFrames = { main = mainPanel, categoryID = mainCategoryID }
 
 	if ns.BuildStrangersOptions then
-		AceConfig:RegisterOptionsTable(registry.Strangers, ns.BuildStrangersOptions())
-		AceConfigDialog:AddToBlizOptions(registry.Strangers, L["TAB_STRANGERS"], parent)
+		AceConfig:RegisterOptionsTable(registry.StrangerBuffs, ns.BuildStrangersOptions())
+		AceConfigDialog:AddToBlizOptions(registry.StrangerBuffs, L["TAB_STRANGERS"], parent)
 	end
 
 	if ns.BuildTeammatesOptions then
 		-- Registered as a function (not a prebuilt table) so the tracked list is
 		-- rebuilt and re-sorted on open, once lazily-loaded item names are cached.
-		AceConfig:RegisterOptionsTable(registry.Teammates, ns.BuildTeammatesOptions)
-		AceConfigDialog:AddToBlizOptions(registry.Teammates, L["TAB_TEAMMATES"], parent)
+		AceConfig:RegisterOptionsTable(registry.TeammateBuffs, ns.BuildTeammatesOptions)
+		AceConfigDialog:AddToBlizOptions(registry.TeammateBuffs, L["TAB_TEAMMATES"], parent)
 	end
 
 	if ns.BuildGoodNewsOptions then
-		AceConfig:RegisterOptionsTable(registry.GoodNews, ns.BuildGoodNewsOptions)
-		AceConfigDialog:AddToBlizOptions(registry.GoodNews, L["TAB_GOOD_NEWS"], parent)
+		AceConfig:RegisterOptionsTable(registry.SendGoodNews, ns.BuildGoodNewsOptions)
+		AceConfigDialog:AddToBlizOptions(registry.SendGoodNews, L["TAB_GOOD_NEWS"], parent)
 	end
 
 	if ns.BuildServicesOptions then
-		AceConfig:RegisterOptionsTable(registry.Services, ns.BuildServicesOptions)
-		AceConfigDialog:AddToBlizOptions(registry.Services, L["TAB_SERVICES"], parent)
+		AceConfig:RegisterOptionsTable(registry.ServiceAlerts, ns.BuildServicesOptions)
+		AceConfigDialog:AddToBlizOptions(registry.ServiceAlerts, L["TAB_SERVICES"], parent)
 	end
 
 	if ns.BuildPeerPressureOptions then
@@ -47,8 +48,8 @@ function ns.SetupOptions()
 	end
 
 	if ns.BuildThankYouButtonOptions then
-		AceConfig:RegisterOptionsTable(registry.ThankYou, ns.BuildThankYouButtonOptions())
-		AceConfigDialog:AddToBlizOptions(registry.ThankYou, L["TAB_THANK_YOU_BUTTON"], parent)
+		AceConfig:RegisterOptionsTable(registry.ThankYouButton, ns.BuildThankYouButtonOptions())
+		AceConfigDialog:AddToBlizOptions(registry.ThankYouButton, L["TAB_THANK_YOU_BUTTON"], parent)
 	end
 
 	-- Profiles registers second-to-last, directly above Diagnostic Tools. Its
@@ -61,12 +62,14 @@ function ns.SetupOptions()
 
 	-- Diagnostic Tools registers last so it sits at the bottom of the tree.
 	if ns.BuildDiagnosticsOptions then
-		AceConfig:RegisterOptionsTable(registry.Diagnostics, ns.BuildDiagnosticsOptions())
+		-- Registered as the builder, so every repaint rebuilds it and the enable
+		-- gate can leave the tabs out of the table while it is off.
+		AceConfig:RegisterOptionsTable(registry.Diagnostics, ns.BuildDiagnosticsOptions)
 		AceConfigDialog:AddToBlizOptions(registry.Diagnostics, ns.DiagnosticsStrings.TAB, parent)
 	end
 
-	SLASH_TFTB_CONFIG1 = "/tftb"
-	SlashCmdList.TFTB_CONFIG = function()
+	SLASH_TFTB1 = "/tftb"
+	SlashCmdList.TFTB = function()
 		ns:OpenOptionsPanel()
 	end
 end

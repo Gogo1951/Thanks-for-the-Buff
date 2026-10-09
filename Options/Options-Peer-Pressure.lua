@@ -3,12 +3,13 @@ local L = ns.L
 
 --[[
     "Peer Pressure" panel -- the same-class cooldown alert (Features/Peer-Pressure.lua,
-    data in Data/Peer-Pressure-Abilities.lua). Renders one class-colored group per
+    data in this client's Data/{Game}/Peer-Pressure-Abilities-{Game}.lua). Renders one class-colored group per
     class with live entries (ns.PeerPressureCategories, built at login); toggles
     bind to peerPressure.watched. Only your own class's rows ever fire in play, but
     the default profile is shared account-wide, so every class is configurable
-    from any character. The print / sound toggles are the enable -- with both
-    off, nothing fires.
+    from any character. The enable switch at the top, twinned in the General
+    panel's Features section, is the master; with both the print and the sound
+    off, nothing fires either.
 ]]
 
 function ns.BuildPeerPressureOptions()
@@ -33,22 +34,11 @@ function ns.BuildPeerPressureOptions()
 		args = {
 			descIntro = ns.OptionsDesc(L["PEER_PRESSURE_DESCRIPTION"], 1),
 			space0 = ns.OptionsSpacer(2),
-			enable = {
-				type = "toggle",
-				name = L["PEER_PRESSURE_ENABLE"],
-				width = "full",
-				order = 3,
-				get = function()
-					return ns.db.profile.peerPressure.enabled
-				end,
-				set = function(_, val)
-					ns.db.profile.peerPressure.enabled = val
-				end,
-			},
-			space1 = { type = "description", name = " ", order = 4, hidden = PeerPressureHidden },
+			enable = ns.OptionsFeatureToggle(ns.GetFeatureSwitch("peerPressure"), 3),
+			space1 = ns.OptionsSpacer(4, PeerPressureHidden),
 
 			headerNotifications = ns.OptionsHeader(L["NOTIFICATIONS_HEADER"], 5, PeerPressureHidden),
-			space2 = { type = "description", name = " ", order = 6, hidden = PeerPressureHidden },
+			space2 = ns.OptionsSpacer(6, PeerPressureHidden),
 			printOut = {
 				type = "toggle",
 				name = L["NOTIFICATIONS_PRINT_ENABLE"],
@@ -63,12 +53,12 @@ function ns.BuildPeerPressureOptions()
 					ns.db.profile.peerPressure.printEnabled = val
 				end,
 			},
-			sampleSpacer = { type = "description", name = " ", order = 8, hidden = SampleHidden },
+			sampleSpacer = ns.OptionsSpacer(8, SampleHidden),
 			--[[
                 A sample of the alert, built by the SAME pipeline as the real
                 print (prefix, class color, spell link), so it can never drift
                 from what actually shows in chat: rogue-colored body, link-blue
-                spell link. Blade Flurry (13877) is live on every flavor.
+                spell link.
 
                 Sits under the PRINT toggle, not the master enable, because the
                 print is the only setting it illustrates -- next to the master it
@@ -79,14 +69,19 @@ function ns.BuildPeerPressureOptions()
 				name = function()
 					return "   "
 						.. ns.GetPrintPrefix()
-						.. ns:BuildPeerPressureMessage("ROGUE", "Expektor", 13877, nil)
+						.. ns:BuildPeerPressureMessage(
+							"ROGUE",
+							"Expektor",
+							ns.GAME_IDS.SAMPLE_PEER_PRESSURE_SPELL_ID,
+							nil
+						)
 						.. "\n"
 				end,
 				fontSize = "medium",
 				order = 9,
 				hidden = SampleHidden,
 			},
-			space3 = { type = "description", name = " ", order = 10, hidden = PeerPressureHidden },
+			space3 = ns.OptionsSpacer(10, PeerPressureHidden),
 			ownCasts = {
 				type = "toggle",
 				name = L["PEER_PRESSURE_OWN_CASTS"],
@@ -101,7 +96,7 @@ function ns.BuildPeerPressureOptions()
 					ns.db.profile.peerPressure.triggerOnOwnCasts = val
 				end,
 			},
-			space4 = { type = "description", name = " ", order = 12, hidden = PeerPressureHidden },
+			space4 = ns.OptionsSpacer(12, PeerPressureHidden),
 			-- Not full-width: the preview speaker sits on the same row.
 			sound = {
 				type = "toggle",
@@ -117,10 +112,10 @@ function ns.BuildPeerPressureOptions()
 				end,
 			},
 			soundPreview = ns.DefineSoundPreview(ns.PlayPeerPressureSound, 14, PeerPressureHidden),
-			space5 = { type = "description", name = " ", order = 15, hidden = PeerPressureHidden },
+			space5 = ns.OptionsSpacer(15, PeerPressureHidden),
 
 			headerTracked = ns.OptionsHeader(L["TRACKED_HEADER"], 16, PeerPressureHidden),
-			space6 = { type = "description", name = " ", order = 17, hidden = PeerPressureHidden },
+			space6 = ns.OptionsSpacer(17, PeerPressureHidden),
 		},
 	}
 

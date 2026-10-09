@@ -5,6 +5,9 @@ ns.Data = {}
 local Data = ns.Data
 local L = ns.L
 
+-- The SavedVariables global the TOC declares; Diagnostics dumps it by this name.
+ns.SAVED_VARIABLES_NAME = "TFTBDB"
+
 --------------------------------------------------------------------------------
 -- Colors (UI Palette)
 --------------------------------------------------------------------------------
@@ -49,14 +52,15 @@ Data.CLASS_COLORS = {
 -- Options Registry
 --------------------------------------------------------------------------------
 
+-- Keys match each panel's file suffix.
 ns.OPTIONS_REGISTRY = {
-	General = ADDON_NAME,
-	Strangers = ADDON_NAME .. "_Strangers",
-	Teammates = ADDON_NAME .. "_Teammates",
-	Services = ADDON_NAME .. "_Services",
-	GoodNews = ADDON_NAME .. "_GoodNews",
+	General = ADDON_NAME .. "_General",
+	StrangerBuffs = ADDON_NAME .. "_StrangerBuffs",
+	TeammateBuffs = ADDON_NAME .. "_TeammateBuffs",
+	SendGoodNews = ADDON_NAME .. "_SendGoodNews",
+	ServiceAlerts = ADDON_NAME .. "_ServiceAlerts",
 	PeerPressure = ADDON_NAME .. "_PeerPressure",
-	ThankYou = ADDON_NAME .. "_ThankYou",
+	ThankYouButton = ADDON_NAME .. "_ThankYouButton",
 	Profiles = ADDON_NAME .. "_Profiles",
 	Diagnostics = ADDON_NAME .. "_Diagnostics",
 }
@@ -66,8 +70,8 @@ ns.OPTIONS_REGISTRY = {
 --------------------------------------------------------------------------------
 
 -- The label-beside-control grid: a label plus its control always total the row width.
-ns.OPTIONS_ROW_WIDTH = 2.6
-ns.OPTIONS_LABEL_WIDTH = 1.3
+ns.OPTIONS_ROW_WIDTH = 3.4
+ns.OPTIONS_LABEL_WIDTH = 2.1
 ns.OPTIONS_CONTROL_WIDTH = ns.OPTIONS_ROW_WIDTH - ns.OPTIONS_LABEL_WIDTH
 
 -- The item lists' remove column, sized to its icon rather than a caption.
@@ -93,9 +97,9 @@ ns.CHAT_MESSAGE_MAX_LENGTH = 255
     -- is generated from this list, so the count is a property of the data rather
     than of five copied blocks. Button 1 is the original and keeps its "- Thank"
     macro name (the leading dash sorts it to the top of the macro list) and its
-    on-by-default settings; 2 through 5 were added later and start switched off,
-    so nobody's existing behaviour changes. They share the leading-dash naming so
-    the whole family sorts together at the top of the macro list.
+    on-by-default settings; 2 through 5 start switched off. They share the
+    leading-dash naming so the whole family sorts together at the top of the
+    macro list.
 ]]
 Data.THANK_YOU_BUTTONS = {
 	-- singleEmote: the button fires ONE chosen emote, picked from a dropdown,
@@ -109,6 +113,9 @@ Data.THANK_YOU_BUTTONS = {
 	{ profileKey = "slash4", macroName = "- TFTB 4", command = "/thankyou4", singleEmote = true },
 	{ profileKey = "slash5", macroName = "- TFTB 5", command = "/thankyou5", singleEmote = true },
 }
+
+-- The account-wide macro cap; TFTB stops creating Thank You macros once the list holds this many.
+Data.MAX_GLOBAL_MACROS = 120
 
 -- Praise Delay lengths, in seconds. Doubles as the dropdown's display order; the
 -- labels themselves come from the client's own duration strings at panel-build
@@ -145,9 +152,9 @@ Data.WAGO_URL = "https://addons.wago.io/addons/thanks-for-the-buff"
 
 -- How the thank-you reads, and which panel the toggle lives on.
 Data.BUFF = {
-	SOLO = "SOLO", -- cast on you            -> "gave you ..."        (Buffs from Teammates)
-	GROUP = "GROUP", -- party/raid-wide        -> "gave your group ..." (Buffs from Teammates)
-	SERVICE = "SERVICE", -- set out for the group  -> "set out a ..."       (Group Services)
+	SOLO = "SOLO", -- cast on you            -> "gave you ..."        (Teammate Buffs)
+	GROUP = "GROUP", -- party/raid-wide        -> "gave your group ..." (Teammate Buffs)
+	SERVICE = "SERVICE", -- set out for the group  -> "set out a ..."       (Service Alerts)
 }
 
 -- How the combat log is matched.
