@@ -21,3 +21,15 @@
 - **Departs from:** MESSAGES → Sent Messages, "`{rtN} Add-on Name // Message`".
 - **Instead:** Every sent message puts the short name after the body, `{rt1} Message // TFTB`, whether or not it is time-sensitive.
 - **Why:** A thank-you should read as thanks first, and the sign-off still tells the recipient where it came from.
+
+### Buff Keys' global-cooldown cutoff
+
+- **Departs from:** COMPATIBILITY → Game Mechanics, "never with a magic threshold like `duration > 1.5`".
+- **Instead:** The Buff Keys count a cooldown of 1.5 seconds or less as the global cooldown when choosing what to cast next.
+- **Why:** On every client the add-on targets, no global cooldown runs past 1.5 seconds and no buff it offers has a real cooldown that short, so the cutoff never misreads.
+
+### Buff Keys bound on the Buff Duty panel
+
+- **Departs from:** OPTIONS PANEL → Main Page Layout, "Key Bindings (if any: one row per binding with its caption, bound key and a Set Key button, then one line saying what the key does)".
+- **Instead:** The Buff Duty panel binds its own keys in place, each row a key-capture button with a copyable macro line under it, and the General panel has no Key Bindings section.
+- **Why:** The keys belong to one feature, and setting a key where that feature is configured is quicker than opening the game's Key Bindings list.
