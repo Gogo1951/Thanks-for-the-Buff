@@ -357,13 +357,7 @@ local function PlaceRow(label, indent, specs, y, nameWidth, slots)
 	for _, spec in ipairs(specs) do
 		local button = AcquireIcon()
 		button:ClearAllPoints()
-		button:SetPoint(
-			"LEFT",
-			content,
-			"TOPLEFT",
-			left + (slots[spec.column] - 1) * (ICON_SIZE + ICON_GAP),
-			y
-		)
+		button:SetPoint("LEFT", content, "TOPLEFT", left + (slots[spec.column] - 1) * (ICON_SIZE + ICON_GAP), y)
 		SetIcon(button, spec)
 	end
 end

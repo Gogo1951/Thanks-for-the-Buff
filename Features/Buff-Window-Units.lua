@@ -275,11 +275,7 @@ end
     a stranger out of sight, who is shown as damage.
 ]]
 function BuffWindow.PlayerLabel(name, class, unit)
-	return RoleIcon(BuffWindow.RoleOf(unit))
-		.. "|cff"
-		.. (Data.CLASS_COLORS[class] or ns.PALETTE.TEXT)
-		.. name
-		.. "|r"
+	return RoleIcon(BuffWindow.RoleOf(unit)) .. "|cff" .. (Data.CLASS_COLORS[class] or ns.PALETTE.TEXT) .. name .. "|r"
 end
 
 --[[
