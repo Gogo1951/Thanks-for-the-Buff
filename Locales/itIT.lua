@@ -51,7 +51,7 @@ L["UNKNOWN_SPELL"] = "Incantesimo sconosciuto"
 L["OPTIONS_WELCOME_TOGGLE"] = "Abilita messaggio di benvenuto"
 L["OPTIONS_WELCOME_DESCRIPTION"] = "Mostra un messaggio visibile solo a te quando accedi."
 L["OPTIONS_DESCRIPTION"] =
-	"Ringrazia automaticamente con un sussurro o un'emote i giocatori che ti potenziano e annuncia i potenziamenti che lanci, come Infusione di Potere, Innervazione e Pietra dell'Anima. Ricevi anche avvisi per banchetti, portali, evocazioni, pozzi delle anime e tempi di recupero della tua classe. Buone maniere, in automatico."
+	"Ringrazia con un sussurro o un'emote ogni giocatore che ti potenzia e scopri a chi mancano i tuoi potenziamenti d'incursione in un pannello dei potenziamenti dove basta un clic per lanciarli. In più, avvisi per banchetti, portali, evocazioni, pozzi delle anime e tempi di recupero della tua classe. Buone maniere, in automatico."
 L["OPTIONS_FEATURES_HEADER"] = "Funzionalità"
 L["OPTIONS_FEATURES_DESCRIPTION"] = "Attiva o disattiva ogni funzionalità qui o nel suo pannello."
 L["OPTIONS_COMMANDS_HEADER"] = "/Commands"

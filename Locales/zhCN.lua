@@ -50,7 +50,7 @@ L["UNKNOWN_SPELL"] = "未知法术"
 L["OPTIONS_WELCOME_TOGGLE"] = "启用欢迎信息"
 L["OPTIONS_WELCOME_DESCRIPTION"] = "登录时显示一条只有你能看到的信息。"
 L["OPTIONS_DESCRIPTION"] =
-	"通过密语或表情，自动感谢为你施加增益的玩家，并通报你施放的增益，例如能量灌注、激活和灵魂石。还会提醒你大餐、传送门、召唤、灵魂之井和同职业的冷却技能。礼数周到，全自动。"
+	"通过密语或表情感谢每一位为你施加增益的玩家，并用一键施放的增益追踪器查看谁缺少你的团队增益。还会提醒你大餐、传送门、召唤、灵魂之井和同职业的冷却技能。礼数周到，全自动。"
 L["OPTIONS_FEATURES_HEADER"] = "功能"
 L["OPTIONS_FEATURES_DESCRIPTION"] = "在此处或各功能自己的面板中开启或关闭每项功能。"
 L["OPTIONS_COMMANDS_HEADER"] = "/Commands"
