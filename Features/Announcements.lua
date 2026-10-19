@@ -8,8 +8,12 @@ local GetColor = ns.GetColor
 -- Print Outs (Player Only)
 --------------------------------------------------------------------------------
 
--- The "TFTB // " brand that opens every print. Exposed so options panels can
--- render pipeline-true sample messages that always match the real thing.
+--[[
+    The "TFTB // " brand that opens every print. Exposed so options panels can
+    render pipeline-true sample messages that always match the real thing.
+    Prints and sent messages brand with the short name, L["ADDON_SHORT"], never
+    the full title.
+]]
 function ns.GetPrintPrefix()
 	return GetColor("INFO") .. L["ADDON_SHORT"] .. "|r " .. GetColor("SEPARATOR") .. "//" .. "|r "
 end
@@ -117,8 +121,10 @@ end
 -- Emotes
 --------------------------------------------------------------------------------
 
--- The one place an emote reaches the client, through the namespaced call every
--- target client ships. Returns its success flag, or nil when that comes back secret.
+--[[
+    The one place an emote reaches the client, through the namespaced call every
+    target client ships. Returns its success flag, or nil when that comes back secret.
+]]
 local function PerformEmote(token, target)
 	local success = C_ChatInfo.PerformEmote(token, target)
 	if ns.IsPlain(success) then
@@ -137,30 +143,27 @@ end
     could not be resolved, and failing to resolve them is itself the evidence
     they are gone -- so it thanks an empty room and reads as a bug. Refusing it
     at the chokepoint instead of at each call site keeps the promise in one
-    place: this addon does not emote into the void.
+    place: this add-on does not emote into the void.
 
     Trap for anyone tempted to pass a target straight through:
-    C_ChatInfo.PerformEmote(cmd, nil) is NOT undirected -- it falls back to your CURRENT TARGET, thanking whatever
-    bystander you happen to be pointing at. "none" is what actually forces the
-    undirected flavor, and an unresolvable name degrades to it the same way,
-    which is why neither is reachable from here any more.
+    C_ChatInfo.PerformEmote(token, nil) is NOT undirected -- it falls back to
+    your CURRENT TARGET, thanking whatever bystander you happen to be pointing
+    at. "none" is what actually forces the undirected flavor, and an
+    unresolvable name degrades to it the same way, so neither may reach here.
 ]]
 function ns:DoRandomEmote(emotes, target)
 	if not emotes or not target then
 		return
 	end
 	--[[
-        Driven by Data.EMOTES rather than by the saved table's own keys, so a key
-        that is no longer a real emote can never be picked. Saved settings outlive
-        the list: renaming the /yes toggle from the bogus "YES" to its true NOD
-        token leaves "YES" sitting in every existing profile, and iterating the
-        saved table would keep offering it -- a silent no-op every time the random
-        pick landed on it.
+        Driven by Data.EMOTES rather than by the saved table's own keys: a saved
+        profile can hold keys that are not real emote tokens (a "YES" key, say),
+        and picking one would be a silent no-op.
     ]]
 	local available = {}
 	for _, data in ipairs(Data.EMOTES) do
-		if emotes[data.cmd] then
-			available[#available + 1] = data.cmd
+		if emotes[data.token] then
+			available[#available + 1] = data.token
 		end
 	end
 	if #available > 0 then
@@ -176,8 +179,8 @@ end
     offers every emote this build has, which is far more than the twelve the
     praise panels curate. An unknown token is dropped rather than handed on,
     because C_ChatInfo.PerformEmote given a bad token is a silent no-op --
-    indistinguishable, to
-    whoever pressed the button, from the button being broken.
+    indistinguishable, to whoever pressed the button, from the button being
+    broken.
 ]]
 function ns:DoEmoteToken(token, target)
 	if not token or token == "" or not target then
@@ -193,22 +196,26 @@ end
 -- Buff Announcements
 --------------------------------------------------------------------------------
 
--- Tint a player's name with their class color.
-local function ColorName(guid, name)
-	if guid then
-		local _, class = GetPlayerInfoByGUID(guid)
-		if class and Data.CLASS_COLORS[class] then
-			return "|cff" .. Data.CLASS_COLORS[class] .. name .. "|r"
-		end
+-- Tint a player's name with their class color; an unknown class leaves it plain.
+local function ColorNameByClass(class, name)
+	if class and Data.CLASS_COLORS[class] then
+		return "|cff" .. Data.CLASS_COLORS[class] .. name .. "|r"
 	end
 	return name
+end
+
+local function ClassOf(guid)
+	if guid then
+		return (select(2, GetPlayerInfoByGUID(guid)))
+	end
+	return nil
 end
 
 --[[
     Item-driven buffs link the source item; everything else links the spell. A
     stranger buff carries no tracked entry, so a nil entry is simply the spell
     case. Resolved once by the caller and passed to whichever of the print and
-    the whisper actually fire, since the two no longer go out together (see
+    the whisper actually fire, since each has its own toggle and timing (see
     ns:WhisperThanks).
 ]]
 function ns.GetBuffLink(entry, spellID)
@@ -222,13 +229,13 @@ function ns.GetBuffLink(entry, spellID)
 end
 
 --[[
-    The chat line for a tracked teammate buff or group service. The verb comes
+    The print out for a tracked teammate buff or group service. The verb comes
     from the entry's type/detect: a solo buff "gave you", a group buff "gave your
-    group", a service "set out", an item used on you "used X on you", a cast
-    "used X on you".
+    group", a service "set out" or "opened", an item used on you "used X on
+    you", a cast "cast X on you".
 ]]
-function ns:AnnounceTracked(entry, creditGUID, creditName, link)
-	local name = ColorName(creditGUID, creditName)
+function ns:BuildTrackedMessage(entry, class, creditName, link)
+	local name = ColorNameByClass(class, creditName)
 	local message
 	if entry.type == Data.BUFF.SERVICE then
 		message = (entry.opened and L["MESSAGE_OPENED"] or L["MESSAGE_SET_OUT"]):format(name, link)
@@ -241,14 +248,18 @@ function ns:AnnounceTracked(entry, creditGUID, creditName, link)
 	else
 		message = L["MESSAGE_GAVE_YOU"]:format(name, link)
 	end
-	ns:PrintMessage(message)
+	return message
+end
+
+function ns:AnnounceTracked(entry, creditGUID, creditName, link)
+	ns:PrintMessage(ns:BuildTrackedMessage(entry, ClassOf(creditGUID), creditName, link))
 end
 
 --[[
     The thank-you whisper behind both the Strangers and the Teammates reactions.
-    Split out from the prints above because the two are no longer sent together:
-    the whisper is praise the other player sees and can be held back by the Praise
-    Delay, while the print is your own heads-up and always fires immediately.
+    Separate from the prints above: the whisper is praise the other player sees
+    and can be held back by the Praise Delay, while the print is your own
+    heads-up and always fires immediately.
 ]]
 function ns:WhisperThanks(target, link)
 	ns:Announce("WHISPER", target, "MESSAGE_WHISPER_THANKS", link)
@@ -284,10 +295,16 @@ function ns:AnnouncePeerPressure(class, sourceName, spellID, targetName, targetC
 	ns:PrintMessage(ns:BuildPeerPressureMessage(class, sourceName, spellID, targetName, targetClass))
 end
 
--- The chat line for any helpful buff from a non-grouped friendly player. Its
--- thank-you whisper goes out through ns:WhisperThanks.
+--[[
+    The print out for any helpful buff from a non-grouped friendly player. Its
+    thank-you whisper goes out through ns:WhisperThanks.
+]]
+function ns:BuildStrangerMessage(class, sourceName, link)
+	return L["MESSAGE_BUFFED"]:format(ColorNameByClass(class, sourceName), link)
+end
+
 function ns:AnnounceStranger(sourceGUID, sourceName, link)
-	ns:PrintMessage(L["MESSAGE_BUFFED"]:format(ColorName(sourceGUID, sourceName), link))
+	ns:PrintMessage(ns:BuildStrangerMessage(ClassOf(sourceGUID), sourceName, link))
 end
 
 --------------------------------------------------------------------------------
@@ -344,10 +361,10 @@ local function ResolvePlurals(text)
 				return count .. gap
 			end
 
-			local n = tonumber(count) or 0
+			local number = tonumber(count) or 0
 			local pick
 			if #forms >= 3 then
-				local mod10, mod100 = n % 10, n % 100
+				local mod10, mod100 = number % 10, number % 100
 				if mod10 == 1 and mod100 ~= 11 then
 					pick = forms[1] -- 1, 21, 31...
 				elseif mod10 >= 2 and mod10 <= 4 and (mod100 < 12 or mod100 > 14) then
@@ -356,7 +373,7 @@ local function ResolvePlurals(text)
 					pick = forms[3]
 				end
 			else
-				pick = (n == 1) and forms[1] or (forms[2] or forms[1])
+				pick = (number == 1) and forms[1] or (forms[2] or forms[1])
 			end
 			return count .. gap .. pick
 		end)
@@ -425,9 +442,11 @@ local GOOD_NEWS_MAX_SECONDS = 60
 local function BuildGoodNewsLine(template, link, duration)
 	local ability = link or ""
 	if duration and duration > 0 then
-		-- Rounded up front, the same way FormatDuration would round it, so a 59.7s
-		-- aura is tested as the "60 Seconds" it would print as instead of slipping
-		-- under the cap and printing a full minute in seconds.
+		--[[
+		    Rounded up front, the same way FormatDuration would round it, so a 59.7s
+		    aura is tested as the "60 Seconds" it would print as instead of slipping
+		    under the cap and printing a full minute in seconds.
+		]]
 		local whole = math.floor(duration + 0.5)
 		if whole < GOOD_NEWS_MAX_SECONDS then
 			ability = ability .. " " .. string.format(L["GOOD_NEWS_DURATION_CLAUSE"], FormatDuration(whole))
@@ -448,8 +467,10 @@ function ns:BuildGoodNewsMessage(link, duration)
 		template = L["DEFAULT_GOOD_NEWS"]
 	end
 
-	-- SendChatMessage rejects a line over 255 bytes, and %a can repeat, so a long
-	-- line falls back to the default template, then drops the duration; cutting it could break the link.
+	--[[
+	    SendChatMessage rejects a line over 255 bytes, and %a can repeat, so a long
+	    line falls back to the default template, then drops the duration; cutting it could break the link.
+	]]
 	local message = BuildGoodNewsLine(template, link, duration)
 	if #message > ns.CHAT_MESSAGE_MAX_LENGTH then
 		message = BuildGoodNewsLine(L["DEFAULT_GOOD_NEWS"], link, duration)

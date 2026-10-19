@@ -299,7 +299,7 @@ ns.TRACKED_ABILITIES = {
 How We Got the Data
 
 Last Validated
-	2026-10-08, Classic Era 1.15.9.70003
+	2026-10-19, Classic Era 1.15.9.70003
 
 Notes
 	- The buffs, cooldowns and services other players spend on you, behind the Buffs from Teammates, Group Services and Good News panels. Buffs from Strangers has no list: any helpful buff from a player outside your group counts.
@@ -327,8 +327,12 @@ Wowhead
 	None.
 
 wago.tools
+	https://wago.tools/db2/SpellLevels?build=1.15.9.70003
+	https://wago.tools/db2/SpellName?build=1.15.9.70003
+	https://wago.tools/db2/SkillLineAbility?build=1.15.9.70003
 	https://wago.tools/db2/ItemSparse?build=1.15.9.70003
 	https://wago.tools/db2/ItemEffect?build=1.15.9.70003
-	https://wago.tools/db2/SpellLevels?build=1.15.9.70003
-	https://wago.tools/db2/SkillLineAbility?build=1.15.9.70003
+
+QuestieDB
+	None.
 ]]

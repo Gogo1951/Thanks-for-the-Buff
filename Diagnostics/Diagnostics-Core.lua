@@ -81,6 +81,7 @@ ns.DiagnosticsStrings = {
 	EVENT_LOG_STOP_DESCRIPTION = "Stops capturing and keeps what was captured, ready to show.",
 	EVENT_LOG_SHOW = "Show",
 	EVENT_LOG_SHOW_DESCRIPTION = "Prints the captured events in the box below, ready to copy.",
+	EVENT_LOG_PRIVACY = "The log includes the text of chat messages it catches, whispers too. Read it through before you paste it anywhere.",
 	TAINT_TITLE = "Taint Log",
 	TAINT_INTRO = 'Seeing "action blocked" or "interface action failed" errors? Turn this on and the game records the cause to a file. Send the file along with your bug report.',
 	TAINT_STATE = "Taint logging is currently set to level %d (0 = off, 2 = verbose).",
@@ -120,9 +121,9 @@ ns.DiagnosticsStrings = {
 	CODE_RUN_ALL = "Run All Code Reports",
 	DATA_INTRO = "Checks every spell and item the add-on ships against this client. Paste a result into a spreadsheet and sort by STATUS to find what needs pruning.",
 	DATA_RUN_ALL = "Validate All Data Files",
-	LOCALIZATION_INTRO = "How "
+	LOCALIZATION_INTRO = "Playing in a language other than English and a name or prompt reads wrong? These show what your client calls everything "
 		.. TITLE
-		.. "'s text comes out in your client's language: the locale settings, every game name it looks up as this client spells it, and whether every whisper and macro fits.",
+		.. " names.",
 	LOCALIZATION_RUN_ALL = "Run All Localization Reports",
 	RUN_ALL_DESCRIPTION = "Runs %s, one after another.",
 
@@ -132,14 +133,17 @@ ns.DiagnosticsStrings = {
 	EVENTS_SOME_FAIL = "%d failed to register",
 	API_TITLE = "API Endpoints",
 	API_DESCRIPTION = "Checks that every game function " .. TITLE .. " calls exists on this client.",
-	CONTEXT_TITLE = "Add-on Context",
-	CONTEXT_DESCRIPTION = "Shows your character and profile, how buffs are detected and whether that is ready right now, every panel's settings and picked emotes, the watched counts, praise cooldowns, sound settings, whether you know the tracked spells for your class, and each Thank You button's macro, whisper and emotes.",
+	CONTEXT_TITLE = "Buff Reactions Context",
+	CONTEXT_DESCRIPTION = "Shows your character and profile, how buffs are detected and whether that is ready right now, every panel's switches and picked emotes, the watched counts, praise cooldowns, sound settings, the tracked spells you know and which Good News and Peer Pressure watch, and each Thank You button's command, macro, whisper and emotes.",
+	BUFF_WINDOW_TITLE = "Buff Window Context",
+	BUFF_WINDOW_DESCRIPTION = "Shows every switch and gate that can keep the Buff Window hidden, each buff your class can give with who it's offered to and the ranks you know, your self buffs, and every group member and your target as the window reads them, with which of your buffs each has on or is missing.",
 	EMOTES_TITLE = "Emote Extract",
 	EMOTES_DESCRIPTION = "Lists every emote this client can perform, read from the client itself, as tab-separated text: index, token, slash commands, and whether it plays a voice line.",
 	VALIDATE_TITLE = "Validate Data: %s",
 	VALIDATE_DESCRIPTION = "Checks every id in this data file against this client and exports the results as tab-separated text.",
 	VALIDATE_PROGRESS = "%s / %s IDs",
-	VALIDATE_HINT = "Checks every spell, item and quest id a data file ships against this client and exports what the client knows about each one as tab-separated text, ready to paste into a spreadsheet. Spell rows carry every spell API return, whether you know the spell, the file's own values in the DATA columns so you can sort for mismatches, its description, and its whole tooltip in SPELL_TOOLTIP. Item rows carry every item API return, the DATA columns, everything the client knows about the item's spell including its tooltip in SPELL_TOOLTIP, and the whole item tooltip in one TOOLTIP cell, its lines joined by // and a right-hand text after >>. STATUS reads OK, NOT ON CLIENT for an id this client does not have or never answers for, INCOMPLETE when an id loaded but its tooltip or description text never did, NO TITLE when a quest's title never loaded (not grounds to prune), ERROR with the message in the name cell when a read throws, or TABLE MISSING when this client's folder never built a table. Each kind follows in a block of its own.",
+	DISPLAY_TITLE = "Display Context",
+	DISPLAY_DESCRIPTION = "Shows your screen size, UI scale and the Buff Window's saved position, and whether that position is on screen.",
 	ADDONS_TITLE = "Other Add-ons",
 	ADDONS_DESCRIPTION = "Lists every installed add-on with its version, and whether it is loadable or disabled.",
 	SAVED_TITLE = "Saved Variables",
@@ -149,17 +153,17 @@ ns.DiagnosticsStrings = {
 	LOCALE_TITLE = "Locale Context",
 	LOCALE_DESCRIPTION = "Shows your client's language, its text and audio language settings, and how many of "
 		.. TITLE
-		.. "'s own strings are defined.",
+		.. "'s own strings loaded.",
 	NAMES_TITLE = "Game Names",
-	NAMES_DESCRIPTION = "Lists every spell, class and time unit "
-		.. TITLE
-		.. " names by ID, with the name this client returns, as tab-separated text.",
-	MESSAGE_LENGTH_TITLE = "Message Length",
-	MESSAGE_LENGTH_DESCRIPTION = "Builds every whisper and macro "
+	NAMES_DESCRIPTION = "Shows the name your client gives every game string " .. TITLE .. " shows or matches.",
+	NAMES_ALL_FOUND = "all found",
+	NAMES_SOME_NIL = "%d NIL",
+	MESSAGES_TITLE = "Message Length",
+	MESSAGES_DESCRIPTION = "Builds every whisper and macro "
 		.. TITLE
 		.. " sends or writes, with the longest names in your language, and checks each one fits. Nothing is sent.",
-	MESSAGE_LENGTH_ALL_FIT = "all fit",
-	MESSAGE_LENGTH_SOME_OVER = "%d over",
+	MESSAGES_ALL_FIT = "all fit",
+	MESSAGES_SOME_OVER = "%d over",
 
 	STATUS_WAITING = "Waiting",
 	STATUS_RUNNING = "Running",
@@ -236,7 +240,11 @@ end
 -- Readers
 --------------------------------------------------------------------------------
 
--- Validate Data's stat read; a client with neither leaves its STATS cells blank.
+--[[
+    The reads Validate Data shares with no feature, kept here because only the
+    diagnostics use them. A client with neither stat read leaves its STATS
+    cells blank.
+]]
 ns.GetItemStats = C_Item.GetItemStats or GetItemStats
 
 --[[

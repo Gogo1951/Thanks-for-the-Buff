@@ -24,20 +24,26 @@ function ns.BuildStrangersOptions()
 			descIntro = ns.OptionsDesc(L["STRANGERS_DESCRIPTION"], 1),
 			space0 = ns.OptionsSpacer(2),
 
-			-- Master switch: everything below it hides when off, and the feature
-			-- itself stops -- see the `enabled` gate in Praise. Its twin sits in
-			-- the General panel's Features section. Fractional orders keep it above
-			-- the first header without renumbering the panel.
+			--[[
+			    Master switch: everything below it hides when off, and the feature
+			    itself stops -- see the `enabled` gate in Praise. Its twin sits in
+			    the General panel's Features section. Fractional orders keep it above
+			    the first header without renumbering the panel.
+			]]
 			enable = ns.OptionsFeatureToggle(ns.GetFeatureSwitch("strangers"), 2.5),
 			enableSpacer = ns.OptionsSpacer(2.6),
 
 			headerPraise = ns.OptionsHeader(L["PRAISE_HEADER"], 3),
 			space1 = ns.OptionsSpacer(4),
+			descPraise = ns.OptionsDesc(L["PRAISE_DESCRIPTION"], 4.3),
+			spacePraise = ns.OptionsSpacer(4.6),
 			emotesStrangers = ns.DefineEmotesToggle(settings, 5),
 			emoteSpacer = ns.OptionsSpacer(6, ns.EmotesHidden(settings)),
 			strangersEmoteGroup = ns.DefineEmoteGroup(settings, 7),
 			space2 = ns.OptionsSpacer(8),
 			whisperStrangers = ns.DefineWhisperToggle(settings, 9),
+			whisperExampleSpacer = ns.DefineExampleSpacer(settings, "whisperEnabled", 9.3),
+			whisperExample = ns.DefineWhisperExample(settings, 9.6, ns.GAME_IDS.SAMPLE_BUFF_SPELL_ID),
 			space3 = ns.OptionsSpacer(10),
 			-- Dropdowns over Data.SECONDS_CHOICES, the scale that explains its own steps.
 			praiseCooldownStrangersLabel = ns.OptionsRowLabel(L["STRANGERS_OVERALL_COOLDOWN"], 11),
@@ -64,15 +70,23 @@ function ns.BuildStrangersOptions()
 				L["STRANGERS_MIN_DURATION_DESCRIPTION"]
 			),
 			space6 = ns.OptionsSpacer(16),
-			-- Praise Delay closes the section, matching Teammate Buffs and
-			-- Service Alerts, where it is already the last praise control.
+			--[[
+			    Praise Delay closes the section, matching Teammate Buffs and
+			    Service Alerts, where it is already the last praise control.
+			]]
 			praiseDelayStrangers = ns.DefinePraiseDelayToggle(settings, 17),
 			praiseDelayLengthStrangers = ns.DefinePraiseDelaySelect(settings, 18),
 			space7 = ns.OptionsSpacer(19),
 
 			headerNotifications = ns.OptionsHeader(L["NOTIFICATIONS_HEADER"], 20),
 			space8 = ns.OptionsSpacer(21),
+			descNotifications = ns.OptionsDesc(L["NOTIFICATIONS_DESCRIPTION"], 21.3),
+			spaceNotifications = ns.OptionsSpacer(21.6),
 			printStrangers = ns.DefinePrintToggle(settings, 22),
+			printExampleSpacer = ns.DefineExampleSpacer(settings, "printEnabled", 22.3),
+			printExample = ns.DefinePrintExample(settings, 22.6, function(class, name)
+				return ns:BuildStrangerMessage(class, name, ns.GetSpellLink(ns.GAME_IDS.SAMPLE_BUFF_SPELL_ID) or "")
+			end),
 			space9 = ns.OptionsSpacer(23),
 			soundStrangers = ns.DefineSoundToggle(settings, 24),
 			soundPreviewStrangers = ns.DefineSoundPreview(ns.PlayBuffSound, 25),

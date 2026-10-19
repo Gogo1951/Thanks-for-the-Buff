@@ -50,7 +50,7 @@ ns.PEER_PRESSURE_ABILITIES = {
 How We Got the Data
 
 Last Validated
-	2026-10-08, WoW Forever 1.60.1.70291
+	2026-10-19, WoW Forever 1.60.1.70450
 
 Notes
 	- The class cooldowns that sound the Peer Pressure alert when another player of your class uses one, or when you do while the own-casts option is on. Hand-picked, not queried.
@@ -68,5 +68,9 @@ Wowhead
 	None.
 
 wago.tools
+	https://wago.tools/db2/SpellName?build=1.60.1.70450
+	https://wago.tools/db2/SkillLineAbility?build=1.60.1.70450
+
+QuestieDB
 	None.
 ]]

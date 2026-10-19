@@ -29,10 +29,12 @@ local playerGUID -- cached at login; a character's GUID never changes within a s
 -- Safety Timer
 --------------------------------------------------------------------------------
 
--- Suppresses buff reactions until the world settles after login or a loading screen.
--- A token invalidates earlier timers: back-to-back loading screens each arm a new
--- pause, and only the most recent callback may restore readiness, so a stale timer
--- can't flip isReady back on mid-pause.
+--[[
+    Suppresses buff reactions until the world settles after login or a loading screen.
+    A token invalidates earlier timers: back-to-back loading screens each arm a new
+    pause, and only the most recent callback may restore readiness, so a stale timer
+    can't flip isReady back on mid-pause.
+]]
 local safetyToken = 0
 local function StartSafetyTimer(duration)
 	isReady = false
@@ -48,6 +50,7 @@ end
 --------------------------------------------------------------------------------
 -- Source Resolution
 --------------------------------------------------------------------------------
+
 --[[
     Credit for a buff goes to a player or to nobody. A pet/guardian source is
     traded for its owner; when that lookup fails -- group pet tokens are missing
@@ -104,26 +107,32 @@ local function OnCombatLogEventUnfiltered()
 	local _, subEvent, _, sourceGUID, sourceName, sourceFlags, _, destGUID, destName, _, _, spellID =
 		CombatLogGetCurrentEventInfo()
 
-	-- REFRESH counts as an aura landing: recasting a buff the target already has
-	-- emits SPELL_AURA_REFRESH, not APPLIED, and a rebuff earns the same thanks.
+	--[[
+	    REFRESH counts as an aura landing: recasting a buff the target already has
+	    emits SPELL_AURA_REFRESH, not APPLIED, and a rebuff earns the same thanks.
+	]]
 	local isAura = (subEvent == "SPELL_AURA_APPLIED") or (subEvent == "SPELL_AURA_REFRESH")
 	local isCast = (subEvent == "SPELL_CAST_SUCCESS")
-	-- The only event that proves a revive actually took: goblin jumper cables and
-	-- Defibrillate report a successful CAST on every attempt, including the ones
-	-- that leave the target dead.
+	--[[
+	    The only event that proves a revive actually took: goblin jumper cables and
+	    Defibrillate report a successful CAST on every attempt, including the ones
+	    that leave the target dead.
+	]]
 	local isResurrect = (subEvent == "SPELL_RESURRECT")
 	if not isAura and not isCast and not isResurrect then
 		return
 	end
 
-	-- Diagnostics probe: log raw cast-success and resurrect events (portals,
-	-- summons, feasts, jumper cables), and every aura landing on you, before the
-	-- guards below drop anything, so even your own test casts and events that get
-	-- filtered out are still visible in the event log. Untracked casts are counted
-	-- by spell id in the log's summary rather than logged in full. Resurrects are
-	-- logged alongside casts specifically so a failed jolt and a working one can
-	-- be told apart by eye -- a cable that revives nobody logs CAST with no REZ
-	-- following it. See ns:LogCombatCast.
+	--[[
+	    Diagnostics probe: log raw cast-success and resurrect events (portals,
+	    summons, feasts, jumper cables), and every aura landing on you, before the
+	    guards below drop anything, so even your own test casts and events that get
+	    filtered out are still visible in the event log. Untracked casts are counted
+	    by spell id in the log's summary rather than logged in full. Resurrects are
+	    logged alongside casts specifically so a failed jolt and a working one can
+	    be told apart by eye -- a cable that revives nobody logs CAST with no REZ
+	    following it. See ns:LogCombatCast.
+	]]
 	local isAuraOnYou = isAura and destGUID == playerGUID
 	if (isCast or isResurrect or isAuraOnYou) and ns.diagnostics and ns.diagnostics.logging then
 		local tracked
@@ -142,36 +151,44 @@ local function OnCombatLogEventUnfiltered()
 		)
 	end
 
-	-- Peer Pressure: same-class cooldown pops. Sits above the own-source drop below
-	-- because "Trigger on Own Casts" lets your own cooldowns fire the alert too;
-	-- CheckPeerPressure applies that setting itself. sourceFlags rides along because
-	-- affiliation is the only reliable read on whether the caster is in your group --
-	-- Era's combat log carries every nearby player, not just yours. A cheap tap --
-	-- its first line is a lookup that misses for everything untracked.
+	--[[
+	    Peer Pressure: same-class cooldown pops. Sits above the own-source drop below
+	    because "Trigger on Own Casts" lets your own cooldowns fire the alert too;
+	    CheckPeerPressure applies that setting itself. sourceFlags rides along because
+	    affiliation is the only reliable read on whether the caster is in your group --
+	    Era's combat log carries every nearby player, not just yours. A cheap tap --
+	    its first line is a lookup that misses for everything untracked.
+	]]
 	if isCast and ns.CheckPeerPressure then
 		ns.CheckPeerPressure(spellID, sourceGUID, sourceName, sourceFlags, destGUID, destName)
 	end
 
-	-- Good News for a resurrect-detect cast of YOURS. It has to be claimed above
-	-- the own-casts return below, which is otherwise the end of the line for
-	-- anything you did yourself.
+	--[[
+	    Good News for a resurrect-detect cast of YOURS. It has to be claimed above
+	    the own-casts return below, which is otherwise the end of the line for
+	    anything you did yourself.
+	]]
 	if isResurrect and sourceGUID == playerGUID then
 		ns.ClaimPendingResurrect(destGUID, spellID)
 	end
 
-	-- Your own casts are Good News's business, and it runs off the cast events
-	-- instead (Features/Good-News.lua); everything below reacts to what OTHERS
-	-- do to you.
+	--[[
+	    Your own casts are Good News's business, and it runs off the cast events
+	    instead (Features/Good-News.lua); everything below reacts to what OTHERS
+	    do to you.
+	]]
 	if not sourceGUID or sourceGUID == playerGUID then
 		return
 	end
 
 	local entry = MatchTracked(spellID, isAura, isCast, isResurrect)
 
-	-- Service casts (portals, summons, feasts) are announced from
-	-- UNIT_SPELLCAST_SUCCEEDED instead -- they don't reliably reach the combat log
-	-- -- so drop any that surface here, both to avoid a double announce and because
-	-- the combat log can't be relied on to carry them at all.
+	--[[
+	    Service casts (portals, summons, feasts) are announced from
+	    UNIT_SPELLCAST_SUCCEEDED instead -- they don't reliably reach the combat log
+	    -- so drop any that surface here, both to avoid a double announce and because
+	    the combat log can't be relied on to carry them at all.
+	]]
 	if entry and entry.type == Data.BUFF.SERVICE then
 		entry = nil
 	end
@@ -226,6 +243,9 @@ local function OnCombatLogEventUnfiltered()
 		end
 	elseif maybeStranger then
 		HandleStrangersBuff(sourceGUID, sourceName, spellID)
+		if ns.NoteFavor then
+			ns.NoteFavor(sourceGUID, sourceName)
+		end
 	end
 end
 
@@ -257,9 +277,11 @@ local function OnUnitSpellcastSucceeded(unitTarget, castGUID, spellID)
 		return
 	end
 
-	-- Good News: a cast of yours that SENT already vetted and named the
-	-- recipient. Claimed before the service check below, which is about OTHER
-	-- people's casts.
+	--[[
+	    Good News: a cast of yours that SENT already vetted and named the
+	    recipient. Claimed before the service check below, which is about OTHER
+	    people's casts.
+	]]
 	if castGUID then
 		ns.ClaimPendingGiven(castGUID)
 	end
@@ -269,13 +291,15 @@ local function OnUnitSpellcastSucceeded(unitTarget, castGUID, spellID)
 		return
 	end
 
-	-- Group members only, never ourselves. The event fires for every unit the
-	-- client tracks, so without the group test a stranger opening a portal
-	-- across a capital city reads as a service to us -- and a group service is
-	-- the whole promise of the Service Alerts panel. Being in the group implies a friendly
-	-- player; UnitIsPlayer drops group pets, which the group calls don't
-	-- distinguish. A battleground IS a raid, so it needs no
-	-- case of its own. A caster whose identity is secret can't be credited.
+	--[[
+	    Group members only, never ourselves. The event fires for every unit the
+	    client tracks, so without the group test a stranger opening a portal
+	    across a capital city reads as a service to us -- and a group service is
+	    the whole promise of the Service Alerts panel. Being in the group implies a friendly
+	    player; UnitIsPlayer drops group pets, which the group calls don't
+	    distinguish. A battleground IS a raid, so it needs no
+	    case of its own. A caster whose identity is secret can't be credited.
+	]]
 	if ns.IsUnitIdentitySecret(unitTarget) then
 		return
 	end
@@ -386,8 +410,10 @@ local function HandleAddedAura(aura)
 			HandleTracked(entry, spellID, creditGUID, creditName, playerGUID)
 		end
 	elseif ns.IsPlayerGUID(creditGUID) then
-		-- Only a unit can be asked whether it's friendly. A player we know by GUID
-		-- alone just put a helpful buff on you, which the other faction can't do.
+		--[[
+		    Only a unit can be asked whether it's friendly. A player we know by GUID
+		    alone just put a helpful buff on you, which the other faction can't do.
+		]]
 		if creditUnit then
 			local isFriend = UnitIsFriend("player", creditUnit)
 			if not (ns.IsPlain(isFriend) and isFriend) then
@@ -395,6 +421,9 @@ local function HandleAddedAura(aura)
 			end
 		end
 		HandleStrangersBuff(creditGUID, creditName, spellID)
+		if ns.NoteFavor then
+			ns.NoteFavor(creditGUID, creditName)
+		end
 	end
 end
 
@@ -438,8 +467,19 @@ local function LogAuraUpdate(updateInfo)
 	end
 end
 
--- Core registers UNIT_AURA for "player" only.
-local function OnUnitAura(_, updateInfo)
+--[[
+    Core registers UNIT_AURA on every flavor and for every unit, because the
+    Buff Window reads the whole group; this handler owns the event and hands it
+    on there first. Everything below it is Forever's buff detection, which only
+    ever cares about auras on you.
+]]
+local function OnUnitAura(unit, updateInfo)
+	if ns.OnBuffWindowAura then
+		ns.OnBuffWindowAura(unit)
+	end
+	if ns.FLAVOR ~= "Camelot" or unit ~= "player" then
+		return
+	end
 	if ns.diagnostics and ns.diagnostics.logging then
 		LogAuraUpdate(updateInfo)
 	end
@@ -488,8 +528,6 @@ function ns.SetupBuffTracking()
 end
 
 ns.SetEventHandler("COMBAT_LOG_EVENT_UNFILTERED", OnCombatLogEventUnfiltered)
-if ns.FLAVOR == "Camelot" then
-	ns.SetEventHandler("UNIT_AURA", OnUnitAura)
-end
+ns.SetEventHandler("UNIT_AURA", OnUnitAura)
 ns.SetEventHandler("UNIT_SPELLCAST_SUCCEEDED", OnUnitSpellcastSucceeded)
 ns.SetEventHandler("LOADING_SCREEN_DISABLED", OnLoadingScreenDisabled)

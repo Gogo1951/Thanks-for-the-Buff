@@ -32,6 +32,8 @@ local AURA_SETTLE = 0.1 -- the aura lands a moment after the cast succeeds
     people actually cast: at your target, a mouseover/focus macro, then a group
     member by unit token.
 ]]
+local CAST_AT_UNITS = { "target", "mouseover", "focus" }
+
 local function ResolveUnitByName(name)
 	if not name then
 		return nil
@@ -45,7 +47,7 @@ local function ResolveUnitByName(name)
 		return unitName ~= nil and (unitName == name or Ambiguate(unitName, "short") == short)
 	end
 
-	for _, unit in ipairs({ "target", "mouseover", "focus" }) do
+	for _, unit in ipairs(CAST_AT_UNITS) do
 		if Matches(unit) then
 			return unit, UnitGUID(unit)
 		end
@@ -129,8 +131,7 @@ end
 --[[
     Good News for a cast of yours. "Yours" includes your PET's: Roar of Sacrifice
     and Battle Squawk are cast by the pet, never by the player, so a bare
-    unit == "player" test silently switched Good News off for every pet-cast
-    entry in the data -- the recipient sees the buff and hears nothing.
+    unit == "player" test would leave every pet-cast entry silent.
 
     Nothing downstream needs to know which of the two it was. The whisper names
     the buff, not the caster, and the recipient's experience is identical either
@@ -158,17 +159,21 @@ local function OnUnitSpellcastSent(_, target, castGUID, spellID)
 	end
 
 	local recipientUnit, guid = ResolveUnitByName(target)
-	-- Players only, never yourself. An unresolvable name is dropped rather than
-	-- guessed at: we can't confirm it isn't a pet, and a whisper to a pet bounces.
+	--[[
+	    Players only, never yourself. An unresolvable name is dropped rather than
+	    guessed at: we can't confirm it isn't a pet, and a whisper to a pet bounces.
+	]]
 	if not ns.IsPlayerGUID(guid) or guid == ns.GetPlayerGUID() then
 		return
 	end
 
-	-- Recipient scope: ALWAYS whispers anyone you buff; everything else means
-	-- group members only -- your party or raid, and a battleground IS a raid
-	-- group, so it needs no case of its own. Unrecognized values fail closed
-	-- into the group check: for an outgoing-whisper feature, the safe wrong
-	-- guess is fewer strangers whispered, not more.
+	--[[
+	    Recipient scope: ALWAYS whispers anyone you buff; everything else means
+	    group members only -- your party or raid, and a battleground IS a raid
+	    group, so it needs no case of its own. Unrecognized values fail closed
+	    into the group check: for an outgoing-whisper feature, the safe wrong
+	    guess is fewer strangers whispered, not more.
+	]]
 	if db.scope ~= "ALWAYS" then
 		if not (UnitInParty(recipientUnit) or UnitInRaid(recipientUnit)) then
 			return

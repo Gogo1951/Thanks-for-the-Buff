@@ -1,40 +1,39 @@
 local _, ns = ...
 local L = ns.L
 
--- The message row mirrors the Thank You Button's: a caption-sized label, the
--- edit box, and the Reset button, together one row, so a whole sentence stays
--- readable.
+--[[
+    The message row mirrors the Thank You Button's: a caption-sized label, the
+    edit box, and the Reset button, together one row, so a whole sentence stays
+    readable.
+]]
 local MESSAGE_LABEL_WIDTH = 0.9
 local RESET_WIDTH = 0.5
 local MESSAGE_INPUT_WIDTH = ns.OPTIONS_ROW_WIDTH - MESSAGE_LABEL_WIDTH - RESET_WIDTH
 
 --[[
     "Good News" panel -- whispers for tracked buffs YOU cast on other players
-    (settings live under goodNews). It renders its own class categories
-    (ns.GoodNewsCategories: the teammate list plus any row this client can't
-    see landing on you; services have no per-person recipient and are absent
-    by construction), and its toggles bind to the independent goodNews.watched
-    list, so "thank for it" and "announce it" stay separate choices on the same
-    ids. Registered as a function, like
-    Teammates, so the tracked list is rebuilt on open once lazily-loaded item
-    names are cached.
+    (settings live under goodNews). Its tracked list lives in its own sub-panel
+    (Options-Send-Good-News-Tracked.lua), which renders ns.GoodNewsCategories:
+    the teammate list plus any row this client can't see landing on you;
+    services have no per-person recipient and are absent by construction.
 ]]
 
 local MESSAGE_MAX = 120
 
--- Joined rather than merged into one locale string: TOKENS carries the literal
--- %a a player is meant to copy, so it must never reach string.format -- only the
--- limit line, whose %d is a real placeholder, does.
+--[[
+    Joined rather than merged into one locale string: TOKENS carries the literal
+    %a a player is meant to copy, so it must never reach string.format -- only the
+    limit line, whose %d is a real placeholder, does.
+]]
 local function MessageHelp()
 	return string.format(L["GOOD_NEWS_MESSAGE_LIMIT"], MESSAGE_MAX) .. " " .. L["GOOD_NEWS_MESSAGE_TOKENS"]
 end
 
 function ns.BuildGoodNewsOptions()
-	local function GivenWatched()
-		return ns.db.profile.goodNews.watched
-	end
-	-- The enable toggle is the panel's master switch: everything below it hides
-	-- outright when Good News is off.
+	--[[
+	    The enable toggle is the panel's master switch: everything below it hides
+	    outright when Good News is off.
+	]]
 	local function GoodNewsHidden()
 		return not ns.db.profile.goodNews.whisperEnabled
 	end
@@ -62,17 +61,21 @@ function ns.BuildGoodNewsOptions()
 				},
 				sorting = { "ALWAYS", "GROUP" },
 				get = function()
-					-- Anything that isn't ALWAYS displays as GROUP, so a stale
-					-- stored value can never leave the dropdown showing blank.
+					--[[
+					    Anything that isn't ALWAYS displays as GROUP, so a stale
+					    stored value can never leave the dropdown showing blank.
+					]]
 					return ns.db.profile.goodNews.scope == "ALWAYS" and "ALWAYS" or "GROUP"
 				end,
-				set = function(_, val)
-					ns.db.profile.goodNews.scope = val
+				set = function(_, value)
+					ns.db.profile.goodNews.scope = value
 				end,
 			},
 			space1 = ns.OptionsSpacer(5, GoodNewsHidden),
 			headerMessages = ns.OptionsHeader(L["GOOD_NEWS_MESSAGES_HEADER"], 6, GoodNewsHidden),
 			space2 = ns.OptionsSpacer(7, GoodNewsHidden),
+			descMessages = ns.OptionsDesc(L["GOOD_NEWS_MESSAGES_DESCRIPTION"], 7.3, GoodNewsHidden),
+			spaceMessages = ns.OptionsSpacer(7.6, GoodNewsHidden),
 			messageLabel = ns.OptionsRowLabel(L["WHISPER_MESSAGE"], 8, MESSAGE_LABEL_WIDTH, GoodNewsHidden),
 			--[[
                 The editable body only. The star marker (left off on WoW Forever)
@@ -94,17 +97,19 @@ function ns.BuildGoodNewsOptions()
 				get = function()
 					return ns.db.profile.goodNews.message
 				end,
-				set = function(_, val)
-					val = ns.TrimToBytes(val or "", MESSAGE_MAX)
-					if val:match("^%s*$") then
-						val = L["DEFAULT_GOOD_NEWS"]
+				set = function(_, value)
+					value = ns.TrimToBytes(value or "", MESSAGE_MAX)
+					if value:match("^%s*$") then
+						value = ns.DATABASE_DEFAULTS.profile.goodNews.message
 					end
-					ns.db.profile.goodNews.message = val
+					ns.db.profile.goodNews.message = value
 				end,
 			},
-			-- Same row as the label and box, same "half" width and shared wording
-			-- as the Thank You Button's: the two panels offer the identical
-			-- affordance and should not look like two different features.
+			--[[
+			    Same row as the label and box, same "half" width and shared wording
+			    as the Thank You Button's: the two panels offer the identical
+			    affordance and should not look like two different features.
+			]]
 			resetMessage = {
 				type = "execute",
 				name = L["WHISPER_MESSAGE_RESET"],
@@ -113,11 +118,11 @@ function ns.BuildGoodNewsOptions()
 				order = 10,
 				hidden = GoodNewsHidden,
 				func = function()
-					ns.db.profile.goodNews.message = L["DEFAULT_GOOD_NEWS"]
+					ns.db.profile.goodNews.message = ns.DATABASE_DEFAULTS.profile.goodNews.message
 				end,
 			},
 			--[[
-                A sample of the outgoing whisper, built by the SAME pipeline that
+                An Example line for the outgoing whisper, built by the SAME pipeline that
                 sends the real one (their template, spell link, localized
                 duration), so it can never drift from what recipients actually
                 get -- and so an edit above is visible here immediately. Only the
@@ -126,46 +131,13 @@ function ns.BuildGoodNewsOptions()
                 options-panel text does not.
             ]]
 			sampleSpacer = ns.OptionsSpacer(12, GoodNewsHidden),
-			sampleMessage = {
-				type = "description",
-				name = function()
-					local link = ns.GetSpellLink(ns.GAME_IDS.SAMPLE_GOOD_NEWS_SPELL_ID) or ""
-					local message = ns:BuildGoodNewsMessage(link, 15)
-					return "   "
-						.. message:gsub(ns.TARGET_MARKER, "|TInterface\\TargetingFrame\\UI-RaidTargetingIcon_1:14|t", 1)
-						.. "\n"
-				end,
-				fontSize = "medium",
-				order = 13,
-				hidden = GoodNewsHidden,
-			},
-			space3 = ns.OptionsSpacer(14, GoodNewsHidden),
-			headerTracked = ns.OptionsHeader(L["TRACKED_HEADER"], 15, GoodNewsHidden),
-			space4 = ns.OptionsSpacer(16, GoodNewsHidden),
+			sampleMessage = ns.OptionsExample(function()
+				local link = ns.GetSpellLink(ns.GAME_IDS.SAMPLE_GOOD_NEWS_SPELL_ID) or ""
+				local message = ns:BuildGoodNewsMessage(link, 15)
+				return ns.MarkerAsTexture(message)
+			end, 13, GoodNewsHidden),
 		},
 	}
-
-	local categoryOrder = 20
-	for _, category in ipairs(ns.GoodNewsCategories or {}) do
-		local groupKey = "cat_" .. category.id
-		options.args[groupKey] = {
-			type = "group",
-			name = category.name,
-			order = categoryOrder,
-			inline = true,
-			hidden = GoodNewsHidden,
-			args = {},
-		}
-
-		local entryOrder = 1
-		for _, entry in ipairs(ns.SortedEntries(category.entries)) do
-			options.args[groupKey].args["entry_" .. entry.ids[1]] =
-				ns.DefineEntryToggle(entry, entryOrder, GivenWatched)
-			entryOrder = entryOrder + 1
-		end
-
-		categoryOrder = categoryOrder + 1
-	end
 
 	return options
 end

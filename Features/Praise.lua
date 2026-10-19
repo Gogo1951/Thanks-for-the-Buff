@@ -25,9 +25,11 @@ end
 
 local function SetCooldown(guid, duration)
 	local now = GetTime()
-	-- Opportunistic sweep: drop lapsed entries so the table can't grow unbounded
-	-- across a long session (one key per distinct source/recipient reacted to).
-	-- Clearing an existing field mid-pairs is defined behavior in Lua.
+	--[[
+	    Opportunistic sweep: drop lapsed entries so the table can't grow unbounded
+	    across a long session (one key per distinct source/recipient reacted to).
+	    Clearing an existing field mid-pairs is defined behavior in Lua.
+	]]
 	for key, expiresAt in pairs(sessionCooldowns) do
 		if expiresAt <= now then
 			sessionCooldowns[key] = nil
@@ -59,9 +61,11 @@ local function TryWhisperCooldown(guid)
 	return true
 end
 
--- The Strangers panel's overall praise limit: one key for the whole feature,
--- since it asks "how recently did I praise ANYONE", not "how recently did I
--- praise this player" (that is the per-source "praise:<guid>" key).
+--[[
+    The Strangers panel's overall praise limit: one key for the whole feature,
+    since it asks "how recently did I praise ANYONE", not "how recently did I
+    praise this player" (that is the per-source "praise:<guid>" key).
+]]
 local PRAISE_OVERALL_KEY = "praise:all"
 
 -- Shared with Good News, which dedupes its whispers in the same table.
@@ -95,7 +99,7 @@ end
     Deliberately looser than true emote range (emote text broadcasts at say
     range, far shorter than either check). Nothing in the API measures that, and
     erring loose costs an emote nobody sees, while erring tight silently drops
-    thanks the buffer WAS standing there for -- the worse failure for an addon
+    thanks the buffer WAS standing there for -- the worse failure for an add-on
     whose whole job is thanking people.
 
     On WoW Forever UnitInRange answers a stranger with secret booleans even out
@@ -131,7 +135,7 @@ end
     emote. That
     hole closes only by dropping the name fallback entirely, which would also
     drop the ordinary case of a stranger buffing you while standing right there
-    untargeted -- the addon's most common thank of all.
+    untargeted -- the add-on's most common thank of all.
 ]]
 local function ResolveEmoteTarget(guid, name)
 	local unit = ns.GetUnitByGUID(guid)
@@ -203,11 +207,15 @@ local function HandleTracked(entry, spellID, creditGUID, creditName, destGUID)
 		return
 	end
 
-	-- No-aura raid help reacts with the Service Alerts settings; everything cast
-	-- on you (SOLO / GROUP) uses the Teammate Buffs settings.
+	--[[
+	    No-aura raid help reacts with the Service Alerts settings; everything cast
+	    on you (SOLO / GROUP) uses the Teammate Buffs settings.
+	]]
 	local db = (entry.type == Data.BUFF.SERVICE) and ns.db.profile.services or ns.db.profile.teammates
-	-- Each panel's master switch, checked once here rather than at each of the
-	-- four outputs below.
+	--[[
+	    Each panel's master switch, checked once here rather than at each of the
+	    four outputs below.
+	]]
 	if not db.enabled then
 		return
 	end
@@ -217,14 +225,18 @@ local function HandleTracked(entry, spellID, creditGUID, creditName, destGUID)
 		ns:AnnounceTracked(entry, creditGUID, creditName, link)
 	end
 
-	-- Like the print, the sound is self-only and fires on every acknowledged
-	-- cast, in or out of combat.
+	--[[
+	    Like the print, the sound is self-only and fires on every acknowledged
+	    cast, in or out of combat.
+	]]
 	if db.soundEnabled then
 		ns.PlayBuffSound()
 	end
 
-	-- Emotes are visible and social, so a buff that lands while you are fighting
-	-- simply goes un-emoted: suppressed, never queued for after combat.
+	--[[
+	    Emotes are visible and social, so a buff that lands while you are fighting
+	    simply goes un-emoted: suppressed, never queued for after combat.
+	]]
 	local whisperAllowed = db.whisperEnabled and TryWhisperCooldown(creditGUID)
 	local emoteAllowed = db.emotesEnabled and not InCombatLockdown()
 	if whisperAllowed or emoteAllowed then
@@ -251,8 +263,10 @@ local function HandleStrangersBuff(sourceGUID, sourceName, spellID)
 
 	local link = ns.GetBuffLink(nil, spellID)
 
-	-- Notifications are self-only and fire for every qualifying buff, in or out of
-	-- combat. Only the praise below answers to the cooldowns and the delay.
+	--[[
+	    Notifications are self-only and fire for every qualifying buff, in or out of
+	    combat. Only the praise below answers to the cooldowns and the delay.
+	]]
 	if db.printEnabled then
 		ns:AnnounceStranger(sourceGUID, sourceName, link)
 	end

@@ -45,8 +45,10 @@ local emoteCatalog, emoteTokens
 local function BuildEmoteCatalog()
 	emoteCatalog, emoteTokens = {}, {}
 
-	-- The client's own list of emotes that play a voice line. Absent on some
-	-- builds, in which case the voice column simply reads unknown.
+	--[[
+	    The client's own list of emotes that play a voice line. Absent on some
+	    builds, in which case the voice column simply reads unknown.
+	]]
 	local voice = {}
 	if type(TextEmoteSpeechList) == "table" then
 		for _, entry in pairs(TextEmoteSpeechList) do
@@ -57,24 +59,27 @@ local function BuildEmoteCatalog()
 	for index = 1, (MAXEMOTEINDEX or EMOTE_SCAN_CEILING) do
 		local token = _G["EMOTE" .. index .. "_TOKEN"]
 		if token and not emoteTokens[token] then
-			-- CMD1 is the primary; the rest are aliases, and the client repeats the
-			-- whole set once per locale, so exact repeats are dropped.
+			--[[
+			    CMD1 is the primary; the rest are aliases, and the client repeats the
+			    whole set once per locale, so exact repeats are dropped.
+			]]
 			local aliases, seen = {}, {}
 			for c = 1, 8 do
-				local cmd = _G["EMOTE" .. index .. "_CMD" .. c]
-				if cmd and cmd ~= "" and not seen[cmd] then
-					seen[cmd] = true
-					aliases[#aliases + 1] = cmd
+				local command = _G["EMOTE" .. index .. "_CMD" .. c]
+				if command and command ~= "" and not seen[command] then
+					seen[command] = true
+					aliases[#aliases + 1] = command
 				end
 			end
-			emoteTokens[token] = true
-			emoteCatalog[#emoteCatalog + 1] = {
+			local entry = {
 				index = index,
 				token = token,
 				command = aliases[1] or ("/" .. token:lower()),
 				aliases = table.concat(aliases, " "),
 				voice = voice[token] == true,
 			}
+			emoteTokens[token] = entry
+			emoteCatalog[#emoteCatalog + 1] = entry
 		end
 	end
 
@@ -96,7 +101,16 @@ function ns.IsClientEmote(token)
 	if not emoteTokens then
 		BuildEmoteCatalog()
 	end
-	return token ~= nil and emoteTokens[token] == true
+	return token ~= nil and emoteTokens[token] ~= nil
+end
+
+-- The slash command this client gives an emote token, in its own language.
+function ns.GetEmoteCommand(token)
+	if not emoteTokens then
+		BuildEmoteCatalog()
+	end
+	local entry = emoteTokens[token]
+	return entry and entry.command or ("/" .. token:lower())
 end
 
 --------------------------------------------------------------------------------
@@ -108,8 +122,10 @@ function ns.IsPlain(value)
 	return not (issecretvalue and issecretvalue(value))
 end
 
--- On WoW Forever, unit identity and aura data go secret in combat. Ask these
--- before reading either; both are always false on the other flavors.
+--[[
+    On WoW Forever, unit identity and aura data go secret in combat. Ask these
+    before reading either; both are always false on the other flavors.
+]]
 function ns.IsUnitIdentitySecret(unit)
 	return ns.FLAVOR == "Camelot" and C_Secrets.ShouldUnitIdentityBeSecret(unit)
 end
@@ -133,9 +149,11 @@ end
     Native is only a last resort, for the rare spell whose name won't resolve (so we
     can't build the link text ourselves) -- at least it gives something on screen.
 ]]
--- The client's own spell-link blue, verbatim. Not a palette role, so it is kept
--- separate; the exact literal is preserved because this string is handed to
--- SendChatMessage's hyperlink validator (see ns.GetSpellLink below).
+--[[
+    The client's own spell-link blue, verbatim. Not a palette role, so it is kept
+    separate; the exact literal is preserved because this string is handed to
+    SendChatMessage's hyperlink validator (see ns.GetSpellLink below).
+]]
 local C_SPELL_LINK = "71d5ff"
 
 function ns.GetSpellLink(spellId)
@@ -170,9 +188,11 @@ end
 -- Sound
 --------------------------------------------------------------------------------
 
--- Both sounds play on the Master channel so they stay audible for players who
--- run with game sound effects turned down. File names must match
--- Includes/Sounds/ exactly.
+--[[
+    Both sounds play on the Master channel so they stay audible for players who
+    run with game sound effects turned down. File names must match
+    Includes/Sounds/ exactly.
+]]
 local SOUND_ROOT = "Interface/AddOns/" .. ADDON_NAME .. "/Includes/Sounds/"
 
 -- Any buff landing on you shares this one, stranger or teammate alike.
@@ -241,6 +261,8 @@ end
     emote caller then falls back to the bare name or no emote, never the
     undirected one.
 ]]
+local POINTED_UNITS = { "target", "focus", "mouseover" }
+
 function ns.GetUnitByGUID(guid)
 	if not guid then
 		return nil
@@ -258,10 +280,50 @@ function ns.GetUnitByGUID(guid)
 			return unit
 		end
 	end
-	for _, unit in ipairs({ "target", "focus", "mouseover" }) do
+	for _, unit in ipairs(POINTED_UNITS) do
 		if UnitExists(unit) and UnitGUID(unit) == guid then
 			return unit
 		end
 	end
 	return nil
+end
+
+--------------------------------------------------------------------------------
+-- Unit Tooltip
+--------------------------------------------------------------------------------
+
+--[[
+    A unit's tooltip as plain left-hand lines, title first. Some facts about a
+    unit reach add-ons only as tooltip text -- whose pet a pet is, above all --
+    so the Buff Window reads them here. C_TooltipInfo hands the lines over as
+    data where the client ships its GetUnit getter (WoW Forever); elsewhere they
+    are read off a hidden tooltip that is never shown (Classic Era and TBC
+    Anniversary), the same split Diagnostics makes for items and spells.
+    Resolved once at load.
+]]
+local UNIT_SCAN_TOOLTIP_NAME = "TFTBUnitScanTooltip"
+local GetUnitTooltipData = C_TooltipInfo and C_TooltipInfo.GetUnit
+local unitScanTooltip
+
+function ns.GetUnitTooltipLines(unit)
+	local lines = {}
+	if GetUnitTooltipData then
+		local data = GetUnitTooltipData(unit)
+		for _, line in ipairs(data and data.lines or {}) do
+			lines[#lines + 1] = line.leftText
+		end
+		return lines
+	end
+
+	if not unitScanTooltip then
+		unitScanTooltip = CreateFrame("GameTooltip", UNIT_SCAN_TOOLTIP_NAME, nil, "GameTooltipTemplate")
+	end
+	unitScanTooltip:SetOwner(WorldFrame, "ANCHOR_NONE")
+	unitScanTooltip:SetUnit(unit)
+	for i = 1, unitScanTooltip:NumLines() do
+		local region = _G[UNIT_SCAN_TOOLTIP_NAME .. "TextLeft" .. i]
+		lines[#lines + 1] = region and region:GetText()
+	end
+	unitScanTooltip:Hide()
+	return lines
 end

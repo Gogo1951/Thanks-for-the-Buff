@@ -1,13 +1,13 @@
 local _, ns = ...
+local Data = ns.Data
 local L = ns.L
 
 --[[
     "Teammate Buffs" panel -- party/raid buffs & cooldowns cast on you. Two
     sections, as on Stranger Buffs: Praise (what the teammate sees) and
-    Notifications (the chat line and sound only you get), then one inline group of
-    tracked abilities per class category, built at login. The controls come from
-    the shared factories in Options-Utilities.lua (ns.Define* / ns.SortedEntries /
-    ns.DefineEntryToggle).
+    Notifications (the chat line and sound only you get). The tracked abilities
+    live in their own sub-panel (Options-Teammate-Buffs-Tracked.lua). The
+    controls come from the shared factories in Options-Utilities.lua (ns.Define*).
 
     No cooldown dropdowns here, unlike Strangers: a teammate's cooldown is worth
     acknowledging every single time it lands, so only the outgoing whisper is
@@ -26,20 +26,26 @@ function ns.BuildTeammatesOptions()
 			descIntro = ns.OptionsDesc(L["TEAMMATES_DESCRIPTION"], 1),
 			space0 = ns.OptionsSpacer(2),
 
-			-- Master switch: everything below it hides when off, and the feature
-			-- itself stops -- see the `enabled` gate in Praise. Its twin sits in
-			-- the General panel's Features section. Fractional orders keep it above
-			-- the first header without renumbering the panel.
+			--[[
+			    Master switch: everything below it hides when off, and the feature
+			    itself stops -- see the `enabled` gate in Praise. Its twin sits in
+			    the General panel's Features section. Fractional orders keep it above
+			    the first header without renumbering the panel.
+			]]
 			enable = ns.OptionsFeatureToggle(ns.GetFeatureSwitch("teammates"), 2.5),
 			enableSpacer = ns.OptionsSpacer(2.6),
 
 			headerPraise = ns.OptionsHeader(L["PRAISE_HEADER"], 3),
 			space1 = ns.OptionsSpacer(4),
+			descPraise = ns.OptionsDesc(L["PRAISE_DESCRIPTION"], 4.3),
+			spacePraise = ns.OptionsSpacer(4.6),
 			emotes = ns.DefineEmotesToggle(settings, 5),
 			emoteSpacer = ns.OptionsSpacer(6, ns.EmotesHidden(settings)),
 			emoteGroup = ns.DefineEmoteGroup(settings, 7),
 			space2 = ns.OptionsSpacer(8),
 			whisper = ns.DefineWhisperToggle(settings, 9),
+			whisperExampleSpacer = ns.DefineExampleSpacer(settings, "whisperEnabled", 9.3),
+			whisperExample = ns.DefineWhisperExample(settings, 9.6, ns.GAME_IDS.SAMPLE_BUFF_SPELL_ID),
 			space3 = ns.OptionsSpacer(10),
 			praiseDelay = ns.DefinePraiseDelayToggle(settings, 11),
 			praiseDelayLength = ns.DefinePraiseDelaySelect(settings, 12),
@@ -47,37 +53,19 @@ function ns.BuildTeammatesOptions()
 
 			headerNotifications = ns.OptionsHeader(L["NOTIFICATIONS_HEADER"], 14),
 			space5 = ns.OptionsSpacer(15),
+			descNotifications = ns.OptionsDesc(L["NOTIFICATIONS_DESCRIPTION"], 15.3),
+			spaceNotifications = ns.OptionsSpacer(15.6),
 			printOut = ns.DefinePrintToggle(settings, 16),
+			printExampleSpacer = ns.DefineExampleSpacer(settings, "printEnabled", 16.3),
+			printExample = ns.DefinePrintExample(settings, 16.6, function(class, name)
+				local link = ns.GetSpellLink(ns.GAME_IDS.SAMPLE_BUFF_SPELL_ID) or ""
+				return ns:BuildTrackedMessage({ type = Data.BUFF.SOLO, detect = Data.DETECT.AURA }, class, name, link)
+			end),
 			space6 = ns.OptionsSpacer(17),
 			sound = ns.DefineSoundToggle(settings, 18),
 			soundPreview = ns.DefineSoundPreview(ns.PlayBuffSound, 19),
-			space7 = ns.OptionsSpacer(20),
-
-			headerTracked = ns.OptionsHeader(L["TRACKED_HEADER"], 21),
-			space8 = ns.OptionsSpacer(22),
 		},
 	}
-
-	-- One inline group per category (each class, then Items), built at login.
-	local categoryOrder = 30
-	for _, category in ipairs(ns.TeammateCategories or {}) do
-		local groupKey = "cat_" .. category.id
-		options.args[groupKey] = {
-			type = "group",
-			name = category.name,
-			order = categoryOrder,
-			inline = true,
-			args = {},
-		}
-
-		local entryOrder = 1
-		for _, entry in ipairs(ns.SortedEntries(category.entries)) do
-			options.args[groupKey].args["entry_" .. entry.ids[1]] = ns.DefineEntryToggle(entry, entryOrder)
-			entryOrder = entryOrder + 1
-		end
-
-		categoryOrder = categoryOrder + 1
-	end
 
 	-- Intro text and the switch itself stay; everything else follows the switch.
 	ns.HideAllExcept(options.args, function()

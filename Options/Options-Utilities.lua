@@ -12,22 +12,35 @@ local GetSpellTexture = C_Spell.GetSpellTexture
 --------------------------------------------------------------------------------
 
 --[[
+    The title drawn at the top of a sub-panel: "Teammate Buffs > Tracked
+    Abilities", so it is always clear where you are. Only the title carries the
+    parent; the settings tree already shows it by nesting, and the tree label is
+    the plain name passed to AddToBlizOptions.
+]]
+function ns.SubPanelTitle(parentName, name)
+	return parentName .. " > " .. name
+end
+
+--[[
     Every section header in the add-on is a real AceConfig "header" -- the ruled
     line with the title set into it -- and no panel draws its own out of a colored
-    description. `hidden` is optional (a function or a boolean) for the panels
-    whose whole section collapses behind a master switch.
+    description. `hidden` is optional (a function or a boolean) here and on
+    OptionsDesc and OptionsSpacer, for the panels whose whole section collapses
+    behind a master switch.
 ]]
 function ns.OptionsHeader(text, order, hidden)
 	return { type = "header", name = GetColor("TITLE") .. text .. "|r", order = order, hidden = hidden }
 end
 
-function ns.OptionsDesc(text, order)
-	return { type = "description", name = text, fontSize = "medium", order = order }
+function ns.OptionsDesc(text, order, hidden)
+	return { type = "description", name = text, fontSize = "medium", order = order, hidden = hidden }
 end
 
--- Always seconds. FormatDuration switches to minutes above 60 and rounds, which
--- is right for a buff ticking down and wrong for a fixed list: it would print 89
--- as "1 Minute" and 144 as "2 Minutes", two units in one dropdown.
+--[[
+    Always seconds. FormatDuration switches to minutes above 60 and rounds, which
+    is right for a buff ticking down and wrong for a fixed list: it would print 89
+    as "1 Minute" and 144 as "2 Minutes", two units in one dropdown.
+]]
 local function FormatChoice(seconds)
 	return ns.FormatDuration(seconds, true)
 end
@@ -58,10 +71,12 @@ function ns.DefineSecondsSelect(settings, key, order, desc)
 	return {
 		type = "select",
 		desc = desc,
-		-- The right half of a label-beside-control row: the caller pairs this with
-		-- ns.OptionsRowLabel, the same way every other dropdown in the add-on is
-		-- built. A select carrying its own `name` stacks the label above itself in
-		-- header gold, which is not how this UI reads a setting.
+		--[[
+		    The right half of a label-beside-control row: the caller pairs this with
+		    ns.OptionsRowLabel, the same way every other dropdown in the add-on is
+		    built. A select carrying its own `name` stacks the label above itself in
+		    header gold, which is not how this UI reads a setting.
+		]]
 		name = "",
 		width = ns.OPTIONS_CONTROL_WIDTH,
 		order = order,
@@ -76,14 +91,77 @@ function ns.DefineSecondsSelect(settings, key, order, desc)
 		get = function()
 			return NearestChoice(settings()[key])
 		end,
-		set = function(_, val)
-			settings()[key] = val
+		set = function(_, value)
+			settings()[key] = value
 		end,
 	}
 end
 
 function ns.OptionsSpacer(order, hidden)
 	return { type = "description", name = " ", order = order, hidden = hidden }
+end
+
+--[[
+    A silver "Example:" line showing the exact string a feature prints or
+    sends. getText returns the whole string, brand prefix included where the
+    real one carries it; a function so the line redraws as settings change.
+]]
+function ns.OptionsExample(getText, order, hidden)
+	return {
+		type = "description",
+		name = function()
+			return GetColor("HELP") .. L["OPTIONS_EXAMPLE"]:format(GetColor("TEXT") .. getText() .. "|r") .. "|r"
+		end,
+		fontSize = "medium",
+		order = order,
+		hidden = hidden,
+	}
+end
+
+-- Chat draws the {rt1} marker as the Star icon; panel text needs the texture itself.
+function ns.MarkerAsTexture(message)
+	return (message:gsub(ns.TARGET_MARKER, "|TInterface\\TargetingFrame\\UI-RaidTargetingIcon_1:14|t", 1))
+end
+
+-- The player every buff panel's Example lines credit.
+local SAMPLE_NAME, SAMPLE_CLASS = "Expektor", "MAGE"
+
+--[[
+    The Example line under a buff panel's print toggle, hidden with it. build
+    gets the sample player's class and name and returns the message body, made
+    by the same builder the real print uses.
+]]
+function ns.DefinePrintExample(settings, order, build)
+	return ns.OptionsExample(
+		function()
+			return ns.GetPrintPrefix() .. build(SAMPLE_CLASS, SAMPLE_NAME)
+		end,
+		order,
+		function()
+			return not settings().printEnabled
+		end
+	)
+end
+
+-- The Example line under a buff panel's whisper toggle, hidden with it.
+function ns.DefineWhisperExample(settings, order, spellId)
+	return ns.OptionsExample(
+		function()
+			local link = ns.GetSpellLink(spellId) or ""
+			return ns.MarkerAsTexture(ns:BuildAnnounceMessage("MESSAGE_WHISPER_THANKS", link))
+		end,
+		order,
+		function()
+			return not settings().whisperEnabled
+		end
+	)
+end
+
+-- The blank line above an Example, hidden whenever the Example is.
+function ns.DefineExampleSpacer(settings, key, order)
+	return ns.OptionsSpacer(order, function()
+		return not settings()[key]
+	end)
 end
 
 --[[
@@ -123,9 +201,11 @@ function ns.OptionsRowLabel(text, order, width, hidden)
 		fontSize = "medium",
 		width = width or ns.OPTIONS_LABEL_WIDTH,
 		order = order,
-		-- A label has no state of its own, so nothing hides it unless it is told
-		-- to: on a panel behind a master switch, one left out is the caption that
-		-- stays floating after everything it described has gone.
+		--[[
+		    A label has no state of its own, so nothing hides it unless it is told
+		    to: on a panel behind a master switch, one left out is the caption that
+		    stays floating after everything it described has gone.
+		]]
 		hidden = hidden,
 	}
 end
@@ -175,8 +255,11 @@ end
     hides follow at once.
 ]]
 ns.FEATURE_SWITCHES = {
-	-- key: the profile subtable, setting: its on/off field, name/desc: locale keys,
-	-- loaded: present only for a feature a flavor's TOC can leave out.
+	--[[
+	    key: the profile subtable, setting: its on/off field, name/desc: locale keys,
+	    loaded: present only for a feature a flavor's TOC can leave out,
+	    onChange: present only for a feature that must react the moment either copy flips.
+	]]
 	{ key = "strangers", setting = "enabled", name = "STRANGERS_ENABLE", desc = "STRANGERS_ENABLE_DESCRIPTION" },
 	{ key = "teammates", setting = "enabled", name = "TEAMMATES_ENABLE", desc = "TEAMMATES_ENABLE_DESCRIPTION" },
 	{
@@ -193,6 +276,15 @@ ns.FEATURE_SWITCHES = {
 		desc = "PEER_PRESSURE_ENABLE_DESCRIPTION",
 		loaded = function()
 			return ns.BuildPeerPressureOptions ~= nil
+		end,
+	},
+	{
+		key = "buffWindow",
+		setting = "enabled",
+		name = "BUFF_WINDOW_ENABLE",
+		desc = "BUFF_WINDOW_ENABLE_DESCRIPTION",
+		onChange = function()
+			ns.RefreshBuffWindow()
 		end,
 	},
 }
@@ -216,6 +308,9 @@ function ns.OptionsFeatureToggle(feature, order, width)
 		end,
 		set = function(_, value)
 			ns.db.profile[feature.key][feature.setting] = value
+			if feature.onChange then
+				feature.onChange()
+			end
 			NotifyAllPanels()
 		end,
 	}
@@ -266,8 +361,7 @@ end
 --[[
     Widget factories shared by the three buff panels (Stranger Buffs, Teammate
     Buffs, Service Alerts). Each panel file owns its own layout and order
-    numbers, since the three no longer share one shape, and draws its controls
-    from here. Every factory takes a `settings` accessor returning the profile
+    numbers, and draws its controls from here. Every factory takes a `settings` accessor returning the profile
     subtable the control binds to (ns.db.profile.strangers / .teammates /
     .services), so one definition serves every panel. The watched-buff list is
     shared between Teammates and Services (ns.db.profile.watchedBuffs); a given id
@@ -310,8 +404,10 @@ function ns.DefineEntryToggle(entry, order, watched)
 			return shown
 		end
 		descField = function()
-			-- For a grouped toggle, list every member item (links) so the tooltip
-			-- spells out exactly what the single checkbox covers.
+			--[[
+			    For a grouped toggle, list every member item (links) so the tooltip
+			    spells out exactly what the single checkbox covers.
+			]]
 			if entry.itemIds and #entry.itemIds > 1 then
 				local lines = {}
 				for _, id in ipairs(entry.itemIds) do
@@ -333,8 +429,10 @@ function ns.DefineEntryToggle(entry, order, watched)
 		nameField = displayName
 
 		if entry.spellIds and #entry.spellIds > 1 then
-			-- Grouped spells (e.g. Portals): list the members alphabetically so the
-			-- tooltip spells out exactly what the one checkbox covers.
+			--[[
+			    Grouped spells (e.g. Portals): list the members alphabetically so the
+			    tooltip spells out exactly what the one checkbox covers.
+			]]
 			descField = function()
 				local names = {}
 				for _, id in ipairs(entry.spellIds) do
@@ -395,16 +493,18 @@ function ns.DefineEntryToggle(entry, order, watched)
 		get = function()
 			return list()[primary]
 		end,
-		set = function(_, val)
+		set = function(_, value)
 			for _, id in ipairs(ids) do
-				list()[id] = val
+				list()[id] = value
 			end
 		end,
 	}
 end
 
--- The displayed name embeds an icon escape (|T...|t), so sorting by it would sort
--- by texture path. This returns the clean, lowercased name for comparison only.
+--[[
+    The displayed name embeds an icon escape (|T...|t), so sorting by it would sort
+    by texture path. This returns the clean, lowercased name for comparison only.
+]]
 local function EntrySortKey(entry)
 	local name = entry.label or entry.spellName
 	if not name and entry.itemId then
@@ -413,21 +513,23 @@ local function EntrySortKey(entry)
 	return (name or ""):lower()
 end
 
--- A copy of `entries` ordered alphabetically by display name, with the watched id
--- breaking ties for a stable result. Item names resolve lazily, which is why the
--- panels register their builders as functions (run on open, when the item cache
--- is warm) rather than as prebuilt tables.
+--[[
+    A copy of `entries` ordered alphabetically by display name, with the watched id
+    breaking ties for a stable result. Item names resolve lazily, which is why the
+    panels register their builders as functions (run on open, when the item cache
+    is warm) rather than as prebuilt tables.
+]]
 function ns.SortedEntries(entries)
 	local sorted = {}
 	for i = 1, #entries do
 		sorted[i] = entries[i]
 	end
 	table.sort(sorted, function(a, b)
-		local ka, kb = EntrySortKey(a), EntrySortKey(b)
-		if ka == kb then
+		local keyA, keyB = EntrySortKey(a), EntrySortKey(b)
+		if keyA == keyB then
 			return (a.ids[1] or 0) < (b.ids[1] or 0)
 		end
-		return ka < kb
+		return keyA < keyB
 	end)
 	return sorted
 end
@@ -446,8 +548,8 @@ function ns.DefineSoundToggle(settings, order)
 		get = function()
 			return settings().soundEnabled
 		end,
-		set = function(_, val)
-			settings().soundEnabled = val
+		set = function(_, value)
+			settings().soundEnabled = value
 		end,
 	}
 end
@@ -494,8 +596,8 @@ function ns.DefinePrintToggle(settings, order)
 		get = function()
 			return settings().printEnabled
 		end,
-		set = function(_, val)
-			settings().printEnabled = val
+		set = function(_, value)
+			settings().printEnabled = value
 		end,
 	}
 end
@@ -510,8 +612,8 @@ function ns.DefineWhisperToggle(settings, order)
 		get = function()
 			return settings().whisperEnabled
 		end,
-		set = function(_, val)
-			settings().whisperEnabled = val
+		set = function(_, value)
+			settings().whisperEnabled = value
 		end,
 	}
 end
@@ -526,22 +628,26 @@ function ns.DefineEmotesToggle(settings, order)
 		get = function()
 			return settings().emotesEnabled
 		end,
-		set = function(_, val)
-			settings().emotesEnabled = val
+		set = function(_, value)
+			settings().emotesEnabled = value
 		end,
 	}
 end
 
--- Shared by the emote picker and the blank line above it, so both disappear
--- together when the panel's emotes are switched off.
+--[[
+    Shared by the emote picker and the blank line above it, so both disappear
+    together when the panel's emotes are switched off.
+]]
 function ns.EmotesHidden(settings)
 	return function()
 		return not settings().emotesEnabled
 	end
 end
 
--- The emote picker: one half-width toggle per entry in Data.EMOTES, inline under
--- the panel's Enable Emotes toggle and hidden along with it.
+--[[
+    The emote picker: one half-width toggle per entry in Data.EMOTES, inline under
+    the panel's Enable Emotes toggle and hidden along with it.
+]]
 function ns.DefineEmoteGroup(settings, order)
 	local group = {
 		type = "group",
@@ -553,18 +659,18 @@ function ns.DefineEmoteGroup(settings, order)
 	}
 
 	for i, emoteData in ipairs(Data.EMOTES) do
-		local emote = emoteData.cmd
+		local emote = emoteData.token
 		group.args[emote] = {
 			type = "toggle",
-			name = emoteData.displayName,
+			name = ns.GetEmoteCommand(emote),
 			desc = emoteData.desc,
 			order = i,
 			width = "half",
 			get = function()
 				return settings().emotes[emote]
 			end,
-			set = function(_, val)
-				settings().emotes[emote] = val
+			set = function(_, value)
+				settings().emotes[emote] = value
 			end,
 		}
 	end
@@ -589,16 +695,18 @@ function ns.DefinePraiseDelayToggle(settings, order)
 		get = function()
 			return settings().praiseDelayEnabled
 		end,
-		set = function(_, val)
-			settings().praiseDelayEnabled = val
+		set = function(_, value)
+			settings().praiseDelayEnabled = value
 		end,
 	}
 end
 
--- Nothing to set while the delay is off, so the dropdown only appears with it.
--- Its labels come from the client's own duration strings (ns.FormatDuration), so
--- "2 seconds" reads correctly in every language without TFTB shipping a string
--- per length. Data.PRAISE_DELAY_CHOICES doubles as the display order.
+--[[
+    Nothing to set while the delay is off, so the dropdown only appears with it.
+    Its labels come from the client's own duration strings (ns.FormatDuration), so
+    "2 seconds" reads correctly in every language without TFTB shipping a string
+    per length. Data.PRAISE_DELAY_CHOICES doubles as the display order.
+]]
 function ns.DefinePraiseDelaySelect(settings, order)
 	return {
 		type = "select",
@@ -620,8 +728,60 @@ function ns.DefinePraiseDelaySelect(settings, order)
 		get = function()
 			return settings().praiseDelay
 		end,
-		set = function(_, val)
-			settings().praiseDelay = val
+		set = function(_, value)
+			settings().praiseDelay = value
 		end,
+	}
+end
+
+--------------------------------------------------------------------------------
+-- Spell Dropdown Rows
+--------------------------------------------------------------------------------
+
+--[[
+    One spell's row inside a class's inline group: its icon and name as the
+    caption, and a dropdown beside it. The Buff Duty panels build their lists
+    from these, so every dropdown on them shares one x and one width -- the
+    caption takes ns.OPTIONS_INLINE_LABEL_WIDTH, and a row outside a box that
+    should line up with these takes ns.OPTIONS_ALIGNED_LABEL_WIDTH.
+
+    The dropdown's tooltip is the spell's own description, taken from the
+    highest id the client describes -- the rank you cast -- and asked for again
+    on each draw, because Classic only holds the text of another class's spells
+    once it has been requested. `fallback` is the tooltip until then.
+
+    `select` carries the dropdown's values, sorting, get and set.
+]]
+function ns.DefineSpellSelectRow(args, entry, order, fallback, select)
+	local primary = entry.ids[1]
+	local texture = GetSpellTexture(primary)
+	local caption = texture and ("|T" .. texture .. ":16|t " .. entry.spellName) or entry.spellName
+
+	local ranked = {}
+	for i = 1, #entry.ids do
+		ranked[i] = entry.ids[i]
+		C_Spell.RequestLoadSpellData(entry.ids[i])
+	end
+	table.sort(ranked)
+
+	args["label_" .. primary] = ns.OptionsRowLabel(caption, order, ns.OPTIONS_INLINE_LABEL_WIDTH)
+	args["select_" .. primary] = {
+		type = "select",
+		name = "",
+		desc = function()
+			for i = #ranked, 1, -1 do
+				local text = GetSpellDescription(ranked[i])
+				if text and text ~= "" then
+					return text
+				end
+			end
+			return fallback
+		end,
+		values = select.values,
+		sorting = select.sorting,
+		width = ns.OPTIONS_CONTROL_WIDTH,
+		order = order + 0.5,
+		get = select.get,
+		set = select.set,
 	}
 end

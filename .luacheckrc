@@ -40,9 +40,14 @@ read_globals = {
 	"GetLocale",
 	"GetMacroIndexByName",
 	"GetNumMacros",
+	"GetNumGroupMembers",
+	"GetPartyAssignment",
 	"GetPlayerInfoByGUID",
+	"GetRaidRosterInfo",
 	"GetTime",
 	"GetUnitName",
+	"GROUP",
+	"GROUP_NUMBER",
 	"InCombatLockdown",
 	"IsInGroup",
 	"IsInRaid",
@@ -52,15 +57,21 @@ read_globals = {
 	"LOCALIZED_CLASS_NAMES_MALE",
 	"MAXEMOTEINDEX",
 	"PlaySoundFile",
+	"RegisterStateDriver",
 	"SetCVar",
 	"Settings",
 	"TextEmoteSpeechList",
+	"UIParent",
+	"UnitCanAssist",
 	"UnitClass",
 	"UnitExists",
 	"UnitFactionGroup",
+	"UnitGroupRolesAssigned",
 	"UnitGUID",
 	"UnitInParty",
 	"UnitInRaid",
+	"UnitIsConnected",
+	"UnitIsDeadOrGhost",
 	"UnitInRange",
 	"UnitIsFriend",
 	"UnitIsPlayer",
@@ -69,12 +80,19 @@ read_globals = {
 	"UnitLevel",
 	"UnitName",
 	"UnitNameFromGUID",
+	"UnitPlayerControlled",
+	"UnitPlayerOrPetInParty",
+	"UnitPlayerOrPetInRaid",
+	"UnitPowerType",
+	"UnregisterStateDriver",
 	"wipe",
 	"WorldFrame",
 }
 
--- The closed set of globals this add-on owns: its SavedVariables table and its
--- slash registrations.
+--[[
+    The closed set of globals this add-on owns: its SavedVariables table and its
+    slash registrations.
+]]
 globals = {
 	"TFTBDB",
 	"SLASH_TFTB1",

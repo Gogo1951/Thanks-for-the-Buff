@@ -2,12 +2,6 @@ local ADDON_NAME, ns = ...
 local L = ns.L
 
 --------------------------------------------------------------------------------
--- State
---------------------------------------------------------------------------------
-
-local welcomeMessageShown = false
-
---------------------------------------------------------------------------------
 -- Version
 --------------------------------------------------------------------------------
 
@@ -46,6 +40,10 @@ local function OnProfileChanged()
 	if ns.PopulatePeerPressureWatched then
 		ns.PopulatePeerPressureWatched()
 	end
+	if ns.PopulateBuffWindowAudience then
+		ns.PopulateBuffWindowAudience()
+		ns.RefreshBuffWindow()
+	end
 	if ns.ReconcileMacros then
 		ns.ReconcileMacros()
 	end
@@ -55,6 +53,7 @@ local function OnProfileChanged()
 	end
 end
 
+-- TFTBDB carries nothing over from the older TFTB_DB table, so an install from before the rename starts from defaults; no bridge is to be added.
 local function InitializeDatabase()
 	ns.db = LibStub("AceDB-3.0"):New("TFTBDB", ns.DATABASE_DEFAULTS, true)
 	ns.db.RegisterCallback(ns, "OnProfileChanged", OnProfileChanged)
@@ -79,22 +78,30 @@ ns.EVENT_NAMES = {
 	"UNIT_SPELLCAST_SENT",
 	"UNIT_SPELLCAST_SUCCEEDED",
 	"LOADING_SCREEN_DISABLED",
+	"UNIT_AURA",
+	"GROUP_ROSTER_UPDATE",
+	"SPELLS_CHANGED",
+	"PLAYER_REGEN_DISABLED",
+	"PLAYER_REGEN_ENABLED",
+	"PLAYER_TARGET_CHANGED",
+	"UNIT_PET",
+	"SPELL_UPDATE_COOLDOWN",
+	"GET_ITEM_INFO_RECEIVED",
 }
 
 -- Forever has no combat log, and registering COMBAT_LOG_EVENT_UNFILTERED there errors.
-if ns.FLAVOR == "Camelot" then
-	table.insert(ns.EVENT_NAMES, "UNIT_AURA")
-else
+if ns.FLAVOR ~= "Camelot" then
 	table.insert(ns.EVENT_NAMES, "COMBAT_LOG_EVENT_UNFILTERED")
 end
 
 --[[
     Unit events the add-on only ever needs for these units register with
     RegisterUnitEvent, so the client never wakes the dispatcher for every
-    nameplate and raid member. Every other event registers unfiltered.
+    nameplate and raid member. Every other event registers unfiltered --
+    UNIT_AURA included, since the Buff Window reads every group member and
+    RegisterUnitEvent takes two units at most.
 ]]
 ns.EVENT_UNITS = {
-	UNIT_AURA = { "player" },
 	UNIT_SPELLCAST_SENT = { "player", "pet" },
 }
 
@@ -155,15 +162,29 @@ local function OnPlayerLogin()
 		ns.SetupPeerPressure()
 	end
 
+	if ns.SetupBuffWindow then
+		ns.SetupBuffWindow()
+	end
+
 	if ns.CreateAutoMacro then
 		ns:CreateAutoMacro()
 	end
 end
 
+-- Once per session: PLAYER_ENTERING_WORLD refires on every loading screen.
+local welcomeMessageShown = false
+
+function ns.PrintWelcome()
+	if not ns.db.profile.showWelcome or welcomeMessageShown then
+		return
+	end
+	ns:PrintMessage(L["CHAT_LOADED"]:format(ns.Version))
+	welcomeMessageShown = true
+end
+
 local function OnPlayerEnteringWorld()
-	if ns.db and ns.db.profile.showWelcome and not welcomeMessageShown then
-		ns:PrintMessage(L["CHAT_LOADED"]:format(ns.Version))
-		welcomeMessageShown = true
+	if ns.db then
+		ns.PrintWelcome()
 	end
 end
 
