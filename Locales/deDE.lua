@@ -51,7 +51,7 @@ L["UNKNOWN_SPELL"] = "Unbekannter Zauber"
 L["OPTIONS_WELCOME_TOGGLE"] = "Willkommensnachricht aktivieren"
 L["OPTIONS_WELCOME_DESCRIPTION"] = "Gibt beim Einloggen eine Nachricht aus, die nur Ihr seht."
 L["OPTIONS_DESCRIPTION"] =
-	"Bedankt Euch automatisch per Flüstern oder Emote bei Spielern, die Euch buffen, und kündigt Eure eigenen Buffs an, etwa Seele der Macht, Anregen und Seelenstein. Lasst Euch außerdem bei Festmählern, Portalen, Beschwörungen, Seelenbrunnen und Abklingzeiten Eurer Klasse benachrichtigen. Gute Manieren, automatisiert."
+	"Bedankt Euch per Flüstern oder Emote bei jedem Spieler, der Euch bufft, und seht in einem Buff-Tracker, wem Eure Schlachtzugsbuffs fehlen, und wirkt sie per Klick. Dazu Benachrichtigungen für Festmähler, Portale, Beschwörungen, Seelenbrunnen und Abklingzeiten Eurer Klasse. Gute Manieren, automatisiert."
 L["OPTIONS_FEATURES_HEADER"] = "Funktionen"
 L["OPTIONS_FEATURES_DESCRIPTION"] = "Schaltet jede Funktion hier oder auf ihrer eigenen Seite ein oder aus."
 L["OPTIONS_COMMANDS_HEADER"] = "/Commands"

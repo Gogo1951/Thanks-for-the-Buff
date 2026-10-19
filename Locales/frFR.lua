@@ -50,7 +50,7 @@ L["UNKNOWN_SPELL"] = "Sort inconnu"
 L["OPTIONS_WELCOME_TOGGLE"] = "Activer le message de bienvenue"
 L["OPTIONS_WELCOME_DESCRIPTION"] = "Affiche un message que vous seul pouvez voir lorsque vous vous connectez."
 L["OPTIONS_DESCRIPTION"] =
-	"Remerciez automatiquement d'un chuchotement ou d'une emote les joueurs qui vous améliorent, et annoncez les améliorations que vous lancez, comme Infusion de puissance, Innervation et Pierre d'âme. Soyez aussi averti des festins, portails, invocations, puits des âmes et temps de recharge de votre classe. La politesse, en automatique."
+	"Remerciez d'un chuchotement ou d'une emote chaque joueur qui vous améliore, et voyez à qui il manque vos améliorations de raid grâce à un suivi des améliorations où un clic suffit pour les lancer. Soyez aussi averti des festins, portails, invocations, puits des âmes et temps de recharge de votre classe. La politesse, en automatique."
 L["OPTIONS_FEATURES_HEADER"] = "Fonctionnalités"
 L["OPTIONS_FEATURES_DESCRIPTION"] = "Activez ou désactivez chaque fonctionnalité ici, ou dans son propre panneau."
 L["OPTIONS_COMMANDS_HEADER"] = "/Commands"

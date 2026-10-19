@@ -50,7 +50,7 @@ L["UNKNOWN_SPELL"] = "Hechizo desconocido"
 L["OPTIONS_WELCOME_TOGGLE"] = "Habilitar mensaje de bienvenida"
 L["OPTIONS_WELCOME_DESCRIPTION"] = "Muestra un mensaje que solo tú puedes ver al iniciar sesión."
 L["OPTIONS_DESCRIPTION"] =
-	"Agradece automáticamente con un susurro o una emoción a los jugadores que te dan beneficios y anuncia los beneficios que lanzas, como Infusión de poder, Estimular y Piedra de alma. Recibe también avisos de festines, portales, invocaciones, pozos de almas y reutilizaciones de tu clase. Buenos modales, en automático."
+	"Agradece con un susurro o una emoción a cada jugador que te dé un beneficio, y mira a quién le faltan tus beneficios de banda en un rastreador de beneficios donde los lanzas con un clic. Además, avisos de festines, portales, invocaciones, pozos de almas y reutilizaciones de tu clase. Buenos modales, en automático."
 L["OPTIONS_FEATURES_HEADER"] = "Funciones"
 L["OPTIONS_FEATURES_DESCRIPTION"] = "Activa o desactiva cada función aquí o en su propio panel."
 L["OPTIONS_COMMANDS_HEADER"] = "/Commands"

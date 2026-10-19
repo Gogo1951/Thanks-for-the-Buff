@@ -1,5 +1,5 @@
 ## Title: Thanks for the Buff (TFTB)
-## Notes: Automatically thank players who buff you with a whisper or emote, and announce the buffs you cast, like Power Infusion, Innervate, and Soulstone. Get alerts for feasts, portals, summons, soulwells, and class cooldowns too. Manners, automated.
+## Notes: Thank every player who buffs you with a whisper or emote, and see who's missing your raid buffs with a click-to-cast buff tracker. Plus alerts for feasts, portals, summons, soulwells, and class cooldowns. Manners, automated.
 ## Author: Gogo1951
 
 ## IconTexture: Interface/AddOns/TFTB/Includes/Images/Thanks-for-the-Buff.tga
