@@ -50,7 +50,7 @@ L["UNKNOWN_SPELL"] = "Feitiço desconhecido"
 L["OPTIONS_WELCOME_TOGGLE"] = "Habilitar mensagem de boas-vindas"
 L["OPTIONS_WELCOME_DESCRIPTION"] = "Exibe uma mensagem que só você vê quando entra no jogo."
 L["OPTIONS_DESCRIPTION"] =
-	"Agradeça automaticamente, com um sussurro ou uma expressão, aos jogadores que dão buffs a você e anuncie os buffs que você lança, como Infusão de Poder, Avivar e Pedra da Alma. Receba também avisos de banquetes, portais, invocações, poços de almas e recargas da sua classe. Boas maneiras, no automático."
+	"Agradeça com um sussurro ou uma expressão a cada jogador que der um buff em você, e veja quem está sem os seus buffs de raide num rastreador de buffs em que basta um clique para lançá-los. E ainda avisos de banquetes, portais, invocações, poços de almas e recargas da sua classe. Boas maneiras, no automático."
 L["OPTIONS_FEATURES_HEADER"] = "Recursos"
 L["OPTIONS_FEATURES_DESCRIPTION"] = "Ative ou desative cada recurso aqui ou no painel dele."
 L["OPTIONS_COMMANDS_HEADER"] = "/Commands"

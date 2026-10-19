@@ -50,7 +50,7 @@ L["UNKNOWN_SPELL"] = "Unknown Spell"
 L["OPTIONS_WELCOME_TOGGLE"] = "Enable Welcome Message"
 L["OPTIONS_WELCOME_DESCRIPTION"] = "Prints a message only you can see when you log in."
 L["OPTIONS_DESCRIPTION"] =
-	"Automatically thank players who buff you with a whisper or emote, and announce the buffs you cast, like Power Infusion, Innervate, and Soulstone. Get alerts for feasts, portals, summons, soulwells, and class cooldowns too. Manners, automated."
+	"Thank every player who buffs you with a whisper or emote, and see who's missing your raid buffs with a click-to-cast buff tracker. Plus alerts for feasts, portals, summons, soulwells, and class cooldowns. Manners, automated."
 L["OPTIONS_FEATURES_HEADER"] = "Features"
 L["OPTIONS_FEATURES_DESCRIPTION"] = "Turn each feature on or off here, or on its own panel."
 L["OPTIONS_COMMANDS_HEADER"] = "/Commands"
