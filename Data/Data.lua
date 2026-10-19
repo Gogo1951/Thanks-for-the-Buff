@@ -33,8 +33,10 @@ ns.PALETTE = {
 -- Class Colors
 --------------------------------------------------------------------------------
 
--- Classes through Wrath only; DEATHKNIGHT is deliberate forward-prep for when
--- Anniversary progresses (Era/TBC clients simply never look the key up).
+--[[
+    Classes through Wrath only; DEATHKNIGHT is deliberate forward-prep for when
+    Anniversary progresses (Era/TBC clients simply never look the key up).
+]]
 Data.CLASS_COLORS = {
 	DEATHKNIGHT = "C41E3A",
 	DRUID = "FF7C0A",
@@ -48,6 +50,36 @@ Data.CLASS_COLORS = {
 	WARRIOR = "C69B6D",
 }
 
+--[[
+    Who a Buff Window buff is offered to, one choice per buff.
+    BUFF_AUDIENCE_ORDER is the dropdown's order; the labels come from the locale
+    (BUFF_WINDOW_AUDIENCE_*).
+]]
+Data.BUFF_AUDIENCE = {
+	OFF = "OFF",
+	TANK = "TANK",
+	HEALER = "HEALER",
+	ALL = "ALL",
+}
+Data.BUFF_AUDIENCE_ORDER = { "OFF", "TANK", "HEALER", "ALL" }
+
+--[[
+    Classes with nothing to gain from melee attack power, so a Buff Window row
+    marked noCasters (Blessing of Might) skips them.
+]]
+Data.CASTER_CLASSES = {
+	MAGE = true,
+	PRIEST = true,
+	WARLOCK = true,
+}
+
+-- Classes with no mana, so a Buff Window row marked manaOnly skips them.
+Data.NO_MANA_CLASSES = {
+	DEATHKNIGHT = true,
+	ROGUE = true,
+	WARRIOR = true,
+}
+
 --------------------------------------------------------------------------------
 -- Options Registry
 --------------------------------------------------------------------------------
@@ -57,11 +89,19 @@ ns.OPTIONS_REGISTRY = {
 	General = ADDON_NAME .. "_General",
 	StrangerBuffs = ADDON_NAME .. "_StrangerBuffs",
 	TeammateBuffs = ADDON_NAME .. "_TeammateBuffs",
+	TeammateBuffsTracked = ADDON_NAME .. "_TeammateBuffsTracked",
 	SendGoodNews = ADDON_NAME .. "_SendGoodNews",
+	SendGoodNewsTracked = ADDON_NAME .. "_SendGoodNewsTracked",
 	ServiceAlerts = ADDON_NAME .. "_ServiceAlerts",
+	ServiceAlertsTracked = ADDON_NAME .. "_ServiceAlertsTracked",
 	PeerPressure = ADDON_NAME .. "_PeerPressure",
+	PeerPressureTracked = ADDON_NAME .. "_PeerPressureTracked",
 	ThankYouButton = ADDON_NAME .. "_ThankYouButton",
+	BuffWindow = ADDON_NAME .. "_BuffWindow",
+	BuffWindowBuffs = ADDON_NAME .. "_BuffWindowBuffs",
+	BuffWindowSelfBuffs = ADDON_NAME .. "_BuffWindowSelfBuffs",
 	Profiles = ADDON_NAME .. "_Profiles",
+	FeedbackSupport = ADDON_NAME .. "_FeedbackSupport",
 	Diagnostics = ADDON_NAME .. "_Diagnostics",
 }
 
@@ -73,6 +113,17 @@ ns.OPTIONS_REGISTRY = {
 ns.OPTIONS_ROW_WIDTH = 3.4
 ns.OPTIONS_LABEL_WIDTH = 2.1
 ns.OPTIONS_CONTROL_WIDTH = ns.OPTIONS_ROW_WIDTH - ns.OPTIONS_LABEL_WIDTH
+
+--[[
+    The same row inside an inline group (a class's box of buffs). The box insets
+    its content 10 pixels -- in width units, where AceConfigDialog makes 1 unit
+    170 pixels -- and its border takes room besides, so the label gives back 0.3
+    or the control wraps under it. A row outside a box that should line up with
+    the boxed ones below it uses the inset label width: same control, same x.
+]]
+ns.OPTIONS_INLINE_LABEL_WIDTH = ns.OPTIONS_LABEL_WIDTH - 0.3
+ns.OPTIONS_INLINE_INSET_WIDTH = 10 / 170
+ns.OPTIONS_ALIGNED_LABEL_WIDTH = ns.OPTIONS_INLINE_LABEL_WIDTH + ns.OPTIONS_INLINE_INSET_WIDTH
 
 -- The item lists' remove column, sized to its icon rather than a caption.
 ns.OPTIONS_REMOVE_ICON_WIDTH = 0.25
@@ -86,8 +137,10 @@ ns.OPTIONS_SUB_INDENT_WIDTH = 0.115
 
 Data.SAFETY_PAUSE = 3
 
--- SendChatMessage rejects a longer body outright, and the ceiling is bytes: a
--- non-Latin locale spends 2-3 of them per character.
+--[[
+    SendChatMessage rejects a longer body outright, and the ceiling is bytes: a
+    non-Latin locale spends 2-3 of them per character.
+]]
 ns.CHAT_MESSAGE_MAX_LENGTH = 255
 --[[
     The Thank You buttons. One row each: the settings key it stores under, the
@@ -102,11 +155,13 @@ ns.CHAT_MESSAGE_MAX_LENGTH = 255
     macro list.
 ]]
 Data.THANK_YOU_BUTTONS = {
-	-- singleEmote: the button fires ONE chosen emote, picked from a dropdown,
-	-- instead of a random one from a checklist. It changes the stored shape too --
-	-- `emote` (a single token) rather than `emotes` (a set) -- which is what the
-	-- options panel and RunThankYou branch on. Button 1 keeps the original
-	-- pick-a-random-one-from-your-selection behaviour.
+	--[[
+	    singleEmote: the button fires ONE chosen emote, picked from a dropdown,
+	    instead of a random one from a checklist. It changes the stored shape too --
+	    `emote` (a single token) rather than `emotes` (a set) -- which is what the
+	    options panel and RunThankYou branch on. Button 1 keeps the original
+	    pick-a-random-one-from-your-selection behaviour.
+	]]
 	{ profileKey = "slash", macroName = "- Thank", command = "/thankyou" },
 	{ profileKey = "slash2", macroName = "- TFTB 2", command = "/thankyou2", singleEmote = true },
 	{ profileKey = "slash3", macroName = "- TFTB 3", command = "/thankyou3", singleEmote = true },
@@ -117,9 +172,48 @@ Data.THANK_YOU_BUTTONS = {
 -- The account-wide macro cap; TFTB stops creating Thank You macros once the list holds this many.
 Data.MAX_GLOBAL_MACROS = 120
 
--- Praise Delay lengths, in seconds. Doubles as the dropdown's display order; the
--- labels themselves come from the client's own duration strings at panel-build
--- time (see ns.DefinePraiseDelaySelect).
+--[[
+    When "Consider Pets as Tanks" applies: SOLO while you're not in a party or
+    raid, ALWAYS everywhere. PETS_AS_TANKS_ORDER is the dropdown's order; the
+    labels come from the locale (BUFF_WINDOW_PETS_AS_TANKS_*).
+]]
+Data.PETS_AS_TANKS = {
+	SOLO = "SOLO",
+	ALWAYS = "ALWAYS",
+}
+Data.PETS_AS_TANKS_ORDER = { "SOLO", "ALWAYS" }
+
+--[[
+    When a self buff shows on the Buff Window: OFF, MISSING (only once it's
+    gone), or a number of minutes left. Doubles as the dropdown's order.
+]]
+Data.SELF_REFRESH_OFF = "OFF"
+Data.SELF_REFRESH_MISSING = 0
+Data.SELF_REFRESH_CHOICES = { "OFF", 0, 10, 5, 3 }
+
+--[[
+    The Buff Window's "Refresh Under" choices, in minutes: a buff with
+    less than this left is offered again.
+]]
+Data.BUFF_WINDOW_REFRESH_CHOICES = { 3, 5, 10 }
+
+--[[
+    How long a stranger who buffed you can stay on the Buff Window's Return the
+    Favor list, in seconds (the player picks one), and how many of them it
+    holds at once. Short on purpose: past a few seconds
+    they have usually walked on.
+]]
+Data.BUFF_WINDOW_FAVOR_CHOICES = { 20, 40, 60 }
+Data.BUFF_WINDOW_FAVOR_MAX = 5
+
+-- The Buff Window's buff buttons, and the role icon in front of each name.
+Data.BUFF_WINDOW_ICON_SIZE = 20
+
+--[[
+    Praise Delay lengths, in seconds. Doubles as the dropdown's display order; the
+    labels themselves come from the client's own duration strings at panel-build
+    time (see ns.DefinePraiseDelaySelect).
+]]
 Data.PRAISE_DELAY_CHOICES = { 1, 2, 3, 4 }
 
 --[[
@@ -141,10 +235,12 @@ Data.SECONDS_CHOICES = { 0, 1, 2, 3, 5, 8, 13, 21, 34, 55, 89, 144 }
 ]]
 ns.TARGET_MARKER = "{rt1}" -- Star
 
-Data.DISCORD_URL = "https://discord.gg/eh8hKq992Q"
-Data.GITHUB_URL = "https://github.com/Gogo1951/Thanks-for-the-Buff"
-Data.CURSEFORGE_URL = "https://www.curseforge.com/wow/addons/thanks-for-the-buff-revisited"
-Data.WAGO_URL = "https://addons.wago.io/addons/thanks-for-the-buff"
+ns.LINKS = {
+	CURSEFORGE = "https://www.curseforge.com/wow/addons/thanks-for-the-buff-revisited",
+	GITHUB = "https://github.com/Gogo1951/Thanks-for-the-Buff",
+	DISCORD = "https://discord.gg/eh8hKq992Q",
+	WAGO = "https://addons.wago.io/addons/thanks-for-the-buff",
+}
 
 --------------------------------------------------------------------------------
 -- Tracking Codes
@@ -161,8 +257,10 @@ Data.BUFF = {
 Data.DETECT = {
 	AURA = "AURA", -- SPELL_AURA_APPLIED lands on you
 	CAST = "CAST", -- SPELL_CAST_SUCCESS fires
-	-- SPELL_RESURRECT fires. For the ones that can FAIL: a cast succeeding only
-	-- means the attempt happened, so the cast event proves nothing worth saying.
+	--[[
+	    SPELL_RESURRECT fires. For the ones that can FAIL: a cast succeeding only
+	    means the attempt happened, so the cast event proves nothing worth saying.
+	]]
 	RESURRECT = "RESURRECT",
 }
 
@@ -171,19 +269,17 @@ Data.DETECT = {
 --------------------------------------------------------------------------------
 
 Data.EMOTES = {
-	{ cmd = "CHEER", displayName = "/cheer", desc = L["EMOTE_CHEER_DESCRIPTION"] },
-	{ cmd = "DRINK", displayName = "/drink", desc = L["EMOTE_DRINK_DESCRIPTION"] },
-	{ cmd = "FLEX", displayName = "/flex", desc = L["EMOTE_FLEX_DESCRIPTION"] },
-	{ cmd = "GRIN", displayName = "/grin", desc = L["EMOTE_GRIN_DESCRIPTION"] },
-	{ cmd = "HIGHFIVE", displayName = "/highfive", desc = L["EMOTE_HIGHFIVE_DESCRIPTION"] },
-	{ cmd = "PRAISE", displayName = "/praise", desc = L["EMOTE_PRAISE_DESCRIPTION"] },
-	{ cmd = "SALUTE", displayName = "/salute", desc = L["EMOTE_SALUTE_DESCRIPTION"] },
-	{ cmd = "SMILE", displayName = "/smile", desc = L["EMOTE_SMILE_DESCRIPTION"] },
-	{ cmd = "THANK", displayName = "/thank", desc = L["EMOTE_THANK_DESCRIPTION"] },
-	{ cmd = "WHOA", displayName = "/whoa", desc = L["EMOTE_WHOA_DESCRIPTION"] },
-	{ cmd = "WINK", displayName = "/wink", desc = L["EMOTE_WINK_DESCRIPTION"] },
-	-- Token is NOD, not YES: /yes is one of NOD's command aliases, and there is no
-	-- YES token on any client (verified against a full EMOTE<n>_TOKEN dump). The
-	-- displayName stays /yes because that is the command players know.
-	{ cmd = "NOD", displayName = "/yes", desc = L["EMOTE_YES_DESCRIPTION"] },
+	{ token = "CHEER", desc = L["EMOTE_CHEER_DESCRIPTION"] },
+	{ token = "DRINK", desc = L["EMOTE_DRINK_DESCRIPTION"] },
+	{ token = "FLEX", desc = L["EMOTE_FLEX_DESCRIPTION"] },
+	{ token = "GRIN", desc = L["EMOTE_GRIN_DESCRIPTION"] },
+	{ token = "HIGHFIVE", desc = L["EMOTE_HIGHFIVE_DESCRIPTION"] },
+	{ token = "PRAISE", desc = L["EMOTE_PRAISE_DESCRIPTION"] },
+	{ token = "SALUTE", desc = L["EMOTE_SALUTE_DESCRIPTION"] },
+	{ token = "SMILE", desc = L["EMOTE_SMILE_DESCRIPTION"] },
+	{ token = "THANK", desc = L["EMOTE_THANK_DESCRIPTION"] },
+	{ token = "WHOA", desc = L["EMOTE_WHOA_DESCRIPTION"] },
+	{ token = "WINK", desc = L["EMOTE_WINK_DESCRIPTION"] },
+	-- Token is NOD: /yes is one of its command aliases, and no client has a YES token.
+	{ token = "NOD", desc = L["EMOTE_YES_DESCRIPTION"] },
 }

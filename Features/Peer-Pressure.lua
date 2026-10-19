@@ -32,8 +32,10 @@ local playerGUID, playerClass
 -- Lookups & Watched List
 --------------------------------------------------------------------------------
 
--- Rows are positional (see the data file header): [1] class, [2] spell ids,
--- [3] the default checkbox state.
+--[[
+    Rows are positional (see the data file header): [1] class, [2] spell ids,
+    [3] the default checkbox state.
+]]
 local DEFAULT_SLOT = 3
 
 local function BuildLookup()
@@ -48,20 +50,17 @@ local function BuildLookup()
 	end
 end
 
--- Same contract as PopulateWatchedBuffs, except the seeded state comes from
--- the row's default digit (0 seeds off, anything else on).
--- Dead ids are pruned so the saved list stays client-real, and a user's own
--- choices are never overwritten. Re-run on profile changes.
+--[[
+    Same contract as PopulateWatchedBuffs, except the seeded state comes from
+    the row's default digit (0 seeds off, anything else on).
+    A user's own choices are never overwritten, and a key this client's data
+    lacks is left alone. Re-run on profile changes.
+]]
 local function PopulatePeerPressureWatched()
 	local watched = ns.db.profile.peerPressure.watched
 	for id, entry in pairs(lookup) do
 		if watched[id] == nil then
 			watched[id] = entry[DEFAULT_SLOT] ~= 0
-		end
-	end
-	for id in pairs(watched) do
-		if lookup[id] == nil then
-			watched[id] = nil
 		end
 	end
 end
@@ -90,9 +89,11 @@ local function BuildCategories()
 		local class = entry[1]
 		local ids = {}
 		for _, id in ipairs(entry[2]) do
-			-- Ownership, not mere existence: an id belongs to THIS row's toggle
-			-- only if the lookup credits it here, so an id two rows share
-			-- renders under one of them only.
+			--[[
+			    Ownership, not mere existence: an id belongs to THIS row's toggle
+			    only if the lookup credits it here, so an id two rows share
+			    renders under one of them only.
+			]]
 			if lookup[id] == entry then
 				ids[#ids + 1] = id
 			end
@@ -196,8 +197,10 @@ end
 -- Setup
 --------------------------------------------------------------------------------
 
--- Run from Core's login sequence, after the saved variables are live and the
--- spell APIs return real data (same timing as SetupBuffTracking).
+--[[
+    Run from Core's login sequence, after the saved variables are live and the
+    spell APIs return real data (same timing as SetupBuffTracking).
+]]
 function ns.SetupPeerPressure()
 	playerGUID = UnitGUID("player")
 	playerClass = select(2, UnitClass("player"))

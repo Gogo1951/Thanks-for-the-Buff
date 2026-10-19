@@ -41,15 +41,19 @@ function ns.ReconcileMacros()
 				CreateMacro(button.macroName, 134411, button.command, nil)
 			end
 		elseif config then
-			-- Only a button we hold settings for is reconciled downward; a missing
-			-- config is not an instruction to delete anything.
+			--[[
+			    Only a button we hold settings for is reconciled downward; a missing
+			    config is not an instruction to delete anything.
+			]]
 			ns:DeleteAutoMacro(button)
 		end
 	end
 end
 
--- The login and options-toggle entry point; reconciling is the same work in both
--- directions, so it has one implementation.
+--[[
+    The login and options-toggle entry point; reconciling is the same work in both
+    directions, so it has one implementation.
+]]
 function ns:CreateAutoMacro()
 	ns.ReconcileMacros()
 end
@@ -86,8 +90,10 @@ end
     falls back to the original button rather than erroring.
 ]]
 function ns.RunThankYou(button)
-	-- A target whose identity is secret can't be checked or whispered, but the
-	-- emote only needs the "target" token.
+	--[[
+	    A target whose identity is secret can't be checked or whispered, but the
+	    emote only needs the "target" token.
+	]]
 	local identitySecret = ns.IsUnitIdentitySecret("target")
 	if not UnitExists("target") or (not identitySecret and not UnitIsPlayer("target")) then
 		ns:PrintMessage(L["MESSAGE_SELECT_PLAYER"])
@@ -103,9 +109,11 @@ function ns.RunThankYou(button)
 		return
 	end
 
-	-- A single-emote button stores one token chosen from everything the client
-	-- offers, so it cannot go through DoRandomEmote -- that one is bounded by
-	-- Data.EMOTES, the curated twelve the praise panels use.
+	--[[
+	    A single-emote button stores one token chosen from everything the client
+	    offers, so it cannot go through DoRandomEmote -- that one is bounded by
+	    Data.EMOTES, the curated twelve the praise panels use.
+	]]
 	if button and button.singleEmote then
 		ns:DoEmoteToken(db.emote, "target")
 	else

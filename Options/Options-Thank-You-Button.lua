@@ -4,9 +4,11 @@ local L = ns.L
 
 local GetColor = ns.GetColor
 
--- The whisper row: a caption-sized label, the message box and the Reset button,
--- together one row, so a full sentence stays readable while it is being edited.
--- The emote row has no button, so its dropdown takes the rest of the row.
+--[[
+    The whisper row: a caption-sized label, the message box and the Reset button,
+    together one row, so a full sentence stays readable while it is being edited.
+    The emote row has no button, so its dropdown takes the rest of the row.
+]]
 local WHISPER_LABEL_WIDTH = 0.9
 local RESET_WIDTH = 0.5
 local WHISPER_INPUT_WIDTH = ns.OPTIONS_ROW_WIDTH - WHISPER_LABEL_WIDTH - RESET_WIDTH
@@ -57,25 +59,31 @@ local function AddButtonSection(args, button, index)
 		return ns.db.profile[key]
 	end
 
-	-- Everything below the macro toggle follows it, so a switched-off button
-	-- collapses to one line instead of five rows nobody is currently using. The
-	-- settings are hidden, not disabled: this button's slash command still fires
-	-- with whatever is stored, macro or no macro.
+	--[[
+	    Everything below the macro toggle follows it, so a switched-off button
+	    collapses to one line instead of five rows nobody is currently using. The
+	    settings are hidden, not disabled: this button's slash command still fires
+	    with whatever is stored, macro or no macro.
+	]]
 	local function sectionHidden()
 		return not config().createMacro
 	end
 
-	-- Spacer on BOTH sides of the header: below it separates the rule from the
-	-- first control, above it keeps the rule off the previous section's emote box
-	-- (and, for button 1, off the panel description).
+	--[[
+	    Spacer on BOTH sides of the header: below it separates the rule from the
+	    first control, above it keeps the rule off the previous section's emote box
+	    (and, for button 1, off the panel description).
+	]]
 	args["space_top" .. index] = ns.OptionsSpacer(base)
 	args["header" .. index] = ns.OptionsHeader(string.format(L["BUTTON_SECTION"], index), base + 1)
 	args["space_a" .. index] = ns.OptionsSpacer(base + 2)
 
 	args["createMacro" .. index] = {
 		type = "toggle",
-		-- The macro's name is in the label, not just the tooltip: with five of
-		-- these stacked, "which macro is this one?" should not need a hover.
+		--[[
+		    The macro's name is in the label, not just the tooltip: with five of
+		    these stacked, "which macro is this one?" should not need a hover.
+		]]
 		name = string.format(L["BUTTON_MACRO_ENABLE"], button.macroName),
 		desc = string.format(L["BUTTON_MACRO_ENABLE_DESCRIPTION"], GetColor("TITLE") .. button.macroName .. "|r"),
 		width = "full",
@@ -83,13 +91,15 @@ local function AddButtonSection(args, button, index)
 		get = function()
 			return config().createMacro
 		end,
-		set = function(_, val)
-			config().createMacro = val
-			-- The toggle owns the macro's existence in both directions: ticking it
-			-- creates the macro now rather than next login, unticking removes it.
-			-- Leaving a switched-off button's macro sitting on the bars would make
-			-- the checkbox a lie.
-			if val then
+		set = function(_, value)
+			config().createMacro = value
+			--[[
+			    The toggle owns the macro's existence in both directions: ticking it
+			    creates the macro now rather than next login, unticking removes it.
+			    Leaving a switched-off button's macro sitting on the bars would make
+			    the checkbox a lie.
+			]]
+			if value then
 				if ns.CreateAutoMacro then
 					ns:CreateAutoMacro()
 				end
@@ -112,8 +122,8 @@ local function AddButtonSection(args, button, index)
 		get = function()
 			return config().message
 		end,
-		set = function(_, val)
-			config().message = ns.TrimToBytes(val or "", ns.CHAT_MESSAGE_MAX_LENGTH)
+		set = function(_, value)
+			config().message = ns.TrimToBytes(value or "", ns.CHAT_MESSAGE_MAX_LENGTH)
 		end,
 	}
 	args["resetMsg" .. index] = {
@@ -130,9 +140,11 @@ local function AddButtonSection(args, button, index)
 
 	args["space_c" .. index] = ns.OptionsSpacer(base + 8, sectionHidden)
 
-	-- A single-emote button gets one dropdown instead of the checklist: there is
-	-- nothing to randomise between, so a grid of checkboxes would be the wrong
-	-- control for the choice being made.
+	--[[
+	    A single-emote button gets one dropdown instead of the checklist: there is
+	    nothing to randomise between, so a grid of checkboxes would be the wrong
+	    control for the choice being made.
+	]]
 	if button.singleEmote then
 		local values, sorting = EmoteChoices()
 		args["emoteLabel" .. index] =
@@ -147,15 +159,17 @@ local function AddButtonSection(args, button, index)
 			values = values,
 			sorting = sorting,
 			get = function()
-				-- A token this client does not have shows as "none" rather than
-				-- blank: profiles travel between flavours, and an emote that only
-				-- exists on a later one would otherwise leave the box empty and
-				-- unexplained.
+				--[[
+				    A token this client does not have shows as "none" rather than
+				    blank: profiles travel between flavours, and an emote that only
+				    exists on a later one would otherwise leave the box empty and
+				    unexplained.
+				]]
 				local current = config().emote
 				return (current and ns.IsClientEmote(current)) and current or ""
 			end,
-			set = function(_, val)
-				config().emote = val
+			set = function(_, value)
+				config().emote = value
 			end,
 		}
 		return
@@ -170,18 +184,18 @@ local function AddButtonSection(args, button, index)
 		args = {},
 	}
 	for i, emoteData in ipairs(Data.EMOTES) do
-		local emote = emoteData.cmd
+		local emote = emoteData.token
 		emoteGroup.args[emote] = {
 			type = "toggle",
-			name = emoteData.displayName,
+			name = ns.GetEmoteCommand(emote),
 			desc = emoteData.desc,
 			order = i,
 			width = "half",
 			get = function()
 				return config().emotes[emote]
 			end,
-			set = function(_, val)
-				config().emotes[emote] = val
+			set = function(_, value)
+				config().emotes[emote] = value
 			end,
 		}
 	end

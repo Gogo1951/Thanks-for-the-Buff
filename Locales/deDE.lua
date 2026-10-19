@@ -11,12 +11,12 @@ L["ADDON_TITLE"] = "Thanks for the Buff (TFTB)"
 L["ADDON_SHORT"] = "TFTB"
 
 --------------------------------------------------------------------------------
--- Chat Messages
+-- Messages
 --------------------------------------------------------------------------------
 
 -- System
 L["CHAT_LOADED"] =
-	"Version %s. Einstellungen (einschließlich der Option, diese Nachricht zu deaktivieren) finden sich unter Optionen > AddOns > Thanks for the Buff (TFTB). Gefällt das Add-on? Erzählt einem Freund davon! (="
+	"Version %s. Einstellungen (einschließlich der Option, diese Nachricht zu deaktivieren) findet Ihr unter Optionen > AddOns > Thanks for the Buff (TFTB). Gefällt Euch dieses Add-on? Erzählt einem Freund davon, markiert es auf CurseForge als Favorit oder vergebt auf GitHub einen Star. (="
 L["CHAT_OPTIONS_IN_COMBAT"] =
 	"Aus Sicherheitsgründen kann das Optionsmenü während des Kampfes nicht geöffnet werden."
 
@@ -31,7 +31,7 @@ L["MESSAGE_OPENED"] = "%s hat %s geöffnet!"
 
 -- Thank-you
 L["MESSAGE_WHISPER_THANKS"] = "Danke für %s"
-L["MESSAGE_SELECT_PLAYER"] = "Wählt einen Spieler aus, dem Ihr danken wollt."
+L["MESSAGE_SELECT_PLAYER"] = "Nehmt zuerst einen Spieler ins Ziel."
 L["MESSAGE_CANT_THANK_SELF"] = "Ihr könnt Euch nicht selbst danken!"
 
 -- Peer Pressure
@@ -49,19 +49,42 @@ L["UNKNOWN_SPELL"] = "Unbekannter Zauber"
 --------------------------------------------------------------------------------
 
 L["OPTIONS_WELCOME_TOGGLE"] = "Willkommensnachricht aktivieren"
-L["OPTIONS_WELCOME_DESCRIPTION"] = "Gibt beim Einloggen eine Nachricht im Chat aus."
+L["OPTIONS_WELCOME_DESCRIPTION"] = "Gibt beim Einloggen eine Nachricht aus, die nur Ihr seht."
 L["OPTIONS_DESCRIPTION"] =
 	"Bedankt Euch automatisch per Flüstern oder Emote bei Spielern, die Euch buffen, und kündigt Eure eigenen Buffs an, etwa Seele der Macht, Anregen und Seelenstein. Lasst Euch außerdem bei Festmählern, Portalen, Beschwörungen, Seelenbrunnen und Abklingzeiten Eurer Klasse benachrichtigen. Gute Manieren, automatisiert."
-L["OPTIONS_SUPPORT"] = "Feedback & Unterstützung"
+L["OPTIONS_FEATURES_HEADER"] = "Funktionen"
+L["OPTIONS_FEATURES_DESCRIPTION"] = "Schaltet jede Funktion hier oder auf ihrer eigenen Seite ein oder aus."
+L["OPTIONS_COMMANDS_HEADER"] = "/Commands"
+L["OPTIONS_COMMAND"] = "/tftb"
+L["OPTIONS_COMMAND_DESCRIPTION"] = "Öffnet das Optionsmenü dieses Add-ons."
+L["OPTIONS_EXAMPLE"] = "Beispiel: %s"
+
+--------------------------------------------------------------------------------
+-- Options: Feedback & Support Panel
+--------------------------------------------------------------------------------
+
+L["OPTIONS_LEVEL_UP_TITLE"] = "Helft Thanks for the Buff (TFTB) beim Stufenaufstieg"
+L["OPTIONS_LEVEL_UP_INTRO"] =
+	"Dieses Add-on wurde von Spielern entwickelt, die dieses Spiel lieben und es für alle so unterhaltsam wie möglich machen wollen. Wir werden niemals um Spenden bitten. Die wahre Genugtuung liegt im Wissen, dass unsere Arbeit Euch das Spiel ein wenig besser macht. Wenn das so ist, würden wir gern davon hören!"
+L["OPTIONS_LEVEL_UP_WAYS"] = "Hier sind ein paar Möglichkeiten, wie Ihr uns helfen könnt, mehr Spieler zu erreichen."
+L["OPTIONS_LEVEL_UP_FEEDBACK"] =
+	"• Feedback geben: Einen Fehler gefunden oder eine Idee? Sagt es uns auf Discord. Euer Feedback hilft uns, das Add-on zu verbessern, und Pull Requests sind jederzeit willkommen."
+L["OPTIONS_LEVEL_UP_FRIEND"] =
+	"• Einem Freund erzählen: Kennt Ihr jemanden, dem dieses Add-on gefallen könnte? Erzählt ihm davon. Mundpropaganda hilft mehr Spielern, großartige Add-ons zu entdecken."
+L["OPTIONS_LEVEL_UP_CURSEFORGE"] =
+	"• Auf CurseForge favorisieren: Öffnet unten den CurseForge-Link, meldet Euch an und klickt auf den Stern unter dem Download-Button. Favoriten helfen mehr Spielern, das Add-on zu entdecken."
+L["OPTIONS_LEVEL_UP_GITHUB"] =
+	"• Star auf GitHub: Öffnet unten den GitHub-Link, meldet Euch an und klickt oben rechts auf Star. Stars helfen dem Projekt, sich für weitere kostenlose Entwicklerwerkzeuge zu qualifizieren."
+L["OPTIONS_LEVEL_UP_THANKS"] = "Danke, dass Ihr Euch für Thanks for the Buff (TFTB) entschieden habt!"
+
+L["OPTIONS_FEEDBACK"] = "Feedback & Unterstützung"
+L["OPTIONS_FEEDBACK_LINKS_HEADER"] = "Links für Feedback & Unterstützung"
 L["OPTIONS_CURSEFORGE"] = "CurseForge"
 L["OPTIONS_GITHUB"] = "GitHub"
 L["OPTIONS_DISCORD"] = "Discord"
 L["OPTIONS_WAGO"] = "Wago"
+L["OPTIONS_COPY_LINK"] = "Um einen Link zu kopieren, klickt in sein Feld und drückt dann Strg+A und Strg+C."
 L["OPTIONS_VERSION"] = "Version %s"
-L["OPTIONS_FEATURES_HEADER"] = "Funktionen"
-L["OPTIONS_COMMANDS_HEADER"] = "/Commands"
-L["OPTIONS_COMMAND"] = "/tftb"
-L["OPTIONS_COMMAND_DESCRIPTION"] = "Öffnet das Optionsmenü dieses Add-ons."
 
 --------------------------------------------------------------------------------
 -- Options: Buff Panels
@@ -97,7 +120,7 @@ L["SERVICES_ENABLE"] = "Dienst-Hinweise aktivieren"
 L["SERVICES_ENABLE_DESCRIPTION"] =
 	"Aktiviert Hinweise zu Festmählern, Seelenbrunnen, Portalen und anderer Hilfe, die für Eure Gruppe aufgestellt wird."
 L["SERVICES_DESCRIPTION"] =
-	"Reagiert auf schlachtzugweite Hilfe Eurer Gruppe: Festmähler, Seelenbrunnen, Portale und Reparaturbots."
+	"Reagiert, wenn jemand Hilfe für Eure Gruppe aufstellt: Festmähler, Seelenbrunnen, Portale und Reparaturbots."
 
 -- Send Good News
 L["TAB_GOOD_NEWS"] = "Gute Neuigkeiten senden"
@@ -109,8 +132,9 @@ L["GOOD_NEWS_SCOPE"] = "Empfänger"
 L["GOOD_NEWS_SCOPE_ALWAYS"] = "Jeder, den Ihr bufft"
 L["GOOD_NEWS_SCOPE_GROUP"] = "Nur Gruppenmitglieder"
 L["GOOD_NEWS_SCOPE_DESCRIPTION"] =
-	"Legt fest, wer die Guten Neuigkeiten zugeflüstert bekommt: jeder, den Ihr bufft, oder nur Eure Gruppe oder Euer Schlachtzug."
+	"Legt fest, wer die Guten Neuigkeiten zugeflüstert bekommt: jeder, den Ihr bufft, oder nur Eure Gruppenmitglieder."
 L["GOOD_NEWS_MESSAGES_HEADER"] = "Nachricht für Gute Neuigkeiten"
+L["GOOD_NEWS_MESSAGES_DESCRIPTION"] = "Das Flüstern, das die Spieler erhalten, die Ihr bufft."
 --[[
     Two halves so the number stays authoritative: LIMIT's %d is a real placeholder
     and gets formatted, TOKENS carries a literal %a for the reader to copy and so
@@ -132,7 +156,7 @@ L["PEER_PRESSURE_ENABLE"] = "Gruppenzwang aktivieren"
 L["PEER_PRESSURE_ENABLE_DESCRIPTION"] =
 	"Aktiviert Hinweise, wenn ein anderer Spieler Eurer Klasse eine verfolgte Abklingzeit einsetzt."
 L["PEER_PRESSURE_PRINT_DESCRIPTION"] =
-	"Gibt eine Nachricht in Eurem eigenen Chat aus, wenn eine Abklingzeit Eurer Klasse eingesetzt wird. Nur Ihr seht sie."
+	"Gibt eine Nachricht aus, die nur Ihr seht, wenn eine Abklingzeit Eurer Klasse eingesetzt wird."
 L["PEER_PRESSURE_OWN_CASTS"] = "Bei eigenen Zaubern auslösen"
 L["PEER_PRESSURE_OWN_CASTS_DESCRIPTION"] =
 	"Löst auch aus, wenn Ihr Eure eigenen Abklingzeiten einsetzt, nicht nur bei anderen Spielern."
@@ -161,8 +185,10 @@ L["WHISPER_MESSAGE_RESET_DESCRIPTION"] = "Setzt die Flüsternachricht auf den St
     carries the Notifications header alone. Key prefixes match the header the
     control appears under.
 ]]
-L["PRAISE_HEADER"] = "Lobnachrichten & Emotes"
+L["PRAISE_HEADER"] = "Dankesflüstern & Emotes"
 L["NOTIFICATIONS_HEADER"] = "Benachrichtigungen"
+L["PRAISE_DESCRIPTION"] = "Was der andere Spieler sieht: ein Dankesflüstern, ein Emote oder beides."
+L["NOTIFICATIONS_DESCRIPTION"] = "Was nur Ihr bekommt: eine Textmeldung, einen Ton oder beides."
 
 -- Also titles the Thank You Button's emote grid, so it carries no PRAISE_ prefix.
 L["EMOTES_SELECT"] = "Emotes auswählen"
@@ -177,9 +203,8 @@ L["PRAISE_DELAY_DESCRIPTION"] =
 	"Wartet einen Moment vor dem Flüstern und dem Emote, damit Euer Dank nicht im selben Augenblick wie der Buff eintrifft. Benachrichtigungen bleiben unberührt."
 L["PRAISE_DELAY_LENGTH_DESCRIPTION"] = "Legt fest, wie lange gewartet wird, bevor Flüstern und Emote gesendet werden."
 
-L["NOTIFICATIONS_PRINT_ENABLE"] = "Chat-Nachrichten aktivieren"
-L["NOTIFICATIONS_PRINT_DESCRIPTION"] =
-	"Gibt eine Nachricht in Eurem eigenen Chat aus, wenn Ihr einen Buff erhaltet. Nur Ihr seht sie."
+L["NOTIFICATIONS_PRINT_ENABLE"] = "Textmeldungen aktivieren"
+L["NOTIFICATIONS_PRINT_DESCRIPTION"] = "Gibt eine Nachricht aus, die nur Ihr seht, wenn Ihr einen Buff erhaltet."
 L["NOTIFICATIONS_SOUND_ENABLE"] = "Soundeffekte aktivieren"
 L["NOTIFICATIONS_SOUND_DESCRIPTION"] = "Spielt einen Ton ab, wenn Ihr einen Buff erhaltet. Nur Ihr hört ihn."
 L["NOTIFICATIONS_SOUND_PREVIEW_DESCRIPTION"] =
@@ -199,12 +224,91 @@ L["GROUP_RESISTANCE_CAULDRONS"] = "Widerstandskessel"
 L["GROUP_REPAIR_BOTS"] = "Reparaturbots"
 
 --------------------------------------------------------------------------------
+-- Options: Buff Duty
+--------------------------------------------------------------------------------
+
+L["TAB_BUFF_WINDOW"] = "Buff-Dienst"
+L["BUFF_WINDOW_DESCRIPTION"] = "Zeigt, wem Eure Buffs fehlen. Klickt auf ein Symbol, um zu wirken."
+L["BUFF_WINDOW_ENABLE"] = "Buff-Dienst aktivieren"
+L["BUFF_WINDOW_ENABLE_DESCRIPTION"] =
+	"Aktiviert den Buff-Dienst, das Fenster mit den Gruppenmitgliedern, denen ein Buff fehlt, den Ihr geben könnt."
+L["BUFF_WINDOW_NO_BUFFS"] =
+	"Eure Klasse hat keine Buffs auf dieser Liste, daher erscheint das Fenster bei diesem Charakter nie."
+L["BUFF_WINDOW_HEADER"] = "Fenster"
+L["BUFF_WINDOW_WINDOW_DESCRIPTION"] =
+	"Lasst das Fenster dort, wo Ihr es abgelegt habt, oder haltet es im Kampf aus dem Weg."
+L["BUFF_WINDOW_LOCK"] = "Fenster sperren"
+L["BUFF_WINDOW_LOCK_DESCRIPTION"] =
+	"Verhindert, dass das Fenster verschoben wird. Entsperrt lässt es sich an seinem Hintergrund ziehen."
+L["BUFF_WINDOW_HIDE_IN_COMBAT"] = "Im Kampf ausblenden"
+L["BUFF_WINDOW_HIDE_IN_COMBAT_DESCRIPTION"] =
+	"Blendet das Fenster während des Kampfes aus. Im Kampf kann die Liste nicht aktualisiert werden, daher behält ein sichtbar gelassenes Fenster seinen letzten Stand, bis der Kampf endet."
+L["BUFF_WINDOW_SHOW_HEADER"] = "Im Fenster anzeigen"
+L["BUFF_WINDOW_SHOW_DESCRIPTION"] =
+	"Fügt dem Fenster Eure eigenen Buffs, die Fremden, die Euch gebufft haben, und Euer Ziel hinzu."
+L["BUFF_WINDOW_FAVOR_ENABLE"] = "Gefallen erwidern"
+L["BUFF_WINDOW_FAVOR_ENABLE_DESCRIPTION"] =
+	"Listet die Fremden auf, die Euch kürzlich gebufft haben, samt den Buffs, die Ihr ihnen zurückgeben könnt. Rechtsklickt auf ein Symbol, um jemanden von der Liste zu nehmen."
+L["BUFF_WINDOW_FAVOR_SECONDS_DESCRIPTION"] =
+	"Legt fest, wie lange ein Fremder nach seinem letzten Buff auf der Liste bleibt."
+L["BUFF_WINDOW_TARGET_ENABLE"] = "Euer Ziel"
+L["BUFF_WINDOW_TARGET_ENABLE_DESCRIPTION"] =
+	"Listet Euer Ziel auf, wenn es ein Spieler außerhalb Eurer Gruppe ist, dem ein Buff fehlt, den Ihr geben könnt."
+L["BUFF_WINDOW_REFRESH"] = "Auffrischen unter"
+L["BUFF_WINDOW_REFRESH_DESCRIPTION"] =
+	"Legt fest, wie wenig Restzeit ein Buff haben darf, bevor er als fehlend gilt, damit Ihr ihn auffrischen könnt, bevor er ausläuft. Ein Buff, der nicht länger als diese Zeit hält, zählt erst, wenn er abgelaufen ist."
+L["BUFF_WINDOW_PETS_AS_TANKS"] = "Begleiter als Tanks werten"
+L["BUFF_WINDOW_PETS_AS_TANKS_DESCRIPTION"] =
+	"Bietet Begleitern die Buffs an, die Ihr auf Tanks gestellt habt, etwa Dornen, zusätzlich zu denen für Alle."
+L["BUFF_WINDOW_PETS_AS_TANKS_WHEN_DESCRIPTION"] = "Legt fest, wann Begleiter als Tanks gelten."
+L["BUFF_WINDOW_PETS_AS_TANKS_SOLO"] = "Wenn nicht in einer Gruppe"
+L["BUFF_WINDOW_PETS_AS_TANKS_ALWAYS"] = "Immer"
+-- Who each buff is offered to: one dropdown per buff, these four choices.
+L["BUFF_WINDOW_AUDIENCE_OFF"] = "Aus"
+L["BUFF_WINDOW_AUDIENCE_TANK"] = "Tanks"
+L["BUFF_WINDOW_AUDIENCE_HEALER"] = "Heiler"
+L["BUFF_WINDOW_AUDIENCE_ALL"] = "Alle"
+-- The dropdown's tooltip when the client has no description for the spell yet.
+L["BUFF_WINDOW_AUDIENCE_DESCRIPTION"] = "Legt fest, wem %s angeboten wird."
+L["BUFF_WINDOW_BUFFS_DESCRIPTION"] =
+	"Wählt für jeden Buff, wem er angeboten wird. Tanks und Heiler richten sich nach der Gruppenrolle oder, wenn keine gesetzt ist, nach der Klasse."
+
+L["BUFF_WINDOW_SELF_DESCRIPTION"] = "Eure eigenen Buffs, oben im Fenster angeheftet."
+--[[
+    Muted note after a class name on the Self-Buffs panel, for a family of self
+    buffs only one of which can be up at a time. Keyed by the family.
+]]
+L["BUFF_WINDOW_SELF_NOTE_ASPECT"] = "ein beliebiger Aspekt genügt"
+L["BUFF_WINDOW_SELF_NOTE_MAGE_ARMOR"] = "eine beliebige Rüstung genügt"
+L["BUFF_WINDOW_SELF_NOTE_PALADIN_AURA"] = "eine beliebige Aura genügt"
+L["BUFF_WINDOW_SELF_NOTE_SHAMAN_SHIELD"] = "ein beliebiger Schild genügt"
+L["BUFF_WINDOW_SELF_NOTE_WARLOCK_ARMOR"] = "eine beliebige Rüstung genügt"
+L["BUFF_WINDOW_SELF_REFRESH_OFF"] = "Aus"
+L["BUFF_WINDOW_SELF_REFRESH_MISSING"] = "Bei Fehlen"
+-- %s is a duration from the client, like "5 Minutes".
+L["BUFF_WINDOW_SELF_REFRESH_UNDER"] = "Unter %s"
+L["BUFF_WINDOW_SELF_REFRESH_DESCRIPTION"] =
+	"Legt fest, wann %s angezeigt wird: nie, nach dem Ablaufen oder wenn weniger als diese Zeit übrig ist."
+L["BUFF_WINDOW_SELF_ENABLE"] = "Eure Selbstbuffs"
+L["BUFF_WINDOW_SELF_ENABLE_DESCRIPTION"] =
+	"Zeigt oben im Fenster die Buffs, die nur Ihr Euch selbst geben könnt, etwa eine Rüstung oder Inneres Feuer, wenn sie fehlen oder bald ablaufen. Welche, legt Ihr unter Selbstbuffs fest."
+
+-- The window itself
+L["BUFF_WINDOW_SELF_HEADER"] = "Selbstbuffs"
+L["BUFF_WINDOW_FAVOR_HEADER"] = "Gefallen erwidern"
+L["BUFF_WINDOW_TARGET_HEADER"] = "Ziel"
+L["BUFF_WINDOW_TOOLTIP_CAST"] = "Klicken, um auf %s zu wirken."
+L["BUFF_WINDOW_TOOLTIP_GROUP"] = "Klicken, um auf %s samt Gruppe zu wirken."
+L["BUFF_WINDOW_TOOLTIP_FAVOR"] = "Klicken, um %s ins Ziel zu nehmen und zu wirken."
+L["BUFF_WINDOW_TOOLTIP_DISMISS"] = "Rechtsklick, um %s von der Liste zu nehmen."
+
+--------------------------------------------------------------------------------
 -- Options: Thank You Button
 --------------------------------------------------------------------------------
 
 L["TAB_THANK_YOU_BUTTON"] = "Dankeschön-Knopf"
 L["BUTTON_DESCRIPTION"] =
-	"Höflichkeit, automatisiert. Jeder Knopf flüstert Eurem aktuellen Ziel zu und kann es auch mit einem Emote bedenken: einen Magier um Wasser bitten, jemandem für ein Portal danken, einen Freund mitten im Kampf für den schnellen Spott loben. Schreibt die Nachricht einmal, danach ist sie nur noch einen Tastendruck entfernt."
+	"Flüstert Eurem Ziel zu und bedenkt es mit einem Emote, alles mit einem einzigen Tastendruck. Höflichkeit, automatisiert."
 -- One heading per button, numbered; %d is the button's position in the list.
 L["BUTTON_SECTION"] = "Dankeschön-Knopf %d"
 L["BUTTON_EMOTE"] = "Emote"

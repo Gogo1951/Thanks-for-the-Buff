@@ -11,12 +11,12 @@ L["ADDON_TITLE"] = "Thanks for the Buff (TFTB)"
 L["ADDON_SHORT"] = "TFTB"
 
 --------------------------------------------------------------------------------
--- Chat Messages
+-- Messages
 --------------------------------------------------------------------------------
 
 -- System
 L["CHAT_LOADED"] =
-	"버전 %s. 설정(이 메시지를 비활성화하는 옵션 포함)은 옵션 > 애드온 > Thanks for the Buff (TFTB)에서 찾을 수 있습니다. 애드온이 마음에 드시나요? 친구에게 알려주세요! (="
+	"버전 %s. 설정(이 메시지를 끄는 옵션 포함)은 옵션 > 애드온 > Thanks for the Buff (TFTB)에 있습니다. 이 애드온이 마음에 드시나요? 친구에게 알려 주시거나, CurseForge에서 즐겨찾기에 추가하거나, GitHub에서 Star를 눌러 주세요. (="
 L["CHAT_OPTIONS_IN_COMBAT"] = "안전을 위해 전투 중에는 설정 인터페이스를 열 수 없습니다."
 
 -- Buff & gift announcements
@@ -30,7 +30,7 @@ L["MESSAGE_OPENED"] = "%s님이 %s(을)를 열었습니다!"
 
 -- Thank-you
 L["MESSAGE_WHISPER_THANKS"] = "%s 고맙습니다"
-L["MESSAGE_SELECT_PLAYER"] = "감사할 플레이어를 선택하세요."
+L["MESSAGE_SELECT_PLAYER"] = "먼저 플레이어를 대상으로 지정하세요."
 L["MESSAGE_CANT_THANK_SELF"] = "자신에게는 감사할 수 없습니다!"
 
 -- Peer Pressure
@@ -48,19 +48,44 @@ L["UNKNOWN_SPELL"] = "알 수 없는 주문"
 --------------------------------------------------------------------------------
 
 L["OPTIONS_WELCOME_TOGGLE"] = "환영 메시지 활성화"
-L["OPTIONS_WELCOME_DESCRIPTION"] = "접속할 때 대화창에 메시지를 출력합니다."
+L["OPTIONS_WELCOME_DESCRIPTION"] = "접속할 때 자신만 볼 수 있는 메시지를 출력합니다."
 L["OPTIONS_DESCRIPTION"] =
 	"버프를 준 플레이어에게 귓속말이나 감정 표현으로 자동으로 감사를 표하고, 마력 주입, 정신 자극, 영혼석처럼 내가 시전한 버프를 알립니다. 잔치, 차원문, 소환, 영혼샘, 같은 직업의 재사용 대기시간 기술 알림도 받을 수 있습니다. 매너도 자동으로."
-L["OPTIONS_SUPPORT"] = "피드백 및 지원"
+L["OPTIONS_FEATURES_HEADER"] = "기능"
+L["OPTIONS_FEATURES_DESCRIPTION"] =
+	"각 기능은 여기서 또는 해당 기능의 패널에서 켜거나 끌 수 있습니다."
+L["OPTIONS_COMMANDS_HEADER"] = "/Commands"
+L["OPTIONS_COMMAND"] = "/tftb"
+L["OPTIONS_COMMAND_DESCRIPTION"] = "이 애드온의 설정 인터페이스를 엽니다."
+L["OPTIONS_EXAMPLE"] = "예시: %s"
+
+--------------------------------------------------------------------------------
+-- Options: Feedback & Support Panel
+--------------------------------------------------------------------------------
+
+L["OPTIONS_LEVEL_UP_TITLE"] = "Thanks for the Buff (TFTB)의 레벨 업을 도와주세요"
+L["OPTIONS_LEVEL_UP_INTRO"] =
+	"이 애드온은 이 게임을 사랑하고 모두가 최대한 즐겁게 플레이하기를 바라는 플레이어들이 만들었습니다. 저희는 절대 후원을 요청하지 않습니다. 저희의 작업이 여러분의 게임을 조금 더 즐겁게 만든다는 것이 가장 큰 보람입니다. 그렇다면 꼭 이야기를 들려주세요!"
+L["OPTIONS_LEVEL_UP_WAYS"] =
+	"더 많은 플레이어에게 다가갈 수 있도록 도와주실 수 있는 몇 가지 방법입니다."
+L["OPTIONS_LEVEL_UP_FEEDBACK"] =
+	"• 피드백 공유: 버그를 발견했거나 아이디어가 있으신가요? Discord에서 알려 주세요. 여러분의 피드백은 애드온 개선에 도움이 되며, 풀 리퀘스트도 언제나 환영합니다."
+L["OPTIONS_LEVEL_UP_FRIEND"] =
+	"• 친구에게 알리기: 이 애드온을 좋아할 만한 사람을 알고 계신가요? 소개해 주세요. 입소문은 더 많은 플레이어가 좋은 애드온을 발견하는 데 도움이 됩니다."
+L["OPTIONS_LEVEL_UP_CURSEFORGE"] =
+	"• CurseForge 즐겨찾기: 아래 CurseForge 링크를 열고 로그인한 뒤 Download 버튼 아래의 별을 클릭하세요. 즐겨찾기는 더 많은 플레이어가 애드온을 발견하는 데 도움이 됩니다."
+L["OPTIONS_LEVEL_UP_GITHUB"] =
+	"• GitHub에서 Star 누르기: 아래 GitHub 링크를 열고 로그인한 뒤 오른쪽 위의 Star를 클릭하세요. Star는 프로젝트가 더 많은 무료 개발자 도구를 이용할 자격을 얻는 데 도움이 됩니다."
+L["OPTIONS_LEVEL_UP_THANKS"] = "Thanks for the Buff (TFTB)를 선택해 주셔서 감사합니다!"
+
+L["OPTIONS_FEEDBACK"] = "피드백 및 지원"
+L["OPTIONS_FEEDBACK_LINKS_HEADER"] = "피드백 및 지원 링크"
 L["OPTIONS_CURSEFORGE"] = "CurseForge"
 L["OPTIONS_GITHUB"] = "GitHub"
 L["OPTIONS_DISCORD"] = "Discord"
 L["OPTIONS_WAGO"] = "Wago"
+L["OPTIONS_COPY_LINK"] = "링크를 복사하려면 해당 칸을 클릭한 뒤 Ctrl+A와 Ctrl+C를 누르세요."
 L["OPTIONS_VERSION"] = "버전 %s"
-L["OPTIONS_FEATURES_HEADER"] = "기능"
-L["OPTIONS_COMMANDS_HEADER"] = "/Commands"
-L["OPTIONS_COMMAND"] = "/tftb"
-L["OPTIONS_COMMAND_DESCRIPTION"] = "이 애드온의 설정 인터페이스를 엽니다."
 
 --------------------------------------------------------------------------------
 -- Options: Buff Panels
@@ -96,7 +121,7 @@ L["SERVICES_ENABLE"] = "지원 알림 활성화"
 L["SERVICES_ENABLE_DESCRIPTION"] =
 	"잔치, 영혼샘, 차원문 등 파티를 위해 설치된 도움에 대한 알림을 켭니다."
 L["SERVICES_DESCRIPTION"] =
-	"파티가 제공하는 공격대 전체 지원에 반응합니다. 잔치, 영혼샘, 차원문, 수리 로봇이 해당됩니다."
+	"누군가 그룹을 위해 지원을 설치하면 반응합니다. 잔치, 영혼샘, 차원문, 수리 로봇이 해당됩니다."
 
 -- Send Good News
 L["TAB_GOOD_NEWS"] = "좋은 소식 보내기"
@@ -109,8 +134,9 @@ L["GOOD_NEWS_SCOPE"] = "받는 대상"
 L["GOOD_NEWS_SCOPE_ALWAYS"] = "버프한 모든 대상"
 L["GOOD_NEWS_SCOPE_GROUP"] = "파티/공격대 구성원만"
 L["GOOD_NEWS_SCOPE_DESCRIPTION"] =
-	"좋은 소식 귓속말을 받을 대상을 설정합니다. 버프한 모든 대상 또는 파티나 공격대 구성원만 선택할 수 있습니다."
+	"좋은 소식 귓속말을 받을 대상을 설정합니다. 버프한 모든 대상 또는 그룹 구성원만 선택할 수 있습니다."
 L["GOOD_NEWS_MESSAGES_HEADER"] = "좋은 소식 메시지"
+L["GOOD_NEWS_MESSAGES_DESCRIPTION"] = "버프를 받은 플레이어가 받게 되는 귓속말입니다."
 --[[
     Two halves so the number stays authoritative: LIMIT's %d is a real placeholder
     and gets formatted, TOKENS carries a literal %a for the reader to copy and so
@@ -132,7 +158,7 @@ L["PEER_PRESSURE_ENABLE"] = "또래 압박 활성화"
 L["PEER_PRESSURE_ENABLE_DESCRIPTION"] =
 	"같은 직업의 다른 플레이어가 추적 중인 재사용 대기시간 기술을 사용할 때의 알림을 켭니다."
 L["PEER_PRESSURE_PRINT_DESCRIPTION"] =
-	"같은 직업의 재사용 대기시간 기술이 사용되면 자신의 대화창에 메시지를 출력합니다. 자신만 볼 수 있습니다."
+	"같은 직업의 재사용 대기시간 기술이 사용되면 자신만 볼 수 있는 메시지를 출력합니다."
 L["PEER_PRESSURE_OWN_CASTS"] = "자신의 시전에도 발동"
 L["PEER_PRESSURE_OWN_CASTS_DESCRIPTION"] =
 	"다른 플레이어뿐 아니라 자신이 재사용 대기시간 기술을 사용할 때도 발동합니다."
@@ -161,8 +187,10 @@ L["WHISPER_MESSAGE_RESET_DESCRIPTION"] = "귓속말 메시지를 기본 문구�
     carries the Notifications header alone. Key prefixes match the header the
     control appears under.
 ]]
-L["PRAISE_HEADER"] = "감사 메시지 및 감정 표현"
+L["PRAISE_HEADER"] = "감사 귓속말 및 감정 표현"
 L["NOTIFICATIONS_HEADER"] = "알림"
+L["PRAISE_DESCRIPTION"] = "상대 플레이어가 보는 것: 감사 귓속말, 감정 표현 또는 둘 다."
+L["NOTIFICATIONS_DESCRIPTION"] = "자신만 받는 것: 텍스트 알림, 효과음 또는 둘 다."
 
 -- Also titles the Thank You Button's emote grid, so it carries no PRAISE_ prefix.
 L["EMOTES_SELECT"] = "감정 표현 선택"
@@ -178,9 +206,8 @@ L["PRAISE_DELAY_DESCRIPTION"] =
 L["PRAISE_DELAY_LENGTH_DESCRIPTION"] =
 	"귓속말과 감정 표현을 보내기 전에 기다릴 시간을 설정합니다."
 
-L["NOTIFICATIONS_PRINT_ENABLE"] = "대화창 메시지 활성화"
-L["NOTIFICATIONS_PRINT_DESCRIPTION"] =
-	"버프를 받을 때 자신의 대화창에 메시지를 출력합니다. 자신만 볼 수 있습니다."
+L["NOTIFICATIONS_PRINT_ENABLE"] = "텍스트 알림 활성화"
+L["NOTIFICATIONS_PRINT_DESCRIPTION"] = "버프를 받을 때 자신만 볼 수 있는 메시지를 출력합니다."
 L["NOTIFICATIONS_SOUND_ENABLE"] = "효과음 활성화"
 L["NOTIFICATIONS_SOUND_DESCRIPTION"] =
 	"버프를 받을 때 효과음을 재생합니다. 자신에게만 들립니다."
@@ -201,12 +228,92 @@ L["GROUP_RESISTANCE_CAULDRONS"] = "저항 가마솥"
 L["GROUP_REPAIR_BOTS"] = "수리 로봇"
 
 --------------------------------------------------------------------------------
+-- Options: Buff Duty
+--------------------------------------------------------------------------------
+
+L["TAB_BUFF_WINDOW"] = "버프 당번"
+L["BUFF_WINDOW_DESCRIPTION"] =
+	"내 버프가 빠진 사람을 보여 줍니다. 아이콘을 클릭하면 시전합니다."
+L["BUFF_WINDOW_ENABLE"] = "버프 당번 활성화"
+L["BUFF_WINDOW_ENABLE_DESCRIPTION"] =
+	"당신이 줄 수 있는 버프가 빠진 그룹 구성원을 보여 주는 창인 버프 당번을 켭니다."
+L["BUFF_WINDOW_NO_BUFFS"] =
+	"당신의 직업에는 이 목록에 있는 버프가 없으므로 이 캐릭터에서는 창이 표시되지 않습니다."
+L["BUFF_WINDOW_HEADER"] = "창"
+L["BUFF_WINDOW_WINDOW_DESCRIPTION"] =
+	"창을 놓아 둔 자리에 두거나, 전투 중에는 방해되지 않게 치워 둡니다."
+L["BUFF_WINDOW_LOCK"] = "창 잠금"
+L["BUFF_WINDOW_LOCK_DESCRIPTION"] =
+	"창이 움직이지 않도록 고정합니다. 잠금을 해제하면 배경을 끌어서 옮길 수 있습니다."
+L["BUFF_WINDOW_HIDE_IN_COMBAT"] = "전투 중 숨기기"
+L["BUFF_WINDOW_HIDE_IN_COMBAT_DESCRIPTION"] =
+	"전투 중에는 창을 숨깁니다. 전투 중에는 목록을 갱신할 수 없으므로, 창을 표시해 두면 전투가 끝날 때까지 마지막 상태가 유지됩니다."
+L["BUFF_WINDOW_SHOW_HEADER"] = "창에 표시"
+L["BUFF_WINDOW_SHOW_DESCRIPTION"] = "자신의 버프, 버프를 준 낯선 사람, 대상을 창에 추가합니다."
+L["BUFF_WINDOW_FAVOR_ENABLE"] = "보답하기"
+L["BUFF_WINDOW_FAVOR_ENABLE_DESCRIPTION"] =
+	"최근 당신에게 버프를 준 낯선 사람과 그들에게 돌려줄 수 있는 버프를 보여 줍니다. 아이콘을 오른쪽 클릭하면 해당 플레이어를 목록에서 제외합니다."
+L["BUFF_WINDOW_FAVOR_SECONDS_DESCRIPTION"] =
+	"낯선 사람이 마지막 버프 후 목록에 남아 있는 시간을 설정합니다."
+L["BUFF_WINDOW_TARGET_ENABLE"] = "내 대상"
+L["BUFF_WINDOW_TARGET_ENABLE_DESCRIPTION"] =
+	"대상이 그룹 외부의 플레이어이고 당신이 줄 수 있는 버프가 빠져 있으면 대상을 보여 줍니다."
+L["BUFF_WINDOW_REFRESH"] = "갱신 기준 시간"
+L["BUFF_WINDOW_REFRESH_DESCRIPTION"] =
+	"버프의 남은 시간이 얼마 이하가 되면 누락으로 간주할지 설정하여, 버프가 사라지기 전에 다시 걸 수 있게 합니다. 지속시간이 이 값 이하인 버프는 사라진 뒤에만 누락으로 간주합니다."
+L["BUFF_WINDOW_PETS_AS_TANKS"] = "소환수를 방어 전담으로 간주"
+L["BUFF_WINDOW_PETS_AS_TANKS_DESCRIPTION"] =
+	"방어 전담으로 설정한 버프(예: 가시)를 모두에게 주는 버프와 함께 소환수에게도 제공합니다."
+L["BUFF_WINDOW_PETS_AS_TANKS_WHEN_DESCRIPTION"] =
+	"소환수를 방어 전담으로 간주할 시점을 설정합니다."
+L["BUFF_WINDOW_PETS_AS_TANKS_SOLO"] = "그룹에 속하지 않을 때"
+L["BUFF_WINDOW_PETS_AS_TANKS_ALWAYS"] = "항상"
+-- Who each buff is offered to: one dropdown per buff, these four choices.
+L["BUFF_WINDOW_AUDIENCE_OFF"] = "끄기"
+L["BUFF_WINDOW_AUDIENCE_TANK"] = "방어 전담"
+L["BUFF_WINDOW_AUDIENCE_HEALER"] = "치유 전담"
+L["BUFF_WINDOW_AUDIENCE_ALL"] = "모두"
+-- The dropdown's tooltip when the client has no description for the spell yet.
+L["BUFF_WINDOW_AUDIENCE_DESCRIPTION"] = "%s을(를) 제공할 대상을 설정합니다."
+L["BUFF_WINDOW_BUFFS_DESCRIPTION"] =
+	"각 버프를 누구에게 제공할지 선택합니다. 방어 전담과 치유 전담은 그룹 역할을 따르며, 역할이 없으면 직업을 기준으로 합니다."
+
+L["BUFF_WINDOW_SELF_DESCRIPTION"] = "자신의 버프로, 창 맨 위에 고정됩니다."
+--[[
+    Muted note after a class name on the Self-Buffs panel, for a family of self
+    buffs only one of which can be up at a time. Keyed by the family.
+]]
+L["BUFF_WINDOW_SELF_NOTE_ASPECT"] = "상 중 하나면 충분"
+L["BUFF_WINDOW_SELF_NOTE_MAGE_ARMOR"] = "갑옷 중 하나면 충분"
+L["BUFF_WINDOW_SELF_NOTE_PALADIN_AURA"] = "오라 중 하나면 충분"
+L["BUFF_WINDOW_SELF_NOTE_SHAMAN_SHIELD"] = "보호막 중 하나면 충분"
+L["BUFF_WINDOW_SELF_NOTE_WARLOCK_ARMOR"] = "갑옷 중 하나면 충분"
+L["BUFF_WINDOW_SELF_REFRESH_OFF"] = "끄기"
+L["BUFF_WINDOW_SELF_REFRESH_MISSING"] = "없을 때"
+-- %s is a duration from the client, like "5 Minutes".
+L["BUFF_WINDOW_SELF_REFRESH_UNDER"] = "%s 미만"
+L["BUFF_WINDOW_SELF_REFRESH_DESCRIPTION"] =
+	"%s을(를) 언제 표시할지 설정합니다. 표시 안 함, 사라졌을 때, 남은 시간이 이 값보다 적을 때 중에서 선택합니다."
+L["BUFF_WINDOW_SELF_ENABLE"] = "내 자기 버프"
+L["BUFF_WINDOW_SELF_ENABLE_DESCRIPTION"] =
+	"갑옷 주문이나 내면의 열정처럼 자신에게만 걸 수 있는 버프가 없거나 곧 끝날 때 창 맨 위에 표시합니다. 어떤 버프를 표시할지는 자기 버프에서 고르세요."
+
+-- The window itself
+L["BUFF_WINDOW_SELF_HEADER"] = "자기 버프"
+L["BUFF_WINDOW_FAVOR_HEADER"] = "보답하기"
+L["BUFF_WINDOW_TARGET_HEADER"] = "대상"
+L["BUFF_WINDOW_TOOLTIP_CAST"] = "클릭하면 %s에게 시전합니다."
+L["BUFF_WINDOW_TOOLTIP_GROUP"] = "클릭하면 %s와(과) 그 파티에게 시전합니다."
+L["BUFF_WINDOW_TOOLTIP_FAVOR"] = "클릭하면 %s을(를) 대상으로 지정하고 시전합니다."
+L["BUFF_WINDOW_TOOLTIP_DISMISS"] = "오른쪽 클릭하면 목록에서 %s을(를) 제외합니다."
+
+--------------------------------------------------------------------------------
 -- Options: Thank You Button
 --------------------------------------------------------------------------------
 
 L["TAB_THANK_YOU_BUTTON"] = "감사 버튼"
 L["BUTTON_DESCRIPTION"] =
-	"예의를 자동으로. 버튼마다 현재 대상에게 귓속말을 보내고 감정 표현까지 함께 할 수 있습니다. 마법사에게 물을 부탁하고, 차원문에 감사를 전하고, 전투 중에 재빨리 도발해 준 친구를 칭찬하세요. 메시지는 한 번만 적어 두면 그다음부터는 키 하나면 됩니다."
+	"키 한 번으로 대상에게 귓속말과 감정 표현을 보냅니다. 예의를 자동으로."
 -- One heading per button, numbered; %d is the button's position in the list.
 L["BUTTON_SECTION"] = "감사 버튼 %d"
 L["BUTTON_EMOTE"] = "감정 표현"

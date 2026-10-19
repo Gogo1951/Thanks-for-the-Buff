@@ -1,15 +1,16 @@
 local _, ns = ...
+local Data = ns.Data
 local L = ns.L
 
 --[[
     "Service Alerts" panel -- raid-wide help with no aura on you (feasts, soulwells,
-    portals, repair bots). The controls and tracked-list helpers come from
-    Options-Utilities.lua (ns.Define* / ns.SortedEntries / ns.DefineEntryToggle).
+    portals, repair bots). The controls come from Options-Utilities.lua
+    (ns.Define*); the tracked list lives in its own sub-panel
+    (Options-Service-Alerts-Tracked.lua).
 
     Same shape as Teammate Buffs -- the Praise / Notifications split, the
     same headers, the same controls -- minus the cooldown dropdowns, which only
-    Strangers carries. The tracked list is one flat category, so there are no
-    inner headers either.
+    Strangers carries.
 ]]
 
 function ns.BuildServicesOptions()
@@ -24,20 +25,26 @@ function ns.BuildServicesOptions()
 			descIntro = ns.OptionsDesc(L["SERVICES_DESCRIPTION"], 1),
 			space0 = ns.OptionsSpacer(2),
 
-			-- Master switch: everything below it hides when off, and the feature
-			-- itself stops -- see the `enabled` gate in Praise. Its twin sits in
-			-- the General panel's Features section. Fractional orders keep it above
-			-- the first header without renumbering the panel.
+			--[[
+			    Master switch: everything below it hides when off, and the feature
+			    itself stops -- see the `enabled` gate in Praise. Its twin sits in
+			    the General panel's Features section. Fractional orders keep it above
+			    the first header without renumbering the panel.
+			]]
 			enable = ns.OptionsFeatureToggle(ns.GetFeatureSwitch("services"), 2.5),
 			enableSpacer = ns.OptionsSpacer(2.6),
 
 			headerPraise = ns.OptionsHeader(L["PRAISE_HEADER"], 3),
 			space1 = ns.OptionsSpacer(4),
+			descPraise = ns.OptionsDesc(L["PRAISE_DESCRIPTION"], 4.3),
+			spacePraise = ns.OptionsSpacer(4.6),
 			emotes = ns.DefineEmotesToggle(settings, 5),
 			emoteSpacer = ns.OptionsSpacer(6, ns.EmotesHidden(settings)),
 			emoteGroup = ns.DefineEmoteGroup(settings, 7),
 			space2 = ns.OptionsSpacer(8),
 			whisper = ns.DefineWhisperToggle(settings, 9),
+			whisperExampleSpacer = ns.DefineExampleSpacer(settings, "whisperEnabled", 9.3),
+			whisperExample = ns.DefineWhisperExample(settings, 9.6, ns.GAME_IDS.SAMPLE_SERVICE_SPELL_ID),
 			space3 = ns.OptionsSpacer(10),
 			praiseDelay = ns.DefinePraiseDelayToggle(settings, 11),
 			praiseDelayLength = ns.DefinePraiseDelaySelect(settings, 12),
@@ -45,22 +52,19 @@ function ns.BuildServicesOptions()
 
 			headerNotifications = ns.OptionsHeader(L["NOTIFICATIONS_HEADER"], 14),
 			space5 = ns.OptionsSpacer(15),
+			descNotifications = ns.OptionsDesc(L["NOTIFICATIONS_DESCRIPTION"], 15.3),
+			spaceNotifications = ns.OptionsSpacer(15.6),
 			printOut = ns.DefinePrintToggle(settings, 16),
+			printExampleSpacer = ns.DefineExampleSpacer(settings, "printEnabled", 16.3),
+			printExample = ns.DefinePrintExample(settings, 16.6, function(class, name)
+				local link = ns.GetSpellLink(ns.GAME_IDS.SAMPLE_SERVICE_SPELL_ID) or ""
+				return ns:BuildTrackedMessage({ type = Data.BUFF.SERVICE, opened = true }, class, name, link)
+			end),
 			space6 = ns.OptionsSpacer(17),
 			sound = ns.DefineSoundToggle(settings, 18),
 			soundPreview = ns.DefineSoundPreview(ns.PlayBuffSound, 19),
-			space7 = ns.OptionsSpacer(20),
-
-			headerTracked = ns.OptionsHeader(L["TRACKED_HEADER"], 21),
-			space8 = ns.OptionsSpacer(22),
 		},
 	}
-
-	local entryOrder = 30
-	for _, entry in ipairs(ns.SortedEntries(ns.ServiceEntries or {})) do
-		options.args["entry_" .. entry.ids[1]] = ns.DefineEntryToggle(entry, entryOrder)
-		entryOrder = entryOrder + 1
-	end
 
 	-- Intro text and the switch itself stay; everything else follows the switch.
 	ns.HideAllExcept(options.args, function()

@@ -22,9 +22,11 @@ local givenLookup = {} -- Good News: keyed by CAST id (see BuildLookups)
 -- Tracked Lookups
 --------------------------------------------------------------------------------
 
--- The id the combat log carries for a trigger: the aura it applies (AURA) or the
--- cast id (CAST). An item trigger's `spell` already is that id; a spell trigger
--- may name a separate `aura`.
+--[[
+    The id the combat log carries for a trigger: the aura it applies (AURA) or the
+    cast id (CAST). An item trigger's `spell` already is that id; a spell trigger
+    may name a separate `aura`.
+]]
 local function WatchedId(entry, trigger)
 	if entry.detect == Data.DETECT.AURA then
 		return trigger.aura or trigger.spell
@@ -55,8 +57,10 @@ local function BuildLookups()
 
 	for _, entry in ipairs(ns.TRACKED_ABILITIES) do
 		local lookup = (entry.detect == Data.DETECT.AURA) and auraLookup or castLookup
-		-- Seeds consumed by PopulateWatchedBuffs: 0 seeds a checkbox off,
-		-- anything else on; a missing value seeds on.
+		--[[
+		    Seeds consumed by PopulateWatchedBuffs: 0 seeds a checkbox off,
+		    anything else on; a missing value seeds on.
+		]]
 		local receivedDefault = entry.received ~= 0
 		local givenDefault = entry.given ~= 0
 		for _, trigger in ipairs(entry.triggers) do
@@ -79,12 +83,14 @@ local function BuildLookups()
 						itemId = trigger.item,
 						watchedId = watched,
 						givenDefault = givenDefault,
-						-- What to read the recipient's remaining duration with.
-						-- Deliberately absent for a cast that leaves no aura and
-						-- for a `noDuration` entry (Fear Ward, Misdirection):
-						-- nothing to read is what drops the duration clause from
-						-- their message. A duration that IS read still has to
-						-- clear the under-a-minute cap in BuildGoodNewsMessage.
+						--[[
+						    What to read the recipient's remaining duration with.
+						    Deliberately absent for a cast that leaves no aura and
+						    for a `noDuration` entry (Fear Ward, Misdirection):
+						    nothing to read is what drops the duration clause from
+						    their message. A duration that IS read still has to
+						    clear the under-a-minute cap in BuildGoodNewsMessage.
+						]]
 						auraId = (entry.detect == Data.DETECT.AURA and not entry.noDuration) and watched or nil,
 					}
 				end
@@ -104,14 +110,17 @@ local function BuildLookups()
 	ns.DIAGNOSTIC_TRACKED.castIds = castCount
 end
 
--- Watched state is keyed by the watched spell id; a key the saved list doesn't
--- hold yet seeds from the entry's received/given defaults, carried on
--- the lookup records by BuildLookups (0 seeds off), and a user's own choice is
--- never overwritten. One shared list backs both the Teammates and Services
--- panels; ids never overlap between them, so a single table is unambiguous. The
--- Good News panel reuses the teammate ids with independent choices, so it
--- seeds its own list here from givenLookup, which holds no service ids (a
--- service has no per-person recipient to whisper).
+--[[
+    Watched state is keyed by the watched spell id; a key the saved list doesn't
+    hold yet seeds from the entry's received/given defaults, carried on
+    the lookup records by BuildLookups (0 seeds off), and a user's own choice is
+    never overwritten. One shared list backs both the Teammates and Services
+    panels; ids never overlap between them, so a single table is unambiguous. The
+    Good News panel reuses the teammate ids with independent choices, so it
+    seeds its own list here from givenLookup, which holds no service ids (a
+    service has no per-person recipient to whisper). A key this client's data
+    lacks is left alone: Classic Era and Season of Discovery share one profile.
+]]
 local function PopulateWatchedBuffs()
 	local watched = ns.db.profile.watchedBuffs
 	local given = ns.db.profile.goodNews.watched
@@ -125,27 +134,9 @@ local function PopulateWatchedBuffs()
 			watched[id] = info.receivedDefault
 		end
 	end
-	local givenIds = {}
 	for _, info in pairs(givenLookup) do
-		givenIds[info.watchedId] = true
 		if given[info.watchedId] == nil then
 			given[info.watchedId] = info.givenDefault
-		end
-	end
-
-	--[[
-        Drop persisted ids not live on this client, so the saved list and the
-        diagnostics counts stay client-real. Ids re-seed above if the client
-        later gains them, so this is safe across a client's progression.
-    ]]
-	for id in pairs(watched) do
-		if auraLookup[id] == nil and castLookup[id] == nil then
-			watched[id] = nil
-		end
-	end
-	for id in pairs(given) do
-		if not givenIds[id] then
-			given[id] = nil
 		end
 	end
 end
@@ -155,17 +146,36 @@ ns.PopulateWatchedBuffs = PopulateWatchedBuffs
 -- Display Groups
 --------------------------------------------------------------------------------
 
+local trackedItemIds = {}
+
 local function WarmItemCache()
-	-- Touch every tracked item so its name/link is cached for the options panel
-	-- and the "used their X on you" message. Cold entries resolve asynchronously.
+	--[[
+	    Touch every tracked item so its name/link is cached for the options panel
+	    and the "used their X on you" message. Cold entries resolve asynchronously.
+	]]
+	wipe(trackedItemIds)
 	for _, entry in ipairs(ns.TRACKED_ABILITIES) do
 		for _, trigger in ipairs(entry.triggers) do
 			if trigger.item then
+				trackedItemIds[trigger.item] = true
 				C_Item.GetItemInfo(trigger.item)
 			end
 		end
 	end
 end
+
+-- An item that loads while a panel is open repaints it, replacing its "Item #" placeholder.
+local function OnGetItemInfoReceived(itemId)
+	if not trackedItemIds[itemId] then
+		return
+	end
+	local registry = LibStub("AceConfigRegistry-3.0")
+	registry:NotifyChange(ns.OPTIONS_REGISTRY.TeammateBuffsTracked)
+	registry:NotifyChange(ns.OPTIONS_REGISTRY.SendGoodNewsTracked)
+	registry:NotifyChange(ns.OPTIONS_REGISTRY.ServiceAlertsTracked)
+end
+
+ns.SetEventHandler("GET_ITEM_INFO_RECEIVED", OnGetItemInfoReceived)
 
 local function AddToBuckets(buckets, class, toggle)
 	local list
@@ -277,8 +287,8 @@ local function BuildDisplayGroups()
 			-- Diagnostics: every class-flavored *spell* (items aren't player spells).
 			if entry.class and #items == 0 then
 				diagnostic[entry.class] = diagnostic[entry.class] or {}
-				local d = diagnostic[entry.class]
-				d[#d + 1] = { name = name, ids = abilities }
+				local classSpells = diagnostic[entry.class]
+				classSpells[#classSpells + 1] = { name = name, ids = abilities }
 			end
 		end
 	end

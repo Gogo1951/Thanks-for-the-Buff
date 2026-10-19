@@ -12,11 +12,13 @@ function ns.RegisterOptionsPanels()
 	local parent = L["ADDON_TITLE"]
 
 	AceConfig:RegisterOptionsTable(registry.General, ns.BuildGeneralOptions())
-	-- AddToBlizOptions returns (frame, categoryID). Both are kept: the opener
-	-- routes by the captured id, falling back to AceConfigDialog:Open, and never
-	-- resolves the panel by title -- a name lookup returns nil on clients that
-	-- carry the Settings API, which is what makes the panel open as a floating
-	-- window.
+	--[[
+	    AddToBlizOptions returns (frame, categoryID). Both are kept: the opener
+	    routes by the captured id, falling back to AceConfigDialog:Open, and never
+	    resolves the panel by title -- a name lookup returns nil on clients that
+	    carry the Settings API, which is what makes the panel open as a floating
+	    window.
+	]]
 	local mainPanel, mainCategoryID = AceConfigDialog:AddToBlizOptions(registry.General, parent)
 	ns.optionsFrames = { main = mainPanel, categoryID = mainCategoryID }
 
@@ -25,26 +27,57 @@ function ns.RegisterOptionsPanels()
 		AceConfigDialog:AddToBlizOptions(registry.StrangerBuffs, L["TAB_STRANGERS"], parent)
 	end
 
+	--[[
+	    Each panel with a tracked list gets it as a "Tracked Abilities" sub-panel,
+	    nested by the category id AddToBlizOptions hands back, as Buff Duty's are
+	    below. The sub-panels register as functions (not prebuilt tables) so the
+	    list is rebuilt and re-sorted on open, once lazily-loaded item names are
+	    cached.
+	]]
+	local function AddTrackedSubPanel(appName, builder, parentID)
+		AceConfig:RegisterOptionsTable(appName, builder)
+		AceConfigDialog:AddToBlizOptions(appName, L["TRACKED_HEADER"], parentID)
+	end
+
 	if ns.BuildTeammatesOptions then
-		-- Registered as a function (not a prebuilt table) so the tracked list is
-		-- rebuilt and re-sorted on open, once lazily-loaded item names are cached.
 		AceConfig:RegisterOptionsTable(registry.TeammateBuffs, ns.BuildTeammatesOptions)
-		AceConfigDialog:AddToBlizOptions(registry.TeammateBuffs, L["TAB_TEAMMATES"], parent)
+		local _, teammatesID = AceConfigDialog:AddToBlizOptions(registry.TeammateBuffs, L["TAB_TEAMMATES"], parent)
+		AddTrackedSubPanel(registry.TeammateBuffsTracked, ns.BuildTeammatesTrackedOptions, teammatesID)
 	end
 
 	if ns.BuildGoodNewsOptions then
 		AceConfig:RegisterOptionsTable(registry.SendGoodNews, ns.BuildGoodNewsOptions)
-		AceConfigDialog:AddToBlizOptions(registry.SendGoodNews, L["TAB_GOOD_NEWS"], parent)
+		local _, goodNewsID = AceConfigDialog:AddToBlizOptions(registry.SendGoodNews, L["TAB_GOOD_NEWS"], parent)
+		AddTrackedSubPanel(registry.SendGoodNewsTracked, ns.BuildGoodNewsTrackedOptions, goodNewsID)
 	end
 
 	if ns.BuildServicesOptions then
 		AceConfig:RegisterOptionsTable(registry.ServiceAlerts, ns.BuildServicesOptions)
-		AceConfigDialog:AddToBlizOptions(registry.ServiceAlerts, L["TAB_SERVICES"], parent)
+		local _, servicesID = AceConfigDialog:AddToBlizOptions(registry.ServiceAlerts, L["TAB_SERVICES"], parent)
+		AddTrackedSubPanel(registry.ServiceAlertsTracked, ns.BuildServicesTrackedOptions, servicesID)
 	end
 
 	if ns.BuildPeerPressureOptions then
 		AceConfig:RegisterOptionsTable(registry.PeerPressure, ns.BuildPeerPressureOptions)
-		AceConfigDialog:AddToBlizOptions(registry.PeerPressure, L["TAB_PEER_PRESSURE"], parent)
+		local _, peerPressureID =
+			AceConfigDialog:AddToBlizOptions(registry.PeerPressure, L["TAB_PEER_PRESSURE"], parent)
+		AddTrackedSubPanel(registry.PeerPressureTracked, ns.BuildPeerPressureTrackedOptions, peerPressureID)
+	end
+
+	if ns.BuildBuffWindowOptions then
+		-- Builders, like Peer Pressure: the class lists exist only after login.
+		AceConfig:RegisterOptionsTable(registry.BuffWindow, ns.BuildBuffWindowOptions)
+		local _, buffWindowID = AceConfigDialog:AddToBlizOptions(registry.BuffWindow, L["TAB_BUFF_WINDOW"], parent)
+
+		--[[
+		    Tracked Abilities and Self-Buffs nest one level deeper, under Buff Duty, by the
+		    category id AddToBlizOptions just handed back: the Settings panel finds
+		    a parent at any depth and indents each level.
+		]]
+		AceConfig:RegisterOptionsTable(registry.BuffWindowBuffs, ns.BuildBuffWindowBuffsOptions)
+		AceConfigDialog:AddToBlizOptions(registry.BuffWindowBuffs, L["TRACKED_HEADER"], buffWindowID)
+		AceConfig:RegisterOptionsTable(registry.BuffWindowSelfBuffs, ns.BuildBuffWindowSelfBuffsOptions)
+		AceConfigDialog:AddToBlizOptions(registry.BuffWindowSelfBuffs, L["BUFF_WINDOW_SELF_HEADER"], buffWindowID)
 	end
 
 	if ns.BuildThankYouButtonOptions then
@@ -52,18 +85,27 @@ function ns.RegisterOptionsPanels()
 		AceConfigDialog:AddToBlizOptions(registry.ThankYouButton, L["TAB_THANK_YOU_BUTTON"], parent)
 	end
 
-	-- Profiles registers second-to-last, directly above Diagnostic Tools. Its
-	-- display name comes already localized from AceDBOptions-3.0.
+	--[[
+	    Profiles registers after the feature panels, directly above Feedback &
+	    Support. Its display name comes already localized from AceDBOptions-3.0.
+	]]
 	if ns.BuildProfilesOptions then
 		local profilesOptions = ns.BuildProfilesOptions()
 		AceConfig:RegisterOptionsTable(registry.Profiles, profilesOptions)
 		AceConfigDialog:AddToBlizOptions(registry.Profiles, profilesOptions.name, parent)
 	end
 
+	if ns.BuildFeedbackSupportOptions then
+		AceConfig:RegisterOptionsTable(registry.FeedbackSupport, ns.BuildFeedbackSupportOptions())
+		AceConfigDialog:AddToBlizOptions(registry.FeedbackSupport, L["OPTIONS_FEEDBACK"], parent)
+	end
+
 	-- Diagnostic Tools registers last so it sits at the bottom of the tree.
 	if ns.BuildDiagnosticsOptions then
-		-- Registered as the builder, so every repaint rebuilds it and the enable
-		-- gate can leave the tabs out of the table while it is off.
+		--[[
+		    Registered as the builder, so every repaint rebuilds it and the enable
+		    gate can leave the tabs out of the table while it is off.
+		]]
 		AceConfig:RegisterOptionsTable(registry.Diagnostics, ns.BuildDiagnosticsOptions)
 		AceConfigDialog:AddToBlizOptions(registry.Diagnostics, ns.DiagnosticsStrings.TAB, parent)
 	end
@@ -100,8 +142,7 @@ end
 --[[
     One command per Thank You button, generated from the same list the macros and
     the options sections come from. The command TEXT is what users and their
-    existing macros type, and button 1's is unchanged; only the internal
-    SlashCmdList key is namespaced, which nothing outside this file reads.
+    existing macros type; only the internal SlashCmdList key is namespaced.
 ]]
 for index, button in ipairs(ns.Data.THANK_YOU_BUTTONS) do
 	local key = "TFTB_THANKYOU" .. index

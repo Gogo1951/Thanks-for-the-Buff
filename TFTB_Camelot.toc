@@ -2,6 +2,9 @@
 ## Notes: Automatically thank players who buff you with a whisper or emote, and announce the buffs you cast, like Power Infusion, Innervate, and Soulstone. Get alerts for feasts, portals, summons, soulwells, and class cooldowns too. Manners, automated.
 ## Author: Gogo1951
 
+## IconTexture: Interface/AddOns/TFTB/Includes/Images/Thanks-for-the-Buff.tga
+## X-License: MIT
+
 ## Category-enUS: Buffs & Debuffs
 ## Category-deDE: Buffs & Debuffs
 ## Category-esES: Beneficios y Perjuicios
@@ -13,9 +16,6 @@
 ## Category-ruRU: Баффы и дебаффы
 ## Category-zhCN: 增益和减益
 ## Category-zhTW: 增益與減益
-
-## IconTexture: Interface/AddOns/TFTB/Includes/Images/Thanks-for-the-Buff.tga
-## X-License: MIT
 
 ## Interface: 16001
 ## X-Flavor: Camelot
@@ -56,6 +56,7 @@ Data/Data.lua
 Data/Camelot/Tracked-Abilities-Camelot.lua
 Data/Camelot/Peer-Pressure-Abilities-Camelot.lua
 Data/Camelot/Game-IDs-Camelot.lua
+Data/Camelot/Buff-Window-Spells-Camelot.lua
 Data/Default-Settings.lua
 
 # Thanks for the Buff
@@ -67,6 +68,11 @@ Features/Praise.lua
 Features/Buff-Tracking.lua
 Features/Good-News.lua
 Features/Thank-You-Button.lua
+Features/Buff-Window-Frame.lua
+Features/Buff-Window-Castable.lua
+Features/Buff-Window-Units.lua
+Features/Buff-Window-Outsiders.lua
+Features/Buff-Window.lua
 
 # Diagnostics
 Diagnostics/Diagnostics-Core.lua
@@ -75,7 +81,7 @@ Diagnostics/Event-Log.lua
 Diagnostics/Code-Reports.lua
 Diagnostics/Settings-Reports.lua
 Diagnostics/Validate-Data.lua
-Diagnostics/Locale-Reports.lua
+Diagnostics/Localization-Reports.lua
 Diagnostics/Report-Runner.lua
 
 # Options
@@ -83,10 +89,17 @@ Options/Options-Utilities.lua
 Options/Options-General.lua
 Options/Options-Stranger-Buffs.lua
 Options/Options-Teammate-Buffs.lua
+Options/Options-Teammate-Buffs-Tracked.lua
 Options/Options-Send-Good-News.lua
+Options/Options-Send-Good-News-Tracked.lua
 Options/Options-Service-Alerts.lua
+Options/Options-Service-Alerts-Tracked.lua
 Options/Options-Thank-You-Button.lua
+Options/Options-Buff-Window.lua
+Options/Options-Buff-Window-Buffs.lua
+Options/Options-Buff-Window-Self-Buffs.lua
 Options/Options-Profiles.lua
+Options/Options-Feedback-Support.lua
 Diagnostics/Options-Diagnostics.lua
 Options/Options.lua
 

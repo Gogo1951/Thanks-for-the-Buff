@@ -2,6 +2,9 @@
 ## Notes: Automatically thank players who buff you with a whisper or emote, and announce the buffs you cast, like Power Infusion, Innervate, and Soulstone. Get alerts for feasts, portals, summons, soulwells, and class cooldowns too. Manners, automated.
 ## Author: Gogo1951
 
+## IconTexture: Interface/AddOns/TFTB/Includes/Images/Thanks-for-the-Buff.tga
+## X-License: MIT
+
 ## Category-enUS: Buffs & Debuffs
 ## Category-deDE: Buffs & Debuffs
 ## Category-esES: Beneficios y Perjuicios
@@ -13,9 +16,6 @@
 ## Category-ruRU: Баффы и дебаффы
 ## Category-zhCN: 增益和减益
 ## Category-zhTW: 增益與減益
-
-## IconTexture: Interface/AddOns/TFTB/Includes/Images/Thanks-for-the-Buff.tga
-## X-License: MIT
 
 ## Interface: 11509
 ## X-Flavor: Vanilla
@@ -56,9 +56,11 @@ Data/Data.lua
 Data/Vanilla/Tracked-Abilities-Vanilla.lua
 Data/Vanilla/Peer-Pressure-Abilities-Vanilla.lua
 Data/Vanilla/Game-IDs-Vanilla.lua
+Data/Vanilla/Buff-Window-Spells-Vanilla.lua
 Data/Discovery/Tracked-Abilities-Discovery.lua
 Data/Discovery/Peer-Pressure-Abilities-Discovery.lua
 Data/Discovery/Game-IDs-Discovery.lua
+Data/Discovery/Buff-Window-Spells-Discovery.lua
 Data/Default-Settings.lua
 
 # Thanks for the Buff
@@ -71,6 +73,11 @@ Features/Buff-Tracking.lua
 Features/Good-News.lua
 Features/Peer-Pressure.lua
 Features/Thank-You-Button.lua
+Features/Buff-Window-Frame.lua
+Features/Buff-Window-Castable.lua
+Features/Buff-Window-Units.lua
+Features/Buff-Window-Outsiders.lua
+Features/Buff-Window.lua
 
 # Diagnostics
 Diagnostics/Diagnostics-Core.lua
@@ -79,7 +86,7 @@ Diagnostics/Event-Log.lua
 Diagnostics/Code-Reports.lua
 Diagnostics/Settings-Reports.lua
 Diagnostics/Validate-Data.lua
-Diagnostics/Locale-Reports.lua
+Diagnostics/Localization-Reports.lua
 Diagnostics/Report-Runner.lua
 
 # Options
@@ -87,11 +94,19 @@ Options/Options-Utilities.lua
 Options/Options-General.lua
 Options/Options-Stranger-Buffs.lua
 Options/Options-Teammate-Buffs.lua
+Options/Options-Teammate-Buffs-Tracked.lua
 Options/Options-Send-Good-News.lua
+Options/Options-Send-Good-News-Tracked.lua
 Options/Options-Service-Alerts.lua
+Options/Options-Service-Alerts-Tracked.lua
 Options/Options-Peer-Pressure.lua
+Options/Options-Peer-Pressure-Tracked.lua
 Options/Options-Thank-You-Button.lua
+Options/Options-Buff-Window.lua
+Options/Options-Buff-Window-Buffs.lua
+Options/Options-Buff-Window-Self-Buffs.lua
 Options/Options-Profiles.lua
+Options/Options-Feedback-Support.lua
 Diagnostics/Options-Diagnostics.lua
 Options/Options.lua
 

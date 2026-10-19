@@ -20,25 +20,37 @@ local EVENT_LOG_MAX_ARG_LENGTH = 255
       combat-log traffic would bury the signal, so every aura landing on you
       and every cast or revive TFTB tracks is logged in full instead, and every
       other cast is counted by spell id in the summary (see ns:LogCombatCast).
-    - UNIT_AURA, registered only on Forever and only for the player: its update
-      table can't be logged as text, so each added aura is logged with the gate
-      that decided it instead (see ns:LogAuraUpdate).
+    - UNIT_AURA, registered on every flavor for every unit (the Buff Window
+      reads the whole group): its update table can't be logged as text, and on
+      Forever each added aura on you is logged with the gate that decided it
+      instead (see ns:LogAuraUpdate). The Buff Window's own reads show on the
+      Buff Window Context report.
+
+    SPELL_UPDATE_COOLDOWN is dropped outright: it fires on every global
+    cooldown and carries no id to classify by, and all it drives is the Buff
+    Window's cooldown swipes, which show on the window itself.
 ]]
 ns.DIAGNOSTIC_EVENT_EXCLUDE = {
 	COMBAT_LOG_EVENT_UNFILTERED = true,
 	UNIT_AURA = true,
+	SPELL_UPDATE_COOLDOWN = true,
 }
 
 --[[
     Events that carry an id worth classifying, and the argument position it
     arrives in, for ns:SuppressUncorrelatedMessage to classify per firing
-    rather than drop wholesale. UNIT_SPELLCAST_SUCCEEDED fires for every unit
-    the client tracks, so in a group or a city it is a firehose; its id is the
-    spell id, a firing logs in full when TFTB correlates that id
-    (ns.IsCorrelatedMessage), and every other firing is counted.
+    rather than drop wholesale. A firing logs in full when TFTB correlates its
+    id (ns.IsCorrelatedMessage), and every other firing is counted.
+
+    - UNIT_SPELLCAST_SUCCEEDED fires for every unit the client tracks, so in a
+      group or a city it is a firehose; its id is the spell id.
+    - GET_ITEM_INFO_RECEIVED fires for every item any add-on or the game's own
+      UI loads, so a bag or auction add-on can send hundreds; its id is the
+      item id, and only a tracked item's matters.
 ]]
 ns.MESSAGE_ID_FILTERED_EVENTS = {
 	UNIT_SPELLCAST_SUCCEEDED = 3,
+	GET_ITEM_INFO_RECEIVED = 1,
 }
 
 -- The counter id a secret id (WoW Forever) folds into, since a secret can't key a table.
@@ -77,12 +89,12 @@ end
 
 --[[
     Per-firing filter for the events above. A firing whose id the add-on
-    correlates (ns.IsCorrelatedMessage, where the add-on defines one) logs in
-    full; any other folds into its counter, so firehose traffic can't evict
-    the entries the log exists to carry. A secret id counts too. A plain
-    firing carrying no numeric id in the filtered position is unclassifiable,
-    and unclassifiable is signal: it logs verbatim. The counter's text is the
-    argument after the id, or blank when none follows.
+    correlates (ns.IsCorrelatedMessage) logs in full; any other folds into its
+    counter, so firehose traffic can't evict the entries the log exists to
+    carry. A secret id counts too. A plain firing carrying no numeric id in the
+    filtered position is unclassifiable, and unclassifiable is signal: it logs
+    verbatim. The counter's text is the argument after the id, or blank when
+    none follows.
 
     Returns true when the firing was counted and must not reach the buffer.
 ]]
@@ -119,34 +131,21 @@ function ns:StopEventLog()
 end
 
 --[[
-    Called by Core's central dispatcher for every event while logging is active.
+    One entry in the buffer, for ns:LogEvent and ns:LogEventNow below.
     Snapshots arguments to strings immediately -- never retain references, since
     some events carry frames or tables that would leak memory or go stale. Caps
     the arg count and per-argument byte length so a single entry can't run away.
+    A secret argument (WoW Forever) can't be turned into text, so it records as
+    <secret>.
 
     Pipes are escaped (| -> ||) AFTER the length cut so each argument shows
     verbatim in the report editbox instead of rendering as a clickable item
     swatch. Escaping last also means the cut can never leave a dangling pipe that
     would eat the following ", " separator.
 ]]
-function ns:LogEvent(event, ...)
-	if ns.DIAGNOSTIC_EVENT_EXCLUDE[event] then
-		return
-	end
-	if ns:SuppressUncorrelatedMessage(event, ...) then
-		return
-	end
-	ns:LogEventNow(event, ...)
-end
-
---[[
-    Records one entry with no exclusion check, for a handler that decides a
-    firing of an excluded firehose is signal. A secret argument (WoW Forever)
-    can't be turned into text, so it records as <secret>.
-]]
-function ns:LogEventNow(event, ...)
+local function AppendEntry(event, ...)
 	local log = ns.diagnostics.log
-	if not log or not ns.diagnostics.logging then
+	if not log then
 		return
 	end
 	local parts = {}
@@ -166,6 +165,31 @@ function ns:LogEventNow(event, ...)
 	if #log > EVENT_LOG_SIZE then
 		table.remove(log, 1)
 	end
+end
+
+-- Called by Core's central dispatcher for every event while logging is active.
+function ns:LogEvent(event, ...)
+	if ns.DIAGNOSTIC_EVENT_EXCLUDE[event] then
+		return
+	end
+	if ns:SuppressUncorrelatedMessage(event, ...) then
+		return
+	end
+	AppendEntry(event, ...)
+end
+
+--[[
+    The way back in for an excluded firehose that is sometimes signal: the
+    handler that decides a firing mattered calls this with the event and its
+    arguments, and it is recorded as the dispatcher would have, past the
+    exclude list. Feature code calls it, so it carries the dispatcher's own
+    single boolean check before any work.
+]]
+function ns:LogEventNow(event, ...)
+	if not ns.diagnostics.logging then
+		return
+	end
+	AppendEntry(event, ...)
 end
 
 --[[
