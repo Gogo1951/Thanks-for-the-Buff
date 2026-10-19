@@ -1,8 +1,8 @@
 # Thanks for the Buff (TFTB)
 
-Automatically thank players who buff you with a whisper or emote, and announce the buffs you cast, like Power Infusion, Innervate, and Soulstone. Get alerts for feasts, portals, summons, soulwells, and class cooldowns too. Manners, automated.
+Thank every player who buffs you with a whisper or emote, and see who's missing your raid buffs with a click-to-cast buff tracker. Plus alerts for feasts, portals, summons, soulwells, and class cooldowns. Manners, automated.
 
-**TL;DR**: For players who want to be polite without stopping what they're doing. Keep questing, farming, or raiding, and every buff still gets a proper thank-you.
+**TL;DR**: For players who want to stay polite and keep their raid buffed without stopping what they're doing. Every buff you get earns a thank-you, and every buff you owe is one click away.
 
 ## Features
 
@@ -50,9 +50,13 @@ Get pinged when another player of your class pops a cooldown, so you can stack y
 
 A small window of everyone missing a buff you can give. Click an icon to cast it.
 
+* Only shows up when someone's missing a buff. Click every icon and it's gone.
+* Picks the right rank for lowbies, so you can buff anyone you meet.
+* Hidden in combat, unless you'd rather see it.
+
 | Own-Buffs Reminders | Return the Favor | In Raid |
 | --- | --- | --- |
-| <img width="180" src="https://github.com/user-attachments/assets/8924a6a3-aa93-42cf-ba1e-e833512ae96a" /><br><br>• Only shows up when someone's missing a buff.<br>• Click every icon and the window's gone.<br>• Hidden in combat, unless you'd rather see it. | <img width="180" src="https://github.com/user-attachments/assets/40e05c06-6bd1-4a41-81d8-f6250166f992" /> | <img width="237" height="670" alt="Pasted_Image_10_19_26__1_46 AM" src="https://github.com/user-attachments/assets/be7c7e1e-50c6-49b3-8a1b-838fbd796f79" /> |
+| <img width="180" src="https://github.com/user-attachments/assets/8924a6a3-aa93-42cf-ba1e-e833512ae96a" /> | <img width="180" src="https://github.com/user-attachments/assets/40e05c06-6bd1-4a41-81d8-f6250166f992" /> | <img width="237" height="670" alt="Pasted_Image_10_19_26__1_46 AM" src="https://github.com/user-attachments/assets/be7c7e1e-50c6-49b3-8a1b-838fbd796f79" /> |
 
 ### Options
 
@@ -101,7 +105,6 @@ A small window of everyone missing a buff you can give. Click an icon to cast it
 
 ### 🟢 Pairs With
 
-* Pupp3h's [Buffwatch Classic](https://www.curseforge.com/wow/addons/buffwatch-classic)
 * Gogo1951's [Connoisseur & Restocker](https://www.curseforge.com/wow/addons/consumable-connoisseur)
 * aznamir's [PallyPower](https://www.curseforge.com/wow/addons/pally-power)
 * Gogo1951's [Play It Forward](https://www.curseforge.com/wow/addons/play-it-forward)
@@ -117,6 +120,7 @@ A small window of everyone missing a buff you can give. Click an icon to cast it
 
 ### 🔴 Alternatives
 
+* Pupp3h's [Buffwatch Classic](https://www.curseforge.com/wow/addons/buffwatch-classic)
 * esNaglfar's [AutoThank](https://www.curseforge.com/wow/addons/autothank)
 * tf4482's [BuffResponder](https://www.curseforge.com/wow/addons/buffresponder)
 * Iamthedot's [Kindred](https://www.curseforge.com/wow/addons/kindred)
