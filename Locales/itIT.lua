@@ -278,6 +278,7 @@ L["BUFF_WINDOW_SELF_DESCRIPTION"] = "I tuoi potenziamenti, fissati in cima alla 
 L["BUFF_WINDOW_SELF_NOTE_ASPECT"] = "vale un aspetto qualsiasi"
 L["BUFF_WINDOW_SELF_NOTE_MAGE_ARMOR"] = "vale un'armatura qualsiasi"
 L["BUFF_WINDOW_SELF_NOTE_PALADIN_AURA"] = "vale un'aura qualsiasi"
+L["BUFF_WINDOW_SELF_NOTE_SHAMAN_IMBUE"] = "vale un potenziamento d'arma qualsiasi"
 L["BUFF_WINDOW_SELF_NOTE_SHAMAN_SHIELD"] = "vale uno scudo qualsiasi"
 L["BUFF_WINDOW_SELF_NOTE_WARLOCK_ARMOR"] = "vale un'armatura qualsiasi"
 L["BUFF_WINDOW_SELF_REFRESH_OFF"] = "Disattivato"

@@ -277,6 +277,7 @@ L["BUFF_WINDOW_SELF_DESCRIPTION"] = "Tus propios beneficios, fijados en la parte
 L["BUFF_WINDOW_SELF_NOTE_ASPECT"] = "cualquier aspecto cuenta"
 L["BUFF_WINDOW_SELF_NOTE_MAGE_ARMOR"] = "cualquier armadura cuenta"
 L["BUFF_WINDOW_SELF_NOTE_PALADIN_AURA"] = "cualquier aura cuenta"
+L["BUFF_WINDOW_SELF_NOTE_SHAMAN_IMBUE"] = "cualquier imbuición de arma cuenta"
 L["BUFF_WINDOW_SELF_NOTE_SHAMAN_SHIELD"] = "cualquier escudo cuenta"
 L["BUFF_WINDOW_SELF_NOTE_WARLOCK_ARMOR"] = "cualquier armadura cuenta"
 L["BUFF_WINDOW_SELF_REFRESH_OFF"] = "Desactivado"

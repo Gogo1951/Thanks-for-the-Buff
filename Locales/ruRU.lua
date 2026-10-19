@@ -300,6 +300,7 @@ L["BUFF_WINDOW_SELF_DESCRIPTION"] =
 L["BUFF_WINDOW_SELF_NOTE_ASPECT"] = "подойдет любой дух"
 L["BUFF_WINDOW_SELF_NOTE_MAGE_ARMOR"] = "подойдет любая броня"
 L["BUFF_WINDOW_SELF_NOTE_PALADIN_AURA"] = "подойдет любая аура"
+L["BUFF_WINDOW_SELF_NOTE_SHAMAN_IMBUE"] = "подойдет любое улучшение оружия"
 L["BUFF_WINDOW_SELF_NOTE_SHAMAN_SHIELD"] = "подойдет любой щит"
 L["BUFF_WINDOW_SELF_NOTE_WARLOCK_ARMOR"] = "подойдет любая броня"
 L["BUFF_WINDOW_SELF_REFRESH_OFF"] = "Выкл."

@@ -38,6 +38,9 @@ local uncachedRecord = NewRecord()
 -- The record ReadAuras last selected, which Has reads.
 local auraExpires, auraDurations, auraMine = uncachedRecord.expires, uncachedRecord.durations, uncachedRecord.mine
 
+-- Main-hand enchant key -> the longest time left seen on it, in seconds.
+local enchantDurations = {}
+
 --------------------------------------------------------------------------------
 -- Unit Reads
 --------------------------------------------------------------------------------
@@ -91,7 +94,7 @@ function BuffWindow.ReadAuras(unit)
 	for i = 1, 40 do
 		local data = C_UnitAuras.GetBuffDataByIndex(unit, i, "HELPFUL")
 		if not data then
-			return
+			break
 		end
 		if ns.IsPlain(data.spellId) and data.spellId then
 			local expires, duration = data.expirationTime, data.duration
@@ -103,6 +106,50 @@ function BuffWindow.ReadAuras(unit)
 			end
 		end
 	end
+
+	--[[
+	    Your main hand's temporary enchant (a weapon imbue) joins your auras as
+	    one of yours. The client gives only its time left, so the longest seen
+	    stands in for its duration.
+	]]
+	local isPlayer = UnitIsUnit(unit, "player")
+	if ns.IsPlain(isPlayer) and isPlayer then
+		for key, seconds in pairs(BuffWindow.MainHandEnchants()) do
+			enchantDurations[key] = math.max(enchantDurations[key] or 0, seconds)
+			auraExpires[key] = seconds > 0 and GetTime() + seconds or 0
+			auraDurations[key] = enchantDurations[key]
+			auraMine[key] = true
+		end
+	end
+end
+
+--[[
+    Your main hand's temporary enchants, EnchantKey -> seconds left (0 for no
+    timer). WoW Forever keeps an imbue apart from an oil or a stone, and only
+    C_Item.GetWeaponEnchantInfo lists both: there GetWeaponEnchantInfo() says
+    nothing of an imbue. Classic has only the old call, with one enchant.
+]]
+function BuffWindow.MainHandEnchants()
+	local found = {}
+	local function Add(enchantId, milliseconds)
+		if ns.IsPlain(enchantId) and enchantId and enchantId > 0 then
+			found[BuffWindow.EnchantKey(enchantId)] = ns.IsPlain(milliseconds) and milliseconds and milliseconds / 1000
+				or 0
+		end
+	end
+	if C_Item and C_Item.GetWeaponEnchantInfo and Enum.WeaponSlot then
+		for _, enchant in ipairs(C_Item.GetWeaponEnchantInfo(Enum.WeaponSlot.MainHand) or {}) do
+			if ns.IsPlain(enchant.hasEnchant) and enchant.hasEnchant then
+				Add(enchant.enchantID, enchant.timeLeft)
+			end
+		end
+	elseif GetWeaponEnchantInfo then
+		local hasEnchant, expiration, _, enchantId = GetWeaponEnchantInfo()
+		if ns.IsPlain(hasEnchant) and hasEnchant then
+			Add(enchantId, expiration)
+		end
+	end
+	return found
 end
 
 --[[

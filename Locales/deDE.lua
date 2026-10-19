@@ -281,6 +281,7 @@ L["BUFF_WINDOW_SELF_DESCRIPTION"] = "Eure eigenen Buffs, oben im Fenster angehef
 L["BUFF_WINDOW_SELF_NOTE_ASPECT"] = "ein beliebiger Aspekt genügt"
 L["BUFF_WINDOW_SELF_NOTE_MAGE_ARMOR"] = "eine beliebige Rüstung genügt"
 L["BUFF_WINDOW_SELF_NOTE_PALADIN_AURA"] = "eine beliebige Aura genügt"
+L["BUFF_WINDOW_SELF_NOTE_SHAMAN_IMBUE"] = "eine beliebige Waffenverzauberung genügt"
 L["BUFF_WINDOW_SELF_NOTE_SHAMAN_SHIELD"] = "ein beliebiger Schild genügt"
 L["BUFF_WINDOW_SELF_NOTE_WARLOCK_ARMOR"] = "eine beliebige Rüstung genügt"
 L["BUFF_WINDOW_SELF_REFRESH_OFF"] = "Aus"

@@ -674,6 +674,14 @@ local function ReadUnitBuffs(unit)
 			mine[spellID] = ns.IsPlain(data.sourceUnit) and data.sourceUnit == "player"
 		end
 	end
+	-- Your main hand's weapon imbue, filed the way the window's own read files it.
+	local isPlayer = UnitIsUnit(unit, "player")
+	if ns.IsPlain(isPlayer) and isPlayer then
+		for key, seconds in pairs(ns.BuffWindow.MainHandEnchants()) do
+			left[key] = seconds > 0 and math.max(1, math.floor(seconds)) or 0
+			mine[key] = true
+		end
+	end
 	return left, mine
 end
 

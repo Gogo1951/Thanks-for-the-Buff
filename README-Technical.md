@@ -419,7 +419,7 @@ Its link ends up inside a whisper capped at **255 bytes** (Style Guide → MESSA
 
 1. Add a row to `ns.BUFF_WINDOW_SPELLS` in `Data/{Game}/Buff-Window-Spells-{Game}.lua` for every folder whose client has the spell: `class`, `single` as `{ spell id, level learned }` per rank (the learn level drives `RankFor`, so it must be right), `group` and `greater` id lists when they exist, and a `default` from `Data.BUFF_AUDIENCE`.
 2. Set `exclusive` when the target can hold only one of yours from a family (paladin blessings share `"BLESSING"`), `manaOnly` when the buff is worthless to a class without mana, and `noCasters` when it is worthless to mages, priests and warlocks.
-3. A self buff goes in `ns.BUFF_WINDOW_SELF_SPELLS` instead, with `ranks`, an `exclusive` family when only one can be up, and a `default` of `MISSING`, `OFF`, or minutes left.
+3. A self buff goes in `ns.BUFF_WINDOW_SELF_SPELLS` instead, with `ranks`, an `exclusive` family when only one can be up, and a `default` of `MISSING`, `OFF`, or minutes left. A weapon imbue also lists `enchants`, the enchant ids its ranks put on the weapon: it is read from the main hand with `GetWeaponEnchantInfo`, not from auras.
 4. A new warlock demon's icon is one `[creature ID] = summoning spell id` row in `ns.BUFF_WINDOW_PET_ICONS.demons`.
 5. No code change is needed: `BuildLookup` and `ns.PopulateBuffWindowAudience` pick the row up at login, and the panels list it under its class.
 

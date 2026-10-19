@@ -61,6 +61,14 @@ local function LiveIds(ids)
 	return live
 end
 
+--[[
+    The key a weapon enchant is filed under among a unit's auras. Enchant ids
+    are their own numbering and would collide with spell ids as plain numbers.
+]]
+function BuffWindow.EnchantKey(enchantId)
+	return "enchant:" .. enchantId
+end
+
 function BuffWindow.BuildLookup()
 	wipe(entries)
 	wipe(lookup)
@@ -118,6 +126,9 @@ function BuffWindow.BuildLookup()
 				auraIds[rank[1]] = true
 				rankLevels[rank[1]] = rank[2]
 			end
+		end
+		for _, id in ipairs(row.enchants or {}) do
+			auraIds[BuffWindow.EnchantKey(id)] = true
 		end
 		if ids[1] then
 			if row.exclusive then

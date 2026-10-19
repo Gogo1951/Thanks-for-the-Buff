@@ -64,7 +64,7 @@ local BACKSTOP_INTERVAL = 3
 --[[
     Your own self-only buffs, as icons on the Self Buffs header with no rows
     under it. Each casts your highest rank on yourself. A family you keep one of
-    (an armor, an aura, an aspect, a shield) asks for nothing while any one of
+    (an armor, an aura, an aspect, a shield, a weapon imbue) asks for nothing while any one of
     yours is up -- Has handles that, as it does for blessings.
 ]]
 local function AddSelfSection(sections)
@@ -314,6 +314,14 @@ local function OnUnitPet()
 	RequestFullRefresh()
 end
 
+--[[
+    A weapon imbue landing or fading: ReadAuras files it among your auras, but
+    no UNIT_AURA says it changed.
+]]
+local function OnUnitInventoryChanged()
+	ns.OnBuffWindowAura("player")
+end
+
 local function OnPlayerTargetChanged()
 	RequestFullRefresh()
 end
@@ -369,6 +377,7 @@ end
 
 ns.SetEventHandler("GROUP_ROSTER_UPDATE", OnGroupRosterUpdate)
 ns.SetEventHandler("UNIT_PET", OnUnitPet)
+ns.SetEventHandler("UNIT_INVENTORY_CHANGED", OnUnitInventoryChanged)
 ns.SetEventHandler("PLAYER_TARGET_CHANGED", OnPlayerTargetChanged)
 ns.SetEventHandler("SPELLS_CHANGED", OnSpellsChanged)
 ns.SetEventHandler("PLAYER_REGEN_DISABLED", OnPlayerRegenDisabled)

@@ -46,6 +46,7 @@ read_globals = {
 	"GetRaidRosterInfo",
 	"GetTime",
 	"GetUnitName",
+	"GetWeaponEnchantInfo",
 	"GROUP",
 	"GROUP_NUMBER",
 	"InCombatLockdown",

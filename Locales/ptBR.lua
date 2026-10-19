@@ -276,6 +276,7 @@ L["BUFF_WINDOW_SELF_DESCRIPTION"] = "Seus próprios buffs, fixados no topo da ja
 L["BUFF_WINDOW_SELF_NOTE_ASPECT"] = "qualquer aspecto conta"
 L["BUFF_WINDOW_SELF_NOTE_MAGE_ARMOR"] = "qualquer armadura conta"
 L["BUFF_WINDOW_SELF_NOTE_PALADIN_AURA"] = "qualquer aura conta"
+L["BUFF_WINDOW_SELF_NOTE_SHAMAN_IMBUE"] = "qualquer imbuição de arma conta"
 L["BUFF_WINDOW_SELF_NOTE_SHAMAN_SHIELD"] = "qualquer escudo conta"
 L["BUFF_WINDOW_SELF_NOTE_WARLOCK_ARMOR"] = "qualquer armadura conta"
 L["BUFF_WINDOW_SELF_REFRESH_OFF"] = "Desativado"

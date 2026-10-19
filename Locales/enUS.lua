@@ -265,6 +265,7 @@ L["BUFF_WINDOW_SELF_DESCRIPTION"] = "Your own buffs, pinned to the top of the wi
 L["BUFF_WINDOW_SELF_NOTE_ASPECT"] = "any one aspect counts"
 L["BUFF_WINDOW_SELF_NOTE_MAGE_ARMOR"] = "any one armor counts"
 L["BUFF_WINDOW_SELF_NOTE_PALADIN_AURA"] = "any one aura counts"
+L["BUFF_WINDOW_SELF_NOTE_SHAMAN_IMBUE"] = "any one imbue counts"
 L["BUFF_WINDOW_SELF_NOTE_SHAMAN_SHIELD"] = "any one shield counts"
 L["BUFF_WINDOW_SELF_NOTE_WARLOCK_ARMOR"] = "any one armor counts"
 L["BUFF_WINDOW_SELF_REFRESH_OFF"] = "Off"

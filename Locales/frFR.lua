@@ -282,6 +282,7 @@ L["BUFF_WINDOW_SELF_DESCRIPTION"] = "Vos propres améliorations, épinglées en 
 L["BUFF_WINDOW_SELF_NOTE_ASPECT"] = "n'importe quel aspect compte"
 L["BUFF_WINDOW_SELF_NOTE_MAGE_ARMOR"] = "n'importe quelle armure compte"
 L["BUFF_WINDOW_SELF_NOTE_PALADIN_AURA"] = "n'importe quelle aura compte"
+L["BUFF_WINDOW_SELF_NOTE_SHAMAN_IMBUE"] = "n'importe quel enchantement d'arme compte"
 L["BUFF_WINDOW_SELF_NOTE_SHAMAN_SHIELD"] = "n'importe quel bouclier compte"
 L["BUFF_WINDOW_SELF_NOTE_WARLOCK_ARMOR"] = "n'importe quelle armure compte"
 L["BUFF_WINDOW_SELF_REFRESH_OFF"] = "Désactivé"

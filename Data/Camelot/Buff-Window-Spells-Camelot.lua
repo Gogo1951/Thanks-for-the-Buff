@@ -4,7 +4,7 @@ local Data = ns.Data
 local ALL, TANK, OFF = Data.BUFF_AUDIENCE.ALL, Data.BUFF_AUDIENCE.TANK, Data.BUFF_AUDIENCE.OFF
 local BLESSING = "BLESSING"
 local ASPECT, MAGE_ARMOR, PALADIN_AURA = "ASPECT", "MAGE_ARMOR", "PALADIN_AURA"
-local SHAMAN_SHIELD, WARLOCK_ARMOR = "SHAMAN_SHIELD", "WARLOCK_ARMOR"
+local SHAMAN_IMBUE, SHAMAN_SHIELD, WARLOCK_ARMOR = "SHAMAN_IMBUE", "SHAMAN_SHIELD", "WARLOCK_ARMOR"
 local MISSING = Data.SELF_REFRESH_MISSING
 
 -- { class, single = { { spell id, level learned } }, group = { spell ids }, greater = { spell ids }, exclusive, manaOnly, noCasters, default }, -- Name
@@ -293,6 +293,34 @@ ns.BUFF_WINDOW_SELF_SPELLS = {
 		exclusive = SHAMAN_SHIELD,
 		default = 5,
 	}, -- Water Shield
+	{
+		class = "SHAMAN",
+		ranks = { { 8017, 1 }, { 8018, 8 }, { 8019, 16 }, { 10399, 24 }, { 16314, 34 }, { 16315, 44 }, { 16316, 54 } },
+		enchants = { 29, 6, 1, 503, 1663, 683, 1664 },
+		exclusive = SHAMAN_IMBUE,
+		default = 5,
+	}, -- Rockbiter Weapon
+	{
+		class = "SHAMAN",
+		ranks = { { 8024, 10 }, { 8027, 18 }, { 8030, 26 }, { 16339, 36 }, { 16341, 46 }, { 16342, 56 } },
+		enchants = { 5, 4, 3, 523, 1665, 1666 },
+		exclusive = SHAMAN_IMBUE,
+		default = 5,
+	}, -- Flametongue Weapon
+	{
+		class = "SHAMAN",
+		ranks = { { 8033, 20 }, { 8038, 28 }, { 10456, 38 }, { 16355, 48 }, { 16356, 58 } },
+		enchants = { 2, 12, 524, 1667, 1668 },
+		exclusive = SHAMAN_IMBUE,
+		default = OFF,
+	}, -- Frostbrand Weapon
+	{
+		class = "SHAMAN",
+		ranks = { { 8232, 30 }, { 8235, 40 }, { 10486, 50 }, { 16362, 60 } },
+		enchants = { 283, 284, 525, 1669 },
+		exclusive = SHAMAN_IMBUE,
+		default = 5,
+	}, -- Windfury Weapon
 	-- Warlock -------------------------------------------------------------------
 	{
 		class = "WARLOCK",
@@ -325,7 +353,8 @@ Notes
 	- BUFF_WINDOW_PET_ICONS picks the icon in front of a pet's name: a warlock demon wears its own summoning spell's icon, found by the creature ID inside the pet's GUID, and any other pet wears Call Pet's. Only the spell IDs are stored; the icons come from the client.
 	- BUFF_WINDOW_SELF_SPELLS are the long buffs a player can only put on themselves, behind the window's Self Buffs row: armors, shields, Inner Fire, Omen of Clarity, Trueshot Aura, and the paladin auras and hunter aspects, which have no timer and only need to be up. Warriors and rogues have none worth listing (Battle Shout lasts two minutes; poisons are items).
 	- ranks is every rank, with the level it is learned at; the row casts the highest one known. Where ranks change name (Frost Armor into Ice Armor, Demon Skin into Demon Armor) they share a row, since they are one line of the same buff.
-	- exclusive groups the self buffs only one of which can be up at a time (an armor, a paladin aura, an aspect, a shaman shield): with any one of yours up, the rest of its family stop asking. Turn on every one you might use, and the window offers them all only when none is up.
+	- exclusive groups the self buffs only one of which can be up at a time (an armor, a paladin aura, an aspect, a shaman shield, a weapon imbue): with any one of yours up, the rest of its family stop asking. Turn on every one you might use, and the window offers them all only when none is up.
+	- The shaman weapon imbues (Rockbiter, Flametongue, Frostbrand, Windfury) share exclusive = SHAMAN_IMBUE: a weapon holds one. They are enchants on the main hand, not auras, so each row also lists enchants, the SpellItemEnchantment ids its ranks put on the weapon (SpellEffect's EffectMiscValue for Effect ENCHANT_ITEM_TEMPORARY), read back with GetWeaponEnchantInfo. Frostbrand starts OFF: it is swapped in for kiting, not kept up. Only the main hand is checked.
 	- default is when the self buff shows until the player picks: minutes left (5) to recast before it drops, MISSING for one with no timer (an aura or aspect is either up or not), or OFF. Every aspect but Hawk starts off: Cheetah and the rest are swapped in for a moment, and Hawk is the one to come back to. A player's own choice is never overwritten.
 	- The self-buff learn levels are checked the same way.
 	- Shadowguard (Troll) and Touch of Weakness (Undead) are priest racial self buffs. Only a priest of that race knows them, and a row offers only the ranks the player knows. Their learn levels come from SpellLevels.
