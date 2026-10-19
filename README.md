@@ -26,34 +26,46 @@ Automatically thank players who buff you with a whisper or emote, and announce t
 
 ## How It Works
 
-### Options
+### 🙌 Thanks for Stranger Buffs
 
-<img width="800" src="https://github.com/user-attachments/assets/73e9cee1-ef63-4b09-84cf-1c2ef19862c8" />
+A whisper, an emote, or both for the passerby who buffs you, and never a spam wall when the world buffs roll in.
+
+### 🤝 Thanks for Teammate Buffs
+
+Your party and raid get a proper thank-you when they burn Power Infusion, Innervate, or a Soulstone on you.
+
+### 📣 Good News
+
+Whispers the players you buff with what they got and how long it lasts.
+
+### 🚪 Service Alerts
+
+Know the moment someone sets out a feast, soulwell, portal, summon, or repair bot.
+
+### 🚂 Peer Pressure
+
+Get pinged when another player of your class pops a cooldown, so you can stack yours on top.
+
+### 🛡️ Buff Duty
+
+A small window of everyone missing a buff you can give. Click an icon to cast it.
+
+| Own-Buffs Reminders | Return the Favor | In Raid |
+| --- | --- | --- |
+| <img width="180" src="https://github.com/user-attachments/assets/8924a6a3-aa93-42cf-ba1e-e833512ae96a" /> | <img width="180" src="https://github.com/user-attachments/assets/40e05c06-6bd1-4a41-81d8-f6250166f992" /> | <img width="237" height="670" alt="Pasted_Image_10_19_26__1_46 AM" src="https://github.com/user-attachments/assets/be7c7e1e-50c6-49b3-8a1b-838fbd796f79" /> |
+
+### Options
 
 * **Stranger Buffs** // Thank players outside your group for their buffs, without a wave of world buffs turning into spam.
 * **Teammate Buffs** // Thank your party and raid for the cooldowns they burn on you, ability by ability.
 * **Service Alerts** // Know the moment a feast, soulwell, portal, summon, or repair bot goes down.
 * **Send Good News** // Tell the players you buff what they just got, in your own words.
 * **Peer Pressure** // Get pinged when another player of your class pops a cooldown.
+* **Buff Duty** // Pick who gets each of your buffs, and where the window sits.
 * **Thank You Button** // Five buttons, each with its own whisper and emote.
 * **Profiles** // Copy a setup to another character, or reset to defaults.
 
-### Tracked Abilities
-
-| Class | Buffs & Cooldowns |
-| --- | --- |
-| Druid | Innervate, Rebirth |
-| Hunter | Misdirection |
-| Mage | Amplify Magic, Dampen Magic |
-| Paladin | Blessing of Freedom, Blessing of Protection, Blessing of Sacrifice, Divine Intervention, Lay on Hands |
-| Priest | Fear Ward, Pain Suppression, Power Infusion |
-| Shaman | Bloodlust, Heroism, Water Breathing, Water Walking |
-| Warlock | Soulstone, Unending Breath |
-| Warrior | Intervene |
-| Items | Drums, Scrolls, Jumper Cables, Battle Squawk |
-| Service Alerts | Feasts, Refreshment Tables, Soulwells, Portals, Summons, Resistance Cauldrons, Repair Bots |
-
-You only see the ones your game client actually has.
+<img width="800" src="https://github.com/user-attachments/assets/73e9cee1-ef63-4b09-84cf-1c2ef19862c8" />
 
 ## Testing & Localization Status
 
@@ -63,9 +75,9 @@ You only see the ones your game client actually has.
 
 🟢 Burning Crusade Anniversary // 2.5.6
 
-🟡 World of Warcraft: Forever // 1.60.1
+🟢 World of Warcraft: Forever // 1.60.1
 
-🟡 World of Warcraft: Season of Discovery // 1.15.9
+🟢 World of Warcraft: Season of Discovery // 1.15.9
 
 🟢 World of Warcraft: Classic // 1.15.9
 
