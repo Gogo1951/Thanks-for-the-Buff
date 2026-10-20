@@ -471,7 +471,11 @@ end
 
 -- Whether this character has anything at all the window could offer.
 function BuffWindow.HasAnythingToOffer()
-	return #buffs > 0 or #selfBuffs > 0 or #weaponBuffs > 0 or BuffWindow.soulstoneBuff ~= nil
+	return #buffs > 0
+		or #selfBuffs > 0
+		or #weaponBuffs > 0
+		or BuffWindow.soulstoneBuff ~= nil
+		or BuffWindow.resurrection ~= nil
 end
 
 --------------------------------------------------------------------------------

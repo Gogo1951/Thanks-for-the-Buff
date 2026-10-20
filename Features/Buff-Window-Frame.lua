@@ -44,10 +44,10 @@ local MAX_NAME_WIDTH = 260
 local NAME_GAP = 8
 local MEMBER_INDENT = 10
 --[[
-    Parties stack four to a column, and a fifth starts the next one; the
+    Parties sit two to a row, reading across -- 1 2, then 3 4 -- and the
     columns stand this far apart.
 ]]
-local PARTIES_PER_COLUMN = 4
+local PARTIES_PER_ROW = 2
 local COLUMN_GAP = 16
 -- A pet sits one step further in, under its owner.
 local PET_INDENT = 20
@@ -557,19 +557,20 @@ function ns.RenderBuffWindow(sections)
 		    Two passes: every label is measured before any is placed, because the
 		    icon column starts where the longest name ends. The sections before
 		    the parties (Self-Buffs, Target, Return the Favor) run across the top;
-		    the parties go under them in columns of PARTIES_PER_COLUMN, so a full
-		    raid's eight groups stand four high instead of running off the screen.
+		    the parties go under them PARTIES_PER_ROW to a row, so a full raid's
+		    eight groups stand four rows high instead of running off the screen.
 		]]
-		local top, columns = {}, {}
+		local top, partyRows = {}, {}
 		local parties = 0
 		local nameWidth = MIN_NAME_WIDTH
 		for _, section in ipairs(sections) do
 			local lines = top
 			if section.party then
 				parties = parties + 1
-				local index = math.ceil(parties / PARTIES_PER_COLUMN)
-				columns[index] = columns[index] or {}
-				lines = columns[index]
+				local index = math.ceil(parties / PARTIES_PER_ROW)
+				partyRows[index] = partyRows[index] or {}
+				lines = {}
+				table.insert(partyRows[index], lines)
 			end
 			local grid = section.grid or MAIN_GRID
 			local function Measure(text, indent, specs, lineGrid)
@@ -597,8 +598,9 @@ function ns.RenderBuffWindow(sections)
 				width = math.max(width, ColumnWidth(line.grid))
 			end
 			local partyWidth = ColumnWidth(MAIN_GRID)
-			for index in ipairs(columns) do
-				width = math.max(width, (index - 1) * (partyWidth + COLUMN_GAP) + partyWidth)
+			local partyColumns = math.min(parties, PARTIES_PER_ROW)
+			if partyColumns > 0 then
+				width = math.max(width, (partyColumns - 1) * (partyWidth + COLUMN_GAP) + partyWidth)
 			end
 			return width
 		end
@@ -621,17 +623,22 @@ function ns.RenderBuffWindow(sections)
 		    Rows sit ROW_HEIGHT apart, middle to middle, but the first and last
 		    are measured by what they show: TITLE_GAP under the title bar to the
 		    top of the first line's content, and PADDING from the bottom of the
-		    lowest's to the window's edge, the same as the sides. Every party
-		    column starts level, under the top.
+		    lowest's to the window's edge, the same as the sides. The parties in a
+		    row start level, and the next row starts under the taller of them.
 		]]
-		local first = top[1] or columns[1][1]
+		local first = top[1] or partyRows[1][1][1]
 		local firstMiddle = -(PADDING + TITLE_HEIGHT + TITLE_GAP + ContentHeight(first) / 2)
 		local y, bottom = PlaceLines(top, PADDING, firstMiddle, nameWidth, offsetsByGrid)
 		local partyWidth = ColumnWidth(MAIN_GRID)
-		for index, lines in ipairs(columns) do
-			local x = PADDING + (index - 1) * (partyWidth + COLUMN_GAP)
-			local _, columnBottom = PlaceLines(lines, x, y, nameWidth, offsetsByGrid)
-			bottom = math.min(bottom, columnBottom)
+		for _, partyRow in ipairs(partyRows) do
+			local nextY = y
+			for index, lines in ipairs(partyRow) do
+				local x = PADDING + (index - 1) * (partyWidth + COLUMN_GAP)
+				local partyY, partyBottom = PlaceLines(lines, x, y, nameWidth, offsetsByGrid)
+				nextY = math.min(nextY, partyY)
+				bottom = math.min(bottom, partyBottom)
+			end
+			y = nextY
 		end
 
 		anchor:SetSize(PADDING * 2 + width, -bottom + PADDING)
@@ -699,9 +706,15 @@ function ns.CreateBuffWindowFrame()
 			anchor:StartMoving()
 		end
 	end)
+	--[[
+	    StopMovingOrSizing re-anchors the frame to whichever screen point is
+	    nearest (often CENTER), so a resize after a drag would grow from the
+	    middle. Re-applying the saved top-left keeps the title bar fixed.
+	]]
 	content:SetScript("OnDragStop", function()
 		anchor:StopMovingOrSizing()
 		SavePosition()
+		RestorePosition()
 	end)
 
 	-- Branded like a print out: "TFTB // Buff Duty".

@@ -27,6 +27,7 @@ local RoleOf = BuffWindow.RoleOf
 local Wants = BuffWindow.Wants
 local Has = BuffWindow.Has
 local SingleIcon = BuffWindow.SingleIcon
+local ResurrectionIcon = BuffWindow.ResurrectionIcon
 local PlayerLabel = BuffWindow.PlayerLabel
 local PetOwnerClass = BuffWindow.PetOwnerClass
 local PetRow = BuffWindow.PetRow
@@ -98,6 +99,21 @@ local function IsOutsider(unit)
 		and not UnitInParty(unit)
 		and not UnitInRaid(unit)
 		and UnitCanAssist("player", unit)
+end
+
+--[[
+    A friendly dead player outside your group. Whether they can take a
+    resurrection right now (lying there, connected, none already waiting) is
+    BuffWindow.ResurrectionIcon's call.
+]]
+local function IsDeadOutsider(unit)
+	return UnitExists(unit)
+		and UnitIsPlayer(unit)
+		and UnitIsDeadOrGhost(unit)
+		and not UnitIsUnit(unit, "player")
+		and not UnitInParty(unit)
+		and not UnitInRaid(unit)
+		and UnitIsFriend("player", unit)
 end
 
 --[[
@@ -203,6 +219,24 @@ local function TargetSection(listed)
 	if not ns.db.profile.buffWindow.targetEnabled then
 		return nil
 	end
+
+	--[[
+	    A dead target is one row with the resurrection alone: no buff takes on
+	    a corpse. Listed, so a dead favor isn't offered buffs below it.
+	]]
+	if IsDeadOutsider("target") then
+		local guid = UnitGUID("target")
+		local short = GetUnitName("target", false) or ""
+		local icon = ResurrectionIcon("target", "target", short)
+		if not icon or not guid or not ns.IsPlain(guid) then
+			return nil
+		end
+		listed[guid] = true
+		local _, class = UnitClass("target")
+		local row = { label = PlayerLabel(short, class, "target"), icons = { icon } }
+		return { kind = "target", label = L["BUFF_WINDOW_TARGET_HEADER"], icons = {}, rows = { row } }
+	end
+
 	local isPet = IsOutsiderPet("target")
 	if not isPet and not IsOutsider("target") then
 		return nil
