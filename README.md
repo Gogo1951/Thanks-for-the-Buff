@@ -26,7 +26,7 @@ Thank every player who buffs you with a whisper or emote, and keep your raid, yo
 
 ## How It Works
 
-### 🛡️ Buff Duty
+### Buff Duty
 
 A small window of everyone missing a buff you can give. Click an icon to cast it; click them all and the window is gone.
 
@@ -48,7 +48,7 @@ A small window of everyone missing a buff you can give. Click an icon to cast it
 | --- | --- | --- |
 | <img width="180" src="https://github.com/user-attachments/assets/8924a6a3-aa93-42cf-ba1e-e833512ae96a" /> | <img width="180" src="https://github.com/user-attachments/assets/40e05c06-6bd1-4a41-81d8-f6250166f992" /> | <img width="300" src="https://github.com/user-attachments/assets/ed131e61-8a7c-4db9-9ce4-5e3d3b20de66" /> |
 
-### 🎀 Mini-map Button
+### Mini-map Button
 
 Hover it to see which features are on. Click to flip one.
 
