@@ -21,8 +21,9 @@ local RankFor = BuffWindow.RankFor
     Each unit's buffs as last read, keyed by GUID so an aura change reported on
     any of a player's tokens marks the one record: spell id -> expiration time,
     -> duration, and -> true for the auras you cast. A record is read again only
-    once its GUID is marked dirty or a MarkAllAurasDirty has passed since its
-    read, so a raid's aura traffic re-reads only the members it touched.
+    once its GUID is marked dirty, a MarkAllAurasDirty has passed since its
+    read, or its unit has died, revived or changed connection, so a raid's aura
+    traffic re-reads only the members it touched.
 ]]
 local auraCache = {}
 local dirtyGUIDs = {}
@@ -44,6 +45,27 @@ local auraExpires, auraDurations, auraMine = uncachedRecord.expires, uncachedRec
 
 function BuffWindow.CanBuff(unit)
 	return UnitExists(unit) and UnitIsPlayer(unit) and UnitIsConnected(unit) and not UnitIsDeadOrGhost(unit)
+end
+
+-- Your group as { unit, subgroup }: the raid by roster order, or you and your party.
+function BuffWindow.GroupMembers()
+	local members = {}
+	if IsInRaid() then
+		for i = 1, GetNumGroupMembers() do
+			local _, _, subgroup = GetRaidRosterInfo(i)
+			if subgroup then
+				members[#members + 1] = { unit = "raid" .. i, subgroup = subgroup }
+			end
+		end
+	else
+		members[1] = { unit = "player", subgroup = 1 }
+		for i = 1, 4 do
+			if UnitExists("party" .. i) then
+				members[#members + 1] = { unit = "party" .. i, subgroup = 1 }
+			end
+		end
+	end
+	return members
 end
 
 --[[
@@ -69,17 +91,28 @@ function BuffWindow.MarkAurasDirty(unit)
 	end
 end
 
+-- A death, revive or dropped connection may reach the window with no aura event, so each one re-reads.
 function BuffWindow.ReadAuras(unit)
 	local guid = UnitGUID(unit)
 	local record = uncachedRecord
 	if guid and ns.IsPlain(guid) then
+		local dead = UnitIsDeadOrGhost(unit) and true or false
+		local connected = UnitIsConnected(unit) and true or false
 		record = auraCache[guid]
-		if record and record.generation == generation and not dirtyGUIDs[guid] then
+		if
+			record
+			and record.generation == generation
+			and not dirtyGUIDs[guid]
+			and record.dead == dead
+			and record.connected == connected
+		then
 			auraExpires, auraDurations, auraMine = record.expires, record.durations, record.mine
 			return
 		end
 		record = record or NewRecord()
 		record.generation = generation
+		record.dead = dead
+		record.connected = connected
 		auraCache[guid] = record
 		dirtyGUIDs[guid] = nil
 	end
@@ -105,25 +138,48 @@ function BuffWindow.ReadAuras(unit)
 	end
 end
 
+-- Whether a Count as Tanks entry (a class token, or Data.TANK_WHEN_PET) applies right now.
+local function CountsAsTank(key)
+	local when = key and ns.db.profile.buffWindow.tankWhen[key]
+	return when == Data.TANK_WHEN.ALWAYS or (when == Data.TANK_WHEN.SOLO and not IsInGroup())
+end
+
 --[[
     The role a player is buffed as, for a buff offered to Tanks or Healers: the
-    raid's Main Tank mark, then the role picked in the group finder. Anyone with
-    neither -- a low-level player who can't pick a role yet, a group that never
-    set one, or a stranger (`unit` nil when out of sight) -- counts as damage,
-    since a class says nothing about what a player is doing. Both group calls are
-    asked for by name, so a client without one simply skips to the next answer.
+    raid's Main Tank mark, then the role assigned in the group finder (damage
+    included, so an assigned role always beats a ticked box). For you alone,
+    with no role assigned, the roles ticked in the group finder's own listing (Era's solo
+    Tank / Healer / DPS boxes, which never assign a role), the first ticked of
+    Tank, then Healer -- a tank's buffs matter most. Anyone with none of these -- a
+    low-level player who can't pick a role yet, a group that never set one, or
+    a stranger (`unit` nil when out of sight) -- counts as a tank when the
+    player's Count as Tanks setting says their `class` does right now, and
+    otherwise as damage. An actual role always wins over the class setting.
+    Every group call is asked for by name, so a client without one simply skips
+    to the next answer.
 ]]
-function BuffWindow.RoleOf(unit)
+function BuffWindow.RoleOf(unit, class)
 	if unit then
 		if GetPartyAssignment and GetPartyAssignment("MAINTANK", unit) then
 			return "TANK"
 		end
 		if UnitGroupRolesAssigned then
 			local role = UnitGroupRolesAssigned(unit)
-			if ns.IsPlain(role) and (role == "TANK" or role == "HEALER") then
+			if ns.IsPlain(role) and (role == "TANK" or role == "HEALER" or role == "DAMAGER") then
 				return role
 			end
 		end
+		if GetLFGRoles and UnitIsUnit(unit, "player") then
+			local _, tank, healer = GetLFGRoles()
+			if tank then
+				return "TANK"
+			elseif healer then
+				return "HEALER"
+			end
+		end
+	end
+	if CountsAsTank(class) then
+		return "TANK"
 	end
 	return "DAMAGER"
 end
@@ -275,7 +331,11 @@ end
     a stranger out of sight, who is shown as damage.
 ]]
 function BuffWindow.PlayerLabel(name, class, unit)
-	return RoleIcon(BuffWindow.RoleOf(unit)) .. "|cff" .. (Data.CLASS_COLORS[class] or ns.PALETTE.TEXT) .. name .. "|r"
+	return RoleIcon(BuffWindow.RoleOf(unit, class))
+		.. "|cff"
+		.. (Data.CLASS_COLORS[class] or ns.PALETTE.TEXT)
+		.. name
+		.. "|r"
 end
 
 --[[
@@ -364,23 +424,16 @@ BuffWindow.SingleIcon = SingleIcon
 --------------------------------------------------------------------------------
 
 --[[
-    Whether pets count as tanks right now, per "Consider Pets as Tanks": solo,
-    a pet is usually what holds aggro; in a group, someone else usually is.
-]]
-local function PetsAreTanks()
-	local db = ns.db.profile.buffWindow
-	return db.petsAsTanks and (db.petsAsTanksWhen == Data.PETS_AS_TANKS.ALWAYS or not IsInGroup())
-end
-
---[[
     A pet takes the buffs offered to Everyone, and those offered to Tanks while
-    "Consider Pets as Tanks" applies -- never those for Healers. It has no role of
-    its own, and its "class" is the creature's, not a player class. Whether it has mana is read off its power bar instead, so a
-    warlock's demon gets Intellect and a hunter's beast doesn't.
+    Count as Tanks says pets do (by default only while you're not grouped:
+    solo, a pet is usually what holds aggro) -- never those for Healers. It has
+    no role of its own, and its "class" is the creature's, not a player class.
+    Whether it has mana is read off its power bar instead, so a warlock's demon
+    gets Intellect and a hunter's beast doesn't.
 ]]
 local function PetWants(buff, unit)
 	if buff.audience == Data.BUFF_AUDIENCE.TANK then
-		if not PetsAreTanks() then
+		if not CountsAsTank(Data.TANK_WHEN_PET) then
 			return false
 		end
 	elseif buff.audience ~= Data.BUFF_AUDIENCE.ALL then

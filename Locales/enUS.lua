@@ -44,15 +44,34 @@ L["MESSAGE_PEER_PRESSURE_TARGET"] = "%s used %s on %s!"
 L["UNKNOWN_SPELL"] = "Unknown Spell"
 
 --------------------------------------------------------------------------------
+-- Mini-map Button
+--------------------------------------------------------------------------------
+
+L["MINIMAP_OPTIONS"] = "Thanks for the Buff (TFTB) Options"
+L["LEFT_CLICK"] = "Left-Click"
+L["RIGHT_CLICK"] = "Right-Click"
+L["SHIFT_LEFT_CLICK"] = "Shift + Left-Click"
+L["SHIFT_RIGHT_CLICK"] = "Shift + Right-Click"
+L["SHIFT_MIDDLE_CLICK"] = "Shift + Middle-Click"
+L["ACTION_TOGGLE"] = "Toggle"
+L["ENABLED"] = "Enabled"
+L["DISABLED"] = "Disabled"
+
+--------------------------------------------------------------------------------
 -- Options: Main Panel
 --------------------------------------------------------------------------------
 
 L["OPTIONS_WELCOME_TOGGLE"] = "Enable Welcome Message"
 L["OPTIONS_WELCOME_DESCRIPTION"] = "Prints a message only you can see when you log in."
+L["OPTIONS_ENABLE_MINIMAP"] = "Enable Mini-map Button"
+L["OPTIONS_ENABLE_MINIMAP_DESCRIPTION"] =
+	"Shows the TFTB button on your mini-map, which turns features on and off with a click."
 L["OPTIONS_DESCRIPTION"] =
-	"Thank every player who buffs you with a whisper or emote, and see who's missing your raid buffs with a click-to-cast buff tracker. Plus alerts for feasts, portals, summons, soulwells, and class cooldowns. Manners, automated."
+	"Thank every player who buffs you with a whisper or emote, and keep your raid, yourself, and your weapons buffed with a click-to-cast buff reminder. Plus alerts for feasts, portals, summons, soulwells, and class cooldowns. Manners, automated."
 L["OPTIONS_FEATURES_HEADER"] = "Features"
 L["OPTIONS_FEATURES_DESCRIPTION"] = "Turn each feature on or off here, or on its own panel."
+L["OPTIONS_FEATURES_NOTE"] =
+	'Some of our newer features, like "%s," stretch past the traditional scope of "Thanks for the Buff." Feel free to turn off anything you don\'t need. These features may move to our other add-on, "Connoisseur & Restocker," or everything may merge into one bigger add-on, maybe "Buttons, Buffs, & Bags." Share your thoughts on Discord, CurseForge, or GitHub. Thanks!'
 L["OPTIONS_COMMANDS_HEADER"] = "/Commands"
 L["OPTIONS_COMMAND"] = "/tftb"
 L["OPTIONS_COMMAND_DESCRIPTION"] = "Opens the Options Interface for this add-on."
@@ -121,9 +140,10 @@ L["SERVICES_DESCRIPTION"] =
 
 -- Send Good News
 L["TAB_GOOD_NEWS"] = "Send Good News"
-L["GOOD_NEWS_DESCRIPTION"] = "Let the players you buff know what you cast on them, and how long it lasts."
-L["GOOD_NEWS_WHISPER_ENABLE"] = "Enable Good News"
-L["GOOD_NEWS_WHISPER_DESCRIPTION"] = "Whispers the player you buffed to tell them what they got and for how long."
+L["GOOD_NEWS_DESCRIPTION"] =
+	"Let the players you buff know what you cast on them, and, for short buffs, how long it lasts."
+L["GOOD_NEWS_ENABLE"] = "Enable Good News"
+L["GOOD_NEWS_ENABLE_DESCRIPTION"] = "Turns on a whisper telling the players you buff what you cast on them."
 L["GOOD_NEWS_SCOPE"] = "Recipients"
 L["GOOD_NEWS_SCOPE_ALWAYS"] = "Anyone You Buff"
 L["GOOD_NEWS_SCOPE_GROUP"] = "Only Group Members"
@@ -131,15 +151,17 @@ L["GOOD_NEWS_SCOPE_DESCRIPTION"] = "Sets who gets a Good News whisper: anyone yo
 L["GOOD_NEWS_MESSAGES_HEADER"] = "Good News Message"
 L["GOOD_NEWS_MESSAGES_DESCRIPTION"] = "The whisper the players you buff receive."
 --[[
-    Two halves so the number stays authoritative: LIMIT's %d is a real placeholder
-    and gets formatted, TOKENS carries a literal %a for the reader to copy and so
+    The message box's tooltip, in three parts. LIMIT's %d is a real placeholder
+    and gets formatted; TOKENS carries a literal %a for the reader to copy and so
     must never reach string.format. Joined into one line at the point of use.
 ]]
+L["GOOD_NEWS_MESSAGE_INPUT_DESCRIPTION"] = "Sets what the whisper says. Leave it empty to use the default."
 L["GOOD_NEWS_MESSAGE_LIMIT"] = "Maximum length: %d."
-L["GOOD_NEWS_MESSAGE_TOKENS"] = "%a becomes the ability link."
+L["GOOD_NEWS_MESSAGE_TOKENS"] = "%a becomes the ability link, plus its duration when it's under a minute."
 --[[
-    Appended to the ability link inside %a when the buff has a readable duration.
-    A whole clause rather than a bare number so it can be reworded per language.
+    Appended to the ability link inside %a when the buff has a readable duration
+    under a minute. A whole clause rather than a bare number so it can be reworded
+    per language.
 ]]
 L["GOOD_NEWS_DURATION_CLAUSE"] = "for %s"
 
@@ -158,7 +180,6 @@ L["PEER_PRESSURE_SOUND_DESCRIPTION"] = "Plays a sound when a same-class cooldown
 -- Shared across the buff panels
 L["TRACKED_HEADER"] = "Tracked Abilities"
 L["TRACKED_GROUP_ITEMS"] = "Items"
-L["TRACKED_TOGGLE_DESCRIPTION"] = "Toggles tracking for %s."
 L["TRACKED_ITEM_PENDING"] = "Item #%d"
 L["TRACKED_SPELL_PENDING"] = "Spell #%d"
 
@@ -241,21 +262,27 @@ L["BUFF_WINDOW_TARGET_ENABLE_DESCRIPTION"] =
 L["BUFF_WINDOW_REFRESH"] = "Refresh Under"
 L["BUFF_WINDOW_REFRESH_DESCRIPTION"] =
 	"Sets how little time a buff can have left before it counts as missing, so you can top it up before it drops. A buff that lasts no longer than this only counts once it's gone."
-L["BUFF_WINDOW_PETS_AS_TANKS"] = "Consider Pets as Tanks"
-L["BUFF_WINDOW_PETS_AS_TANKS_DESCRIPTION"] =
-	"Offers pets the buffs you set to Tanks, like Thorns, as well as the ones for Everyone."
-L["BUFF_WINDOW_PETS_AS_TANKS_WHEN_DESCRIPTION"] = "Sets when pets count as tanks."
-L["BUFF_WINDOW_PETS_AS_TANKS_SOLO"] = "When Not in a Group"
-L["BUFF_WINDOW_PETS_AS_TANKS_ALWAYS"] = "Always"
+-- Count as Tanks: one dropdown per class, then Pets, each with these three choices.
+L["BUFF_WINDOW_TANKS_HEADER"] = "Count as Tanks"
+L["BUFF_WINDOW_TANKS_DESCRIPTION"] =
+	"Who gets the buffs you offer to Tanks, like Thorns, when they have no role of their own."
+L["BUFF_WINDOW_TANKS_CLASS_DESCRIPTION"] =
+	"Sets when players of this class count as tanks. A tank or healer role they have always comes first."
+L["BUFF_WINDOW_TANKS_PETS"] = "Pets"
+L["BUFF_WINDOW_TANKS_PETS_DESCRIPTION"] =
+	"Sets when pets count as tanks. Pets also get the buffs you offer to Everyone."
+L["BUFF_WINDOW_TANKS_NEVER"] = "Never"
+L["BUFF_WINDOW_TANKS_SOLO"] = "When Not in a Group"
+L["BUFF_WINDOW_TANKS_ALWAYS"] = "Always"
 -- Who each buff is offered to: one dropdown per buff, these four choices.
 L["BUFF_WINDOW_AUDIENCE_OFF"] = "Off"
 L["BUFF_WINDOW_AUDIENCE_TANK"] = "Tanks"
 L["BUFF_WINDOW_AUDIENCE_HEALER"] = "Healers"
 L["BUFF_WINDOW_AUDIENCE_ALL"] = "Everyone"
--- The dropdown's tooltip when the client has no description for the spell yet.
+-- Each buff's dropdown tooltip; hovering the buff's name shows the spell itself.
 L["BUFF_WINDOW_AUDIENCE_DESCRIPTION"] = "Sets who %s is offered to."
 L["BUFF_WINDOW_BUFFS_DESCRIPTION"] =
-	"Choose who's offered each buff. Tanks and Healers go by group role; anyone without one counts as Damage."
+	"Choose who's offered each buff. Tanks and Healers go by group role; anyone without one counts as Damage, unless Count as Tanks below says otherwise."
 
 L["BUFF_WINDOW_SELF_DESCRIPTION"] = "Your own buffs, pinned to the top of the window."
 --[[
@@ -267,24 +294,68 @@ L["BUFF_WINDOW_SELF_NOTE_MAGE_ARMOR"] = "any one armor counts"
 L["BUFF_WINDOW_SELF_NOTE_PALADIN_AURA"] = "any one aura counts"
 L["BUFF_WINDOW_SELF_NOTE_SHAMAN_SHIELD"] = "any one shield counts"
 L["BUFF_WINDOW_SELF_NOTE_WARLOCK_ARMOR"] = "any one armor counts"
+L["BUFF_WINDOW_SELF_NOTE_WARLOCK_DEMON"] = "either demon buff counts"
 L["BUFF_WINDOW_SELF_REFRESH_OFF"] = "Off"
 L["BUFF_WINDOW_SELF_REFRESH_MISSING"] = "When Missing"
 -- %s is a duration from the client, like "5 Minutes".
 L["BUFF_WINDOW_SELF_REFRESH_UNDER"] = "Under %s"
 L["BUFF_WINDOW_SELF_REFRESH_DESCRIPTION"] =
 	"Sets when %s shows: never, once it's gone, or once it has less than this left."
+-- The Weapon Buffs panel, under Buff Duty after Self-Buffs.
+L["BUFF_WINDOW_WEAPON_PANEL_HEADER"] = "Weapon Buffs"
+L["BUFF_WINDOW_WEAPON_DESCRIPTION"] =
+	"Tick what each weapon should carry. The window offers it when it's missing or running low, if it's in your bags and fits the weapon."
+-- The one timing for every weapon buff, at the top of the panel.
+L["BUFF_WINDOW_WEAPON_REFRESH"] = "Reapply"
+L["BUFF_WINDOW_WEAPON_REFRESH_DESCRIPTION"] =
+	"Sets when a weapon buff is offered again: once it's gone, or once it has less than this left."
+-- The boxes for the weapon items any class can use, after the rogue and shaman boxes.
+L["BUFF_WINDOW_WEAPON_KIND_OIL"] = "Oils"
+L["BUFF_WINDOW_WEAPON_KIND_STONE"] = "Stones"
+L["BUFF_WINDOW_WEAPON_KIND_LURE"] = "Lures"
+--[[
+    One choice's checkbox under one hand. The first %s is the poison, imbue,
+    oil, stone or lure, the second the client's "Main Hand" or "Off Hand".
+]]
+L["BUFF_WINDOW_WEAPON_PICK_DESCRIPTION"] =
+	"Offers %s for your %s. While the weapon carries none of your ticked choices, each one you have is offered."
 L["BUFF_WINDOW_SELF_ENABLE"] = "Your Self-Buffs"
 L["BUFF_WINDOW_SELF_ENABLE_DESCRIPTION"] =
 	"Shows the buffs only you can put on yourself, like an armor or Inner Fire, at the top of the window when they're missing or running low. Pick which ones under Self-Buffs."
+L["BUFF_WINDOW_WEAPON_ENABLE"] = "Your Weapon Buffs"
+L["BUFF_WINDOW_WEAPON_ENABLE_DESCRIPTION"] =
+	"Shows the poisons, imbues, oils, stones and lures your weapons are missing or running low on, with your self-buffs at the top of the window. Click one to put it on. Pick which ones under Weapon Buffs."
 
 -- The window itself
 L["BUFF_WINDOW_SELF_HEADER"] = "Self-Buffs"
 L["BUFF_WINDOW_FAVOR_HEADER"] = "Return the Favor"
 L["BUFF_WINDOW_TARGET_HEADER"] = "Target"
 L["BUFF_WINDOW_TOOLTIP_CAST"] = "Click to cast on %s."
+-- %s is the client's "Main Hand" or "Off Hand".
+L["BUFF_WINDOW_TOOLTIP_WEAPON"] = "Click to apply to your %s."
+L["BUFF_WINDOW_TOOLTIP_USE"] = "Nobody in your group has a Soulstone. Click to use one on %s."
+L["BUFF_WINDOW_TOOLTIP_CREATE"] = "Nobody in your group has a Soulstone. Click to create one."
 L["BUFF_WINDOW_TOOLTIP_GROUP"] = "Click to cast on %s and their party."
 L["BUFF_WINDOW_TOOLTIP_FAVOR"] = "Click to target %s and cast."
 L["BUFF_WINDOW_TOOLTIP_DISMISS"] = "Right-click to take %s off the list."
+-- The window's close button; %s is the options slash command.
+L["BUFF_WINDOW_CLOSED"] = "Buff Duty is off. To turn it back on, Shift + Right-Click the mini-map button or type %s."
+
+-- The Buff Keys (Key Bindings, and the Keybinds section of Buff Duty)
+L["BUFF_KEYS_HEADER"] = "Keybinds"
+L["BUFF_KEYS_DESCRIPTION"] =
+	"Cast the next buff on your list with one key or macro, out of combat. Weapon buffs stay a click on the window."
+L["BUFF_KEY_SINGLE"] = "Individual Buff Button"
+L["BUFF_KEY_SINGLE_DESCRIPTION"] =
+	"Casts your next missing buff, one per press: a resurrection on your dead target (priests and paladins), then your Self-Buffs, Return the Favor, your target, and your group."
+L["BUFF_KEY_GROUP"] = "Group Buff Button"
+L["BUFF_KEY_GROUP_DESCRIPTION"] =
+	"Casts your next missing group buff, one per press: a resurrection on your dead target (priests and paladins), then your Self-Buffs, then your target's party and the rest. A party waits until everyone missing the buff is in range."
+-- %s is a player's name.
+L["BUFF_KEY_WAITING"] = "Waiting on %s to get in range."
+L["BUFF_KEY_DONE"] = "Nothing left to buff."
+-- The caption beside the read-only box that holds a Buff Key's macro line.
+L["BUFF_KEY_MACRO_CAPTION"] = "Macro:"
 
 --------------------------------------------------------------------------------
 -- Options: Thank You Button
@@ -297,6 +368,10 @@ L["BUTTON_SECTION"] = "Thank You Button %d"
 L["BUTTON_EMOTE"] = "Emote"
 L["BUTTON_EMOTE_DESCRIPTION"] = "Sets the emote this button performs at your target, or None for no emote."
 L["BUTTON_EMOTE_NONE"] = "None"
+L["BUTTON_ICON"] = "Icon"
+L["BUTTON_ICON_DESCRIPTION"] = "Sets the icon this button's macro shows in your macro list and on your action bars."
+-- The Icon dropdown's first choice, the macros' own icon; every other choice is a picture alone.
+L["BUTTON_ICON_DEFAULT"] = "Default"
 --[[
     The toggle owns the macro in both directions, so the label is ENABLE rather
     than CREATE. Both strings carry the macro's name: with five buttons stacked,

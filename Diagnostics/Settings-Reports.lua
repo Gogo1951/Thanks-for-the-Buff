@@ -1,4 +1,4 @@
-local _, ns = ...
+local ADDON_NAME, ns = ...
 
 local GetClientHeader = ns.GetDiagnosticClientHeader
 
@@ -7,8 +7,9 @@ local GetClientHeader = ns.GetDiagnosticClientHeader
 --------------------------------------------------------------------------------
 
 --[[
-    Answers "the Buff Window is gone / off-screen" reports: screen size, UI
-    scale, and the window's saved placement against the screen it has now. The
+    Answers "the Buff Window or mini-map button is gone / off-screen" reports:
+    screen size, UI scale, and the window's saved placement against the screen
+    it has now. The
     window saves its top-left corner in UIParent's coordinates, measured from
     the bottom-left, so a corner outside UIParent's size was saved on a bigger
     screen or a smaller UI scale. Read-only.
@@ -42,7 +43,8 @@ function ns:BuildDisplayContextReport()
 			onScreen and "on screen" or "OFF SCREEN"
 		)
 	else
-		lines[#lines + 1] = "Buff Window saved top-left: (never dragged; centered default)"
+		lines[#lines + 1] =
+			"Buff Window saved top-left: (never dragged; default, a little left of and above the middle)"
 	end
 	lines[#lines + 1] = string.format(
 		"Buff Window: enabled=%s locked=%s hideInCombat=%s",
@@ -50,6 +52,25 @@ function ns:BuildDisplayContextReport()
 		tostring(db.locked),
 		tostring(db.hideInCombat)
 	)
+
+	--[[
+	    The mini-map button: whether it was built, whether Enable Mini-map
+	    Button hid it, and whether it still points at the active profile's
+	    table, which is where a dragged position is saved.
+	]]
+	lines[#lines + 1] = ""
+	local button = LibStub("LibDBIcon-1.0"):GetMinimapButton(ADDON_NAME)
+	local minimap = ns.db.profile.minimap
+	lines[#lines + 1] = string.format("Data broker object: %s", ns.dataBrokerObject and "present" or "MISSING")
+	lines[#lines + 1] = string.format("Minimap button created: %s", button and "yes" or "no")
+	lines[#lines + 1] = string.format(
+		"Minimap button hidden: %s  saved angle: %s",
+		tostring(minimap.hide or false),
+		tostring(minimap.minimapPos)
+	)
+	if button then
+		lines[#lines + 1] = string.format("Button db is ns.db.profile.minimap: %s", tostring(button.db == minimap))
+	end
 
 	return table.concat(lines, "\n")
 end
@@ -101,8 +122,10 @@ end
     Dumps the single AceDB-managed table (profiles, profileKeys, global) so a
     player can paste their exact configuration: every setting in each profile,
     every watched-buff, Good News and Peer Pressure choice, every Buff Window
-    audience and self-buff choice and its saved position, every Thank You
-    button's text and emotes, and the welcome message's last version.
+    audience, tank, self-buff and weapon choice and its saved position, every
+    Thank You button's text, icon and emotes, and the welcome message's last
+    version. The Buff Keys' bindings are the game's, not saved here: Buff
+    Window Context reads them.
 ]]
 function ns:BuildSavedVariablesReport()
 	local lines = { GetClientHeader(), "", ns.SAVED_VARIABLES_NAME .. " = {" }

@@ -121,7 +121,7 @@ ns.TRACKED_ABILITIES = {
 			{ spell = 1277639 },
 			{ spell = 1277640 },
 		},
-	}, -- Contingency Plan (Forever)
+	}, -- Contingency Plan
 	{
 		class = "PRIEST",
 		type = SOLO,
@@ -138,7 +138,7 @@ ns.TRACKED_ABILITIES = {
 			{ spell = 1277377 },
 			{ spell = 1277378 },
 		},
-	}, -- Divine Grace (Forever)
+	}, -- Divine Grace
 	{
 		class = "PRIEST",
 		type = SOLO,
@@ -207,44 +207,44 @@ ns.TRACKED_ABILITIES = {
 		},
 	}, -- Soulstone
 	-- Feasts (item) -------------------------------------------------------------
-	{ type = SERVICE, detect = CAST, received = 1, triggers = { { item = 279957, spell = 1307257 } } }, -- Cookie's Feast (Forever)
-	{ type = SERVICE, detect = CAST, received = 1, triggers = { { item = 238641, spell = 1225906 } } }, -- Specklefin Feast (Forever)
-	{ type = SERVICE, detect = CAST, received = 1, triggers = { { item = 279944, spell = 1307392 } } }, -- Sharpening Wheel (Forever)
-	{ type = SERVICE, detect = CAST, received = 1, triggers = { { item = 279956, spell = 1307259 } } }, -- Mana Well (Forever)
-	{ type = SERVICE, detect = CAST, received = 1, triggers = { { item = 279960, spell = 1307254 } } }, -- Lodestone (Forever)
-	{ type = SERVICE, detect = CAST, received = 1, triggers = { { item = 279962, spell = 1307251 } } }, -- Incense Candle (Forever)
-	{ type = SERVICE, detect = CAST, received = 1, triggers = { { item = 279967, spell = 1307245 } } }, -- Fish Bowl (Forever)
-	{ type = SERVICE, detect = CAST, received = 1, triggers = { { item = 279968, spell = 1307244 } } }, -- First Aid Kit (Forever)
-	{ type = SERVICE, detect = CAST, received = 1, triggers = { { item = 279976, spell = 1307234 } } }, -- Enchanted Lute (Forever)
-	{ type = SERVICE, detect = CAST, received = 1, triggers = { { item = 279978, spell = 1307230 } } }, -- Camp Tent (Forever)
-	{ type = SERVICE, detect = CAST, received = 1, triggers = { { item = 279979, spell = 1307229 } } }, -- Camp Chair (Forever)
-	{ type = SERVICE, detect = CAST, received = 1, triggers = { { item = 279938, spell = 1307397 } } }, -- Trapper's Workbench (Forever)
-	{ type = SERVICE, detect = CAST, received = 1, triggers = { { item = 279940, spell = 1307396 } } }, -- Toxin Study (Forever)
-	{ type = SERVICE, detect = CAST, received = 1, triggers = { { item = 279941, spell = 1307395 } } }, -- Tanning Rack (Forever)
-	{ type = SERVICE, detect = CAST, received = 1, triggers = { { item = 279943, spell = 1307393 } } }, -- Spinning Wheel (Forever)
-	{ type = SERVICE, detect = CAST, received = 1, triggers = { { item = 279945, spell = 1307391 } } }, -- Sewing Machine (Forever)
-	{ type = SERVICE, detect = CAST, received = 1, triggers = { { item = 279947, spell = 1307387 } } }, -- Seed Hybridizer (Forever)
-	{ type = SERVICE, detect = CAST, received = 1, triggers = { { item = 279948, spell = 1307386 } } }, -- Rock Garden (Forever)
-	{ type = SERVICE, detect = CAST, received = 1, triggers = { { item = 279951, spell = 1307265 } } }, -- Plague Doctor's Laboratory (Forever)
-	{ type = SERVICE, detect = CAST, received = 1, triggers = { { item = 279952, spell = 1307264 } } }, -- Molten Foundry (Forever)
-	{ type = SERVICE, detect = CAST, received = 1, triggers = { { item = 279955, spell = 1307261 } } }, -- Master Forge (Forever)
-	{ type = SERVICE, detect = CAST, received = 1, triggers = { { item = 279959, spell = 1307255 } } }, -- Loom (Forever)
-	{ type = SERVICE, detect = CAST, received = 1, triggers = { { item = 279964, spell = 1307248 } } }, -- Greenhouse (Forever)
-	{ type = SERVICE, detect = CAST, received = 1, triggers = { { item = 279965, spell = 1307247 } } }, -- Fishing Rack (Forever)
-	{ type = SERVICE, detect = CAST, received = 1, triggers = { { item = 279966, spell = 1307246 } } }, -- Fishing Hut (Forever)
-	{ type = SERVICE, detect = CAST, received = 1, triggers = { { item = 279969, spell = 1307243 } } }, -- Field Guide (Forever)
-	{ type = SERVICE, detect = CAST, received = 1, triggers = { { item = 279970, spell = 1307242 } } }, -- Fermenter (Forever)
-	{ type = SERVICE, detect = CAST, received = 1, triggers = { { item = 279985, spell = 1307223 } } }, -- Arcane Salvager (Forever)
-	{ type = SERVICE, detect = CAST, received = 1, triggers = { { item = 279987, spell = 1307176 } } }, -- Arcane Forge (Forever)
-	{ type = SERVICE, detect = CAST, received = 1, triggers = { { item = 279988, spell = 1307175 } } }, -- Anvil (Forever)
-	{ type = SERVICE, detect = CAST, received = 1, triggers = { { item = 279990, spell = 1307172 } } }, -- Alchemy Laboratory (Forever)
+	{ type = SERVICE, detect = CAST, received = 1, triggers = { { item = 279957, spell = 1307257 } } }, -- Cookie's Feast
+	{ type = SERVICE, detect = CAST, received = 1, triggers = { { item = 238641, spell = 1225906 } } }, -- Specklefin Feast
+	{ type = SERVICE, detect = CAST, received = 1, triggers = { { item = 279944, spell = 1307392 } } }, -- Sharpening Wheel
+	{ type = SERVICE, detect = CAST, received = 1, triggers = { { item = 279956, spell = 1307259 } } }, -- Mana Well
+	{ type = SERVICE, detect = CAST, received = 1, triggers = { { item = 279960, spell = 1307254 } } }, -- Lodestone
+	{ type = SERVICE, detect = CAST, received = 1, triggers = { { item = 279962, spell = 1307251 } } }, -- Incense Candle
+	{ type = SERVICE, detect = CAST, received = 1, triggers = { { item = 279967, spell = 1307245 } } }, -- Fish Bowl
+	{ type = SERVICE, detect = CAST, received = 1, triggers = { { item = 279968, spell = 1307244 } } }, -- First Aid Kit
+	{ type = SERVICE, detect = CAST, received = 1, triggers = { { item = 279976, spell = 1307234 } } }, -- Enchanted Lute
+	{ type = SERVICE, detect = CAST, received = 1, triggers = { { item = 279978, spell = 1307230 } } }, -- Camp Tent
+	{ type = SERVICE, detect = CAST, received = 1, triggers = { { item = 279979, spell = 1307229 } } }, -- Camp Chair
+	{ type = SERVICE, detect = CAST, received = 1, triggers = { { item = 279938, spell = 1307397 } } }, -- Trapper's Workbench
+	{ type = SERVICE, detect = CAST, received = 1, triggers = { { item = 279940, spell = 1307396 } } }, -- Toxin Study
+	{ type = SERVICE, detect = CAST, received = 1, triggers = { { item = 279941, spell = 1307395 } } }, -- Tanning Rack
+	{ type = SERVICE, detect = CAST, received = 1, triggers = { { item = 279943, spell = 1307393 } } }, -- Spinning Wheel
+	{ type = SERVICE, detect = CAST, received = 1, triggers = { { item = 279945, spell = 1307391 } } }, -- Sewing Machine
+	{ type = SERVICE, detect = CAST, received = 1, triggers = { { item = 279947, spell = 1307387 } } }, -- Seed Hybridizer
+	{ type = SERVICE, detect = CAST, received = 1, triggers = { { item = 279948, spell = 1307386 } } }, -- Rock Garden
+	{ type = SERVICE, detect = CAST, received = 1, triggers = { { item = 279951, spell = 1307265 } } }, -- Plague Doctor's Laboratory
+	{ type = SERVICE, detect = CAST, received = 1, triggers = { { item = 279952, spell = 1307264 } } }, -- Molten Foundry
+	{ type = SERVICE, detect = CAST, received = 1, triggers = { { item = 279955, spell = 1307261 } } }, -- Master Forge
+	{ type = SERVICE, detect = CAST, received = 1, triggers = { { item = 279959, spell = 1307255 } } }, -- Loom
+	{ type = SERVICE, detect = CAST, received = 1, triggers = { { item = 279964, spell = 1307248 } } }, -- Greenhouse
+	{ type = SERVICE, detect = CAST, received = 1, triggers = { { item = 279965, spell = 1307247 } } }, -- Fishing Rack
+	{ type = SERVICE, detect = CAST, received = 1, triggers = { { item = 279966, spell = 1307246 } } }, -- Fishing Hut
+	{ type = SERVICE, detect = CAST, received = 1, triggers = { { item = 279969, spell = 1307243 } } }, -- Field Guide
+	{ type = SERVICE, detect = CAST, received = 1, triggers = { { item = 279970, spell = 1307242 } } }, -- Fermenter
+	{ type = SERVICE, detect = CAST, received = 1, triggers = { { item = 279985, spell = 1307223 } } }, -- Arcane Salvager
+	{ type = SERVICE, detect = CAST, received = 1, triggers = { { item = 279987, spell = 1307176 } } }, -- Arcane Forge
+	{ type = SERVICE, detect = CAST, received = 1, triggers = { { item = 279988, spell = 1307175 } } }, -- Anvil
+	{ type = SERVICE, detect = CAST, received = 1, triggers = { { item = 279990, spell = 1307172 } } }, -- Alchemy Laboratory
 	{
 		labelItem = 279972,
 		type = SERVICE,
 		detect = CAST,
 		received = 1,
 		triggers = { { item = 279972, spell = 1307240 }, { item = 279973, spell = 1307239 } },
-	}, -- Faction Banner (Forever)
+	}, -- Faction Banner
 	-- Stat Scrolls (item) -------------------------------------------------------
 	{
 		labelItem = 1181,
@@ -389,6 +389,10 @@ wago.tools
 	https://wago.tools/db2/ItemSparse?build=1.60.1.70450
 	https://wago.tools/db2/ItemXItemEffect?build=1.60.1.70450
 	https://wago.tools/db2/ItemEffect?build=1.60.1.70450
+	https://wago.tools/db2/SpellLevels?build=1.60.1.70450
+	https://wago.tools/db2/SkillLine?build=1.60.1.70450
+	https://wago.tools/db2/SpellEffect?build=1.60.1.70450
+	https://wago.tools/db2/Talent?build=1.60.1.70450
 
 QuestieDB
 	None.

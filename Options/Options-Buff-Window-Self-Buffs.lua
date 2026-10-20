@@ -13,8 +13,28 @@ local GetColor = ns.GetColor
 
     The switch for the window's Self-Buffs row lives on the Buff Duty panel with
     the window's other rows. Like the Tracked Abilities panel, nothing here hides behind it:
-    these are choices worth making before turning the row on.
+    these are choices worth making before turning the row on. Weapons have a
+    panel of their own (Options-Buff-Window-Weapon-Buffs.lua).
 ]]
+
+--[[
+    The Off / When Missing / Under labels for a list of choices this panel and
+    Weapon Buffs share, "Under 5 Minutes" built from the client's own duration
+    string.
+]]
+function ns.BuffWindowRefreshValues(choices)
+	local values = {}
+	for _, choice in ipairs(choices) do
+		if choice == Data.SELF_REFRESH_OFF then
+			values[choice] = L["BUFF_WINDOW_SELF_REFRESH_OFF"]
+		elseif choice == Data.SELF_REFRESH_MISSING then
+			values[choice] = L["BUFF_WINDOW_SELF_REFRESH_MISSING"]
+		else
+			values[choice] = L["BUFF_WINDOW_SELF_REFRESH_UNDER"]:format(D_MINUTES:format(choice))
+		end
+	end
+	return values
+end
 
 --[[
     "Hunter · any one aspect counts": a class with two or more self buffs from
@@ -58,17 +78,7 @@ function ns.BuildBuffWindowSelfBuffsOptions()
 		},
 	}
 
-	-- "Under 5 Minutes" built from the client's own duration string.
-	local refreshValues = {}
-	for _, choice in ipairs(Data.SELF_REFRESH_CHOICES) do
-		if choice == Data.SELF_REFRESH_OFF then
-			refreshValues[choice] = L["BUFF_WINDOW_SELF_REFRESH_OFF"]
-		elseif choice == Data.SELF_REFRESH_MISSING then
-			refreshValues[choice] = L["BUFF_WINDOW_SELF_REFRESH_MISSING"]
-		else
-			refreshValues[choice] = L["BUFF_WINDOW_SELF_REFRESH_UNDER"]:format(D_MINUTES:format(choice))
-		end
-	end
+	local refreshValues = ns.BuffWindowRefreshValues(Data.SELF_REFRESH_CHOICES)
 	local selfOrder = 10
 	for _, category in ipairs(ns.BuffWindowSelfCategories or {}) do
 		local groupKey = "self_" .. category.id

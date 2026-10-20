@@ -1,5 +1,5 @@
 ## Title: Thanks for the Buff (TFTB)
-## Notes: Thank every player who buffs you with a whisper or emote, and see who's missing your raid buffs with a click-to-cast buff tracker. Plus alerts for feasts, portals, summons, soulwells, and class cooldowns. Manners, automated.
+## Notes: Thank every player who buffs you with a whisper or emote, and keep your raid, yourself, and your weapons buffed with a click-to-cast buff reminder. Plus alerts for feasts, portals, summons, soulwells, and class cooldowns. Manners, automated.
 ## Author: Gogo1951
 
 ## IconTexture: Interface/AddOns/TFTB/Includes/Images/Thanks-for-the-Buff.tga
@@ -36,6 +36,8 @@ Includes/Libraries/AceConfig-3.0/AceConfigCmd-3.0/AceConfigCmd-3.0.lua
 Includes/Libraries/AceConfig-3.0/AceConfigDialog-3.0/AceConfigDialog-3.0.lua
 Includes/Libraries/AceConfig-3.0/AceConfig-3.0.lua
 Includes/Libraries/AceDBOptions-3.0/AceDBOptions-3.0.lua
+Includes/Libraries/LibDataBroker-1.1/LibDataBroker-1.1.lua
+Includes/Libraries/LibDBIcon-1.0/LibDBIcon-1.0.lua
 
 # Localization
 Locales/enUS.lua
@@ -72,8 +74,11 @@ Features/Thank-You-Button.lua
 Features/Buff-Window-Frame.lua
 Features/Buff-Window-Castable.lua
 Features/Buff-Window-Units.lua
+Features/Buff-Window-Self.lua
 Features/Buff-Window-Outsiders.lua
 Features/Buff-Window.lua
+Features/Buff-Window-Keys.lua
+Features/Minimap-Button.lua
 
 # Diagnostics
 Diagnostics/Diagnostics-Core.lua
@@ -101,6 +106,7 @@ Options/Options-Thank-You-Button.lua
 Options/Options-Buff-Window.lua
 Options/Options-Buff-Window-Buffs.lua
 Options/Options-Buff-Window-Self-Buffs.lua
+Options/Options-Buff-Window-Weapon-Buffs.lua
 Options/Options-Profiles.lua
 Options/Options-Feedback-Support.lua
 Diagnostics/Options-Diagnostics.lua

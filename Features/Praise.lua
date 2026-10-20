@@ -164,9 +164,10 @@ end
     plays while you are fighting. And the emote target: ResolveEmoteTarget hands
     back a live unit token, and "target", "focus", and "mouseover" all name
     whoever you are pointing at in that instant -- resolve it early and a delayed
-    emote thanks whoever you moved on to. An unresolvable buffer degrades to
-    their bare name, and from there to no emote at all -- never to the
-    undirected one.
+    emote thanks whoever you moved on to. A buffer with no unit token degrades
+    to their bare name, and nil means no emote at all; a bare name the client
+    can't resolve still falls back to the undirected emote (see
+    ResolveEmoteTarget).
 ]]
 local function DeliverPraise(db, guid, name, link, whisperAllowed, emoteAllowed)
 	local function Praise()

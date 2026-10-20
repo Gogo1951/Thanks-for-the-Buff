@@ -166,6 +166,10 @@ local function OnUnitSpellcastSent(_, target, castGUID, spellID)
 	if not ns.IsPlayerGUID(guid) or guid == ns.GetPlayerGUID() then
 		return
 	end
+	local fullName = GetUnitName(recipientUnit, true)
+	if not fullName or not ns.IsPlain(fullName) then
+		fullName = target
+	end
 
 	--[[
 	    Recipient scope: ALWAYS whispers anyone you buff; everything else means
@@ -182,7 +186,7 @@ local function OnUnitSpellcastSent(_, target, castGUID, spellID)
 
 	SweepPendingGiven()
 	pendingGiven[castGUID] = {
-		name = target,
+		name = fullName,
 		guid = guid,
 		unit = recipientUnit,
 		entry = entry,

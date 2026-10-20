@@ -16,7 +16,8 @@ local GetColor = ns.GetColor
 
     Two frames stack so combat visibility and our own never fight: the anchor
     belongs to a secure state driver (Hide in Combat), and the content inside it
-    is shown and hidden by this file, out of combat only.
+    is shown and hidden by this file, out of combat only. The content carries a
+    title bar whose close button turns Buff Duty off (ns.CloseBuffWindow).
 ]]
 
 --------------------------------------------------------------------------------
@@ -42,9 +43,24 @@ local MAX_NAME_WIDTH = 260
 -- Room between the end of the longest name and the first icon.
 local NAME_GAP = 8
 local MEMBER_INDENT = 10
+--[[
+    Parties stack four to a column, and a fifth starts the next one; the
+    columns stand this far apart.
+]]
+local PARTIES_PER_COLUMN = 4
+local COLUMN_GAP = 16
 -- A pet sits one step further in, under its owner.
 local PET_INDENT = 20
 local PADDING = 7
+--[[
+    The title bar: one icon-high row for the title and close button, then one
+    blank row before the first section so the title doesn't read as one of them.
+]]
+local TITLE_HEIGHT = ICON_SIZE
+local TITLE_GAP = ROW_HEIGHT + ICON_GAP
+local CLOSE_SIZE = 22
+-- Room between the end of the title and the close button.
+local TITLE_CLOSE_GAP = 8
 local OUT_OF_RANGE_ALPHA = 0.35
 local RANGE_INTERVAL = 0.5
 
@@ -65,7 +81,7 @@ local BACKDROP = {
 -- State
 --------------------------------------------------------------------------------
 
-local anchor, content
+local anchor, content, title
 local labels, icons = {}, {}
 local usedLabels, usedIcons = 0, 0
 local lastSignature
@@ -103,12 +119,21 @@ local function OnIconEnter(self)
 		return
 	end
 	GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
-	GameTooltip:SetSpellByID(spec.spellId)
+	if spec.itemId then
+		GameTooltip:SetItemByID(spec.itemId)
+	else
+		GameTooltip:SetSpellByID(spec.spellId)
+	end
 	GameTooltip:AddLine(" ")
-	local hint = (spec.favorGUID and L["BUFF_WINDOW_TOOLTIP_FAVOR"])
-		or (spec.isGroup and L["BUFF_WINDOW_TOOLTIP_GROUP"])
-		or L["BUFF_WINDOW_TOOLTIP_CAST"]
-	GameTooltip:AddLine(GetColor("INFO") .. hint:format(spec.targetName) .. "|r", 1, 1, 1, true)
+	-- A Self Buffs weapon or Soulstone icon brings its own hint, already worded.
+	local hint = spec.hint
+	if not hint then
+		local text = (spec.favorGUID and L["BUFF_WINDOW_TOOLTIP_FAVOR"])
+			or (spec.isGroup and L["BUFF_WINDOW_TOOLTIP_GROUP"])
+			or L["BUFF_WINDOW_TOOLTIP_CAST"]
+		hint = text:format(spec.targetName)
+	end
+	GameTooltip:AddLine(GetColor("INFO") .. hint .. "|r", 1, 1, 1, true)
 	if spec.favorGUID then
 		GameTooltip:AddLine(
 			GetColor("INFO") .. L["BUFF_WINDOW_TOOLTIP_DISMISS"]:format(spec.targetName) .. "|r",
@@ -123,6 +148,16 @@ end
 
 local function OnIconLeave()
 	GameTooltip:Hide()
+end
+
+--[[
+    PreClick, because the secure click fires the game's "replace your
+    enchant?" question before PostClick runs (Buff-Window-Self.lua answers it).
+]]
+local function OnIconPreClick(self, button)
+	if button == "LeftButton" and self.spec and self.spec.confirmReplace then
+		ns.ExpectReplaceEnchant()
+	end
 end
 
 --[[
@@ -166,6 +201,7 @@ local function AcquireIcon()
 		button:SetHighlightTexture("Interface/Buttons/ButtonHilight-Square", "ADD")
 		button:SetScript("OnEnter", OnIconEnter)
 		button:SetScript("OnLeave", OnIconLeave)
+		button:SetScript("PreClick", OnIconPreClick)
 		button:SetScript("PostClick", OnIconPostClick)
 		icons[usedIcons] = button
 	end
@@ -176,16 +212,34 @@ end
     Left button only ("type1"): a right-click finds no "type2" and no bare
     "type" to fall back on, so it casts nothing and is free for dismissing a
     favor. Every attribute is written on every use, nil included, because a
-    pooled button still carries whatever its last spec set.
+    pooled button still carries whatever its last spec set; a nil spec clears
+    them all. Shared with the Buff Keys, which write the same attributes.
 ]]
-local function SetIcon(button, spec)
-	button.spec = spec
-	button.icon:SetTexture(C_Spell.GetSpellTexture(spec.spellId))
+function ns.SetBuffButtonAttributes(button, spec)
+	if not spec then
+		for _, key in ipairs({ "type1", "spell", "item", "unit", "macrotext", "target-slot" }) do
+			button:SetAttribute(key, nil)
+		end
+		return
+	end
+	--[[
+	    The weapon a poison goes on: the template uses this slot once the item
+	    leaves the cursor waiting on one.
+	]]
+	button:SetAttribute("target-slot", spec.targetSlot)
 	if spec.macrotext then
 		button:SetAttribute("type1", "macro")
 		button:SetAttribute("spell", nil)
+		button:SetAttribute("item", nil)
 		button:SetAttribute("unit", nil)
 		button:SetAttribute("macrotext", spec.macrotext)
+	elseif spec.item then
+		-- "item:12345", resolved by the template the way /use resolves it.
+		button:SetAttribute("type1", "item")
+		button:SetAttribute("spell", nil)
+		button:SetAttribute("item", spec.item)
+		button:SetAttribute("unit", spec.unit)
+		button:SetAttribute("macrotext", nil)
 	else
 		button:SetAttribute("type1", "spell")
 		--[[
@@ -195,9 +249,20 @@ local function SetIcon(button, spec)
 		    lower rank's ID cast nothing. Group buffs pass the bare name.
 		]]
 		button:SetAttribute("spell", spec.castSpell or spec.spellName)
+		button:SetAttribute("item", nil)
 		button:SetAttribute("unit", spec.unit)
 		button:SetAttribute("macrotext", nil)
 	end
+end
+
+local function SetIcon(button, spec)
+	button.spec = spec
+	if spec.itemId then
+		button.icon:SetTexture(C_Item.GetItemIconByID(spec.itemId))
+	else
+		button.icon:SetTexture(C_Spell.GetSpellTexture(spec.spellId))
+	end
+	ns.SetBuffButtonAttributes(button, spec)
 	button:Show()
 end
 
@@ -221,8 +286,15 @@ end
 -- Cooldowns
 --------------------------------------------------------------------------------
 
-local function GetCooldown(spellId)
-	local info = C_Spell.GetSpellCooldown(spellId)
+local GetItemCooldown = C_Container.GetItemCooldown
+
+-- An item icon (a poison, a Soulstone) shows the item's own cooldown.
+local function GetCooldown(spec)
+	if spec.itemId then
+		local start, duration = GetItemCooldown(spec.itemId)
+		return start, duration, 1
+	end
+	local info = C_Spell.GetSpellCooldown(spec.spellId)
 	if info then
 		return info.startTime, info.duration, info.modRate
 	end
@@ -244,7 +316,7 @@ local function UpdateCooldowns()
 		local spec = button.spec
 		local start, duration, modRate
 		if spec then
-			start, duration, modRate = GetCooldown(spec.spellId)
+			start, duration, modRate = GetCooldown(spec)
 		end
 		if ns.IsPlain(start) and ns.IsPlain(duration) then
 			if start and duration and duration > 0 then
@@ -266,6 +338,27 @@ ns.SetEventHandler("SPELL_UPDATE_COOLDOWN", OnSpellUpdateCooldown)
 -- Range
 --------------------------------------------------------------------------------
 
+local IsItemInRange = C_Item.IsItemInRange
+
+--[[
+    An item used on someone (a Soulstone) asks the item's own range, and
+    falls back on the buffs' check when the client has no answer. The Buff
+    Keys ask it too.
+]]
+local function InRange(spec)
+	if spec.itemId and spec.unit then
+		local isPlayer = UnitIsUnit(spec.unit, "player")
+		if ns.IsPlain(isPlayer) and not isPlayer then
+			local inRange = IsItemInRange(spec.itemId, spec.unit)
+			if ns.IsPlain(inRange) and inRange ~= nil then
+				return inRange and true or false
+			end
+		end
+	end
+	return ns.IsBuffInRange(spec.unit, spec.spellName)
+end
+ns.IsBuffSpecInRange = InRange
+
 local function UpdateRange()
 	if not content:IsVisible() then
 		return
@@ -273,7 +366,7 @@ local function UpdateRange()
 	for i = 1, usedIcons do
 		local button = icons[i]
 		local spec = button.spec
-		local inRange = not spec or ns.IsBuffInRange(spec.unit, spec.spellName)
+		local inRange = not spec or InRange(spec)
 		button:SetAlpha(inRange and 1 or OUT_OF_RANGE_ALPHA)
 	end
 end
@@ -305,9 +398,10 @@ local function Signature(sections)
 		for _, spec in ipairs(list) do
 			parts[#parts + 1] = spec.column
 				.. ":"
-				.. (spec.castSpell or spec.spellName)
+				.. (spec.castSpell or spec.spellName or spec.item or ("item:" .. tostring(spec.itemId)))
 				.. "@"
 				.. (spec.unit or "")
+				.. (spec.targetSlot or "")
 				.. (spec.macrotext or "")
 		end
 	end
@@ -315,7 +409,7 @@ local function Signature(sections)
 		parts[#parts + 1] = "#" .. (section.grid or "") .. section.label
 		AddIcons(section.icons)
 		for _, row in ipairs(section.rows) do
-			parts[#parts + 1] = (row.pet and ">>" or ">") .. row.label
+			parts[#parts + 1] = (row.pet and ">>" or ">") .. (row.grid or "") .. row.label
 			AddIcons(row.icons)
 		end
 	end
@@ -346,18 +440,23 @@ local function ContentHeight(line)
 	return line.label:GetStringHeight()
 end
 
--- `slots` maps a buff's column to its place in the grid (1 = first icon). `y` is the row's middle.
-local function PlaceRow(label, indent, specs, y, nameWidth, slots)
+--[[
+    `offsets` maps a buff's column to how far its icon sits from the grid's
+    first, in pixels. `x` is the left edge of the window column the row sits
+    in, `y` the row's middle.
+]]
+local function PlaceRow(line, x, y, nameWidth, offsets)
+	local label, indent = line.label, line.indent
 	label:ClearAllPoints()
-	label:SetPoint("LEFT", content, "TOPLEFT", PADDING + indent, y)
+	label:SetPoint("LEFT", content, "TOPLEFT", x + indent, y)
 	label:SetWidth(nameWidth - indent)
 	label:Show()
 
-	local left = PADDING + nameWidth + NAME_GAP
-	for _, spec in ipairs(specs) do
+	local left = x + nameWidth + NAME_GAP
+	for _, spec in ipairs(line.specs) do
 		local button = AcquireIcon()
 		button:ClearAllPoints()
-		button:SetPoint("LEFT", content, "TOPLEFT", left + (slots[spec.column] - 1) * (ICON_SIZE + ICON_GAP), y)
+		button:SetPoint("LEFT", content, "TOPLEFT", left + offsets[spec.column], y)
 		SetIcon(button, spec)
 	end
 end
@@ -371,8 +470,11 @@ end
 
     A section can name its own grid (Self Buffs does): its columns are other
     buffs than the parties', so lining them up with the parties' would only
-    push them right. Returns grid -> (column -> slot), and the widest grid's
-    slot count.
+    push them right. A row can name one too (each weapon hand does), so its
+    icons start at the left whatever the header's hold. Returns grid ->
+    (column -> pixels from the first icon), and grid -> the icons' whole
+    width. The party columns share one grid, so a buff sits at the same place
+    in each.
 ]]
 local MAIN_GRID = "main"
 
@@ -388,25 +490,45 @@ local function GridSlots(sections)
 		local grid = section.grid or MAIN_GRID
 		Mark(grid, section.icons)
 		for _, row in ipairs(section.rows) do
-			Mark(grid, row.icons)
+			Mark(row.grid or grid, row.icons)
 		end
 	end
 
-	local slotsByGrid, widest = {}, 0
+	local offsetsByGrid, widths = {}, {}
 	for grid, columnSet in pairs(used) do
 		local columns = {}
 		for column in pairs(columnSet) do
 			columns[#columns + 1] = column
 		end
 		table.sort(columns)
-		local slots = {}
+		local offsets, x = {}, 0
 		for slot, column in ipairs(columns) do
-			slots[column] = slot
+			if slot > 1 then
+				x = x + ICON_SIZE + ICON_GAP
+			end
+			offsets[column] = x
 		end
-		slotsByGrid[grid] = slots
-		widest = math.max(widest, #columns)
+		offsetsByGrid[grid] = offsets
+		widths[grid] = #columns > 0 and x + ICON_SIZE or 0
 	end
-	return slotsByGrid, widest
+	return offsetsByGrid, widths
+end
+
+--[[
+    Places a run of lines down from `y`, the first one's middle. Returns where
+    the next run's first middle goes, and the lowest edge this run drew.
+]]
+local function PlaceLines(lines, x, y, nameWidth, offsetsByGrid)
+	local bottom = y
+	for _, line in ipairs(lines) do
+		PlaceRow(line, x, y, nameWidth, offsetsByGrid[line.grid])
+		bottom = y - ContentHeight(line) / 2
+		y = y - ROW_HEIGHT
+		if line.sectionEnd then
+			y = y - SECTION_GAP
+		end
+	end
+	return y, bottom
 end
 
 local function ReleaseAll()
@@ -432,46 +554,86 @@ function ns.RenderBuffWindow(sections)
 
 		--[[
 		    Two passes: every label is measured before any is placed, because the
-		    icon column starts where the longest name ends.
+		    icon column starts where the longest name ends. The sections before
+		    the parties (Self-Buffs, Target, Return the Favor) run across the top;
+		    the parties go under them in columns of PARTIES_PER_COLUMN, so a full
+		    raid's eight groups stand four high instead of running off the screen.
 		]]
-		local lines = {}
+		local top, columns = {}, {}
+		local parties = 0
 		local nameWidth = MIN_NAME_WIDTH
-		local function Measure(text, indent, specs, grid)
-			local label, width = MeasureLabel(text, indent)
-			lines[#lines + 1] = { label = label, indent = indent, specs = specs, grid = grid }
-			nameWidth = math.max(nameWidth, width)
-		end
 		for _, section in ipairs(sections) do
+			local lines = top
+			if section.party then
+				parties = parties + 1
+				local index = math.ceil(parties / PARTIES_PER_COLUMN)
+				columns[index] = columns[index] or {}
+				lines = columns[index]
+			end
 			local grid = section.grid or MAIN_GRID
+			local function Measure(text, indent, specs, lineGrid)
+				local label, width = MeasureLabel(text, indent)
+				lines[#lines + 1] = { label = label, indent = indent, specs = specs, grid = lineGrid }
+				nameWidth = math.max(nameWidth, width)
+			end
 			Measure(GetColor("TITLE") .. section.label .. "|r", 0, section.icons, grid)
 			for _, row in ipairs(section.rows) do
-				Measure(row.label, row.pet and PET_INDENT or MEMBER_INDENT, row.icons, grid)
+				-- A row can set its own indent: the weapon hands sit flush with their header.
+				Measure(row.label, row.indent or (row.pet and PET_INDENT or MEMBER_INDENT), row.icons, row.grid or grid)
 			end
 			lines[#lines].sectionEnd = true
 		end
 		nameWidth = math.min(math.ceil(nameWidth), MAX_NAME_WIDTH)
 
-		local slotsByGrid, slotCount = GridSlots(sections)
-		--[[
-		    Rows sit ROW_HEIGHT apart, middle to middle, but the first and last
-		    are measured by what they show: PADDING from the window's edge to the
-		    top of the first line's content and from the bottom of the last's,
-		    the same as the sides.
-		]]
-		local y = -(PADDING + ContentHeight(lines[1]) / 2)
-		for index, line in ipairs(lines) do
-			PlaceRow(line.label, line.indent, line.specs, y, nameWidth, slotsByGrid[line.grid])
-			if index < #lines then
-				y = y - ROW_HEIGHT
-				if line.sectionEnd then
-					y = y - SECTION_GAP
-				end
+		-- A window column: the names, then as many icons as its grid keeps.
+		local offsetsByGrid, iconWidths = GridSlots(sections)
+		local function ColumnWidth(grid)
+			return nameWidth + NAME_GAP + math.max(iconWidths[grid] or 0, ICON_SIZE)
+		end
+		local function ContentWidth()
+			local width = 0
+			for _, line in ipairs(top) do
+				width = math.max(width, ColumnWidth(line.grid))
 			end
+			local partyWidth = ColumnWidth(MAIN_GRID)
+			for index in ipairs(columns) do
+				width = math.max(width, (index - 1) * (partyWidth + COLUMN_GAP) + partyWidth)
+			end
+			return width
 		end
 
-		local iconsWidth = math.max(slotCount, 1) * (ICON_SIZE + ICON_GAP) - ICON_GAP
-		local height = -y + ContentHeight(lines[#lines]) / 2 + PADDING
-		anchor:SetSize(PADDING * 2 + nameWidth + NAME_GAP + iconsWidth, height)
+		--[[
+		    The close button sits over the far-right icon column (see
+		    CreateBuffWindowFrame), so the window is never narrower than the
+		    title plus that column. A short list widens its name column to make
+		    up the difference, which pushes the icons right until the last one
+		    sits under the close button.
+		]]
+		local minWidth = math.ceil(title:GetStringWidth()) + TITLE_CLOSE_GAP + (CLOSE_SIZE + ICON_SIZE) / 2
+		local width = ContentWidth()
+		if width < minWidth then
+			nameWidth = nameWidth + (minWidth - width)
+			width = ContentWidth()
+		end
+
+		--[[
+		    Rows sit ROW_HEIGHT apart, middle to middle, but the first and last
+		    are measured by what they show: TITLE_GAP under the title bar to the
+		    top of the first line's content, and PADDING from the bottom of the
+		    lowest's to the window's edge, the same as the sides. Every party
+		    column starts level, under the top.
+		]]
+		local first = top[1] or columns[1][1]
+		local firstMiddle = -(PADDING + TITLE_HEIGHT + TITLE_GAP + ContentHeight(first) / 2)
+		local y, bottom = PlaceLines(top, PADDING, firstMiddle, nameWidth, offsetsByGrid)
+		local partyWidth = ColumnWidth(MAIN_GRID)
+		for index, lines in ipairs(columns) do
+			local x = PADDING + (index - 1) * (partyWidth + COLUMN_GAP)
+			local _, columnBottom = PlaceLines(lines, x, y, nameWidth, offsetsByGrid)
+			bottom = math.min(bottom, columnBottom)
+		end
+
+		anchor:SetSize(PADDING * 2 + width, -bottom + PADDING)
 	end
 
 	content:Show()
@@ -540,5 +702,23 @@ function ns.CreateBuffWindowFrame()
 		anchor:StopMovingOrSizing()
 		SavePosition()
 	end)
+
+	-- Branded like a print out: "TFTB // Buff Duty".
+	title = content:CreateFontString(nil, "OVERLAY", "GameFontNormal")
+	title:SetPoint("LEFT", content, "TOPLEFT", PADDING, -(PADDING + TITLE_HEIGHT / 2))
+	title:SetText(ns.GetPrintPrefix() .. GetColor("TEXT") .. L["TAB_BUFF_WINDOW"] .. "|r")
+
+	--[[
+	    Closing turns Buff Duty off rather than hiding the window for the
+	    session, since the window reopens itself on the next roster or aura
+	    change. The template's own click hides its parent, which is protected
+	    (it holds the secure icons), so the script is replaced outright.
+	]]
+	local close = CreateFrame("Button", nil, content, "UIPanelCloseButton")
+	close:SetSize(CLOSE_SIZE, CLOSE_SIZE)
+	-- Centered over the far-right icon column, which ends PADDING from the edge.
+	close:SetPoint("CENTER", content, "TOPRIGHT", -(PADDING + ICON_SIZE / 2), -(PADDING + TITLE_HEIGHT / 2))
+	close:SetScript("OnClick", ns.CloseBuffWindow)
+
 	content:Hide()
 end

@@ -3,7 +3,7 @@ local Data = ns.Data
 local L = ns.L
 
 --[[
-    The two lists under the parties are players outside your group: strangers
+    The two lists above the parties are players outside your group: strangers
     who just buffed you (Return the Favor) and your target. Each player is
     listed once, and Target claims them first, so the list you asked for by
     targeting is never the one that loses them.
@@ -15,7 +15,7 @@ local L = ns.L
 
     There is no Players in Range list on purpose: the game reveals players
     around you to add-ons only through friendly nameplates, which are off for
-    most players, so a list built on them came up empty.
+    most players, so a list built on them would almost always be empty.
 ]]
 
 local BuffWindow = ns.BuffWindow
@@ -110,7 +110,7 @@ local function OutsiderIcons(unit, class, short, fullName, castUnit, given, favo
 	if unit then
 		ReadAuras(unit)
 	end
-	local role = RoleOf(unit)
+	local role = RoleOf(unit, class)
 	local icons = {}
 	for _, buff in ipairs(buffs) do
 		local wanted = buff.singleName and Wants(buff, class, role)
@@ -228,7 +228,7 @@ local function TargetSection(listed)
 		end
 		-- It stands on its own even when the tooltip named no owner.
 		petRow.pet = nil
-		return { label = L["BUFF_WINDOW_TARGET_HEADER"], icons = {}, rows = { petRow } }
+		return { kind = "target", label = L["BUFF_WINDOW_TARGET_HEADER"], icons = {}, rows = { petRow } }
 	end
 
 	local _, class = UnitClass("target")
@@ -247,7 +247,7 @@ local function TargetSection(listed)
 	if #rows == 0 then
 		return nil
 	end
-	return { label = L["BUFF_WINDOW_TARGET_HEADER"], icons = {}, rows = rows }
+	return { kind = "target", label = L["BUFF_WINDOW_TARGET_HEADER"], icons = {}, rows = rows }
 end
 
 local function FavorSection(listed)
@@ -286,7 +286,7 @@ local function FavorSection(listed)
 	table.sort(rows, function(a, b)
 		return a.at > b.at
 	end)
-	return { label = L["BUFF_WINDOW_FAVOR_HEADER"], icons = {}, rows = rows }
+	return { kind = "favor", label = L["BUFF_WINDOW_FAVOR_HEADER"], icons = {}, rows = rows }
 end
 
 function BuffWindow.AddOutsiderSections(sections)
@@ -295,9 +295,9 @@ function BuffWindow.AddOutsiderSections(sections)
 	local target = TargetSection(listed)
 	local favor = FavorSection(listed)
 	--[[
-	    Not a loop over { favor, target }: ipairs stops at the first nil, so an
-	    empty Return the Favor would drop Target after it.
+	    Not a loop over { target, favor }: ipairs stops at the first nil, so an
+	    empty Target would drop Return the Favor after it.
 	]]
-	sections[#sections + 1] = favor
 	sections[#sections + 1] = target
+	sections[#sections + 1] = favor
 end

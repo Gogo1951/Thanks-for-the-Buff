@@ -6,8 +6,29 @@ ns.BUFF_WINDOW_SPELLS = {}
 -- { beast = spell id, demons = { [npc id] = spell id } }: the icon a pet's row wears, from its summoning spell
 ns.BUFF_WINDOW_PET_ICONS = { demons = {} }
 
--- { class, ranks = { { spell id, level learned } }, exclusive, default }, -- Name
+-- { class, ranks = { { spell id, level learned } }, auras, exclusive, needsPet, default }, -- Name
 ns.BUFF_WINDOW_SELF_SPELLS = {}
+
+-- { class, ranks = { { spell id, level learned, enchant id } } or items = { { item id, level required, enchant id } } }, -- Name
+ns.BUFF_WINDOW_WEAPON_ENCHANTS = {}
+
+-- The weapons each class keeps a poison or imbue on.
+ns.BUFF_WINDOW_WEAPON_HANDS = {}
+
+--[[
+    Every other temporary weapon enchant, for any class: oils, sharpening
+    stones, weightstones, fishing lures. weapon types is the item spell's
+    weapon-subclass mask (0 for any weapon but a fishing pole); kind is the
+    Weapon Buffs panel group it's listed under ("OIL", "STONE" or "LURE").
+]]
+-- { item id, level required, enchant id, weapon types, kind, item level }, -- Name
+ns.BUFF_WINDOW_WEAPON_ITEMS = {}
+
+-- The Soulstone reminder; nil until this client's stones are listed.
+ns.BUFF_WINDOW_SOULSTONE = nil
+
+-- { class, ranks = { spell ids } }: the Buff Keys' resurrection on a dead target
+ns.BUFF_WINDOW_RESURRECTIONS = {}
 
 --[[
 How We Got the Data

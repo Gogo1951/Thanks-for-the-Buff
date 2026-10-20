@@ -7,7 +7,8 @@ local GetColor = ns.GetColor
 --[[
     The whisper row: a caption-sized label, the message box and the Reset button,
     together one row, so a full sentence stays readable while it is being edited.
-    The emote row has no button, so its dropdown takes the rest of the row.
+    The emote and icon rows have no button, so their dropdowns take the rest of
+    the row.
 ]]
 local WHISPER_LABEL_WIDTH = 0.9
 local RESET_WIDTH = 0.5
@@ -38,6 +39,29 @@ local function EmoteChoices()
 		end
 	end
 	return emoteValues, emoteSorting
+end
+
+--[[
+    The Icon dropdown: the macros' own icon as Default first, then this
+    client's ns.THANK_YOU_MACRO_ICONS in list order, each its picture alone, since
+    the client gives an icon no name. Values are texture file IDs, the same number
+    the macro is created with. Cached: the list can't change during a session.
+]]
+local iconValues, iconSorting
+local function IconChoices()
+	if not iconValues then
+		local function Picture(texture)
+			return "|T" .. texture .. ":16|t"
+		end
+		local default = Data.THANK_YOU_DEFAULT_ICON
+		iconValues = { [default] = Picture(default) .. " " .. L["BUTTON_ICON_DEFAULT"] }
+		iconSorting = { default }
+		for _, icon in ipairs(ns.THANK_YOU_MACRO_ICONS) do
+			iconValues[icon[1]] = Picture(icon[1])
+			iconSorting[#iconSorting + 1] = icon[1]
+		end
+	end
+	return iconValues, iconSorting
 end
 
 --[[
@@ -140,6 +164,29 @@ local function AddButtonSection(args, button, index)
 
 	args["space_c" .. index] = ns.OptionsSpacer(base + 8, sectionHidden)
 
+	-- The icon row closes the section, under the emote row or grid.
+	args["space_d" .. index] = ns.OptionsSpacer(base + 11, sectionHidden)
+	args["iconLabel" .. index] = ns.OptionsRowLabel(L["BUTTON_ICON"], base + 12, WHISPER_LABEL_WIDTH, sectionHidden)
+	local choices, choiceOrder = IconChoices()
+	args["iconSelect" .. index] = {
+		type = "select",
+		name = "",
+		desc = L["BUTTON_ICON_DESCRIPTION"],
+		width = EMOTE_SELECT_WIDTH,
+		order = base + 13,
+		hidden = sectionHidden,
+		values = choices,
+		sorting = choiceOrder,
+		get = function()
+			-- What the macro actually wears: an icon this client's list lacks shows as Default rather than blank.
+			return ns.GetThankYouIcon(config())
+		end,
+		set = function(_, value)
+			config().macroIcon = value
+			ns.ReconcileMacros()
+		end,
+	}
+
 	--[[
 	    A single-emote button gets one dropdown instead of the checklist: there is
 	    nothing to randomise between, so a grid of checkboxes would be the wrong
@@ -175,30 +222,9 @@ local function AddButtonSection(args, button, index)
 		return
 	end
 
-	local emoteGroup = {
-		type = "group",
-		name = L["EMOTES_SELECT"],
-		order = base + 9,
-		inline = true,
-		hidden = sectionHidden,
-		args = {},
-	}
-	for i, emoteData in ipairs(Data.EMOTES) do
-		local emote = emoteData.token
-		emoteGroup.args[emote] = {
-			type = "toggle",
-			name = ns.GetEmoteCommand(emote),
-			desc = emoteData.desc,
-			order = i,
-			width = "half",
-			get = function()
-				return config().emotes[emote]
-			end,
-			set = function(_, value)
-				config().emotes[emote] = value
-			end,
-		}
-	end
+	-- The shared grid hides on emotesEnabled, which a button doesn't carry, so it follows the macro toggle instead.
+	local emoteGroup = ns.DefineEmoteGroup(config, base + 9)
+	emoteGroup.hidden = sectionHidden
 	args["emoteGroup" .. index] = emoteGroup
 end
 

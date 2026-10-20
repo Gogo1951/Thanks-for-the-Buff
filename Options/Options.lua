@@ -70,7 +70,7 @@ function ns.RegisterOptionsPanels()
 		local _, buffWindowID = AceConfigDialog:AddToBlizOptions(registry.BuffWindow, L["TAB_BUFF_WINDOW"], parent)
 
 		--[[
-		    Tracked Abilities and Self-Buffs nest one level deeper, under Buff Duty, by the
+		    Tracked Abilities, Self-Buffs and Weapon Buffs nest one level deeper, under Buff Duty, by the
 		    category id AddToBlizOptions just handed back: the Settings panel finds
 		    a parent at any depth and indents each level.
 		]]
@@ -78,6 +78,12 @@ function ns.RegisterOptionsPanels()
 		AceConfigDialog:AddToBlizOptions(registry.BuffWindowBuffs, L["TRACKED_HEADER"], buffWindowID)
 		AceConfig:RegisterOptionsTable(registry.BuffWindowSelfBuffs, ns.BuildBuffWindowSelfBuffsOptions)
 		AceConfigDialog:AddToBlizOptions(registry.BuffWindowSelfBuffs, L["BUFF_WINDOW_SELF_HEADER"], buffWindowID)
+		AceConfig:RegisterOptionsTable(registry.BuffWindowWeaponBuffs, ns.BuildBuffWindowWeaponBuffsOptions)
+		AceConfigDialog:AddToBlizOptions(
+			registry.BuffWindowWeaponBuffs,
+			L["BUFF_WINDOW_WEAPON_PANEL_HEADER"],
+			buffWindowID
+		)
 	end
 
 	if ns.BuildThankYouButtonOptions then

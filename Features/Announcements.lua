@@ -148,8 +148,9 @@ end
     Trap for anyone tempted to pass a target straight through:
     C_ChatInfo.PerformEmote(token, nil) is NOT undirected -- it falls back to
     your CURRENT TARGET, thanking whatever bystander you happen to be pointing
-    at. "none" is what actually forces the undirected flavor, and an
-    unresolvable name degrades to it the same way, so neither may reach here.
+    at. "none" is what actually forces the undirected flavor, and a name the
+    client can't resolve degrades to it the same way; no API pre-tests a name,
+    so that case still reaches here (see ResolveEmoteTarget in Praise.lua).
 ]]
 function ns:DoRandomEmote(emotes, target)
 	if not emotes or not target then
@@ -388,11 +389,11 @@ end
     for 89s) but wrong for a fixed menu choice, where 89 would print as "1
     Minute" directly beneath "55 Seconds".
 
-    No caller reaches the minute or hour rung today -- Good News caps its clause
-    below a minute (GOOD_NEWS_MAX_SECONDS) and both dropdowns list seconds. They
-    stay because this formats whatever duration it is handed, and a later caller
-    re-deriving the ladder would walk back into the plural-escape trap that
-    ResolvePlurals exists to solve.
+    Good News caps its clause below a minute (GOOD_NEWS_MAX_SECONDS) and the
+    seconds dropdowns pass forceSeconds, but Return the Favor's 60-second choice
+    reads as a minute. The hour rung stays because this formats whatever
+    duration it is handed, and a later caller re-deriving the ladder would walk
+    back into the plural-escape trap that ResolvePlurals exists to solve.
 ]]
 local function FormatDuration(seconds, forceSeconds)
 	seconds = math.floor((seconds or 0) + 0.5)

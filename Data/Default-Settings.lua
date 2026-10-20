@@ -31,6 +31,8 @@ end
 ns.DATABASE_DEFAULTS = {
 	profile = {
 		showWelcome = true,
+		-- LibDBIcon's own table: the button's position, and `hide` for Enable Mini-map Button.
+		minimap = {},
 		--[[
             Praise (the outgoing whisper and emote) carries its own throttles here:
             `praiseCooldown` is the gap between any two praises whoever buffed you,
@@ -63,6 +65,8 @@ ns.DATABASE_DEFAULTS = {
 		},
 		slash = {
 			createMacro = true,
+			-- The texture file ID the macro wears: its own icon, or one from ns.THANK_YOU_MACRO_ICONS.
+			macroIcon = Data.THANK_YOU_DEFAULT_ICON,
 			message = ns.L["DEFAULT_WHISPER"],
 			emotes = GetDefaultEmoteSettings(true),
 		},
@@ -149,9 +153,9 @@ ns.DATABASE_DEFAULTS = {
 		    only appears when there is something you can fix. `audience` holds who
 		    each buff is offered to (Data.BUFF_AUDIENCE), keyed by the row's first
 		    single-target id, and seeds from the row defaults in this client's
-		    Buff-Window-Spells file. `point` is
-		    nil until the window is first dragged, and the window centers itself
-		    until then.
+		    Buff-Window-Spells file. `point` is nil until the window is first
+		    dragged, and until then its top-left corner sits a little left of and
+		    above the middle of the screen.
 		]]
 		buffWindow = {
 			enabled = true,
@@ -163,11 +167,19 @@ ns.DATABASE_DEFAULTS = {
 			]]
 			refreshMinutes = 5,
 			--[[
-			    Pets take Tanks buffs (Thorns) while this applies; petsAsTanksWhen
-			    is one of Data.PETS_AS_TANKS, SOLO by default.
+			    When each class, and pets (Data.TANK_WHEN_PET), take Tanks buffs
+			    (Thorns) without a role of their own: one of Data.TANK_WHEN, keyed
+			    by class token. A class with no entry is NEVER; the classes that
+			    can fight in melee, and pets, start SOLO.
 			]]
-			petsAsTanks = true,
-			petsAsTanksWhen = "SOLO",
+			tankWhen = {
+				DRUID = "SOLO",
+				PALADIN = "SOLO",
+				ROGUE = "SOLO",
+				SHAMAN = "SOLO",
+				WARRIOR = "SOLO",
+				PET = "SOLO",
+			},
 			--[[
 			    The Self Buffs row's master switch, and when each self buff shows
 			    (one of Data.SELF_REFRESH_CHOICES), keyed by the row's first rank
@@ -175,6 +187,21 @@ ns.DATABASE_DEFAULTS = {
 			]]
 			selfEnabled = true,
 			selfRefresh = {},
+			--[[
+			    Whether each poison or imbue is ticked for each hand, keyed
+			    "ROGUE_MAIN" and so on, then by the BUFF_WINDOW_WEAPON_ENCHANTS
+			    row's first id. Unset reads as ticked.
+			]]
+			weaponPicks = {},
+			--[[
+			    The Weapon Buffs switch, its one Reapply timing (one of
+			    Data.WEAPON_REFRESH_CHOICES), and whether each oil, stone or
+			    lure is ticked for each hand ("MAIN" or "OFF", then the item
+			    id; unset reads as ticked).
+			]]
+			weaponEnabled = true,
+			weaponRefresh = 3,
+			weaponItems = {},
 			favorEnabled = true,
 			-- One of Data.BUFF_WINDOW_FAVOR_CHOICES.
 			favorSeconds = 40,
@@ -193,11 +220,24 @@ ns.DATABASE_DEFAULTS = {
     default. Every later button starts fully switched off -- no macro, no
     whisper text, no emotes -- and only does something once its owner has
     filled it in. An empty message sends no whisper and an all-false emote
-    table performs no emote, both by existing logic, so "off" needs no new guard.
+    table performs no emote, so "off" needs no guard of its own. Each starts on
+    the icon in this client's ns.THANK_YOU_MACRO_ICONS that names its button,
+    so the macros tell apart on a bar, or on the default icon where none does.
 ]]
+local startingIcons = {}
+for _, icon in ipairs(ns.THANK_YOU_MACRO_ICONS) do
+	if icon[2] then
+		startingIcons[icon[2]] = icon[1]
+	end
+end
+
 for index = 2, #Data.THANK_YOU_BUTTONS do
 	local button = Data.THANK_YOU_BUTTONS[index]
-	local buttonDefaults = { createMacro = false, message = "" }
+	local buttonDefaults = {
+		createMacro = false,
+		message = "",
+		macroIcon = startingIcons[index] or Data.THANK_YOU_DEFAULT_ICON,
+	}
 	if button.singleEmote then
 		--[[
 		    One chosen token, "" meaning none. A checklist would be the wrong shape:

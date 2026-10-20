@@ -118,6 +118,19 @@ function ns.OptionsExample(getText, order, hidden)
 	}
 end
 
+--[[
+    The blue note on where the newer features may end up, shown under the
+    General panel's Features section and under Buff Duty's own switch. It names
+    Buff Duty through its tab title so each locale uses its own name for it.
+]]
+function ns.OptionsFeaturesNote(order, hidden)
+	return ns.OptionsDesc(
+		GetColor("INFO") .. L["OPTIONS_FEATURES_NOTE"]:format(L["TAB_BUFF_WINDOW"]) .. "|r",
+		order,
+		hidden
+	)
+end
+
 -- Chat draws the {rt1} marker as the Star icon; panel text needs the texture itself.
 function ns.MarkerAsTexture(message)
 	return (message:gsub(ns.TARGET_MARKER, "|TInterface\\TargetingFrame\\UI-RaidTargetingIcon_1:14|t", 1))
@@ -211,6 +224,48 @@ function ns.OptionsRowLabel(text, order, width, hidden)
 end
 
 --[[
+    A row label naming an ability, which shows the game's own tooltip for it
+    on hover, the same one an action bar shows. `hyperlink` returns
+    "spell:<id>" or "item:<id>". A plain Label takes no mouse, so this one is
+    an InteractiveLabel, which AceConfigDialog gives the same hover handler as
+    any control, and that handler shows `tooltipHyperlink` when there is one.
+]]
+function ns.OptionsAbilityLabel(text, order, width, hyperlink)
+	local label = ns.OptionsRowLabel(text, order, width)
+	label.dialogControl = "InteractiveLabel"
+	label.tooltipHyperlink = hyperlink
+	return label
+end
+
+--[[
+    The spell an ability's tooltip quotes: the HIGHEST id in its rank group
+    that the client describes, so it reads the rank you actually cast, not rank
+    1. Ids are sorted rather than trusted in data order -- rows are not
+    reliably rank-ordered (Combustion is { 29977, 11129 }, Vanish
+    { 1856, 1857, 27617, 26889, 44290 }). Classic holds tooltip data only for
+    spells the character has known, and these panels list every class, so each
+    id is requested once here and the pick is made again at every hover, when
+    the text has had time to land.
+]]
+function ns.SpellTooltipLink(ids)
+	local ranked = {}
+	for i = 1, #ids do
+		ranked[i] = ids[i]
+		C_Spell.RequestLoadSpellData(ids[i])
+	end
+	table.sort(ranked)
+	return function()
+		for i = #ranked, 1, -1 do
+			local text = GetSpellDescription(ranked[i])
+			if text and text ~= "" then
+				return "spell:" .. ranked[i]
+			end
+		end
+		return "spell:" .. ranked[#ranked]
+	end
+end
+
+--[[
     Hide every control on a panel behind its master switch.
 
     Applied to the finished args table rather than threaded through every shared
@@ -262,12 +317,7 @@ ns.FEATURE_SWITCHES = {
 	]]
 	{ key = "strangers", setting = "enabled", name = "STRANGERS_ENABLE", desc = "STRANGERS_ENABLE_DESCRIPTION" },
 	{ key = "teammates", setting = "enabled", name = "TEAMMATES_ENABLE", desc = "TEAMMATES_ENABLE_DESCRIPTION" },
-	{
-		key = "goodNews",
-		setting = "whisperEnabled",
-		name = "GOOD_NEWS_WHISPER_ENABLE",
-		desc = "GOOD_NEWS_WHISPER_DESCRIPTION",
-	},
+	{ key = "goodNews", setting = "whisperEnabled", name = "GOOD_NEWS_ENABLE", desc = "GOOD_NEWS_ENABLE_DESCRIPTION" },
 	{ key = "services", setting = "enabled", name = "SERVICES_ENABLE", desc = "SERVICES_ENABLE_DESCRIPTION" },
 	{
 		key = "peerPressure",
@@ -307,11 +357,7 @@ function ns.OptionsFeatureToggle(feature, order, width)
 			return ns.db.profile[feature.key][feature.setting]
 		end,
 		set = function(_, value)
-			ns.db.profile[feature.key][feature.setting] = value
-			if feature.onChange then
-				feature.onChange()
-			end
-			NotifyAllPanels()
+			ns.SetFeatureSwitch(feature.key, value)
 		end,
 	}
 end
@@ -323,6 +369,25 @@ function ns.GetFeatureSwitch(key)
 		end
 	end
 	return nil
+end
+
+function ns.IsFeatureOn(key)
+	local feature = ns.GetFeatureSwitch(key)
+	return ns.db.profile[key][feature.setting] and true or false
+end
+
+--[[
+    Flips a feature from anywhere -- either copy of its toggle, the mini-map
+    button, the Buff Duty window's close button -- so each one reacts and every
+    open panel repaints the same way.
+]]
+function ns.SetFeatureSwitch(key, value)
+	local feature = ns.GetFeatureSwitch(key)
+	ns.db.profile[key][feature.setting] = value
+	if feature.onChange then
+		feature.onChange()
+	end
+	NotifyAllPanels()
 end
 
 --[[
@@ -389,7 +454,7 @@ function ns.DefineEntryToggle(entry, order, watched)
 		return watched and watched() or ns.db.profile.watchedBuffs
 	end
 
-	local nameField, descField
+	local nameField, descField, hyperlink
 
 	if entry.itemId then
 		local itemId = entry.itemId
@@ -403,19 +468,21 @@ function ns.DefineEntryToggle(entry, order, watched)
 			end
 			return shown
 		end
-		descField = function()
+		if entry.itemIds and #entry.itemIds > 1 then
 			--[[
 			    For a grouped toggle, list every member item (links) so the tooltip
 			    spells out exactly what the single checkbox covers.
 			]]
-			if entry.itemIds and #entry.itemIds > 1 then
+			descField = function()
 				local lines = {}
 				for _, id in ipairs(entry.itemIds) do
 					lines[#lines + 1] = (select(2, C_Item.GetItemInfo(id))) or L["TRACKED_ITEM_PENDING"]:format(id)
 				end
 				return table.concat(lines, "\n")
 			end
-			return (select(2, C_Item.GetItemInfo(itemId))) or ""
+		else
+			-- A lone item shows the game's own item tooltip.
+			hyperlink = "item:" .. itemId
 		end
 	else
 		local name = entry.spellName
@@ -442,45 +509,8 @@ function ns.DefineEntryToggle(entry, order, watched)
 				return table.concat(names, "\n")
 			end
 		else
-			--[[
-                The ability's own tooltip text, preferred over the generic
-                "Toggle tracking for X." line, and taken from the HIGHEST id in
-                the entry: a rank group collapses to one name but not to one set
-                of numbers, and the tooltip should quote the rank you actually
-                cast, not rank 1. The ids are sorted here rather than trusted in
-                data order -- rows are not reliably rank-ordered (Combustion is
-                { 29977, 11129 }, Vanish { 1856, 1857, 27617, 26889, 44290 }).
-                Walking down from the top also skips any id that is dead on this
-                client, so a row spanning flavors still describes itself.
-
-                A function, not a baked string, for the same reason the item
-                branch above uses one: descriptions arrive asynchronously.
-                Classic holds tooltip data only for spells the character has
-                known, and this panel lists every class, so the first look at
-                another class's cooldown legitimately has nothing to show. The
-                request below asks for it when the panel is built and the draw
-                re-asks each time, so the real text appears once it lands.
-            ]]
-			local ranked = {}
-			for i = 1, #ids do
-				ranked[i] = ids[i]
-			end
-			table.sort(ranked)
-
-			for i = 1, #ranked do
-				C_Spell.RequestLoadSpellData(ranked[i])
-			end
-
-			local fallback = string.format(L["TRACKED_TOGGLE_DESCRIPTION"], name)
-			descField = function()
-				for i = #ranked, 1, -1 do
-					local spellDesc = GetSpellDescription(ranked[i])
-					if spellDesc and spellDesc ~= "" then
-						return spellDesc
-					end
-				end
-				return fallback
-			end
+			-- A lone ability, or a rank group, shows the game's own spell tooltip.
+			hyperlink = ns.SpellTooltipLink(ids)
 		end
 	end
 
@@ -488,6 +518,7 @@ function ns.DefineEntryToggle(entry, order, watched)
 		type = "toggle",
 		name = nameField,
 		desc = descField,
+		tooltipHyperlink = hyperlink,
 		order = order,
 		width = "full",
 		get = function()
@@ -745,38 +776,22 @@ end
     caption takes ns.OPTIONS_INLINE_LABEL_WIDTH, and a row outside a box that
     should line up with these takes ns.OPTIONS_ALIGNED_LABEL_WIDTH.
 
-    The dropdown's tooltip is the spell's own description, taken from the
-    highest id the client describes -- the rank you cast -- and asked for again
-    on each draw, because Classic only holds the text of another class's spells
-    once it has been requested. `fallback` is the tooltip until then.
+    Hovering the caption shows the spell's own game tooltip (ns.SpellTooltipLink),
+    and hovering the dropdown says what it sets (`desc`).
 
     `select` carries the dropdown's values, sorting, get and set.
 ]]
-function ns.DefineSpellSelectRow(args, entry, order, fallback, select)
+function ns.DefineSpellSelectRow(args, entry, order, desc, select)
 	local primary = entry.ids[1]
 	local texture = GetSpellTexture(primary)
 	local caption = texture and ("|T" .. texture .. ":16|t " .. entry.spellName) or entry.spellName
 
-	local ranked = {}
-	for i = 1, #entry.ids do
-		ranked[i] = entry.ids[i]
-		C_Spell.RequestLoadSpellData(entry.ids[i])
-	end
-	table.sort(ranked)
-
-	args["label_" .. primary] = ns.OptionsRowLabel(caption, order, ns.OPTIONS_INLINE_LABEL_WIDTH)
+	args["label_" .. primary] =
+		ns.OptionsAbilityLabel(caption, order, ns.OPTIONS_INLINE_LABEL_WIDTH, ns.SpellTooltipLink(entry.ids))
 	args["select_" .. primary] = {
 		type = "select",
 		name = "",
-		desc = function()
-			for i = #ranked, 1, -1 do
-				local text = GetSpellDescription(ranked[i])
-				if text and text ~= "" then
-					return text
-				end
-			end
-			return fallback
-		end,
+		desc = desc,
 		values = select.values,
 		sorting = select.sorting,
 		width = ns.OPTIONS_CONTROL_WIDTH,

@@ -19,10 +19,26 @@ local L = ns.L
 --------------------------------------------------------------------------------
 
 --[[
+    The texture file ID a button's macro wears: its picked icon when this
+    client's list offers it, otherwise the macros' own icon, since profiles
+    travel between flavors.
+]]
+function ns.GetThankYouIcon(config)
+	local picked = config and config.macroIcon
+	for _, icon in ipairs(ns.THANK_YOU_MACRO_ICONS) do
+		if icon[1] == picked then
+			return picked
+		end
+	end
+	return Data.THANK_YOU_DEFAULT_ICON
+end
+
+--[[
     Bring every button's macro in line with the profile: create the ones switched
-    on that are missing, delete the ones switched off that are still there. Runs
-    at login and on every profile change, so a profile switch moves the macros
-    with it instead of leaving the previous profile's on the bars until a reload.
+    on that are missing, give the ones already there their picked icon, and
+    delete the ones switched off that are still there. Runs at login and on
+    every profile change, so a profile switch moves the macros with it instead
+    of leaving the previous profile's on the bars until a reload.
 
     The global macro cap is re-read inside the loop, not hoisted: each macro this
     creates counts against it, so five buttons enabled at once on a nearly-full
@@ -37,8 +53,15 @@ function ns.ReconcileMacros()
 	for _, button in ipairs(Data.THANK_YOU_BUTTONS) do
 		local config = ns.db.profile[button.profileKey]
 		if config and config.createMacro then
-			if GetMacroIndexByName(button.macroName) == 0 and GetNumMacros() < Data.MAX_GLOBAL_MACROS then
-				CreateMacro(button.macroName, 134411, button.command, nil)
+			local icon = ns.GetThankYouIcon(config)
+			local index = GetMacroIndexByName(button.macroName)
+			if index == 0 then
+				if GetNumMacros() < Data.MAX_GLOBAL_MACROS then
+					CreateMacro(button.macroName, icon, button.command, nil)
+				end
+			elseif select(2, GetMacroInfo(index)) ~= icon then
+				-- nil keeps the name and body, the way the game's own macro window edits one.
+				EditMacro(index, nil, icon)
 			end
 		elseif config then
 			--[[
@@ -59,7 +82,7 @@ function ns:CreateAutoMacro()
 end
 
 --[[
-    Remove one button's macro, for when its Create Macro toggle is turned off.
+    Remove one button's macro, for when its Enable Macro toggle is turned off.
 
     Deletes by INDEX resolved from this button's exact name, never by a name
     match at delete time: DeleteMacro accepts a name, but resolving first lets
@@ -87,7 +110,7 @@ end
 --[[
     Body of the /thankyou commands; the registration lives in Options/Options.lua,
     which passes the Data.THANK_YOU_BUTTONS entry that was invoked. A missing one
-    falls back to the original button rather than erroring.
+    falls back to button 1 rather than erroring.
 ]]
 function ns.RunThankYou(button)
 	--[[
