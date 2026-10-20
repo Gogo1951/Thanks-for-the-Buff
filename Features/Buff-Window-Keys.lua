@@ -5,11 +5,12 @@ local L = ns.L
     The Buff Keys: two key bindings that cast the next buff on Buff Duty's
     list, one press at a time, the way Pally Power's auto-buff keys do.
 
-        Individual Buff Button: a resurrection on your dead target (priests
-        and paladins), then your self-buffs, then Return the Favor, then
-        single-target buffs -- your target first, then your group.
+        Individual Buff Button: a resurrection on your dead target, then on
+        your group's dead (priests, paladins and shamans), then your
+        self-buffs, then Return the Favor, then single-target buffs -- your
+        target first, then your group.
 
-        Group Buff Button: the same resurrection and self-buffs, then group
+        Group Buff Button: the same resurrections and self-buffs, then group
         buffs -- your target's party first, then the others. A party waits
         until everyone missing the buff is in range, so a cast never leaves
         someone out and costs a second reagent.
@@ -88,36 +89,14 @@ local IsSpellUsable = C_Spell.IsSpellUsable
 --------------------------------------------------------------------------------
 
 --[[
-    Your target, if they're a dead player you can bring back. A released
-    ghost has no corpse here to cast on, and one with a resurrection already
-    coming needs no second.
+    Your target, if they're a friendly dead player you can bring back -- in
+    your group or not. BuffWindow.ResurrectionIcon says who can take one.
 ]]
 local function ResurrectionSpec()
-	local resurrection = BuffWindow.resurrection
-	if not resurrection or not UnitExists("target") or not UnitIsPlayer("target") then
+	if not UnitExists("target") or not UnitIsFriend("player", "target") then
 		return nil
 	end
-	if not UnitIsDead("target") or UnitIsGhost("target") or not UnitIsConnected("target") then
-		return nil
-	end
-	if not UnitIsFriend("player", "target") then
-		return nil
-	end
-	if UnitHasIncomingResurrection then
-		local incoming = UnitHasIncomingResurrection("target")
-		if ns.IsPlain(incoming) and incoming then
-			return nil
-		end
-	end
-	return {
-		spellId = resurrection.id,
-		spellName = resurrection.name,
-		castSpell = resurrection.name,
-		castIds = resurrection.ids,
-		unit = "target",
-		targetName = GetUnitName("target", false) or "",
-		isResurrection = true,
-	}
+	return BuffWindow.ResurrectionIcon("target", "target", GetUnitName("target", false) or "")
 end
 
 -- Your target's party, or nil when your target isn't in your group.
@@ -134,7 +113,7 @@ local function TargetSubgroup()
 end
 
 --[[
-    Every icon the key could cast, in the order it should: resurrection,
+    Every icon the key could cast, in the order it should: resurrections,
     self-buffs, then (Individual) Return the Favor, your target, and every
     party's members, or (Group) your target's party's group buffs and then
     every other party's.
@@ -169,7 +148,17 @@ local function Candidates(sections, group)
 		end
 	end
 
+	-- Resurrections before anything else: your dead target, then your group's dead.
 	Add(ResurrectionSpec())
+	Each("party", function(section)
+		for _, row in ipairs(section.rows) do
+			for _, spec in ipairs(row.icons) do
+				if spec.isResurrection then
+					Add(spec)
+				end
+			end
+		end
+	end)
 	Each("self", function(section)
 		for _, spec in ipairs(section.icons) do
 			Add(spec)

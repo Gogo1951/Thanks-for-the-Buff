@@ -35,6 +35,7 @@ local RoleOf = BuffWindow.RoleOf
 local Wants = BuffWindow.Wants
 local Has = BuffWindow.Has
 local SingleIcon = BuffWindow.SingleIcon
+local ResurrectionIcon = BuffWindow.ResurrectionIcon
 local PlayerLabel = BuffWindow.PlayerLabel
 local PetRow = BuffWindow.PetRow
 local PetUnitOf = BuffWindow.PetUnitOf
@@ -90,6 +91,10 @@ end
     -- with no icons of their own, if they need nothing -- until the pet is
     buffed too. Pets don't count toward a group icon: the group versions are
     cast to be sure of the players.
+
+    A dead member you can resurrect gets a row with that one icon, in its own
+    column on the left, and drops off once they're back up (or a resurrection
+    is waiting on them to accept).
 ]]
 local function AddGroupSections(sections)
 	local grouped = IsInGroup()
@@ -121,6 +126,11 @@ local function AddGroupSections(sections)
 						row.icons[#row.icons + 1] = icon
 					end
 				end
+			end
+		else
+			local icon = ResurrectionIcon(unit, unit, name)
+			if icon then
+				row = { label = PlayerLabel(name, class, unit), icons = { icon } }
 			end
 		end
 
@@ -169,7 +179,7 @@ local function AddGroupSections(sections)
 					label = raid and GROUP_NUMBER:format(subgroup) or GROUP,
 					icons = icons,
 					rows = party.rows,
-					-- The frame wraps parties into columns of four.
+					-- The frame lays parties out two to a row.
 					party = true,
 				}
 			end
@@ -184,7 +194,7 @@ end
 --[[
     Every section the window would show, in display order: your own buffs,
     then the players outside your group (Target, Return the Favor), then the
-    parties, which the frame wraps into columns of four in a raid. The Buff
+    parties, which the frame lays out two to a row in a raid. The Buff
     Keys read the same list, so a key casts only what the window offers.
 ]]
 function BuffWindow.BuildSections()

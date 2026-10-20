@@ -463,6 +463,7 @@ ns.BUFF_WINDOW_SOULSTONE = {
 ns.BUFF_WINDOW_RESURRECTIONS = {
 	{ class = "PALADIN", ranks = { 7328, 10322, 10324, 20772, 20773 } }, -- Redemption
 	{ class = "PRIEST", ranks = { 2006, 2010, 10880, 10881, 20770 } }, -- Resurrection
+	{ class = "SHAMAN", ranks = { 2008, 20609, 20610, 20776, 20777 } }, -- Ancestral Spirit
 }
 
 --[[

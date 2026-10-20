@@ -347,10 +347,10 @@ L["BUFF_KEYS_DESCRIPTION"] =
 	"Cast the next buff on your list with one key or macro, out of combat. Weapon buffs stay a click on the window."
 L["BUFF_KEY_SINGLE"] = "Individual Buff Button"
 L["BUFF_KEY_SINGLE_DESCRIPTION"] =
-	"Casts your next missing buff, one per press: a resurrection on your dead target (priests and paladins), then your Self-Buffs, Return the Favor, your target, and your group."
+	"Casts your next missing buff, one per press: a resurrection on your dead target, then your group's dead (priests, paladins and shamans), then your Self-Buffs, Return the Favor, your target, and your group."
 L["BUFF_KEY_GROUP"] = "Group Buff Button"
 L["BUFF_KEY_GROUP_DESCRIPTION"] =
-	"Casts your next missing group buff, one per press: a resurrection on your dead target (priests and paladins), then your Self-Buffs, then your target's party and the rest. A party waits until everyone missing the buff is in range."
+	"Casts your next missing group buff, one per press: a resurrection on your dead target, then your group's dead (priests, paladins and shamans), then your Self-Buffs, then your target's party and the rest. A party waits until everyone missing the buff is in range."
 -- %s is a player's name.
 L["BUFF_KEY_WAITING"] = "Waiting on %s to get in range."
 L["BUFF_KEY_DONE"] = "Nothing left to buff."

@@ -34,7 +34,7 @@ A small window of everyone missing a buff you can give. Click an icon to cast it
 
 | Who Shows Up | What They're Offered |
 | --- | --- |
-| Your party and raid | The buffs you give them, by role: Tanks, Healers, or Everyone |
+| Your party and raid | The buffs you give them, by role: Tanks, Healers, or Everyone, and a resurrection for the dead |
 | You | Armors, auras, Shadowform, Battle Shout, and a Soulstone when nobody in your group has one |
 | Your weapons | Poisons, imbues, oils, sharpening stones, weightstones, and fishing lures, per hand, from your bags |
 | Strangers who buffed you | The buffs you can give them back |
@@ -43,7 +43,7 @@ A small window of everyone missing a buff you can give. Click an icon to cast it
 * Picks the right rank for lowbies, so you can buff anyone you meet.
 * Hidden in combat, unless you'd rather see it.
 * Close it with the X to turn Buff Duty off; Shift + Right-Click the mini-map button to bring it back.
-* Two keys, Pally Power style: each press casts the next buff on your list, one for single-target buffs and one for group buffs. A group buff waits until the whole party is in range, and priests and paladins resurrect a dead target first.
+* Two keys, Pally Power style: each press casts the next buff on your list, one for single-target buffs and one for group buffs. A group buff waits until the whole party is in range, and priests, paladins and shamans resurrect the dead first: your target, then your group.
 * Prefer a bar button? Put `/click TFTBBuffIndividual` or `/click TFTBBuffGroup` in a macro.
 
 | Own-Buffs Reminders | Return the Favor | In Raid |

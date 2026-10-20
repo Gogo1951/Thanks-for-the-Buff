@@ -172,6 +172,11 @@ local function OnCombatLogEventUnfiltered()
 		ns.ClaimPendingResurrect(destGUID, spellID)
 	end
 
+	-- Buff Duty hides a dead player's resurrect icon while anyone's offer waits on them.
+	if isResurrect and ns.BuffWindow and ns.BuffWindow.NoteResurrect then
+		ns.BuffWindow.NoteResurrect(destGUID)
+	end
+
 	--[[
 	    Your own casts are Good News's business, and it runs off the cast events
 	    instead (Features/Good-News.lua); everything below reacts to what OTHERS
