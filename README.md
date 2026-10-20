@@ -4,7 +4,7 @@ Thank every player who buffs you with a whisper or emote, and keep your raid, yo
 
 **TL;DR**: For players who want to stay polite and keep their raid buffed without stopping what they're doing. Every buff you get earns a thank-you, and every buff you owe is one click away.
 
-<img width="800" src="https://github.com/user-attachments/assets/677df386-912a-48fc-95dc-508a247770f9" />
+<img width="800" src="https://github.com/user-attachments/assets/24f46145-7188-4260-86be-7a76d46982d0" />
 
 ## Features
 
