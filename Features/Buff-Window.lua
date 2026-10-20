@@ -149,6 +149,7 @@ local function AddGroupSections(sections)
 						castIds = buff.groupIds,
 						column = buff.column,
 						spellName = buff.groupName,
+						castSpell = buff.groupCastText,
 						unit = target,
 						targetName = GetUnitName(target, false) or "",
 						isGroup = true,

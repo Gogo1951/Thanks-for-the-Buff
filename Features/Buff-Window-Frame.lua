@@ -246,7 +246,8 @@ function ns.SetBuffButtonAttributes(button, spec)
 		    Rank text ("Name(Rank 2)") casts that exact rank through the secure
 		    template's CastSpellByName; a bare name casts your highest. Not a spell
 		    ID: the template hands a number to CastSpellByID, and on Classic Era a
-		    lower rank's ID cast nothing. Group buffs pass the bare name.
+		    lower rank's ID cast nothing. Group buffs pass their highest rank's
+		    text too: Prayer of Fortitude's bare name cast Rank 1.
 		]]
 		button:SetAttribute("spell", spec.castSpell or spec.spellName)
 		button:SetAttribute("item", nil)
