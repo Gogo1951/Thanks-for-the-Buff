@@ -12,8 +12,6 @@ Thank every player who buffs you with a whisper or emote, and keep your raid, yo
 
 📣 **Send Good News** // Whisper the players you buff with what they got and how long it lasts, perfect for Power Infusion, a clutch Innervate, or a soulstone before the pull.
 
-🚪 **Service Alerts** // Get a heads-up the moment someone sets out a feast, drops a soulwell, opens a portal, or puts down a repair bot for the group.
-
 🚂 **Feel Peer Pressure** // Get pinged the moment another player of your class pops a cooldown, so you can stack yours on top.
 
 🙏 **Thank You Buttons** // Up to five one-click macros that emote at your target and whisper your own words: thank the healer, ask a mage for water, or heckle a guildie.
