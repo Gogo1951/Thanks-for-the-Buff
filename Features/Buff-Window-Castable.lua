@@ -479,7 +479,7 @@ end
 --------------------------------------------------------------------------------
 
 --[[
-    Any known rank of a group version will do: its button casts by name, which
+    Any known rank of a resurrection will do: its key casts by name, which
     resolves to the highest rank you know.
 ]]
 local function FirstKnown(ids)
@@ -491,8 +491,30 @@ local function FirstKnown(ids)
 	return nil
 end
 
+--[[
+    The highest group version you know. The data lists them lowest first, so
+    the last known one; the tooltip shows it and the button casts it by rank.
+]]
+local function HighestKnown(ids)
+	for index = #ids, 1, -1 do
+		if IsPlayerSpell(ids[index]) then
+			return ids[index]
+		end
+	end
+	return nil
+end
+
 -- The client's spell subtext ("Rank 3").
 local GetSpellSubtext = C_Spell.GetSpellSubtext
+
+--[[
+    What a macro types to cast exactly this rank: "Prayer of Fortitude(Rank 2)",
+    or the bare name for a spell with no rank text.
+]]
+local function CastText(id, name)
+	local subtext = GetSpellSubtext(id)
+	return (subtext and subtext ~= "") and (name .. "(" .. subtext .. ")") or name
+end
 
 --[[
     The single-target ranks you know, highest first, each with what a macro
@@ -506,9 +528,8 @@ local function KnownRanks(entry)
 		if IsPlayerSpell(rank.id) then
 			local name = C_Spell.GetSpellName(rank.id)
 			if name then
-				local subtext = GetSpellSubtext(rank.id)
-				local castText = (subtext and subtext ~= "") and (name .. "(" .. subtext .. ")") or name
-				known[#known + 1] = { id = rank.id, level = rank.level, name = name, castText = castText }
+				known[#known + 1] =
+					{ id = rank.id, level = rank.level, name = name, castText = CastText(rank.id, name) }
 			end
 		end
 	end
@@ -529,7 +550,8 @@ function BuffWindow.BuildBuffs()
 	for _, entry in ipairs(entries) do
 		local who = audience[entry.key]
 		if entry.row.class == playerClass and who and who ~= Data.BUFF_AUDIENCE.OFF then
-			local ranks, groupId = KnownRanks(entry), FirstKnown(entry.groupIds)
+			local ranks, groupId = KnownRanks(entry), HighestKnown(entry.groupIds)
+			local groupName = groupId and C_Spell.GetSpellName(groupId)
 			if ranks[1] or groupId then
 				buffs[#buffs + 1] = {
 					--[[
@@ -550,7 +572,9 @@ function BuffWindow.BuildBuffs()
 					singleName = ranks[1] and ranks[1].name,
 					groupId = groupId,
 					groupIds = entry.groupIds,
-					groupName = groupId and C_Spell.GetSpellName(groupId),
+					groupName = groupName,
+					-- "Prayer of Fortitude(Rank 2)": the bare name can cast Rank 1.
+					groupCastText = groupName and CastText(groupId, groupName),
 				}
 			end
 		end
