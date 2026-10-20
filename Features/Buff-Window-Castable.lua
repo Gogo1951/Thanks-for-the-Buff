@@ -528,7 +528,8 @@ local function KnownRanks(entry)
 		if IsPlayerSpell(rank.id) then
 			local name = C_Spell.GetSpellName(rank.id)
 			if name then
-				known[#known + 1] = { id = rank.id, level = rank.level, name = name, castText = CastText(rank.id, name) }
+				known[#known + 1] =
+					{ id = rank.id, level = rank.level, name = name, castText = CastText(rank.id, name) }
 			end
 		end
 	end
