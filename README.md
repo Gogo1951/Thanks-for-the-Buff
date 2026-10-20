@@ -4,10 +4,6 @@ Thank every player who buffs you with a whisper or emote, and keep your raid, yo
 
 **TL;DR**: For players who want to stay polite and keep their raid buffed without stopping what they're doing. Every buff you get earns a thank-you, and every buff you owe is one click away.
 
-| Own-Buffs Reminders | Return the Favor | In Raid |
-| --- | --- | --- |
-| <img width="180" src="https://github.com/user-attachments/assets/8924a6a3-aa93-42cf-ba1e-e833512ae96a" /> | <img width="180" src="https://github.com/user-attachments/assets/40e05c06-6bd1-4a41-81d8-f6250166f992" /> | <img width="237" height="670" alt="Pasted_Image_10_19_26__1_46 AM" src="https://github.com/user-attachments/assets/be7c7e1e-50c6-49b3-8a1b-838fbd796f79" /> |
-
 ## Features
 
 🙌 **Every Buff Gets a Thank-You** // Emote and whisper the stranger who buffs you in passing or the teammate who burns a cooldown on you, without it ever turning into spam.
@@ -52,7 +48,7 @@ A small window of everyone missing a buff you can give. Click an icon to cast it
 
 | Own-Buffs Reminders | Return the Favor | In Raid |
 | --- | --- | --- |
-| <img width="180" src="https://github.com/user-attachments/assets/8924a6a3-aa93-42cf-ba1e-e833512ae96a" /> | <img width="180" src="https://github.com/user-attachments/assets/40e05c06-6bd1-4a41-81d8-f6250166f992" /> | <img width="300" src="https://github.com/user-attachments/assets/ed131e61-8a7c-4db9-9ce4-5e3d3b20de66" /> |
+| <img width="180" src="https://github.com/user-attachments/assets/8924a6a3-aa93-42cf-ba1e-e833512ae96a" /> | <img width="180" src="https://github.com/user-attachments/assets/40e05c06-6bd1-4a41-81d8-f6250166f992" /> | <img width="237" height="670" alt="Pasted_Image_10_19_26__1_46 AM" src="https://github.com/user-attachments/assets/be7c7e1e-50c6-49b3-8a1b-838fbd796f79" /> |
 
 ### 🎀 Mini-map Button
 
