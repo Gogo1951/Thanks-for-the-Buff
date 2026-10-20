@@ -10,7 +10,7 @@
 - **Instead:** The README's H1 is the in-game title, `Thanks for the Buff (TFTB)`.
 - **Why:** The README heading matches the name players see in game and in their add-on list.
 
-### README Features lists all five features
+### README Features lists every headline feature
 
 - **Departs from:** README Creation Rules → Features, "Restating the pitch as a bullet."
 - **Instead:** Features keeps a bullet for every headline feature, including the ones the pitch already names.
@@ -33,3 +33,9 @@
 - **Departs from:** OPTIONS PANEL → Main Page Layout, "Key Bindings (if any: one row per binding with its caption, bound key and a Set Key button, then one line saying what the key does)".
 - **Instead:** The Buff Duty panel binds its own keys in place, each row a key-capture button with a copyable macro line under it, and the General panel has no Key Bindings section.
 - **Why:** The keys belong to one feature, and setting a key where that feature is configured is quicker than opening the game's Key Bindings list.
+
+### Note on where the newer features may go
+
+- **Departs from:** OPTIONS PANEL → Main Page Layout, "Page order of the root General panel".
+- **Instead:** A note under the General panel's Features switches, repeated under Buff Duty's own switch, says the newer features may move to Connoisseur & Restocker or merge into one bigger add-on, and asks for players' thoughts.
+- **Why:** Players who rely on the newer features should hear where they may end up before it happens, and have a say in it.
