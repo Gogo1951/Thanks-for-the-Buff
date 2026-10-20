@@ -1,62 +1,70 @@
 # Thanks for the Buff (TFTB)
 
-Thank every player who buffs you with a whisper or emote, and see who's missing your raid buffs with a click-to-cast buff tracker. Plus alerts for feasts, portals, summons, soulwells, and class cooldowns. Manners, automated.
+Thank every player who buffs you with a whisper or emote, and keep your raid, yourself, and your weapons buffed with a click-to-cast buff reminder. Plus alerts for feasts, portals, summons, soulwells, and class cooldowns. Manners, automated.
 
 **TL;DR**: For players who want to stay polite and keep their raid buffed without stopping what they're doing. Every buff you get earns a thank-you, and every buff you owe is one click away.
+
+| Own-Buffs Reminders | Return the Favor | In Raid |
+| --- | --- | --- |
+| <img width="180" src="https://github.com/user-attachments/assets/8924a6a3-aa93-42cf-ba1e-e833512ae96a" /> | <img width="180" src="https://github.com/user-attachments/assets/40e05c06-6bd1-4a41-81d8-f6250166f992" /> | <img width="237" height="670" alt="Pasted_Image_10_19_26__1_46 AM" src="https://github.com/user-attachments/assets/be7c7e1e-50c6-49b3-8a1b-838fbd796f79" /> |
 
 ## Features
 
 🙌 **Every Buff Gets a Thank-You** // Emote and whisper the stranger who buffs you in passing or the teammate who burns a cooldown on you, without it ever turning into spam.
 
+🛡️ **Buff Duty** // One click-to-cast window, or one key, for every buff you owe: your group, the stranger who just buffed you, your own armor or aura, and the poisons, oils and stones on your weapons.
+
 📣 **Send Good News** // Whisper the players you buff with what they got and how long it lasts, perfect for Power Infusion, a clutch Innervate, or a soulstone before the pull.
 
-🚂 **Feel Peer Pressure** // Get pinged the moment another player of your class pops a cooldown, so you can stack yours on top.
-
 🚪 **Service Alerts** // Get a heads-up the moment someone sets out a feast, drops a soulwell, opens a portal, or puts down a repair bot for the group.
+
+🚂 **Feel Peer Pressure** // Get pinged the moment another player of your class pops a cooldown, so you can stack yours on top.
 
 🙏 **Thank You Buttons** // Up to five one-click macros that emote at your target and whisper your own words: thank the healer, ask a mage for water, or heckle a guildie.
 
 ## Setup
 
 1. Install the add-on, ideally using [CurseForge](https://www.curseforge.com/wow/addons/thanks-for-the-buff-revisited) or [Wago](https://addons.wago.io/addons/thanks-for-the-buff).
-2. Log in. Strangers who buff you start getting thanked right away.
-3. Type `/tftb` to pick your emotes, write your whispers, and switch on teammate cooldowns, Service Alerts, and Send Good News.
+2. Log in. Strangers who buff you start getting thanked, and Buff Duty pops up whenever someone, you, or your weapons need a buff.
+3. Type `/tftb` to pick your emotes, write your whispers, set your buff keys, and switch on teammate cooldowns, Service Alerts, and Send Good News.
 4. On the Thank You Button tab, switch on the `- Thank` macro and drag it to your action bar.
 5. _"Manners maketh the raid."_
 
 ## How It Works
 
-### 🙌 Thanks for Stranger Buffs
-
-A whisper, an emote, or both for the passerby who buffs you, and never a spam wall when the world buffs roll in.
-
-### 🤝 Thanks for Teammate Buffs
-
-Your party and raid get a proper thank-you when they burn Power Infusion, Innervate, or a Soulstone on you.
-
-### 📣 Good News
-
-Whispers the players you buff with what they got and how long it lasts.
-
-### 🚪 Service Alerts
-
-Know the moment someone sets out a feast, soulwell, portal, summon, or repair bot.
-
-### 🚂 Peer Pressure
-
-Get pinged when another player of your class pops a cooldown, so you can stack yours on top.
-
 ### 🛡️ Buff Duty
 
-A small window of everyone missing a buff you can give. Click an icon to cast it.
+A small window of everyone missing a buff you can give. Click an icon to cast it; click them all and the window is gone.
 
-* Only shows up when someone's missing a buff. Click every icon and it's gone.
+| Who Shows Up | What They're Offered |
+| --- | --- |
+| Your party and raid | The buffs you give them, by role: Tanks, Healers, or Everyone |
+| You | Armors, auras, Shadowform, Battle Shout, and a Soulstone when nobody in your group has one |
+| Your weapons | Poisons, imbues, oils, sharpening stones, weightstones, and fishing lures, per hand, from your bags |
+| Strangers who buffed you | The buffs you can give them back |
+| Your target | Any buff you can give a player outside your group |
+
 * Picks the right rank for lowbies, so you can buff anyone you meet.
 * Hidden in combat, unless you'd rather see it.
+* Close it with the X to turn Buff Duty off; Shift + Right-Click the mini-map button to bring it back.
+* Two keys, Pally Power style: each press casts the next buff on your list, one for single-target buffs and one for group buffs. A group buff waits until the whole party is in range, and priests and paladins resurrect a dead target first.
+* Prefer a bar button? Put `/click TFTBBuffIndividual` or `/click TFTBBuffGroup` in a macro.
 
 | Own-Buffs Reminders | Return the Favor | In Raid |
 | --- | --- | --- |
 | <img width="180" src="https://github.com/user-attachments/assets/8924a6a3-aa93-42cf-ba1e-e833512ae96a" /> | <img width="180" src="https://github.com/user-attachments/assets/40e05c06-6bd1-4a41-81d8-f6250166f992" /> | <img width="300" src="https://github.com/user-attachments/assets/ed131e61-8a7c-4db9-9ce4-5e3d3b20de66" /> |
+
+### 🎀 Mini-map Button
+
+Hover it to see which features are on. Click to flip one.
+
+| Click | What It Does |
+| --- | --- |
+| Left-Click | Turns Stranger Buffs on or off |
+| Right-Click | Turns Teammate Buffs on or off |
+| Shift + Left-Click | Turns Send Good News on or off |
+| Shift + Right-Click | Turns Buff Duty on or off |
+| Shift + Middle-Click | Opens the options |
 
 ### Options
 
@@ -65,7 +73,7 @@ A small window of everyone missing a buff you can give. Click an icon to cast it
 * **Service Alerts** // Know the moment a feast, soulwell, portal, summon, or repair bot goes down.
 * **Send Good News** // Tell the players you buff what they just got, in your own words.
 * **Peer Pressure** // Get pinged when another player of your class pops a cooldown.
-* **Buff Duty** // Pick who gets each of your buffs, and where the window sits.
+* **Buff Duty** // Pick who gets each of your buffs, which self-buffs and weapon buffs to watch, where the window sits, and your buff keys.
 * **Thank You Button** // Five buttons, each with its own whisper and emote.
 * **Profiles** // Copy a setup to another character, or reset to defaults.
 
@@ -106,21 +114,21 @@ A small window of everyone missing a buff you can give. Click an icon to cast it
 ### 🟢 Pairs With
 
 * Gogo1951's [Connoisseur & Restocker](https://www.curseforge.com/wow/addons/consumable-connoisseur)
-* aznamir's [PallyPower](https://www.curseforge.com/wow/addons/pally-power)
+* shimoro's [MageAssistant](https://www.curseforge.com/wow/addons/mage-assist)
+* lumumba's [MageSphere](https://www.curseforge.com/wow/addons/magesphere)
 * Gogo1951's [Play It Forward](https://www.curseforge.com/wow/addons/play-it-forward)
 * Gogo1951's [Water Dispenser](https://www.curseforge.com/wow/addons/water-dispenser-revisited)
 
 ### 🟡 Overlaps
 
-* K1DW1K's [BuffBack](https://www.curseforge.com/wow/addons/buffback)
-* lumumba's [MageSphere](https://www.curseforge.com/wow/addons/magesphere)
-* fpsacha's [Manners](https://www.curseforge.com/wow/addons/manners)
-* noobsgonewild's [Summon announcer](https://www.curseforge.com/wow/addons/summon-announcer)
+* kvakvs's [Buffomat Classic](https://www.curseforge.com/wow/addons/buffomat-classic)
+* Pupp3h's [Buffwatch Classic](https://www.curseforge.com/wow/addons/buffwatch-classic)
+* aznamir's [PallyPower](https://www.curseforge.com/wow/addons/pally-power)
+* Codermik's [SmartBuff](https://www.curseforge.com/wow/addons/smartbuff-retail-burning-crusade-classic)
 * Nitrak's [Vocal Raid Assistant](https://www.curseforge.com/wow/addons/vocalraidassistant)
 
 ### 🔴 Alternatives
 
-* Pupp3h's [Buffwatch Classic](https://www.curseforge.com/wow/addons/buffwatch-classic)
 * esNaglfar's [AutoThank](https://www.curseforge.com/wow/addons/autothank)
 * tf4482's [BuffResponder](https://www.curseforge.com/wow/addons/buffresponder)
 * Iamthedot's [Kindred](https://www.curseforge.com/wow/addons/kindred)
