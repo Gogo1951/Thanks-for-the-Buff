@@ -54,57 +54,84 @@ function ns.BuildBuffWindowBuffsOptions()
 			ns.RefreshBuffWindow()
 		end,
 	}
-	options.args.spacePetsAsTanks = ns.OptionsSpacer(28)
 	--[[
-	    A toggle and its "when" on one row; the dropdown appears only while the
-	    toggle is on.
+	    Count as Tanks: one row per class this client's data carries, then Pets,
+	    each a caption beside a Never / When Not in a Group / Always dropdown.
+	    It decides only for a player with no role of their own (RoleOf), so it
+	    sits apart from the role note above rather than inside it. Captions take
+	    the aligned width so the dropdowns line up with the boxed ones below.
 	]]
-	options.args.petsAsTanks = {
-		type = "toggle",
-		name = L["BUFF_WINDOW_PETS_AS_TANKS"],
-		desc = L["BUFF_WINDOW_PETS_AS_TANKS_DESCRIPTION"],
-		-- Lined up with the boxed buff dropdowns below, not the panel's edge.
-		width = ns.OPTIONS_ALIGNED_LABEL_WIDTH,
-		order = 29,
-		get = function()
-			return Settings().petsAsTanks
-		end,
-		set = function(_, value)
-			Settings().petsAsTanks = value
-			ns.RefreshBuffWindow()
-		end,
-	}
-	local petsAsTanksValues = {}
-	for _, value in ipairs(Data.PETS_AS_TANKS_ORDER) do
-		petsAsTanksValues[value] = L["BUFF_WINDOW_PETS_AS_TANKS_" .. value]
+	options.args.spaceTanks0 = ns.OptionsSpacer(28)
+	options.args.headerTanks = ns.OptionsHeader(L["BUFF_WINDOW_TANKS_HEADER"], 29)
+	options.args.spaceTanks1 = ns.OptionsSpacer(30)
+	options.args.descTanks = ns.OptionsDesc(L["BUFF_WINDOW_TANKS_DESCRIPTION"], 30.3)
+	options.args.spaceTanks2 = ns.OptionsSpacer(30.6)
+
+	local tankValues = {}
+	for _, value in ipairs(Data.TANK_WHEN_ORDER) do
+		tankValues[value] = L["BUFF_WINDOW_TANKS_" .. value]
 	end
-	options.args.petsAsTanksWhen = {
-		type = "select",
-		name = "",
-		desc = L["BUFF_WINDOW_PETS_AS_TANKS_WHEN_DESCRIPTION"],
-		values = petsAsTanksValues,
-		sorting = Data.PETS_AS_TANKS_ORDER,
-		width = ns.OPTIONS_CONTROL_WIDTH,
-		order = 30,
-		hidden = function()
-			return not Settings().petsAsTanks
-		end,
-		get = function()
-			return Settings().petsAsTanksWhen
-		end,
-		set = function(_, value)
-			Settings().petsAsTanksWhen = value
-			ns.RefreshBuffWindow()
-		end,
-	}
-	options.args.space10 = ns.OptionsSpacer(31)
+	local function TankRow(key, caption, desc, order)
+		options.args["tankLabel_" .. key] = ns.OptionsRowLabel(caption, order, ns.OPTIONS_ALIGNED_LABEL_WIDTH)
+		options.args["tankWhen_" .. key] = {
+			type = "select",
+			name = "",
+			desc = desc,
+			values = tankValues,
+			sorting = Data.TANK_WHEN_ORDER,
+			width = ns.OPTIONS_CONTROL_WIDTH,
+			order = order + 0.5,
+			get = function()
+				return Settings().tankWhen[key] or Data.TANK_WHEN.NEVER
+			end,
+			set = function(_, value)
+				Settings().tankWhen[key] = value
+				ns.RefreshBuffWindow()
+			end,
+		}
+	end
+
+	local classes = {}
+	for _, list in ipairs({
+		ns.TRACKED_ABILITIES,
+		ns.BUFF_WINDOW_SPELLS,
+		ns.BUFF_WINDOW_SELF_SPELLS,
+		ns.BUFF_WINDOW_WEAPON_ENCHANTS,
+	}) do
+		for _, row in ipairs(list) do
+			if row.class then
+				classes[row.class] = true
+			end
+		end
+	end
+	for _, row in ipairs(ns.PEER_PRESSURE_ABILITIES) do
+		classes[row[1]] = true
+	end
+	local classNames = {}
+	for class in pairs(classes) do
+		classNames[#classNames + 1] = class
+	end
+	table.sort(classNames)
+
+	local tankOrder = 31
+	for _, class in ipairs(classNames) do
+		local caption = "|cff"
+			.. (Data.CLASS_COLORS[class] or ns.PALETTE.TEXT)
+			.. (LOCALIZED_CLASS_NAMES_MALE[class] or class)
+			.. "|r"
+		TankRow(class, caption, L["BUFF_WINDOW_TANKS_CLASS_DESCRIPTION"], tankOrder)
+		tankOrder = tankOrder + 1
+	end
+	TankRow(Data.TANK_WHEN_PET, L["BUFF_WINDOW_TANKS_PETS"], L["BUFF_WINDOW_TANKS_PETS_DESCRIPTION"], tankOrder)
+	options.args.spaceTanks3 = ns.OptionsSpacer(tankOrder + 1)
 
 	local audienceValues = {}
 	for _, value in ipairs(Data.BUFF_AUDIENCE_ORDER) do
 		audienceValues[value] = L["BUFF_WINDOW_AUDIENCE_" .. value]
 	end
 
-	local categoryOrder = 40
+	-- After Count as Tanks, which takes up to one order number per class.
+	local categoryOrder = 60
 	for _, category in ipairs(ns.BuffWindowCategories or {}) do
 		local groupKey = "cat_" .. category.id
 		options.args[groupKey] = {

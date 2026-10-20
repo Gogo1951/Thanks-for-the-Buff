@@ -45,15 +45,34 @@ L["MESSAGE_PEER_PRESSURE_TARGET"] = "%s hat %s auf %s eingesetzt!"
 L["UNKNOWN_SPELL"] = "Unbekannter Zauber"
 
 --------------------------------------------------------------------------------
+-- Mini-map Button
+--------------------------------------------------------------------------------
+
+L["MINIMAP_OPTIONS"] = "Thanks for the Buff (TFTB) Optionen"
+L["LEFT_CLICK"] = "Linksklick"
+L["RIGHT_CLICK"] = "Rechtsklick"
+L["SHIFT_LEFT_CLICK"] = "Umschalt + Linksklick"
+L["SHIFT_RIGHT_CLICK"] = "Umschalt + Rechtsklick"
+L["SHIFT_MIDDLE_CLICK"] = "Umschalt + Mittelklick"
+L["ACTION_TOGGLE"] = "Umschalten"
+L["ENABLED"] = "Aktiviert"
+L["DISABLED"] = "Deaktiviert"
+
+--------------------------------------------------------------------------------
 -- Options: Main Panel
 --------------------------------------------------------------------------------
 
 L["OPTIONS_WELCOME_TOGGLE"] = "Willkommensnachricht aktivieren"
 L["OPTIONS_WELCOME_DESCRIPTION"] = "Gibt beim Einloggen eine Nachricht aus, die nur Ihr seht."
+L["OPTIONS_ENABLE_MINIMAP"] = "Minikarten-Schaltfläche aktivieren"
+L["OPTIONS_ENABLE_MINIMAP_DESCRIPTION"] =
+	"Zeigt die TFTB-Schaltfläche an Eurer Minikarte, mit der Ihr Funktionen per Klick ein- und ausschaltet."
 L["OPTIONS_DESCRIPTION"] =
-	"Bedankt Euch per Flüstern oder Emote bei jedem Spieler, der Euch bufft, und seht in einem Buff-Tracker, wem Eure Schlachtzugsbuffs fehlen, und wirkt sie per Klick. Dazu Benachrichtigungen für Festmähler, Portale, Beschwörungen, Seelenbrunnen und Abklingzeiten Eurer Klasse. Gute Manieren, automatisiert."
+	"Bedankt Euch per Flüstern oder Emote bei jedem Spieler, der Euch bufft, und haltet Euren Schlachtzug, Euch selbst und Eure Waffen mit einer Buff-Erinnerung gebufft, die per Klick wirkt. Dazu Benachrichtigungen für Festmähler, Portale, Beschwörungen, Seelenbrunnen und Abklingzeiten Eurer Klasse. Gute Manieren, automatisiert."
 L["OPTIONS_FEATURES_HEADER"] = "Funktionen"
 L["OPTIONS_FEATURES_DESCRIPTION"] = "Schaltet jede Funktion hier oder auf ihrer eigenen Seite ein oder aus."
+L["OPTIONS_FEATURES_NOTE"] =
+	'Mögliche anstehende Änderungen: Einige unserer neueren Funktionen, wie "%s", gehen über den bisherigen Rahmen von "Thanks for the Buff" hinaus. Schaltet ruhig alles aus, was Ihr nicht braucht. Diese Funktionen könnten in unser anderes Add-on "Connoisseur & Restocker" umziehen, oder alles wird zu einem größeren Add-on zusammengeführt, vielleicht "Buttons, Buffs, & Bags". Teilt uns Eure Meinung auf Discord, CurseForge oder GitHub mit. Danke!'
 L["OPTIONS_COMMANDS_HEADER"] = "/Commands"
 L["OPTIONS_COMMAND"] = "/tftb"
 L["OPTIONS_COMMAND_DESCRIPTION"] = "Öffnet das Optionsmenü dieses Add-ons."
@@ -125,9 +144,10 @@ L["SERVICES_DESCRIPTION"] =
 -- Send Good News
 L["TAB_GOOD_NEWS"] = "Gute Neuigkeiten senden"
 L["GOOD_NEWS_DESCRIPTION"] =
-	"Lasst die Spieler, die Ihr bufft, wissen, was Ihr auf sie gewirkt habt und wie lange es anhält."
-L["GOOD_NEWS_WHISPER_ENABLE"] = "Gute Neuigkeiten aktivieren"
-L["GOOD_NEWS_WHISPER_DESCRIPTION"] = "Flüstert dem gebufften Spieler zu, was er erhalten hat und wie lange es anhält."
+	"Lasst die Spieler, die Ihr bufft, wissen, was Ihr auf sie gewirkt habt und, bei kurzen Buffs, wie lange es anhält."
+L["GOOD_NEWS_ENABLE"] = "Gute Neuigkeiten aktivieren"
+L["GOOD_NEWS_ENABLE_DESCRIPTION"] =
+	"Aktiviert ein Flüstern, das den Spielern, die Ihr bufft, mitteilt, was Ihr auf sie gewirkt habt."
 L["GOOD_NEWS_SCOPE"] = "Empfänger"
 L["GOOD_NEWS_SCOPE_ALWAYS"] = "Jeder, den Ihr bufft"
 L["GOOD_NEWS_SCOPE_GROUP"] = "Nur Gruppenmitglieder"
@@ -136,15 +156,18 @@ L["GOOD_NEWS_SCOPE_DESCRIPTION"] =
 L["GOOD_NEWS_MESSAGES_HEADER"] = "Nachricht für Gute Neuigkeiten"
 L["GOOD_NEWS_MESSAGES_DESCRIPTION"] = "Das Flüstern, das die Spieler erhalten, die Ihr bufft."
 --[[
-    Two halves so the number stays authoritative: LIMIT's %d is a real placeholder
-    and gets formatted, TOKENS carries a literal %a for the reader to copy and so
+    The message box's tooltip, in three parts. LIMIT's %d is a real placeholder
+    and gets formatted; TOKENS carries a literal %a for the reader to copy and so
     must never reach string.format. Joined into one line at the point of use.
 ]]
+L["GOOD_NEWS_MESSAGE_INPUT_DESCRIPTION"] =
+	"Legt fest, was das Flüstern sagt. Lasst das Feld leer, um den Standardtext zu verwenden."
 L["GOOD_NEWS_MESSAGE_LIMIT"] = "Maximale Länge: %d."
-L["GOOD_NEWS_MESSAGE_TOKENS"] = "%a wird zum Fähigkeitslink."
+L["GOOD_NEWS_MESSAGE_TOKENS"] = "%a wird zum Fähigkeitslink, samt Dauer, wenn sie unter einer Minute liegt."
 --[[
-    Appended to the ability link inside %a when the buff has a readable duration.
-    A whole clause rather than a bare number so it can be reworded per language.
+    Appended to the ability link inside %a when the buff has a readable duration
+    under a minute. A whole clause rather than a bare number so it can be reworded
+    per language.
 ]]
 L["GOOD_NEWS_DURATION_CLAUSE"] = "für %s"
 
@@ -166,7 +189,6 @@ L["PEER_PRESSURE_SOUND_DESCRIPTION"] =
 -- Shared across the buff panels
 L["TRACKED_HEADER"] = "Verfolgte Fähigkeiten"
 L["TRACKED_GROUP_ITEMS"] = "Gegenstände"
-L["TRACKED_TOGGLE_DESCRIPTION"] = "Schaltet die Verfolgung von %s ein oder aus."
 L["TRACKED_ITEM_PENDING"] = "Gegenstand #%d"
 L["TRACKED_SPELL_PENDING"] = "Zauber #%d"
 
@@ -257,21 +279,27 @@ L["BUFF_WINDOW_TARGET_ENABLE_DESCRIPTION"] =
 L["BUFF_WINDOW_REFRESH"] = "Auffrischen unter"
 L["BUFF_WINDOW_REFRESH_DESCRIPTION"] =
 	"Legt fest, wie wenig Restzeit ein Buff haben darf, bevor er als fehlend gilt, damit Ihr ihn auffrischen könnt, bevor er ausläuft. Ein Buff, der nicht länger als diese Zeit hält, zählt erst, wenn er abgelaufen ist."
-L["BUFF_WINDOW_PETS_AS_TANKS"] = "Begleiter als Tanks werten"
-L["BUFF_WINDOW_PETS_AS_TANKS_DESCRIPTION"] =
-	"Bietet Begleitern die Buffs an, die Ihr auf Tanks gestellt habt, etwa Dornen, zusätzlich zu denen für Alle."
-L["BUFF_WINDOW_PETS_AS_TANKS_WHEN_DESCRIPTION"] = "Legt fest, wann Begleiter als Tanks gelten."
-L["BUFF_WINDOW_PETS_AS_TANKS_SOLO"] = "Wenn nicht in einer Gruppe"
-L["BUFF_WINDOW_PETS_AS_TANKS_ALWAYS"] = "Immer"
+-- Count as Tanks: one dropdown per class, then Pets, each with these three choices.
+L["BUFF_WINDOW_TANKS_HEADER"] = "Als Tanks zählen"
+L["BUFF_WINDOW_TANKS_DESCRIPTION"] =
+	"Wer die Buffs erhält, die Ihr für Tanks anbietet, etwa Dornen, wenn er keine eigene Rolle hat."
+L["BUFF_WINDOW_TANKS_CLASS_DESCRIPTION"] =
+	"Legt fest, wann Spieler dieser Klasse als Tanks zählen. Eine Tank- oder Heilerrolle, die sie haben, geht immer vor."
+L["BUFF_WINDOW_TANKS_PETS"] = "Begleiter"
+L["BUFF_WINDOW_TANKS_PETS_DESCRIPTION"] =
+	"Legt fest, wann Begleiter als Tanks zählen. Begleiter erhalten außerdem die Buffs, die Ihr für Alle anbietet."
+L["BUFF_WINDOW_TANKS_NEVER"] = "Nie"
+L["BUFF_WINDOW_TANKS_SOLO"] = "Wenn nicht in einer Gruppe"
+L["BUFF_WINDOW_TANKS_ALWAYS"] = "Immer"
 -- Who each buff is offered to: one dropdown per buff, these four choices.
 L["BUFF_WINDOW_AUDIENCE_OFF"] = "Aus"
 L["BUFF_WINDOW_AUDIENCE_TANK"] = "Tanks"
 L["BUFF_WINDOW_AUDIENCE_HEALER"] = "Heiler"
 L["BUFF_WINDOW_AUDIENCE_ALL"] = "Alle"
--- The dropdown's tooltip when the client has no description for the spell yet.
+-- Each buff's dropdown tooltip; hovering the buff's name shows the spell itself.
 L["BUFF_WINDOW_AUDIENCE_DESCRIPTION"] = "Legt fest, wem %s angeboten wird."
 L["BUFF_WINDOW_BUFFS_DESCRIPTION"] =
-	"Wählt für jeden Buff, wem er angeboten wird. Tanks und Heiler richten sich nach der Gruppenrolle oder, wenn keine gesetzt ist, nach der Klasse."
+	"Wählt für jeden Buff, wem er angeboten wird. Tanks und Heiler richten sich nach der Gruppenrolle; wer keine hat, zählt als Schaden, sofern Als Tanks zählen weiter unten nichts anderes festlegt."
 
 L["BUFF_WINDOW_SELF_DESCRIPTION"] = "Eure eigenen Buffs, oben im Fenster angeheftet."
 --[[
@@ -283,24 +311,69 @@ L["BUFF_WINDOW_SELF_NOTE_MAGE_ARMOR"] = "eine beliebige Rüstung genügt"
 L["BUFF_WINDOW_SELF_NOTE_PALADIN_AURA"] = "eine beliebige Aura genügt"
 L["BUFF_WINDOW_SELF_NOTE_SHAMAN_SHIELD"] = "ein beliebiger Schild genügt"
 L["BUFF_WINDOW_SELF_NOTE_WARLOCK_ARMOR"] = "eine beliebige Rüstung genügt"
+L["BUFF_WINDOW_SELF_NOTE_WARLOCK_DEMON"] = "einer der beiden Dämonenbuffs genügt"
 L["BUFF_WINDOW_SELF_REFRESH_OFF"] = "Aus"
 L["BUFF_WINDOW_SELF_REFRESH_MISSING"] = "Bei Fehlen"
 -- %s is a duration from the client, like "5 Minutes".
 L["BUFF_WINDOW_SELF_REFRESH_UNDER"] = "Unter %s"
 L["BUFF_WINDOW_SELF_REFRESH_DESCRIPTION"] =
 	"Legt fest, wann %s angezeigt wird: nie, nach dem Ablaufen oder wenn weniger als diese Zeit übrig ist."
+-- The Weapon Buffs panel, under Buff Duty after Self-Buffs.
+L["BUFF_WINDOW_WEAPON_PANEL_HEADER"] = "Waffenbuffs"
+L["BUFF_WINDOW_WEAPON_DESCRIPTION"] =
+	"Hakt an, was jede Waffe tragen soll. Das Fenster bietet es an, wenn es fehlt oder bald abläuft, sofern es in Euren Taschen ist und zur Waffe passt."
+-- The one timing for every weapon buff, at the top of the panel.
+L["BUFF_WINDOW_WEAPON_REFRESH"] = "Erneuern"
+L["BUFF_WINDOW_WEAPON_REFRESH_DESCRIPTION"] =
+	"Legt fest, wann ein Waffenbuff erneut angeboten wird: nach dem Ablaufen oder wenn weniger als diese Zeit übrig ist."
+-- The boxes for the weapon items any class can use, after the rogue and shaman boxes.
+L["BUFF_WINDOW_WEAPON_KIND_OIL"] = "Öle"
+L["BUFF_WINDOW_WEAPON_KIND_STONE"] = "Steine"
+L["BUFF_WINDOW_WEAPON_KIND_LURE"] = "Köder"
+--[[
+    One choice's checkbox under one hand. The first %s is the poison, imbue,
+    oil, stone or lure, the second the client's "Main Hand" or "Off Hand".
+]]
+L["BUFF_WINDOW_WEAPON_PICK_DESCRIPTION"] =
+	"Bietet %s für die Waffe in Eurer %s an. Solange die Waffe keine Eurer angehakten Optionen trägt, wird jede angeboten, die Ihr habt."
 L["BUFF_WINDOW_SELF_ENABLE"] = "Eure Selbstbuffs"
 L["BUFF_WINDOW_SELF_ENABLE_DESCRIPTION"] =
 	"Zeigt oben im Fenster die Buffs, die nur Ihr Euch selbst geben könnt, etwa eine Rüstung oder Inneres Feuer, wenn sie fehlen oder bald ablaufen. Welche, legt Ihr unter Selbstbuffs fest."
+L["BUFF_WINDOW_WEAPON_ENABLE"] = "Eure Waffenbuffs"
+L["BUFF_WINDOW_WEAPON_ENABLE_DESCRIPTION"] =
+	"Zeigt die Gifte, Waffenverzauberungen, Öle und Steine, die Euren Waffen fehlen oder bald ablaufen, zusammen mit Euren Selbstbuffs oben im Fenster. Klickt auf einen, um ihn aufzutragen. Welche, legt Ihr unter Waffenbuffs fest."
 
 -- The window itself
 L["BUFF_WINDOW_SELF_HEADER"] = "Selbstbuffs"
 L["BUFF_WINDOW_FAVOR_HEADER"] = "Gefallen erwidern"
 L["BUFF_WINDOW_TARGET_HEADER"] = "Ziel"
 L["BUFF_WINDOW_TOOLTIP_CAST"] = "Klicken, um auf %s zu wirken."
+-- %s is the client's "Main Hand" or "Off Hand".
+L["BUFF_WINDOW_TOOLTIP_WEAPON"] = "Klicken, um es auf die Waffe in Eurer %s aufzutragen."
+L["BUFF_WINDOW_TOOLTIP_USE"] = "Niemand in Eurer Gruppe hat einen Seelenstein. Klicken, um einen auf %s anzuwenden."
+L["BUFF_WINDOW_TOOLTIP_CREATE"] = "Niemand in Eurer Gruppe hat einen Seelenstein. Klicken, um einen herzustellen."
 L["BUFF_WINDOW_TOOLTIP_GROUP"] = "Klicken, um auf %s samt Gruppe zu wirken."
 L["BUFF_WINDOW_TOOLTIP_FAVOR"] = "Klicken, um %s ins Ziel zu nehmen und zu wirken."
 L["BUFF_WINDOW_TOOLTIP_DISMISS"] = "Rechtsklick, um %s von der Liste zu nehmen."
+-- The window's close button; %s is the options slash command.
+L["BUFF_WINDOW_CLOSED"] =
+	"Buff-Dienst ist aus. Um ihn wieder einzuschalten, macht Umschalt + Rechtsklick auf die Minikarten-Schaltfläche oder gebt %s ein."
+
+-- The Buff Keys (Key Bindings, and the Keybinds section of Buff Duty)
+L["BUFF_KEYS_HEADER"] = "Tastenbelegungen"
+L["BUFF_KEYS_DESCRIPTION"] =
+	"Wirkt den nächsten Buff Eurer Liste mit einer Taste oder einem Makro, außerhalb des Kampfes. Waffenbuffs bleiben ein Klick im Fenster."
+L["BUFF_KEY_SINGLE"] = "Einzelbuff-Knopf"
+L["BUFF_KEY_SINGLE_DESCRIPTION"] =
+	"Wirkt Euren nächsten fehlenden Buff, einen pro Tastendruck: eine Wiederbelebung auf Euer totes Ziel (Priester und Paladine), dann Eure Selbstbuffs, Gefallen erwidern, Euer Ziel und Eure Gruppe."
+L["BUFF_KEY_GROUP"] = "Gruppenbuff-Knopf"
+L["BUFF_KEY_GROUP_DESCRIPTION"] =
+	"Wirkt Euren nächsten fehlenden Gruppenbuff, einen pro Tastendruck: eine Wiederbelebung auf Euer totes Ziel (Priester und Paladine), dann Eure Selbstbuffs, dann die Gruppe Eures Ziels und die übrigen. Eine Gruppe wartet, bis alle, denen der Buff fehlt, in Reichweite sind."
+-- %s is a player's name.
+L["BUFF_KEY_WAITING"] = "Warte darauf, dass %s in Reichweite kommt."
+L["BUFF_KEY_DONE"] = "Nichts mehr zu buffen."
+-- The caption beside the read-only box that holds a Buff Key's macro line.
+L["BUFF_KEY_MACRO_CAPTION"] = "Makro:"
 
 --------------------------------------------------------------------------------
 -- Options: Thank You Button
@@ -315,6 +388,11 @@ L["BUTTON_EMOTE"] = "Emote"
 L["BUTTON_EMOTE_DESCRIPTION"] =
 	"Legt das Emote fest, das dieser Knopf bei Eurem Ziel ausführt, oder Keine für kein Emote."
 L["BUTTON_EMOTE_NONE"] = "Keine"
+L["BUTTON_ICON"] = "Symbol"
+L["BUTTON_ICON_DESCRIPTION"] =
+	"Legt das Symbol fest, das das Makro dieses Knopfes in Eurer Makroliste und auf Euren Aktionsleisten zeigt."
+-- The Icon dropdown's first choice, the macros' own icon; every other choice is a picture alone.
+L["BUTTON_ICON_DEFAULT"] = "Standard"
 --[[
     The toggle owns the macro in both directions, so the label is ENABLE rather
     than CREATE. Both strings carry the macro's name: with five buttons stacked,

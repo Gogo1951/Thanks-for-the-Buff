@@ -34,12 +34,46 @@ local buffs = {} -- the entries this character can cast right now, built by Buil
     when each one shows rather than who it is for.
 ]]
 local selfEntries, selfLookup, selfBuffs = {}, {}, {}
+--[[
+    The same three for weapon enchants (ns.BUFF_WINDOW_WEAPON_ENCHANTS), the
+    poisons and imbues. Their setting is what goes on each hand, so the
+    castable list holds one per hand rather than one per row.
+]]
+local weaponEntries, weaponLookup, weaponBuffs = {}, {}, {}
+--[[
+    One per ns.BUFF_WINDOW_WEAPON_ITEMS row, the oils, stones and lures any
+    class can use, shaped like a poison's entry: { key, row, ids, items,
+    enchants, types, kind, itemLevel }. Picked per hand, not per class.
+]]
+local weaponItemEntries = {}
+--[[
+    Enchant id (what GetWeaponEnchantInfo reports) -> an entry that puts it
+    on, for Diagnostics. Two items can share one (a Season of Discovery copy
+    of Blessed Wizard Oil), so the window asks each pick's own enchants set.
+]]
+local weaponByEnchant = {}
+-- Every poison, weapon item and Soulstone item id this client's data names.
+local itemIds = {}
 
 BuffWindow.entries = entries
 BuffWindow.exclusiveIds = exclusiveIds
 BuffWindow.buffs = buffs
 BuffWindow.selfEntries = selfEntries
 BuffWindow.selfBuffs = selfBuffs
+BuffWindow.weaponEntries = weaponEntries
+BuffWindow.weaponLookup = weaponLookup
+BuffWindow.weaponBuffs = weaponBuffs
+BuffWindow.weaponItemEntries = weaponItemEntries
+BuffWindow.weaponByEnchant = weaponByEnchant
+--[[
+    The Soulstone (ns.BUFF_WINDOW_SOULSTONE): its entry, and the buff the
+    window offers when nobody in your group carries one. Both are replaced
+    rather than refilled, so read them off BuffWindow at the time.
+]]
+BuffWindow.soulstoneEntry = nil
+BuffWindow.soulstoneBuff = nil
+-- The resurrection the Buff Keys cast on a dead target, { id, name, ids }, or nil.
+BuffWindow.resurrection = nil
 --[[
     Seconds left under which a buff counts as missing; set from the profile at
     the start of each Refresh.
@@ -120,6 +154,10 @@ function BuffWindow.BuildLookup()
 			end
 		end
 		if ids[1] then
+			-- A buff whose aura isn't its cast (Demonic Sacrifice's four) names its auras.
+			for _, id in ipairs(LiveIds(row.auras)) do
+				auraIds[id] = true
+			end
 			if row.exclusive then
 				exclusiveIds[row.exclusive] = exclusiveIds[row.exclusive] or {}
 				for id in pairs(auraIds) do
@@ -132,6 +170,134 @@ function BuffWindow.BuildLookup()
 			selfLookup[entry.key] = entry
 		end
 	end
+
+	--[[
+	    A poison is an item, kept best first by the level it needs; an imbue is
+	    a spell, kept like any self buff's ranks. Items aren't checked against
+	    the client: a poison it doesn't know is one no bag ever holds. Every
+	    rank's enchant id points back at its row (weaponByEnchant), which is how
+	    the window tells which of the player's picks a weapon carries. A rank
+	    may name several: TBC's Rockbiter lands a different enchant for each
+	    weapon speed.
+	]]
+	local function AddEnchants(enchants, value)
+		if type(value) == "table" then
+			for _, enchant in ipairs(value) do
+				enchants[enchant] = true
+			end
+		elseif value then
+			enchants[value] = true
+		end
+	end
+	wipe(weaponEntries)
+	wipe(weaponLookup)
+	wipe(weaponByEnchant)
+	for _, row in ipairs(ns.BUFF_WINDOW_WEAPON_ENCHANTS) do
+		local entry
+		local enchants = {}
+		if row.items then
+			local items, ids = {}, {}
+			for _, item in ipairs(row.items) do
+				items[#items + 1] = { id = item[1], level = item[2] }
+				ids[#ids + 1] = item[1]
+				AddEnchants(enchants, item[3])
+			end
+			table.sort(items, function(a, b)
+				return a.level > b.level
+			end)
+			entry = { key = ids[1], row = row, ids = ids, items = items, enchants = enchants }
+		else
+			local ranks, ids = {}, {}
+			for _, rank in ipairs(row.ranks) do
+				AddEnchants(enchants, rank[3])
+				if C_Spell.DoesSpellExist(rank[1]) then
+					ranks[#ranks + 1] = { id = rank[1], level = rank[2] }
+					ids[#ids + 1] = rank[1]
+				end
+			end
+			if ids[1] then
+				entry = { key = ids[1], row = row, ids = ids, ranks = ranks, enchants = enchants }
+			end
+		end
+		if entry then
+			weaponEntries[#weaponEntries + 1] = entry
+			weaponLookup[entry.key] = entry
+			for enchant in pairs(enchants) do
+				weaponByEnchant[enchant] = entry
+			end
+		end
+	end
+
+	--[[
+	    Every other weapon item, one entry each: its enchant, and the weapon
+	    types it takes (a subclass mask, 0 for any weapon).
+	]]
+	wipe(weaponItemEntries)
+	for _, row in ipairs(ns.BUFF_WINDOW_WEAPON_ITEMS or {}) do
+		local itemId = row[1]
+		local entry = {
+			key = itemId,
+			row = row,
+			ids = { itemId },
+			items = { { id = itemId, level = row[2], itemLevel = row[6] } },
+			enchants = { [row[3]] = true },
+			types = row[4],
+			kind = row[5],
+			itemLevel = row[6],
+		}
+		weaponItemEntries[#weaponItemEntries + 1] = entry
+		weaponByEnchant[row[3]] = weaponByEnchant[row[3]] or entry
+	end
+
+	--[[
+	    Ask for every poison's, weapon item's and Soulstone's item data now, so
+	    the Weapon Buffs panel names each one instead of its "Item #"
+	    placeholder; ns.OnBuffWindowItemInfo repaints the panel as each one
+	    arrives.
+	]]
+	wipe(itemIds)
+	for _, list in ipairs({ weaponEntries, weaponItemEntries }) do
+		for _, entry in ipairs(list) do
+			for _, id in ipairs(entry.items and entry.ids or {}) do
+				itemIds[id] = true
+			end
+		end
+	end
+	for _, id in ipairs(ns.BUFF_WINDOW_SOULSTONE and ns.BUFF_WINDOW_SOULSTONE.items or {}) do
+		itemIds[id] = true
+	end
+	for id in pairs(itemIds) do
+		C_Item.RequestLoadItemDataByID(id)
+	end
+
+	--[[
+	    The Soulstone is offered by its Create Soulstone ranks, counted by its
+	    Soulstone Resurrection auras, and named on the panel by the aura.
+	]]
+	BuffWindow.soulstoneEntry = nil
+	local stone = ns.BUFF_WINDOW_SOULSTONE
+	if stone then
+		local ranks, auraIds = {}, {}
+		for _, rank in ipairs(stone.create) do
+			if C_Spell.DoesSpellExist(rank[1]) then
+				ranks[#ranks + 1] = { id = rank[1], level = rank[2] }
+			end
+		end
+		local auras = LiveIds(stone.auras)
+		for _, id in ipairs(auras) do
+			auraIds[id] = true
+		end
+		if ranks[1] and auras[1] then
+			BuffWindow.soulstoneEntry = {
+				key = ranks[1].id,
+				row = stone,
+				ids = auras,
+				ranks = ranks,
+				auraIds = auraIds,
+				items = stone.items,
+			}
+		end
+	end
 end
 
 --[[
@@ -140,6 +306,27 @@ end
     offers, and never touch a key this client lacks. Re-run on profile changes.
 ]]
 local function PopulateBuffWindowAudience()
+	local tankWhen = ns.db.profile.buffWindow.tankWhen
+
+	-- MIGRATION (remove after 2026-11-18): the 2026.10.19.A pets toggle and its "when" became tankWhen.PET.
+	local legacy = ns.db.profile.buffWindow
+	if legacy.petsAsTanks ~= nil or legacy.petsAsTanksWhen ~= nil then
+		if legacy.petsAsTanks == false then
+			tankWhen[Data.TANK_WHEN_PET] = Data.TANK_WHEN.NEVER
+		elseif legacy.petsAsTanksWhen == Data.TANK_WHEN.ALWAYS then
+			tankWhen[Data.TANK_WHEN_PET] = Data.TANK_WHEN.ALWAYS
+		end
+		legacy.petsAsTanks = nil
+		legacy.petsAsTanksWhen = nil
+	end
+
+	-- A value the Count as Tanks dropdowns don't offer reads as its default again.
+	for key, value in pairs(tankWhen) do
+		if not Data.TANK_WHEN[value] then
+			tankWhen[key] = nil
+		end
+	end
+
 	local audience = ns.db.profile.buffWindow.audience
 	for key, value in pairs(audience) do
 		if not Data.BUFF_AUDIENCE[value] then
@@ -170,6 +357,32 @@ local function PopulateBuffWindowAudience()
 		if selfRefresh[key] == nil then
 			selfRefresh[key] = entry.row.default
 		end
+	end
+	local stone = BuffWindow.soulstoneEntry
+	if stone and selfRefresh[stone.key] == nil then
+		selfRefresh[stone.key] = stone.row.default
+	end
+
+	--[[
+	    Weapon choices are ticked or not per hand (true or false; unset reads
+	    as ticked, WeaponChoiceOn), so anything else stored is dropped. A
+	    stored id this client has no row for is kept: Classic Era and Season
+	    of Discovery share a profile, and an Occult Poison ticked on one is
+	    the other's to keep. The one timing falls back to the default when it
+	    isn't a choice the dropdown offers.
+	]]
+	local settings = ns.db.profile.buffWindow
+	for _, list in ipairs({ settings.weaponPicks, settings.weaponItems }) do
+		for _, hand in pairs(list) do
+			for key, value in pairs(hand) do
+				if type(value) ~= "boolean" then
+					hand[key] = nil
+				end
+			end
+		end
+	end
+	if not tContains(Data.WEAPON_REFRESH_CHOICES, settings.weaponRefresh) then
+		settings.weaponRefresh = Data.WEAPON_REFRESH_DEFAULT
 	end
 end
 ns.PopulateBuffWindowAudience = PopulateBuffWindowAudience
@@ -214,13 +427,29 @@ function BuffWindow.BuildCategories(list)
 	return categories
 end
 
+-- Called from Tracked-Lookups' GET_ITEM_INFO_RECEIVED handler, which owns the event.
+function ns.OnBuffWindowItemInfo(itemId)
+	if itemIds[itemId] then
+		LibStub("AceConfigRegistry-3.0"):NotifyChange(ns.OPTIONS_REGISTRY.BuffWindowWeaponBuffs)
+	end
+end
+
+-- Diagnostics reads this to log a poison's, weapon item's or Soulstone's item load in full.
+function ns.IsBuffWindowItem(itemId)
+	return itemIds[itemId] == true
+end
+
 --[[
     The options panel reads this to say why the window never shows on a class
-    with nothing to give (a paladin, a warrior).
+    with nothing to give on this client.
 ]]
 function ns.BuffWindowHasClassRows()
+	-- Any class can use an oil or a stone.
+	if weaponItemEntries[1] then
+		return true
+	end
 	local _, playerClass = UnitClass("player")
-	for _, list in ipairs({ entries, selfEntries }) do
+	for _, list in ipairs({ entries, selfEntries, weaponEntries, { BuffWindow.soulstoneEntry } }) do
 		for _, entry in ipairs(list) do
 			if entry.row.class == playerClass then
 				return true
@@ -228,6 +457,21 @@ function ns.BuffWindowHasClassRows()
 		end
 	end
 	return false
+end
+
+--[[
+    Whether a weapon choice is ticked for a hand. `list` is weaponPicks
+    (keyed "ROGUE_MAIN" and so on) or weaponItems (keyed "MAIN" or "OFF");
+    one never set reads as ticked, so a new row reaches every player on.
+]]
+function BuffWindow.WeaponChoiceOn(list, handKey, key)
+	local hand = list[handKey]
+	return not hand or hand[key] ~= false
+end
+
+-- Whether this character has anything at all the window could offer.
+function BuffWindow.HasAnythingToOffer()
+	return #buffs > 0 or #selfBuffs > 0 or #weaponBuffs > 0 or BuffWindow.soulstoneBuff ~= nil
 end
 
 --------------------------------------------------------------------------------
@@ -305,6 +549,7 @@ function BuffWindow.BuildBuffs()
 					-- Set when you know any single-target rank at all.
 					singleName = ranks[1] and ranks[1].name,
 					groupId = groupId,
+					groupIds = entry.groupIds,
 					groupName = groupId and C_Spell.GetSpellName(groupId),
 				}
 			end
@@ -329,7 +574,108 @@ function BuffWindow.BuildBuffs()
 					singleName = ranks[1].name,
 					-- Its own "count as missing under", in seconds; 0 waits for it to drop.
 					refreshSeconds = when * 60,
+					-- Soul Link only means anything with a demon out.
+					needsPet = entry.row.needsPet,
 				}
+			end
+		end
+	end
+
+	--[[
+	    One per hand with anything ticked, each its own row under Self Buffs:
+	    the picks, all on the one Reapply timing -- your class's poisons or
+	    imbues (classPick), and the oils, stones and lures any class can use.
+	    The row orders its icons as it draws them, by the item or rank each
+	    one uses (Buff-Window-Self.lua). An imbue needs a known rank; an item
+	    is looked for in your bags at each refresh, since that changes without
+	    SPELLS_CHANGED. Nothing while Weapon Buffs is off.
+	]]
+	wipe(weaponBuffs)
+	local settings = ns.db.profile.buffWindow
+	local classHands = {}
+	for _, hand in ipairs(ns.BUFF_WINDOW_WEAPON_HANDS[playerClass] or {}) do
+		classHands[hand] = true
+	end
+	for _, hand in ipairs(settings.weaponEnabled and Data.WEAPON_HAND_ORDER or {}) do
+		local chosen = {}
+		local when = settings.weaponRefresh
+		local function Choose(entry, ranks, classPick)
+			chosen[#chosen + 1] = {
+				key = entry.key,
+				ranks = ranks,
+				items = entry.items,
+				enchants = entry.enchants,
+				types = entry.types,
+				refreshSeconds = when * 60,
+				durationSeconds = entry.row.duration and entry.row.duration * 60,
+				classPick = classPick,
+			}
+		end
+		for _, entry in ipairs(classHands[hand] and weaponEntries or {}) do
+			local ranks = entry.ranks and KnownRanks(entry)
+			if
+				entry.row.class == playerClass
+				and BuffWindow.WeaponChoiceOn(settings.weaponPicks, playerClass .. "_" .. hand, entry.key)
+				and (entry.items or ranks[1])
+			then
+				Choose(entry, ranks, true)
+			end
+		end
+		for _, entry in ipairs(weaponItemEntries) do
+			local kindHands = Data.WEAPON_ITEM_KIND_HANDS[entry.kind]
+			if
+				(not kindHands or tContains(kindHands, hand))
+				and BuffWindow.WeaponChoiceOn(settings.weaponItems, hand, entry.key)
+			then
+				Choose(entry)
+			end
+		end
+		if chosen[1] then
+			weaponBuffs[#weaponBuffs + 1] = {
+				hand = hand,
+				slot = Data.WEAPON_HAND_SLOTS[hand],
+				picks = chosen,
+			}
+		end
+	end
+
+	--[[
+	    Shaped like a self buff so Has can read it on anyone in the group: no
+	    ranks of its own to weigh against theirs, only its auras. The button
+	    makes a stone with the best Create Soulstone you know, cast by its bare
+	    name -- Classic Era names each tier its own spell, and a "(Rank 1)"
+	    added to one of those names a spell that doesn't exist.
+	]]
+	BuffWindow.soulstoneBuff = nil
+	local stone = BuffWindow.soulstoneEntry
+	local stoneWhen = stone and selfRefresh[stone.key]
+	if stone and stone.row.class == playerClass and stoneWhen and stoneWhen ~= Data.SELF_REFRESH_OFF then
+		local known = KnownRanks(stone)
+		if known[1] then
+			BuffWindow.soulstoneBuff = {
+				column = #selfBuffs + 1,
+				key = stone.key,
+				auraIds = stone.auraIds,
+				rankLevels = {},
+				ranks = {},
+				create = known[1],
+				items = stone.items,
+				refreshSeconds = stoneWhen * 60,
+			}
+		end
+	end
+
+	--[[
+	    The Buff Keys' resurrection (ns.BUFF_WINDOW_RESURRECTIONS): any rank
+	    you know, cast by its bare name, which resolves to your highest.
+	]]
+	BuffWindow.resurrection = nil
+	for _, row in ipairs(ns.BUFF_WINDOW_RESURRECTIONS or {}) do
+		if row.class == playerClass then
+			local id = FirstKnown(row.ranks)
+			local name = id and C_Spell.GetSpellName(id)
+			if name then
+				BuffWindow.resurrection = { id = id, name = name, ids = row.ranks }
 			end
 		end
 	end

@@ -87,9 +87,9 @@ ns.DIAGNOSTIC_API_CHECKS = {
 		end,
 	},
 	{
-		"bit.band",
+		"bit.band / bit.lshift",
 		function()
-			return type(bit) == "table" and type(bit.band) == "function"
+			return type(bit) == "table" and type(bit.band) == "function" and type(bit.lshift) == "function"
 		end,
 	},
 	{ "GetPlayerInfoByGUID", HasGlobalFunction("GetPlayerInfoByGUID") },
@@ -113,6 +113,7 @@ ns.DIAGNOSTIC_API_CHECKS = {
 	{ "UnitIsVisible", HasGlobalFunction("UnitIsVisible") },
 	{ "UnitInRange", HasGlobalFunction("UnitInRange") },
 	{ "CreateMacro", HasGlobalFunction("CreateMacro") },
+	{ "EditMacro", HasGlobalFunction("EditMacro") },
 	{ "DeleteMacro", HasGlobalFunction("DeleteMacro") },
 	{ "GetMacroIndexByName", HasGlobalFunction("GetMacroIndexByName") },
 	{ "GetNumMacros", HasGlobalFunction("GetNumMacros") },
@@ -123,6 +124,7 @@ ns.DIAGNOSTIC_API_CHECKS = {
 	{ "GetRaidRosterInfo", HasGlobalFunction("GetRaidRosterInfo") },
 	{ "GetPartyAssignment (guarded)", HasGlobalFunction("GetPartyAssignment") },
 	{ "UnitGroupRolesAssigned (guarded)", HasGlobalFunction("UnitGroupRolesAssigned") },
+	{ "GetLFGRoles (guarded)", HasGlobalFunction("GetLFGRoles") },
 	{ "C_Spell.IsSpellInRange (guarded)", HasFunction("C_Spell", "IsSpellInRange") },
 	{ "UnitPowerType", HasGlobalFunction("UnitPowerType") },
 	{
@@ -135,6 +137,33 @@ ns.DIAGNOSTIC_API_CHECKS = {
 		end,
 	},
 	{ "C_Spell.GetSpellCooldown", HasFunction("C_Spell", "GetSpellCooldown") },
+	-- Self Buffs' weapons and Soulstone: what each hand holds and carries, and what your bags hold.
+	{ "GetInventoryItemID", HasGlobalFunction("GetInventoryItemID") },
+	{ "GetInventoryItemTexture", HasGlobalFunction("GetInventoryItemTexture") },
+	{ "GetWeaponEnchantInfo", HasGlobalFunction("GetWeaponEnchantInfo") },
+	{
+		"Enum.ItemClass.Weapon / Enum.ItemWeaponSubclass.Fishingpole (guarded)",
+		function()
+			return type(Enum) == "table"
+				and type(Enum.ItemClass) == "table"
+				and Enum.ItemClass.Weapon ~= nil
+				and type(Enum.ItemWeaponSubclass) == "table"
+				and Enum.ItemWeaponSubclass.Fishingpole ~= nil
+		end,
+	},
+	{ "C_Item.GetItemCount", HasFunction("C_Item", "GetItemCount") },
+	{ "C_Item.IsItemInRange", HasFunction("C_Item", "IsItemInRange") },
+	{ "C_Container.GetItemCooldown", HasFunction("C_Container", "GetItemCooldown") },
+	-- The game's "replace your enchant?" question, answered when a weapon icon's click asked it.
+	{ "C_Item.ReplaceEnchant", HasFunction("C_Item", "ReplaceEnchant") },
+	{ "StaticPopup_Hide", HasGlobalFunction("StaticPopup_Hide") },
+	-- The Buff Keys: what a press can cast, and the bindings Buff Duty sets.
+	{ "C_Spell.IsSpellUsable", HasFunction("C_Spell", "IsSpellUsable") },
+	{ "UnitHasIncomingResurrection (guarded)", HasGlobalFunction("UnitHasIncomingResurrection") },
+	{ "GetBindingKey", HasGlobalFunction("GetBindingKey") },
+	{ "SetBinding", HasGlobalFunction("SetBinding") },
+	{ "SaveBindings", HasGlobalFunction("SaveBindings") },
+	{ "GetCurrentBindingSet", HasGlobalFunction("GetCurrentBindingSet") },
 	{ "C_TooltipInfo.GetUnit", HasFunction("C_TooltipInfo", "GetUnit") },
 	{
 		"Hidden unit tooltip (legacy)",
@@ -193,7 +222,7 @@ ns.DIAGNOSTIC_API_CHECKS = {
 
 -- The add-on's own example reports, appended to the shared Event Log intro.
 ns.DiagnosticsStrings.EVENT_LOG_EXAMPLES =
-	"Best for 'nobody got thanked' or 'a portal wasn't announced' reports. On every flavor it records each buff that lands on you, decoded, with whether TFTB tracks and watches it. Off WoW Forever it also records each nearby cast and revive TFTB tracks the same way, and counts every other spell cast by spell id at the end."
+	"Best for 'nobody got thanked' or 'a portal wasn't announced' reports. On every flavor it records each buff that lands on you, decoded, with whether TFTB tracks and watches it. Off WoW Forever it also records each nearby cast and revive TFTB tracks the same way, and counts every other spell cast by spell id at the end. For 'a Buff Key keeps casting the same buff' reports, it records every cast of a spell the Buff Window offers."
 
 -- Per-class tracked-spell manifest for the IsPlayerSpell readout, rebuilt from
 -- ns.TRACKED_ABILITIES at login by Features/Tracked-Lookups.lua.
@@ -342,8 +371,8 @@ end
     the Master channel answers to, how much of the tracked data is live on this
     client, which tracked spells of their class they know and whether Good
     News and Peer Pressure watch each one, where /tftb goes, and what stops
-    each Thank You button: its command, its toggle, its macro, its whisper
-    text and its emotes.
+    each Thank You button: its command, its toggle, its macro and the icon it
+    wears, its whisper text and its emotes.
 ]]
 function ns:BuildContextReport()
 	local lines = { GetClientHeader(), "" }
@@ -574,12 +603,13 @@ function ns:BuildContextReport()
 				macro = (body and body:gsub("%s+$", "") == button.command) and "runs command" or "BODY EDITED"
 			end
 			lines[#lines + 1] = string.format(
-				"  %s (%s): command=%s createMacro=%s macro=%s whisper=%s %s",
+				"  %s (%s): command=%s createMacro=%s macro=%s icon=%s whisper=%s %s",
 				button.command,
 				button.macroName,
 				SlashCmdList["TFTB_THANKYOU" .. index] and "registered" or "MISSING",
 				tostring(config.createMacro),
 				macro,
+				tostring(ns.GetThankYouIcon and ns.GetThankYouIcon(config)),
 				whisper,
 				emote
 			)
@@ -650,7 +680,7 @@ local function MemberLine(BW, member, rangeSpell)
 		member.subgroup,
 		tostring(class),
 		PlainText(UnitLevel(unit)),
-		BW.RoleOf(unit),
+		BW.RoleOf(unit, class),
 		tostring(BW.CanBuff(unit) and true or false),
 		PlainText(UnitIsConnected(unit)),
 		PlainText(UnitIsDeadOrGhost(unit)),
@@ -687,7 +717,7 @@ end
 ]]
 local function BuffStates(BW, unit, class, list)
 	local left, mine = ReadUnitBuffs(unit)
-	local role = class and BW.RoleOf(unit)
+	local role = class and BW.RoleOf(unit, class)
 	local parts = {}
 	for _, buff in ipairs(list) do
 		local name = buff.singleName or buff.groupName or "?"
@@ -728,11 +758,13 @@ end
 --[[
     The state behind a "the Buff Window never shows" or "it doesn't offer X"
     report: whether it set up, every switch and setting, each gate its refresh
-    checks (combat, WoW Forever's secret auras, nothing castable), every buff
-    and self buff your class has on this client with who it's offered to, the
-    ranks you know, and the rank and group version the window would cast, then
-    every group member and your target as the window reads them, each with
-    which of your buffs they have on or are missing. The group read is skipped
+    checks (combat, WoW Forever's secret auras, being dead, nothing to offer),
+    every buff and self buff your class has on this client with who it's
+    offered to, the ranks you know, and the rank and group version the window
+    would cast; each hand's weapon and what your bags hold for it, the
+    Soulstone, and the Buff Keys' bindings; then every group member and your
+    target as the window reads them, each with which of your buffs they have
+    on or are missing. The group read is skipped
     in combat, as the window skips it. Existence/value reads only: nothing is
     cast, targeted or redrawn.
 ]]
@@ -765,18 +797,26 @@ function ns:BuildBuffWindowContextReport()
 		tostring(db.favorEnabled),
 		tostring(db.targetEnabled)
 	)
+	local tankWhen = {}
+	for key, when in pairs(db.tankWhen) do
+		tankWhen[#tankWhen + 1] = key .. "=" .. tostring(when)
+	end
+	table.sort(tankWhen)
 	lines[#lines + 1] = string.format(
-		"Settings: countAsMissingUnder=%s min petsAsTanks=%s (%s)",
+		"Settings: countAsMissingUnder=%s min countAsTanks=%s (unlisted classes NEVER)",
 		tostring(db.refreshMinutes),
-		tostring(db.petsAsTanks),
-		tostring(db.petsAsTanksWhen)
+		#tankWhen > 0 and table.concat(tankWhen, " ") or "none"
 	)
 	lines[#lines + 1] = string.format(
-		"Gates now: inCombat=%s aurasSecret=%s castableBuffs=%d castableSelfBuffs=%d",
+		"Gates now: inCombat=%s aurasSecret=%s youDead=%s anythingToOffer=%s castableBuffs=%d castableSelfBuffs=%d weaponHands=%d soulstone=%s",
 		tostring(InCombatLockdown() and true or false),
 		tostring(ns.AreAurasSecret()),
+		PlainText(UnitIsDeadOrGhost("player")),
+		tostring(BW.HasAnythingToOffer()),
 		#BW.buffs,
-		#BW.selfBuffs
+		#BW.selfBuffs,
+		#BW.weaponBuffs,
+		tostring(BW.soulstoneBuff ~= nil)
 	)
 	lines[#lines + 1] = string.format(
 		"Rows live on this client: %d of %d buffs, %d of %d self buffs",
@@ -835,21 +875,166 @@ function ns:BuildBuffWindowContextReport()
 			any = true
 			local buff = castableSelf[entry.key]
 			lines[#lines + 1] = string.format(
-				"  %s: shows=%s ranksKnown=%d/%d inWindow=%s",
+				"  %s: shows=%s ranksKnown=%d/%d inWindow=%s%s",
 				SpellLabel(entry),
 				tostring(db.selfRefresh[entry.key]),
 				CountKnown(entry.ids),
 				#entry.ids,
-				buff and ("yes cast=" .. tostring(buff.ranks[1] and buff.ranks[1].castText)) or "NO"
+				buff and ("yes cast=" .. tostring(buff.ranks[1] and buff.ranks[1].castText)) or "NO",
+				entry.row.needsPet and " needsPet" or ""
 			)
 		end
 	end
 	if not any then
 		lines[#lines + 1] = "  (none for this class on this client)"
 	end
+	-- A self buff that needs a pet (Soul Link) waits for one that is out and alive.
+	local petState = "none"
+	if UnitExists("pet") then
+		local petDead = UnitIsDeadOrGhost("pet")
+		petState = not ns.IsPlain(petDead) and "<secret>" or petDead and "dead" or "out"
+	end
+	lines[#lines + 1] = "  Your pet: " .. petState
 	local aurasSecret = ns.AreAurasSecret()
 	if #BW.selfBuffs > 0 then
 		lines[#lines + 1] = aurasSecret and "    buffs: (auras secret)" or BuffStates(BW, "player", nil, BW.selfBuffs)
+	end
+
+	--[[
+	    Each hand as the window sees it: your class's picks ticked or not,
+	    the weapon items set apart from the default (ticked), how many made the
+	    castable list and how many of those item picks you carry at your level
+	    (an oil, stone or lure shows only from your bags), what the slot holds
+	    and whether it is a weapon the window asks about (an off hand holding a
+	    shield, or a fishing pole for anything but a lure, gets nothing), the
+	    temporary enchant's seconds left, and which row's enchant it is. Every
+	    class has hands, since any class can use an oil; your class's own picks
+	    are asked about only on the hands its data names.
+	]]
+	local classHands = ns.BUFF_WINDOW_WEAPON_HANDS and ns.BUFF_WINDOW_WEAPON_HANDS[class]
+	lines[#lines + 1] = ""
+	lines[#lines + 1] = string.format(
+		"Weapons (switch %s, reapply %s, your class's picks on %s):",
+		tostring(db.weaponEnabled),
+		tostring(db.weaponRefresh),
+		classHands and #classHands > 0 and table.concat(classHands, " ") or "no hand"
+	)
+	local level = UnitLevel("player")
+	local listed = {}
+	for _, buff in ipairs(BW.weaponBuffs) do
+		local keys, itemPicks, carried = {}, 0, 0
+		for _, pick in ipairs(buff.picks) do
+			keys[#keys + 1] = tostring(pick.key)
+			if pick.items then
+				itemPicks = itemPicks + 1
+				for _, item in ipairs(pick.items) do
+					if (not ns.IsPlain(level) or level >= item.level) and C_Item.GetItemCount(item.id) > 0 then
+						carried = carried + 1
+						break
+					end
+				end
+			end
+		end
+		listed[buff.hand] =
+			string.format("%d (%s) itemsInBags=%d/%d", #keys, table.concat(keys, " "), carried, itemPicks)
+	end
+	local weaponClass = Enum.ItemClass and Enum.ItemClass.Weapon or 2
+	local fishingPole = Enum.ItemWeaponSubclass and Enum.ItemWeaponSubclass.Fishingpole or 20
+	local function Holds(itemID)
+		if not ns.IsPlain(itemID) then
+			return "<secret>"
+		end
+		if not itemID then
+			return "nothing"
+		end
+		local _, _, _, _, _, classID, subclassID = C_Item.GetItemInfoInstant(itemID)
+		if classID ~= weaponClass then
+			return "not a weapon"
+		end
+		return subclassID == fishingPole and "fishing pole" or ("weapon subclass " .. tostring(subclassID))
+	end
+	local enchants = { GetWeaponEnchantInfo() }
+	local stride = select("#", GetWeaponEnchantInfo()) >= 8 and 4 or 3
+	for _, hand in ipairs(ns.Data.WEAPON_HAND_ORDER) do
+		local slot = ns.Data.WEAPON_HAND_SLOTS[hand]
+		local base = (ns.Data.WEAPON_HAND_ORDER[1] == hand and 0 or 1) * stride
+		local expiration = enchants[base + 1] and enchants[base + 2]
+		local enchant = enchants[base + 1] and stride == 4 and enchants[base + 4]
+		local carried = ns.IsPlain(enchant) and enchant and BW.weaponByEnchant[enchant]
+		local picks = {}
+		for key, when in pairs(db.weaponPicks[class .. "_" .. hand] or {}) do
+			picks[#picks + 1] = key .. "=" .. tostring(when)
+		end
+		table.sort(picks)
+		local items = {}
+		for key, when in pairs(db.weaponItems[hand] or {}) do
+			items[#items + 1] = key .. "=" .. tostring(when)
+		end
+		table.sort(items)
+		local itemID = GetInventoryItemID("player", slot)
+		lines[#lines + 1] = string.format(
+			"  %s (slot %d): picks=%s items=%s castable=%s item=%s (%s) enchantLeft=%s enchant=%s (row %s)",
+			hand,
+			slot,
+			#picks > 0 and table.concat(picks, " ") or "none",
+			#items > 0 and table.concat(items, " ") or "default",
+			listed[hand] or "0",
+			PlainText(itemID),
+			Holds(itemID),
+			ns.IsPlain(expiration) and expiration and (math.floor(expiration / 1000) .. "s") or "none",
+			PlainText(enchant),
+			carried and tostring(carried.key) or "not a TFTB row"
+		)
+	end
+
+	local stone = BW.soulstoneEntry
+	if stone and stone.row.class == class then
+		local createIds = {}
+		for _, rank in ipairs(stone.ranks) do
+			createIds[#createIds + 1] = rank.id
+		end
+		-- With no stone in your bags the button makes one; with one, it goes on a healer or you.
+		local stonesCarried = 0
+		for _, id in ipairs(stone.items or {}) do
+			stonesCarried = stonesCarried + C_Item.GetItemCount(id)
+		end
+		lines[#lines + 1] = ""
+		lines[#lines + 1] = string.format(
+			"Soulstone: shows=%s createRanksKnown=%d/%d inWindow=%s stonesInBags=%d",
+			tostring(db.selfRefresh[stone.key]),
+			CountKnown(createIds),
+			#createIds,
+			BW.soulstoneBuff and "yes" or "NO",
+			stonesCarried
+		)
+	end
+
+	--[[
+	    The Buff Keys: each key's binding (unbound, a press can't happen), the
+	    hidden button it clicks and a macro's /click reaches, and the
+	    resurrection a press casts on a dead target first. A press also does
+	    nothing in combat, while you're dead, and while the window is off, not
+	    set up or reading secret auras (the switches and gates above).
+	]]
+	lines[#lines + 1] = ""
+	lines[#lines + 1] = string.format(
+		"Buff Keys: resurrection=%s",
+		BW.resurrection and string.format("%s (%d)", tostring(BW.resurrection.name), BW.resurrection.id) or "none known"
+	)
+	for _, key in ipairs({ "SINGLE", "GROUP" }) do
+		local command = ns.BUFF_KEY_COMMANDS and ns.BUFF_KEY_COMMANDS[key]
+		if command then
+			local bound = { GetBindingKey(command) }
+			local buttonName = command:match("^CLICK ([^:]+)")
+			lines[#lines + 1] = string.format(
+				"  %s: bound=%s button=%s",
+				command,
+				#bound > 0 and table.concat(bound, " ") or "NONE",
+				(buttonName and _G[buttonName]) and buttonName or "MISSING"
+			)
+		else
+			lines[#lines + 1] = "  " .. key .. ": not loaded"
+		end
 	end
 
 	lines[#lines + 1] = ""
@@ -936,12 +1121,16 @@ end
     event (ns.MESSAGE_ID_FILTERED_EVENTS) is one TFTB acts on. For
     UNIT_SPELLCAST_SUCCEEDED that is a spell id the live lookups hold -- a
     service or other cast entry, or a buff you can give for Good News -- the
-    same lookups the handlers match against. For GET_ITEM_INFO_RECEIVED it is
-    an item of a tracked trigger, the set the panels' repaint watches (built
-    from ns.TRACKED_ABILITIES the same way, on the first firing while
-    logging). Everything else is counted.
+    same lookups the handlers match against, or any rank of a spell the Buff
+    Window can cast, which is what a Buff Key press waits to hear go off (the
+    set built from this client's Buff-Window-Spells data, on the first firing
+    while logging). For GET_ITEM_INFO_RECEIVED it is an item of a tracked
+    trigger, the set the panels' repaint watches (built from
+    ns.TRACKED_ABILITIES the same way), or one the Buff Window uses.
+    Everything else is counted.
 ]]
 local trackedItems
+local IsBuffWindowSpell -- defined under Validate Data Sources, from the same collectors
 
 local function IsTrackedItem(itemID)
 	if not trackedItems then
@@ -959,10 +1148,10 @@ end
 
 function ns.IsCorrelatedMessage(event, id)
 	if event == "GET_ITEM_INFO_RECEIVED" then
-		return IsTrackedItem(id)
+		return IsTrackedItem(id) or (ns.IsBuffWindowItem ~= nil and ns.IsBuffWindowItem(id))
 	end
 	if event == "UNIT_SPELLCAST_SUCCEEDED" then
-		return ns.GetCastEntry(id) ~= nil or ns.GetGivenEntry(id) ~= nil
+		return ns.GetCastEntry(id) ~= nil or ns.GetGivenEntry(id) ~= nil or IsBuffWindowSpell(id)
 	end
 	return false
 end
@@ -1108,7 +1297,9 @@ end
       whisper uses them, with the sample count in the ID cell;
     - the pet-owner tooltip formats the Buff Window turns into patterns to find
       a targeted pet's owner (NIL means that wording is skipped on this client);
-    - the group labels the Buff Window heads its party sections with;
+    - the group labels the Buff Window heads its party sections with, the
+      hand names its weapon rows and the Weapon Buffs panel show, and the
+      error a Buff Key pressed in combat shows;
     - every curated emote token the praise panels pick from, named by the
       command this client gives it (NIL means the client has no such emote, so
       a pick of it never plays).
@@ -1186,6 +1377,9 @@ do
 		"UNITNAME_TITLE_COMPANION",
 		"GROUP",
 		"GROUP_NUMBER",
+		"INVTYPE_WEAPONMAINHAND",
+		"INVTYPE_WEAPONOFFHAND",
+		"ERR_NOT_IN_COMBAT",
 	}) do
 		rows[#rows + 1] = UiLabel(constant)
 	end
@@ -1389,6 +1583,90 @@ local function CollectSelfBuffs(rows)
 	return found
 end
 
+-- A rank's enchant id, or its list of them (TBC's Rockbiter, one per weapon speed).
+local function EnchantText(enchant)
+	if type(enchant) == "table" then
+		return table.concat(enchant, " ")
+	end
+	return enchant
+end
+
+--[[
+    Weapon enchants: an imbue's ranks are spells, a poison's items; `kind`
+    picks which, and a row of the other kind adds nothing. A rank with no
+    enchant id is flagged ERROR: the Buff Window can't tell it's on a weapon,
+    and keeps offering it.
+]]
+local NO_ENCHANT_ID = "No enchant id: the Buff Window can't see it on a weapon"
+
+local function CollectWeaponEnchants(kind)
+	return function(rows)
+		local found = {}
+		for index, row in ipairs(rows) do
+			local ranks
+			if kind == "item" then
+				ranks = row.items
+			else
+				ranks = row.ranks
+			end
+			for _, rank in ipairs(ranks or {}) do
+				found[#found + 1] = {
+					id = rank[1],
+					key = index,
+					row = { row = row, level = rank[2], enchant = EnchantText(rank[3]) },
+					problem = rank[3] == nil and NO_ENCHANT_ID or nil,
+				}
+			end
+		end
+		return found
+	end
+end
+
+-- Weapon items: { item id, level required, enchant id, weapon types, kind, item level }, flagged ERROR without an enchant id.
+local function CollectWeaponItems(rows)
+	local found = {}
+	for index, row in ipairs(rows) do
+		found[#found + 1] = {
+			id = row[1],
+			key = index,
+			row = { level = row[2], enchant = row[3], types = row[4], kind = row[5], itemLevel = row[6] },
+			problem = row[3] == nil and NO_ENCHANT_ID or nil,
+		}
+	end
+	return found
+end
+
+-- The Soulstone: its Create Soulstone ranks and its auras as spells, its stones as items.
+local function CollectSoulstone(kind)
+	return function(stone)
+		local found = {}
+		if kind == "item" then
+			for _, id in ipairs(stone.items or {}) do
+				found[#found + 1] = { id = id, key = id, row = { role = "stone" } }
+			end
+			return found
+		end
+		for _, rank in ipairs(stone.create or {}) do
+			found[#found + 1] = { id = rank[1], key = rank[1], row = { role = "create", level = rank[2] } }
+		end
+		for _, id in ipairs(stone.auras or {}) do
+			found[#found + 1] = { id = id, key = id, row = { role = "aura" } }
+		end
+		return found
+	end
+end
+
+-- The Buff Keys' resurrections: bare rank ids, one row per class.
+local function CollectResurrections(rows)
+	local found = {}
+	for index, row in ipairs(rows) do
+		for _, id in ipairs(row.ranks or {}) do
+			found[#found + 1] = { id = id, key = index, row = { row = row } }
+		end
+	end
+	return found
+end
+
 -- The pet icons' summoning spells: Call Pet for beasts, and one per demon by NPC id.
 local function CollectPetIcons(icons)
 	local found = {}
@@ -1399,6 +1677,29 @@ local function CollectPetIcons(icons)
 		found[#found + 1] = { id = spell, key = npc, row = { npc = npc } }
 	end
 	return found
+end
+
+-- Every spell id a Buff Window data table names, for the event log's filter above.
+local buffWindowSpells
+
+function IsBuffWindowSpell(id)
+	if not buffWindowSpells then
+		buffWindowSpells = {}
+		for _, source in ipairs({
+			{ ns.BUFF_WINDOW_SPELLS, CollectBuffWindow },
+			{ ns.BUFF_WINDOW_SELF_SPELLS, CollectSelfBuffs },
+			{ ns.BUFF_WINDOW_WEAPON_ENCHANTS, CollectWeaponEnchants("spell") },
+			{ ns.BUFF_WINDOW_SOULSTONE, CollectSoulstone("spell") },
+			{ ns.BUFF_WINDOW_RESURRECTIONS, CollectResurrections },
+		}) do
+			if type(source[1]) == "table" then
+				for _, found in ipairs(source[2](source[1])) do
+					buffWindowSpells[found.id] = true
+				end
+			end
+		end
+	end
+	return buffWindowSpells[id] == true
 end
 
 local function CollectPeerPressure(rows)
@@ -1470,6 +1771,8 @@ ns.DIAGNOSTIC_DATA_SOURCES = {
 					},
 				},
 			},
+			-- Texture file IDs, which no client API looks up, so the report counts them.
+			{ table = "THANK_YOU_MACRO_ICONS", kind = "other" },
 		},
 	},
 	{
@@ -1522,6 +1825,65 @@ ns.DIAGNOSTIC_DATA_SOURCES = {
 					{ "DATA_CLASS", BuffRowField("class") },
 					{ "DATA_EXCLUSIVE", BuffRowField("exclusive") },
 					{ "DATA_DEFAULT", BuffRowField("default") },
+				},
+			},
+			{
+				table = "BUFF_WINDOW_WEAPON_ENCHANTS",
+				kind = "spell",
+				collect = CollectWeaponEnchants("spell"),
+				dataColumns = {
+					{ "DATA_LEVEL", FoundField("level") },
+					{ "DATA_CLASS", BuffRowField("class") },
+					{ "DATA_ENCHANT_ID", FoundField("enchant") },
+				},
+			},
+			{
+				table = "BUFF_WINDOW_WEAPON_ENCHANTS",
+				kind = "item",
+				collect = CollectWeaponEnchants("item"),
+				dataColumns = {
+					{ "DATA_LEVEL", FoundField("level") },
+					{ "DATA_CLASS", BuffRowField("class") },
+					{ "DATA_ENCHANT_ID", FoundField("enchant") },
+				},
+			},
+			-- Which hands each class is asked about: class tokens, no ids, so the report counts them.
+			{ table = "BUFF_WINDOW_WEAPON_HANDS", kind = "other" },
+			{
+				table = "BUFF_WINDOW_WEAPON_ITEMS",
+				kind = "item",
+				collect = CollectWeaponItems,
+				dataColumns = {
+					{ "DATA_LEVEL", FoundField("level") },
+					{ "DATA_ENCHANT_ID", FoundField("enchant") },
+					{ "DATA_WEAPON_TYPES", FoundField("types") },
+					{ "DATA_KIND", FoundField("kind") },
+					{ "DATA_ITEM_LEVEL", FoundField("itemLevel") },
+				},
+			},
+			{
+				table = "BUFF_WINDOW_SOULSTONE",
+				kind = "spell",
+				collect = CollectSoulstone("spell"),
+				dataColumns = {
+					{ "DATA_ROLE", FoundField("role") },
+					{ "DATA_LEVEL", FoundField("level") },
+				},
+			},
+			{
+				table = "BUFF_WINDOW_SOULSTONE",
+				kind = "item",
+				collect = CollectSoulstone("item"),
+				dataColumns = {
+					{ "DATA_ROLE", FoundField("role") },
+				},
+			},
+			{
+				table = "BUFF_WINDOW_RESURRECTIONS",
+				kind = "spell",
+				collect = CollectResurrections,
+				dataColumns = {
+					{ "DATA_CLASS", BuffRowField("class") },
 				},
 			},
 			{

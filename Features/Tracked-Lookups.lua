@@ -164,8 +164,16 @@ local function WarmItemCache()
 	end
 end
 
--- An item that loads while a panel is open repaints it, replacing its "Item #" placeholder.
+--[[
+    An item that loads while a panel is open repaints it, replacing its "Item #"
+    placeholder. This file owns the event and hands every firing to the Buff
+    Window first, whose Weapon Buffs panel names poisons, oils, stones and
+    lures the same way.
+]]
 local function OnGetItemInfoReceived(itemId)
+	if ns.OnBuffWindowItemInfo then
+		ns.OnBuffWindowItemInfo(itemId)
+	end
 	if not trackedItemIds[itemId] then
 		return
 	end

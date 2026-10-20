@@ -9,12 +9,16 @@ local GetColor = ns.GetColor
     Data/{Game}/Buff-Window-Spells-{Game}.lua). The enable switch at the top,
     twinned in the General panel's Features section, is the master; everything
     below it hides while it is off. Each optional row of the window has its
-    switch here, Self Buffs included; what each buff is offered to lives in two
-    sub-panels of this one: Tracked Abilities (Options-Buff-Window-Buffs.lua) and Self-Buffs
-    (Options-Buff-Window-Self-Buffs.lua).
+    switch here, Self Buffs and Weapon Buffs included, and so do the two Buff
+    Keys' bindings (Features/Buff-Window-Keys.lua); what each buff is offered
+    to lives in three sub-panels of this one: Tracked Abilities
+    (Options-Buff-Window-Buffs.lua), Self-Buffs
+    (Options-Buff-Window-Self-Buffs.lua) and Weapon Buffs
+    (Options-Buff-Window-Weapon-Buffs.lua).
 
-    Every setter ends in ns.RefreshBuffWindow, which rebuilds the castable list
-    and redraws the window: none of these settings is read live by the window.
+    Every window setting's setter ends in ns.RefreshBuffWindow, which rebuilds
+    the castable list and redraws the window: none of them is read live by the
+    window. The key-binding rows write game bindings instead.
 ]]
 
 function ns.BuildBuffWindowOptions()
@@ -43,6 +47,66 @@ function ns.BuildBuffWindowOptions()
 		}
 	end
 
+	--[[
+	    The right half of a Buff Key's row: the same binding the game's Key
+	    Bindings list shows under Thanks for the Buff, so setting it in either
+	    place sets both. A key moved here leaves whatever it did before, and the
+	    command's old key is let go. Bindings are locked in combat.
+	]]
+	local function KeyBinding(command, desc, order)
+		return {
+			type = "keybinding",
+			name = "",
+			desc = desc,
+			width = ns.OPTIONS_CONTROL_WIDTH,
+			order = order,
+			hidden = Hidden,
+			disabled = function()
+				return InCombatLockdown()
+			end,
+			get = function()
+				return GetBindingKey(command)
+			end,
+			set = function(_, key)
+				if InCombatLockdown() then
+					return
+				end
+				for _, old in ipairs({ GetBindingKey(command) }) do
+					SetBinding(old)
+				end
+				if key and key ~= "" then
+					SetBinding(key, command)
+				end
+				SaveBindings(GetCurrentBindingSet())
+			end,
+		}
+	end
+
+	--[[
+	    A row under a Buff Key's row: what to put in a macro to press the same
+	    key from an action bar, in a read-only box so it can be copied. The box
+	    sits under the key button, beside its caption.
+	]]
+	local function MacroLine(macro, order)
+		return {
+			label = ns.OptionsRowLabel(GetColor("HELP") .. L["BUFF_KEY_MACRO_CAPTION"] .. "|r", order, nil, Hidden),
+			box = {
+				type = "input",
+				name = "",
+				width = ns.OPTIONS_CONTROL_WIDTH,
+				order = order + 0.05,
+				hidden = Hidden,
+				get = function()
+					return macro
+				end,
+				set = function() end,
+			},
+		}
+	end
+
+	local singleMacro = MacroLine(ns.BUFF_KEY_MACROS.SINGLE, 22.2)
+	local groupMacro = MacroLine(ns.BUFF_KEY_MACROS.GROUP, 24.2)
+
 	local options = {
 		name = L["TAB_BUFF_WINDOW"],
 		type = "group",
@@ -63,6 +127,8 @@ function ns.BuildBuffWindowOptions()
 					return Hidden() or ns.BuffWindowHasClassRows()
 				end,
 			},
+			spaceNote = ns.OptionsSpacer(4.3),
+			note = ns.OptionsFeaturesNote(4.6),
 			space1 = ns.OptionsSpacer(5, Hidden),
 
 			--[[
@@ -78,6 +144,13 @@ function ns.BuildBuffWindowOptions()
 				L["BUFF_WINDOW_SELF_ENABLE"],
 				L["BUFF_WINDOW_SELF_ENABLE_DESCRIPTION"],
 				8
+			),
+			spaceWeapon = ns.OptionsSpacer(8.3, Hidden),
+			weaponEnabled = Toggle(
+				"weaponEnabled",
+				L["BUFF_WINDOW_WEAPON_ENABLE"],
+				L["BUFF_WINDOW_WEAPON_ENABLE_DESCRIPTION"],
+				8.6
 			),
 			space3 = ns.OptionsSpacer(9, Hidden),
 			favorEnabled = Toggle(
@@ -140,6 +213,21 @@ function ns.BuildBuffWindowOptions()
 				18
 			),
 			space8 = ns.OptionsSpacer(19, Hidden),
+
+			headerKeys = ns.OptionsHeader(L["BUFF_KEYS_HEADER"], 20, Hidden),
+			space9 = ns.OptionsSpacer(21, Hidden),
+			descKeys = ns.OptionsDesc(L["BUFF_KEYS_DESCRIPTION"], 21.3, Hidden),
+			spaceKeys = ns.OptionsSpacer(21.6, Hidden),
+			singleKeyLabel = ns.OptionsRowLabel(L["BUFF_KEY_SINGLE"], 22, nil, Hidden),
+			singleKey = KeyBinding(ns.BUFF_KEY_COMMANDS.SINGLE, L["BUFF_KEY_SINGLE_DESCRIPTION"], 22.1),
+			singleMacroLabel = singleMacro.label,
+			singleMacro = singleMacro.box,
+			space10 = ns.OptionsSpacer(23, Hidden),
+			groupKeyLabel = ns.OptionsRowLabel(L["BUFF_KEY_GROUP"], 24, nil, Hidden),
+			groupKey = KeyBinding(ns.BUFF_KEY_COMMANDS.GROUP, L["BUFF_KEY_GROUP_DESCRIPTION"], 24.1),
+			groupMacroLabel = groupMacro.label,
+			groupMacro = groupMacro.box,
+			space11 = ns.OptionsSpacer(25, Hidden),
 		},
 	}
 

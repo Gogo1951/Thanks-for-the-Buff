@@ -26,7 +26,11 @@ local MESSAGE_MAX = 120
     limit line, whose %d is a real placeholder, does.
 ]]
 local function MessageHelp()
-	return string.format(L["GOOD_NEWS_MESSAGE_LIMIT"], MESSAGE_MAX) .. " " .. L["GOOD_NEWS_MESSAGE_TOKENS"]
+	return L["GOOD_NEWS_MESSAGE_INPUT_DESCRIPTION"]
+		.. " "
+		.. string.format(L["GOOD_NEWS_MESSAGE_LIMIT"], MESSAGE_MAX)
+		.. " "
+		.. L["GOOD_NEWS_MESSAGE_TOKENS"]
 end
 
 function ns.BuildGoodNewsOptions()

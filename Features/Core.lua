@@ -29,7 +29,8 @@ ns.Version = GetVersion()
     A profile switch / copy / reset swaps every user setting at once, so re-seed
     the watched-buff lists (a fresh profile starts empty and seeds from the
     defaults in this client's Data folder), bring the Thank You macros in
-    line with the incoming profile, and refresh any open options panels off the
+    line with the incoming profile, point the mini-map button at the incoming
+    profile's position, and refresh any open options panels off the
     new values. Settings read live from the database update themselves; anything
     applied imperatively, like a macro on the bars, has to be re-applied here.
 ]]
@@ -47,13 +48,15 @@ local function OnProfileChanged()
 	if ns.ReconcileMacros then
 		ns.ReconcileMacros()
 	end
+	if ns.RefreshMinimapButton then
+		ns.RefreshMinimapButton()
+	end
 	local registry = LibStub("AceConfigRegistry-3.0")
 	for _, name in pairs(ns.OPTIONS_REGISTRY) do
 		registry:NotifyChange(name)
 	end
 end
 
--- TFTBDB carries nothing over from the older TFTB_DB table, so an install from before the rename starts from defaults; no bridge is to be added.
 local function InitializeDatabase()
 	ns.db = LibStub("AceDB-3.0"):New("TFTBDB", ns.DATABASE_DEFAULTS, true)
 	ns.db.RegisterCallback(ns, "OnProfileChanged", OnProfileChanged)
@@ -87,6 +90,9 @@ ns.EVENT_NAMES = {
 	"UNIT_PET",
 	"SPELL_UPDATE_COOLDOWN",
 	"GET_ITEM_INFO_RECEIVED",
+	"UNIT_INVENTORY_CHANGED",
+	"BAG_UPDATE_DELAYED",
+	"REPLACE_ENCHANT",
 }
 
 -- Forever has no combat log, and registering COMBAT_LOG_EVENT_UNFILTERED there errors.
@@ -103,6 +109,7 @@ end
 ]]
 ns.EVENT_UNITS = {
 	UNIT_SPELLCAST_SENT = { "player", "pet" },
+	UNIT_INVENTORY_CHANGED = { "player" },
 }
 
 --[[
@@ -152,6 +159,10 @@ local function OnPlayerLogin()
 
 	if ns.RegisterOptionsPanels then
 		ns.RegisterOptionsPanels()
+	end
+
+	if ns.RegisterMinimapButton then
+		ns.RegisterMinimapButton()
 	end
 
 	if ns.SetupBuffTracking then

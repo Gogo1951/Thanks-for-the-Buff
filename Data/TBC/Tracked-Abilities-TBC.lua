@@ -310,7 +310,7 @@ ns.TRACKED_ABILITIES = {
 		},
 	}, -- Soulstone
 	-- Feasts (item) -------------------------------------------------------------
-	{ type = SERVICE, detect = CAST, received = 1, triggers = { { item = 33052, spell = 33258 } } }, -- Fisherman's Feast (TBC)
+	{ type = SERVICE, detect = CAST, received = 1, triggers = { { item = 33052, spell = 33258 } } }, -- Fisherman's Feast
 	-- Resistance Cauldrons (item) -----------------------------------------------
 	{
 		name = L["GROUP_RESISTANCE_CAULDRONS"],
@@ -480,6 +480,10 @@ wago.tools
 	https://wago.tools/db2/SkillLineAbility?build=2.5.6.70006
 	https://wago.tools/db2/ItemSparse?build=2.5.6.70006
 	https://wago.tools/db2/ItemEffect?build=2.5.6.70006
+	https://wago.tools/db2/SpellLevels?build=2.5.6.70006
+	https://wago.tools/db2/SkillLine?build=2.5.6.70006
+	https://wago.tools/db2/SpellEffect?build=2.5.6.70006
+	https://wago.tools/db2/Talent?build=2.5.6.70006
 
 QuestieDB
 	None.

@@ -81,6 +81,10 @@ wago.tools
 	https://wago.tools/db2/SkillLineAbility?build=2.5.6.69795
 	https://wago.tools/db2/SpellName?build=2.5.6.70006
 	https://wago.tools/db2/SkillLineAbility?build=2.5.6.70006
+	https://wago.tools/db2/SpellLevels?build=2.5.6.70006
+	https://wago.tools/db2/SkillLine?build=2.5.6.70006
+	https://wago.tools/db2/SpellEffect?build=2.5.6.70006
+	https://wago.tools/db2/Talent?build=2.5.6.70006
 
 QuestieDB
 	None.

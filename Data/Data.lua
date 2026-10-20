@@ -100,6 +100,7 @@ ns.OPTIONS_REGISTRY = {
 	BuffWindow = ADDON_NAME .. "_BuffWindow",
 	BuffWindowBuffs = ADDON_NAME .. "_BuffWindowBuffs",
 	BuffWindowSelfBuffs = ADDON_NAME .. "_BuffWindowSelfBuffs",
+	BuffWindowWeaponBuffs = ADDON_NAME .. "_BuffWindowWeaponBuffs",
 	Profiles = ADDON_NAME .. "_Profiles",
 	FeedbackSupport = ADDON_NAME .. "_FeedbackSupport",
 	Diagnostics = ADDON_NAME .. "_Diagnostics",
@@ -147,20 +148,18 @@ ns.CHAT_MESSAGE_MAX_LENGTH = 255
     macro it offers to create, and the slash command that macro runs.
 
     Everything else about a button -- its options section, its macro, its command
-    -- is generated from this list, so the count is a property of the data rather
-    than of five copied blocks. Button 1 is the original and keeps its "- Thank"
-    macro name (the leading dash sorts it to the top of the macro list) and its
-    on-by-default settings; 2 through 5 start switched off. They share the
-    leading-dash naming so the whole family sorts together at the top of the
-    macro list.
+    -- is generated from this list, so the count is a property of the data.
+    Button 1 keeps its "- Thank" macro name and its on-by-default settings; 2
+    through 5 start switched off. Every name leads with a dash, so the whole
+    family sorts together at the top of the macro list.
 ]]
 Data.THANK_YOU_BUTTONS = {
 	--[[
 	    singleEmote: the button fires ONE chosen emote, picked from a dropdown,
 	    instead of a random one from a checklist. It changes the stored shape too --
 	    `emote` (a single token) rather than `emotes` (a set) -- which is what the
-	    options panel and RunThankYou branch on. Button 1 keeps the original
-	    pick-a-random-one-from-your-selection behaviour.
+	    options panel and RunThankYou branch on. A button without it performs a
+	    random emote from its checklist.
 	]]
 	{ profileKey = "slash", macroName = "- Thank", command = "/thankyou" },
 	{ profileKey = "slash2", macroName = "- TFTB 2", command = "/thankyou2", singleEmote = true },
@@ -173,23 +172,56 @@ Data.THANK_YOU_BUTTONS = {
 Data.MAX_GLOBAL_MACROS = 120
 
 --[[
-    When "Consider Pets as Tanks" applies: SOLO while you're not in a party or
-    raid, ALWAYS everywhere. PETS_AS_TANKS_ORDER is the dropdown's order; the
-    labels come from the locale (BUFF_WINDOW_PETS_AS_TANKS_*).
+    The Thank You macros' own icon, a texture file ID (inv_misc_ribbon_01): the
+    Icon dropdown's Default. ns.THANK_YOU_MACRO_ICONS holds the rest.
 ]]
-Data.PETS_AS_TANKS = {
+Data.THANK_YOU_DEFAULT_ICON = 134411
+
+--[[
+    When a class, or pets, count as tanks on the Buff Window ("Count as
+    Tanks"): NEVER, SOLO while you're not in a party or raid, or ALWAYS. Only
+    for a player with no role of their own. TANK_WHEN_ORDER is the dropdown's
+    order; the labels come from the locale (BUFF_WINDOW_TANKS_*). Pets are
+    stored under TANK_WHEN_PET beside the class tokens.
+]]
+Data.TANK_WHEN = {
+	NEVER = "NEVER",
 	SOLO = "SOLO",
 	ALWAYS = "ALWAYS",
 }
-Data.PETS_AS_TANKS_ORDER = { "SOLO", "ALWAYS" }
+Data.TANK_WHEN_ORDER = { "NEVER", "SOLO", "ALWAYS" }
+Data.TANK_WHEN_PET = "PET"
 
 --[[
-    When a self buff shows on the Buff Window: OFF, MISSING (only once it's
-    gone), or a number of minutes left. Doubles as the dropdown's order.
+    When a self buff or the Soulstone shows on the Buff Window: OFF, MISSING
+    (only once it's gone), or a number of minutes left. Doubles as the
+    dropdown's order. The Weapon Buffs dropdown reuses MISSING for When
+    Missing.
 ]]
 Data.SELF_REFRESH_OFF = "OFF"
 Data.SELF_REFRESH_MISSING = 0
 Data.SELF_REFRESH_CHOICES = { "OFF", 0, 10, 5, 3 }
+
+--[[
+    The weapon hands a poison or imbue can go on, by the inventory slot each
+    names. Which hands a class is offered is the data folder's call
+    (BUFF_WINDOW_WEAPON_HANDS): a Classic Era shaman can't dual wield.
+]]
+Data.WEAPON_HAND_SLOTS = { MAIN = 16, OFF = 17 }
+Data.WEAPON_HAND_ORDER = { "MAIN", "OFF" }
+
+--[[
+    The Weapon Buffs panel's one Reapply timing, for every poison, imbue,
+    oil, stone and lure: When Missing, or minutes left. No Off: each choice
+    has its own checkboxes for that.
+]]
+Data.WEAPON_REFRESH_CHOICES = { 0, 10, 5, 3 }
+Data.WEAPON_REFRESH_DEFAULT = 3
+
+-- The Weapon Buffs panel's boxes for the items any class can use, in order (BUFF_WINDOW_WEAPON_ITEMS' kind).
+Data.WEAPON_ITEM_KINDS = { "OIL", "STONE", "LURE" }
+-- A kind that only one hand can carry: a fishing pole is always two-handed, so a lure is main hand only.
+Data.WEAPON_ITEM_KIND_HANDS = { LURE = { "MAIN" } }
 
 --[[
     The Buff Window's "Refresh Under" choices, in minutes: a buff with
@@ -225,7 +257,7 @@ Data.PRAISE_DELAY_CHOICES = { 1, 2, 3, 4 }
 
     The point of the curve is resolution where the choice matters: the difference
     between 1 and 2 seconds is a real decision, the difference between 88 and 89
-    is not, and a slider spent 145 steps pretending otherwise.
+    is not.
 ]]
 Data.SECONDS_CHOICES = { 0, 1, 2, 3, 5, 8, 13, 21, 34, 55, 89, 144 }
 

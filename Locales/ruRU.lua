@@ -45,17 +45,36 @@ L["MESSAGE_PEER_PRESSURE_TARGET"] = "%s применяет %s к %s!"
 L["UNKNOWN_SPELL"] = "Неизвестное заклинание"
 
 --------------------------------------------------------------------------------
+-- Mini-map Button
+--------------------------------------------------------------------------------
+
+L["MINIMAP_OPTIONS"] = "Настройки Thanks for the Buff (TFTB)"
+L["LEFT_CLICK"] = "Левый клик"
+L["RIGHT_CLICK"] = "Правый клик"
+L["SHIFT_LEFT_CLICK"] = "Shift + Левый клик"
+L["SHIFT_RIGHT_CLICK"] = "Shift + Правый клик"
+L["SHIFT_MIDDLE_CLICK"] = "Shift + Средний клик"
+L["ACTION_TOGGLE"] = "Переключить"
+L["ENABLED"] = "Включено"
+L["DISABLED"] = "Выключено"
+
+--------------------------------------------------------------------------------
 -- Options: Main Panel
 --------------------------------------------------------------------------------
 
 L["OPTIONS_WELCOME_TOGGLE"] = "Включить приветственное сообщение"
 L["OPTIONS_WELCOME_DESCRIPTION"] =
 	"Выводит сообщение, которое видите только вы, при входе в игру."
+L["OPTIONS_ENABLE_MINIMAP"] = "Включить кнопку у миникарты"
+L["OPTIONS_ENABLE_MINIMAP_DESCRIPTION"] =
+	"Показывает кнопку TFTB у миникарты, которая включает и выключает функции одним щелчком."
 L["OPTIONS_DESCRIPTION"] =
-	"Благодарите шепотом или эмоцией каждого игрока, который накладывает на вас бафф, и смотрите, кому не хватает ваших рейдовых баффов, в трекере баффов, где их можно наложить одним щелчком. А еще получайте оповещения о пиршествах, порталах, призывах, колодцах душ и способностях игроков вашего класса. Вежливость на автомате."
+	"Благодарите шепотом или эмоцией каждого игрока, который накладывает на вас бафф, и держите под баффами свой рейд, себя и свое оружие с помощью напоминания о баффах, где их можно наложить одним щелчком. А еще получайте оповещения о пиршествах, порталах, призывах, колодцах душ и способностях игроков вашего класса. Вежливость на автомате."
 L["OPTIONS_FEATURES_HEADER"] = "Функции"
 L["OPTIONS_FEATURES_DESCRIPTION"] =
 	"Включайте и отключайте каждую функцию здесь или на ее собственной панели."
+L["OPTIONS_FEATURES_NOTE"] =
+	'Возможные грядущие изменения: некоторые наши новые функции, например "%s", выходят за привычные рамки "Thanks for the Buff". Смело отключайте всё, что вам не нужно. Эти функции могут переехать в наш другой аддон, "Connoisseur & Restocker", или всё может объединиться в один большой аддон, например "Buttons, Buffs, & Bags". Поделитесь мнением в Discord, на CurseForge или GitHub. Спасибо!'
 L["OPTIONS_COMMANDS_HEADER"] = "/Commands"
 L["OPTIONS_COMMAND"] = "/tftb"
 L["OPTIONS_COMMAND_DESCRIPTION"] = "Открывает окно настроек этого аддона."
@@ -132,10 +151,10 @@ L["SERVICES_DESCRIPTION"] =
 -- Send Good News
 L["TAB_GOOD_NEWS"] = "Отправка хороших новостей"
 L["GOOD_NEWS_DESCRIPTION"] =
-	"Сообщайте игрокам, которых вы усилили, что вы на них наложили и как долго это продлится."
-L["GOOD_NEWS_WHISPER_ENABLE"] = "Включить хорошие новости"
-L["GOOD_NEWS_WHISPER_DESCRIPTION"] =
-	"Отправляет игроку, которого вы усилили, личное сообщение о том, что он получил и на какое время."
+	"Сообщайте игрокам, которых вы усилили, что вы на них наложили, а для коротких баффов и как долго это продлится."
+L["GOOD_NEWS_ENABLE"] = "Включить хорошие новости"
+L["GOOD_NEWS_ENABLE_DESCRIPTION"] =
+	"Включает личное сообщение игрокам, которых вы усилили, о том, что вы на них наложили."
 L["GOOD_NEWS_SCOPE"] = "Получатели"
 L["GOOD_NEWS_SCOPE_ALWAYS"] = "Любой, кого вы усилили"
 L["GOOD_NEWS_SCOPE_GROUP"] = "Только участники группы"
@@ -145,15 +164,19 @@ L["GOOD_NEWS_MESSAGES_HEADER"] = "Сообщение с хорошими нов�
 L["GOOD_NEWS_MESSAGES_DESCRIPTION"] =
 	"Личное сообщение, которое получают игроки, на которых вы накладываете баффы."
 --[[
-    Two halves so the number stays authoritative: LIMIT's %d is a real placeholder
-    and gets formatted, TOKENS carries a literal %a for the reader to copy and so
+    The message box's tooltip, in three parts. LIMIT's %d is a real placeholder
+    and gets formatted; TOKENS carries a literal %a for the reader to copy and so
     must never reach string.format. Joined into one line at the point of use.
 ]]
+L["GOOD_NEWS_MESSAGE_INPUT_DESCRIPTION"] =
+	"Задает текст личного сообщения. Оставьте поле пустым, чтобы использовать стандартный текст."
 L["GOOD_NEWS_MESSAGE_LIMIT"] = "Максимальная длина: %d."
-L["GOOD_NEWS_MESSAGE_TOKENS"] = "%a заменяется ссылкой на способность."
+L["GOOD_NEWS_MESSAGE_TOKENS"] =
+	"%a заменяется ссылкой на способность, а также ее длительностью, если она меньше минуты."
 --[[
-    Appended to the ability link inside %a when the buff has a readable duration.
-    A whole clause rather than a bare number so it can be reworded per language.
+    Appended to the ability link inside %a when the buff has a readable duration
+    under a minute. A whole clause rather than a bare number so it can be reworded
+    per language.
 ]]
 L["GOOD_NEWS_DURATION_CLAUSE"] = "на %s"
 
@@ -175,7 +198,6 @@ L["PEER_PRESSURE_SOUND_DESCRIPTION"] =
 -- Shared across the buff panels
 L["TRACKED_HEADER"] = "Отслеживаемые способности"
 L["TRACKED_GROUP_ITEMS"] = "Предметы"
-L["TRACKED_TOGGLE_DESCRIPTION"] = "Включает или выключает отслеживание для %s."
 L["TRACKED_ITEM_PENDING"] = "Предмет #%d"
 L["TRACKED_SPELL_PENDING"] = "Заклинание #%d"
 
@@ -274,22 +296,27 @@ L["BUFF_WINDOW_TARGET_ENABLE_DESCRIPTION"] =
 L["BUFF_WINDOW_REFRESH"] = "Обновлять, если осталось меньше"
 L["BUFF_WINDOW_REFRESH_DESCRIPTION"] =
 	"Задает, при каком оставшемся времени бафф считается отсутствующим, чтобы вы успели обновить его до того, как он спадет. Бафф, который длится не дольше этого времени, учитывается только после того, как спадет."
-L["BUFF_WINDOW_PETS_AS_TANKS"] = "Считать питомцев танками"
-L["BUFF_WINDOW_PETS_AS_TANKS_DESCRIPTION"] =
-	"Предлагает питомцам баффы, назначенные танкам, например Шипы, а также баффы для всех."
-L["BUFF_WINDOW_PETS_AS_TANKS_WHEN_DESCRIPTION"] =
-	"Задает, когда питомцы считаются танками."
-L["BUFF_WINDOW_PETS_AS_TANKS_SOLO"] = "Когда вы не в группе"
-L["BUFF_WINDOW_PETS_AS_TANKS_ALWAYS"] = "Всегда"
+-- Count as Tanks: one dropdown per class, then Pets, each with these three choices.
+L["BUFF_WINDOW_TANKS_HEADER"] = "Считать танками"
+L["BUFF_WINDOW_TANKS_DESCRIPTION"] =
+	"Кто получает баффы, которые вы предлагаете танкам, например Шипы, если у игрока нет своей роли."
+L["BUFF_WINDOW_TANKS_CLASS_DESCRIPTION"] =
+	"Задает, когда игроки этого класса считаются танками. Роль танка или лекаря, если она у них есть, всегда важнее."
+L["BUFF_WINDOW_TANKS_PETS"] = "Питомцы"
+L["BUFF_WINDOW_TANKS_PETS_DESCRIPTION"] =
+	"Задает, когда питомцы считаются танками. Питомцы также получают баффы, которые вы предлагаете всем."
+L["BUFF_WINDOW_TANKS_NEVER"] = "Никогда"
+L["BUFF_WINDOW_TANKS_SOLO"] = "Когда вы не в группе"
+L["BUFF_WINDOW_TANKS_ALWAYS"] = "Всегда"
 -- Who each buff is offered to: one dropdown per buff, these four choices.
 L["BUFF_WINDOW_AUDIENCE_OFF"] = "Выкл."
 L["BUFF_WINDOW_AUDIENCE_TANK"] = "Танки"
 L["BUFF_WINDOW_AUDIENCE_HEALER"] = "Лекари"
 L["BUFF_WINDOW_AUDIENCE_ALL"] = "Все"
--- The dropdown's tooltip when the client has no description for the spell yet.
+-- Each buff's dropdown tooltip; hovering the buff's name shows the spell itself.
 L["BUFF_WINDOW_AUDIENCE_DESCRIPTION"] = "Задает, кому предлагать %s."
 L["BUFF_WINDOW_BUFFS_DESCRIPTION"] =
-	"Выберите, кому предлагать каждый бафф. Танки и лекари определяются по роли в группе, а если роль не задана, по классу."
+	"Выберите, кому предлагать каждый бафф. Танки и лекари определяются по роли в группе; все без роли считаются бойцами, если в разделе Считать танками ниже не указано иное."
 
 L["BUFF_WINDOW_SELF_DESCRIPTION"] =
 	"Ваши собственные баффы, закрепленные вверху окна."
@@ -302,26 +329,74 @@ L["BUFF_WINDOW_SELF_NOTE_MAGE_ARMOR"] = "подойдет любая броня"
 L["BUFF_WINDOW_SELF_NOTE_PALADIN_AURA"] = "подойдет любая аура"
 L["BUFF_WINDOW_SELF_NOTE_SHAMAN_SHIELD"] = "подойдет любой щит"
 L["BUFF_WINDOW_SELF_NOTE_WARLOCK_ARMOR"] = "подойдет любая броня"
+L["BUFF_WINDOW_SELF_NOTE_WARLOCK_DEMON"] =
+	"подойдет любой из двух демонических баффов"
 L["BUFF_WINDOW_SELF_REFRESH_OFF"] = "Выкл."
 L["BUFF_WINDOW_SELF_REFRESH_MISSING"] = "Если нет"
 -- %s is a duration from the client, like "5 Minutes".
 L["BUFF_WINDOW_SELF_REFRESH_UNDER"] = "Меньше, чем %s"
 L["BUFF_WINDOW_SELF_REFRESH_DESCRIPTION"] =
 	"Задает, когда показывать %s: никогда, после окончания действия или когда осталось меньше этого времени."
+-- The Weapon Buffs panel, under Buff Duty after Self-Buffs.
+L["BUFF_WINDOW_WEAPON_PANEL_HEADER"] = "Баффы оружия"
+L["BUFF_WINDOW_WEAPON_DESCRIPTION"] =
+	"Отметьте, что должно быть на каждом оружии. Окно предложит это, когда эффекта нет или он скоро закончится, если предмет есть в сумках и подходит к оружию."
+-- The one timing for every weapon buff, at the top of the panel.
+L["BUFF_WINDOW_WEAPON_REFRESH"] = "Наносить снова"
+L["BUFF_WINDOW_WEAPON_REFRESH_DESCRIPTION"] =
+	"Задает, когда бафф оружия предлагается снова: после окончания действия или когда осталось меньше этого времени."
+-- The boxes for the weapon items any class can use, after the rogue and shaman boxes.
+L["BUFF_WINDOW_WEAPON_KIND_OIL"] = "Масла"
+L["BUFF_WINDOW_WEAPON_KIND_STONE"] = "Камни"
+L["BUFF_WINDOW_WEAPON_KIND_LURE"] = "Приманки"
+--[[
+    One choice's checkbox under one hand. The first %s is the poison, imbue,
+    oil, stone or lure, the second the client's "Main Hand" or "Off Hand".
+]]
+L["BUFF_WINDOW_WEAPON_PICK_DESCRIPTION"] =
+	"Предлагает %s для оружия (%s). Пока на оружии нет ни одного из отмеченных вариантов, предлагается каждый, который у вас есть."
 L["BUFF_WINDOW_SELF_ENABLE"] = "Ваши баффы на себя"
 L["BUFF_WINDOW_SELF_ENABLE_DESCRIPTION"] =
 	"Показывает вверху окна баффы, которые вы можете наложить только на себя, например броню или Внутренний огонь, когда их нет или они скоро закончатся. Выберите нужные в разделе Баффы на себя."
+L["BUFF_WINDOW_WEAPON_ENABLE"] = "Ваши баффы оружия"
+L["BUFF_WINDOW_WEAPON_ENABLE_DESCRIPTION"] =
+	"Показывает яды, чары оружия, масла и камни, которых нет на вашем оружии или которые скоро закончатся, вместе с баффами на себя вверху окна. Нажмите на один из них, чтобы нанести его. Выберите нужные в разделе Баффы оружия."
 
 -- The window itself
 L["BUFF_WINDOW_SELF_HEADER"] = "Баффы на себя"
 L["BUFF_WINDOW_FAVOR_HEADER"] = "Ответная любезность"
 L["BUFF_WINDOW_TARGET_HEADER"] = "Цель"
 L["BUFF_WINDOW_TOOLTIP_CAST"] = "Нажмите, чтобы применить к игроку %s."
+-- %s is the client's "Main Hand" or "Off Hand".
+L["BUFF_WINDOW_TOOLTIP_WEAPON"] = "Нажмите, чтобы нанести на оружие (%s)."
+L["BUFF_WINDOW_TOOLTIP_USE"] =
+	"Ни у кого в группе нет камня души. Нажмите, чтобы использовать его на игроке %s."
+L["BUFF_WINDOW_TOOLTIP_CREATE"] =
+	"Ни у кого в группе нет камня души. Нажмите, чтобы создать его."
 L["BUFF_WINDOW_TOOLTIP_GROUP"] =
 	"Нажмите, чтобы применить к игроку %s и его группе."
 L["BUFF_WINDOW_TOOLTIP_FAVOR"] =
 	"Нажмите, чтобы выбрать игрока %s целью и применить."
 L["BUFF_WINDOW_TOOLTIP_DISMISS"] = "Правый клик, чтобы убрать игрока %s из списка."
+-- The window's close button; %s is the options slash command.
+L["BUFF_WINDOW_CLOSED"] =
+	"Дежурство по баффам выключено. Чтобы включить его снова, нажмите Shift + Правый клик по кнопке у миникарты или введите %s."
+
+-- The Buff Keys (Key Bindings, and the Keybinds section of Buff Duty)
+L["BUFF_KEYS_HEADER"] = "Клавиши"
+L["BUFF_KEYS_DESCRIPTION"] =
+	"Накладывайте следующий бафф из списка одной клавишей или макросом вне боя. Баффы оружия по-прежнему наносятся щелчком в окне."
+L["BUFF_KEY_SINGLE"] = "Кнопка одиночных баффов"
+L["BUFF_KEY_SINGLE_DESCRIPTION"] =
+	"Накладывает следующий недостающий бафф, по одному за нажатие: воскрешение мертвой цели (жрецы и паладины), затем баффы на себя, Ответная любезность, ваша цель и ваша группа."
+L["BUFF_KEY_GROUP"] = "Кнопка групповых баффов"
+L["BUFF_KEY_GROUP_DESCRIPTION"] =
+	"Накладывает следующий недостающий групповой бафф, по одному за нажатие: воскрешение мертвой цели (жрецы и паладины), затем баффы на себя, затем группа вашей цели и остальные. Группа ждет, пока все, кому не хватает баффа, не окажутся в радиусе действия."
+-- %s is a player's name.
+L["BUFF_KEY_WAITING"] = "Ожидание, пока игрок %s окажется в радиусе действия."
+L["BUFF_KEY_DONE"] = "Больше нечего накладывать."
+-- The caption beside the read-only box that holds a Buff Key's macro line.
+L["BUFF_KEY_MACRO_CAPTION"] = "Макрос:"
 
 --------------------------------------------------------------------------------
 -- Options: Thank You Button
@@ -336,6 +411,11 @@ L["BUTTON_EMOTE"] = "Эмоция"
 L["BUTTON_EMOTE_DESCRIPTION"] =
 	"Задает эмоцию, которую эта кнопка адресует вашей цели. Вариант Нет отключает эмоцию."
 L["BUTTON_EMOTE_NONE"] = "Нет"
+L["BUTTON_ICON"] = "Значок"
+L["BUTTON_ICON_DESCRIPTION"] =
+	"Задает значок, который макрос этой кнопки показывает в списке макросов и на панелях команд."
+-- The Icon dropdown's first choice, the macros' own icon; every other choice is a picture alone.
+L["BUTTON_ICON_DEFAULT"] = "По умолчанию"
 --[[
     The toggle owns the macro in both directions, so the label is ENABLE rather
     than CREATE. Both strings carry the macro's name: with five buttons stacked,

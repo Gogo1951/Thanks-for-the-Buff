@@ -675,7 +675,13 @@ local function CollectIds(entry)
 					for _, column in ipairs(columns) do
 						data[column[1]] = column[2](found.key, found.row)
 					end
-					ids[#ids + 1] = { id = found.id, source = source.table, kind = source.kind, data = data }
+					ids[#ids + 1] = {
+						id = found.id,
+						source = source.table,
+						kind = source.kind,
+						data = data,
+						problem = found.problem,
+					}
 				end
 			end
 		end

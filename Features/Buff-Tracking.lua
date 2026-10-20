@@ -268,6 +268,11 @@ end
     second is already on cooldown).
 ]]
 local function OnUnitSpellcastSucceeded(unitTarget, castGUID, spellID)
+	-- The Buff Keys hear their own casts go off, whether or not tracking is ready.
+	if ns.OnBuffKeyCastSucceeded then
+		ns.OnBuffKeyCastSucceeded(unitTarget, spellID)
+	end
+
 	if not isReady or not ns.db then
 		return
 	end
@@ -477,7 +482,7 @@ local function OnUnitAura(unit, updateInfo)
 	if ns.OnBuffWindowAura then
 		ns.OnBuffWindowAura(unit)
 	end
-	if ns.FLAVOR ~= "Camelot" or unit ~= "player" then
+	if ns.FLAVOR ~= "Camelot" or not ns.IsPlain(unit) or unit ~= "player" then
 		return
 	end
 	if ns.diagnostics and ns.diagnostics.logging then

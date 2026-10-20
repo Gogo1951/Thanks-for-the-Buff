@@ -3,7 +3,7 @@ local _, ns = ...
 -- { class, { spell ids }, default }, -- Name
 ns.PEER_PRESSURE_ABILITIES = {
 	-- Druid ---------------------------------------------------------------------
-	{ "DRUID", { 417141 }, 1 }, -- Berserk (Forever talent id)
+	{ "DRUID", { 417141 }, 1 }, -- Berserk (talent id)
 	{ "DRUID", { 22842 }, 0 }, -- Frenzied Regeneration
 	{ "DRUID", { 29166 }, 1 }, -- Innervate
 	-- Hunter --------------------------------------------------------------------
@@ -25,7 +25,7 @@ ns.PEER_PRESSURE_ABILITIES = {
 	{ "PALADIN", { 642, 1020 }, 1 }, -- Divine Shield
 	{ "PALADIN", { 633, 2800, 10310 }, 1 }, -- Lay on Hands
 	-- Priest --------------------------------------------------------------------
-	{ "PRIEST", { 1277462, 1277634, 1277638, 1277639, 1277640 }, 1 }, -- Contingency Plan (Forever)
+	{ "PRIEST", { 1277462, 1277634, 1277638, 1277639, 1277640 }, 1 }, -- Contingency Plan
 	{ "PRIEST", { 13908, 19236, 19238, 19240, 19241, 19242, 19243 }, 0 }, -- Desperate Prayer
 	{ "PRIEST", { 6346 }, 1 }, -- Fear Ward
 	{ "PRIEST", { 10060 }, 1 }, -- Power Infusion
@@ -70,6 +70,10 @@ Wowhead
 wago.tools
 	https://wago.tools/db2/SpellName?build=1.60.1.70450
 	https://wago.tools/db2/SkillLineAbility?build=1.60.1.70450
+	https://wago.tools/db2/SpellLevels?build=1.60.1.70450
+	https://wago.tools/db2/SkillLine?build=1.60.1.70450
+	https://wago.tools/db2/SpellEffect?build=1.60.1.70450
+	https://wago.tools/db2/Talent?build=1.60.1.70450
 
 QuestieDB
 	None.

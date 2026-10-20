@@ -141,9 +141,9 @@ end
 --[[
     Chat-safe spell link, built by hand the way Control Freak does. We deliberately
     do NOT prefer the native GetSpellLink: on Classic it returns a link WITHOUT the
-    trailing ":0" glyph field, which renders fine in a local tooltip or print but
-    SendChatMessage's hyperlink validator strips on send -- so whispers arrived with
-    the link gone and only the bare spell name left. Building "Hspell:<id>:0"
+    trailing ":0" glyph field, which renders fine in a local tooltip or print, but
+    SendChatMessage's hyperlink validator strips a link without it and leaves only
+    the bare spell name. Building "Hspell:<id>:0"
     ourselves passes that validator and works in both chat and local prints.
 
     Native is only a last resort, for the rare spell whose name won't resolve (so we
@@ -258,8 +258,8 @@ end
     one -- cross-realm sources arrive as "Name-Realm" and never resolve. Map the
     buffer's GUID to a unit we actually have (the player, a group member, or the
     current target / focus / mouseover) and return nil when none matches; the
-    emote caller then falls back to the bare name or no emote, never the
-    undirected one.
+    emote caller then falls back to the bare name, which still degrades to the
+    undirected emote when the client can't resolve it.
 ]]
 local POINTED_UNITS = { "target", "focus", "mouseover" }
 

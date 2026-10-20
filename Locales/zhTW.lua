@@ -44,15 +44,34 @@ L["MESSAGE_PEER_PRESSURE_TARGET"] = "%s 使用了 %s，目標是 %s！"
 L["UNKNOWN_SPELL"] = "未知法術"
 
 --------------------------------------------------------------------------------
+-- Mini-map Button
+--------------------------------------------------------------------------------
+
+L["MINIMAP_OPTIONS"] = "Thanks for the Buff (TFTB) 選項"
+L["LEFT_CLICK"] = "左鍵點擊"
+L["RIGHT_CLICK"] = "右鍵點擊"
+L["SHIFT_LEFT_CLICK"] = "Shift + 左鍵點擊"
+L["SHIFT_RIGHT_CLICK"] = "Shift + 右鍵點擊"
+L["SHIFT_MIDDLE_CLICK"] = "Shift + 中鍵點擊"
+L["ACTION_TOGGLE"] = "切換"
+L["ENABLED"] = "已啟用"
+L["DISABLED"] = "已停用"
+
+--------------------------------------------------------------------------------
 -- Options: Main Panel
 --------------------------------------------------------------------------------
 
 L["OPTIONS_WELCOME_TOGGLE"] = "啟用歡迎訊息"
 L["OPTIONS_WELCOME_DESCRIPTION"] = "登入時顯示一則只有你能看到的訊息。"
+L["OPTIONS_ENABLE_MINIMAP"] = "啟用小地圖按鈕"
+L["OPTIONS_ENABLE_MINIMAP_DESCRIPTION"] =
+	"在小地圖上顯示 TFTB 按鈕，點擊即可開啟或關閉各項功能。"
 L["OPTIONS_DESCRIPTION"] =
-	"透過密語或表情感謝每一位為你施加增益的玩家，並用一鍵施放的增益追蹤器查看誰缺少你的團隊增益。還會提醒你大餐、傳送門、召喚、靈魂之井和同職業的冷卻技能。禮數周到，全自動。"
+	"透過密語或表情感謝每一位為你施加增益的玩家，並用一鍵施放的增益提醒，讓你的團隊、你自己和你的武器始終保持增益。還會提醒你大餐、傳送門、召喚、靈魂之井和同職業的冷卻技能。禮數周到，全自動。"
 L["OPTIONS_FEATURES_HEADER"] = "功能"
 L["OPTIONS_FEATURES_DESCRIPTION"] = "在此處或各功能自己的面板中開啟或關閉每項功能。"
+L["OPTIONS_FEATURES_NOTE"] =
+	'可能的變化：一些新功能（例如"%s"）已超出"Thanks for the Buff"的傳統範圍。不需要的功能可以隨時關閉。這些功能可能會移到我們的另一個插件"Connoisseur & Restocker"中，或者全部合併成一個更大的插件，也許叫"Buttons, Buffs, & Bags"。歡迎在 Discord、CurseForge 或 GitHub 上告訴我們你的想法。謝謝！'
 L["OPTIONS_COMMANDS_HEADER"] = "/Commands"
 L["OPTIONS_COMMAND"] = "/tftb"
 L["OPTIONS_COMMAND_DESCRIPTION"] = "打開此插件的選項介面。"
@@ -122,10 +141,10 @@ L["SERVICES_DESCRIPTION"] =
 -- Send Good News
 L["TAB_GOOD_NEWS"] = "發送好消息"
 L["GOOD_NEWS_DESCRIPTION"] =
-	"讓被你施加增益的玩家知道你為他們施放了什麼，以及能持續多久。"
-L["GOOD_NEWS_WHISPER_ENABLE"] = "啟用好消息"
-L["GOOD_NEWS_WHISPER_DESCRIPTION"] =
-	"密語被你施加增益的玩家，告訴對方獲得了什麼增益以及持續多久。"
+	"讓被你施加增益的玩家知道你為他們施放了什麼；對於短時增益，還會告知能持續多久。"
+L["GOOD_NEWS_ENABLE"] = "啟用好消息"
+L["GOOD_NEWS_ENABLE_DESCRIPTION"] =
+	"開啟一則密語，告訴被你施加增益的玩家你為他們施放了什麼。"
 L["GOOD_NEWS_SCOPE"] = "接收者"
 L["GOOD_NEWS_SCOPE_ALWAYS"] = "任何被你增益的人"
 L["GOOD_NEWS_SCOPE_GROUP"] = "僅隊伍或團隊成員"
@@ -134,15 +153,17 @@ L["GOOD_NEWS_SCOPE_DESCRIPTION"] =
 L["GOOD_NEWS_MESSAGES_HEADER"] = "好消息訊息"
 L["GOOD_NEWS_MESSAGES_DESCRIPTION"] = "被你增益的玩家會收到的密語。"
 --[[
-    Two halves so the number stays authoritative: LIMIT's %d is a real placeholder
-    and gets formatted, TOKENS carries a literal %a for the reader to copy and so
+    The message box's tooltip, in three parts. LIMIT's %d is a real placeholder
+    and gets formatted; TOKENS carries a literal %a for the reader to copy and so
     must never reach string.format. Joined into one line at the point of use.
 ]]
+L["GOOD_NEWS_MESSAGE_INPUT_DESCRIPTION"] = "設定密語的內容。留空則使用預設文字。"
 L["GOOD_NEWS_MESSAGE_LIMIT"] = "最大長度：%d。"
-L["GOOD_NEWS_MESSAGE_TOKENS"] = "%a 會變成技能連結。"
+L["GOOD_NEWS_MESSAGE_TOKENS"] = "%a 會變成技能連結，持續時間不足一分鐘時還會附上持續時間。"
 --[[
-    Appended to the ability link inside %a when the buff has a readable duration.
-    A whole clause rather than a bare number so it can be reworded per language.
+    Appended to the ability link inside %a when the buff has a readable duration
+    under a minute. A whole clause rather than a bare number so it can be reworded
+    per language.
 ]]
 L["GOOD_NEWS_DURATION_CLAUSE"] = "持續 %s"
 
@@ -162,7 +183,6 @@ L["PEER_PRESSURE_SOUND_DESCRIPTION"] = "有同職業冷卻技能被使用時播�
 -- Shared across the buff panels
 L["TRACKED_HEADER"] = "追蹤的技能"
 L["TRACKED_GROUP_ITEMS"] = "物品"
-L["TRACKED_TOGGLE_DESCRIPTION"] = "開啟或關閉對 %s 的追蹤。"
 L["TRACKED_ITEM_PENDING"] = "物品 #%d"
 L["TRACKED_SPELL_PENDING"] = "法術 #%d"
 
@@ -249,21 +269,27 @@ L["BUFF_WINDOW_TARGET_ENABLE_DESCRIPTION"] =
 L["BUFF_WINDOW_REFRESH"] = "剩餘低於此值時補充"
 L["BUFF_WINDOW_REFRESH_DESCRIPTION"] =
 	"設定增益剩餘時間低於多少時視為缺失，方便你在增益消失前及時補上。持續時間不超過此值的增益，只有在消失後才會視為缺失。"
-L["BUFF_WINDOW_PETS_AS_TANKS"] = "將寵物視為坦克"
-L["BUFF_WINDOW_PETS_AS_TANKS_DESCRIPTION"] =
-	"除了設為所有人的增益外，也為寵物提供設為坦克的增益，例如荊棘術。"
-L["BUFF_WINDOW_PETS_AS_TANKS_WHEN_DESCRIPTION"] = "設定寵物何時視為坦克。"
-L["BUFF_WINDOW_PETS_AS_TANKS_SOLO"] = "不在隊伍中時"
-L["BUFF_WINDOW_PETS_AS_TANKS_ALWAYS"] = "總是"
+-- Count as Tanks: one dropdown per class, then Pets, each with these three choices.
+L["BUFF_WINDOW_TANKS_HEADER"] = "視為坦克"
+L["BUFF_WINDOW_TANKS_DESCRIPTION"] =
+	"沒有自身職責時，誰能獲得你提供給坦克的增益，例如荊棘術。"
+L["BUFF_WINDOW_TANKS_CLASS_DESCRIPTION"] =
+	"設定此職業的玩家何時視為坦克。他們自己的坦克或治療者職責始終優先。"
+L["BUFF_WINDOW_TANKS_PETS"] = "寵物"
+L["BUFF_WINDOW_TANKS_PETS_DESCRIPTION"] =
+	"設定寵物何時視為坦克。寵物也會獲得你提供給所有人的增益。"
+L["BUFF_WINDOW_TANKS_NEVER"] = "從不"
+L["BUFF_WINDOW_TANKS_SOLO"] = "不在隊伍中時"
+L["BUFF_WINDOW_TANKS_ALWAYS"] = "總是"
 -- Who each buff is offered to: one dropdown per buff, these four choices.
 L["BUFF_WINDOW_AUDIENCE_OFF"] = "關閉"
 L["BUFF_WINDOW_AUDIENCE_TANK"] = "坦克"
 L["BUFF_WINDOW_AUDIENCE_HEALER"] = "治療者"
 L["BUFF_WINDOW_AUDIENCE_ALL"] = "所有人"
--- The dropdown's tooltip when the client has no description for the spell yet.
+-- Each buff's dropdown tooltip; hovering the buff's name shows the spell itself.
 L["BUFF_WINDOW_AUDIENCE_DESCRIPTION"] = "設定 %s 提供給誰。"
 L["BUFF_WINDOW_BUFFS_DESCRIPTION"] =
-	"選擇每個增益提供給誰。坦克和治療者依隊伍職責判定，未設定職責時依職業判定。"
+	"選擇每個增益提供給誰。坦克和治療者依隊伍職責判定；沒有職責的人視為傷害輸出，除非下方的視為坦克另有設定。"
 
 L["BUFF_WINDOW_SELF_DESCRIPTION"] = "你自己的增益，固定在視窗頂部。"
 --[[
@@ -275,24 +301,69 @@ L["BUFF_WINDOW_SELF_NOTE_MAGE_ARMOR"] = "任意一種護甲即可"
 L["BUFF_WINDOW_SELF_NOTE_PALADIN_AURA"] = "任意一種光環即可"
 L["BUFF_WINDOW_SELF_NOTE_SHAMAN_SHIELD"] = "任意一種護盾即可"
 L["BUFF_WINDOW_SELF_NOTE_WARLOCK_ARMOR"] = "任意一種護甲即可"
+L["BUFF_WINDOW_SELF_NOTE_WARLOCK_DEMON"] = "兩種惡魔增益任意一種即可"
 L["BUFF_WINDOW_SELF_REFRESH_OFF"] = "關閉"
 L["BUFF_WINDOW_SELF_REFRESH_MISSING"] = "缺失時"
 -- %s is a duration from the client, like "5 Minutes".
 L["BUFF_WINDOW_SELF_REFRESH_UNDER"] = "剩餘不足%s"
 L["BUFF_WINDOW_SELF_REFRESH_DESCRIPTION"] =
 	"設定 %s 何時顯示：從不、消失後，或剩餘時間少於此值時。"
+-- The Weapon Buffs panel, under Buff Duty after Self-Buffs.
+L["BUFF_WINDOW_WEAPON_PANEL_HEADER"] = "武器增益"
+L["BUFF_WINDOW_WEAPON_DESCRIPTION"] =
+	"勾選每把武器應保持的效果。當效果缺失或即將結束，且物品在你的背包中並適用於該武器時，視窗會提供它。"
+-- The one timing for every weapon buff, at the top of the panel.
+L["BUFF_WINDOW_WEAPON_REFRESH"] = "重新施加"
+L["BUFF_WINDOW_WEAPON_REFRESH_DESCRIPTION"] =
+	"設定武器增益何時再次提供：消失後，或剩餘時間少於此值時。"
+-- The boxes for the weapon items any class can use, after the rogue and shaman boxes.
+L["BUFF_WINDOW_WEAPON_KIND_OIL"] = "油"
+L["BUFF_WINDOW_WEAPON_KIND_STONE"] = "磨刀石"
+L["BUFF_WINDOW_WEAPON_KIND_LURE"] = "魚餌"
+--[[
+    One choice's checkbox under one hand. The first %s is the poison, imbue,
+    oil, stone or lure, the second the client's "Main Hand" or "Off Hand".
+]]
+L["BUFF_WINDOW_WEAPON_PICK_DESCRIPTION"] =
+	"提供%s，用於你的%s武器。當武器上沒有任何已勾選的選項時，會提供你擁有的每一種。"
 L["BUFF_WINDOW_SELF_ENABLE"] = "你的自身增益"
 L["BUFF_WINDOW_SELF_ENABLE_DESCRIPTION"] =
 	"當只能對自己施放的增益（例如護甲類法術或心靈之火）缺失或即將結束時，將其顯示在視窗頂部。可在自身增益中選擇要顯示哪些。"
+L["BUFF_WINDOW_WEAPON_ENABLE"] = "你的武器增益"
+L["BUFF_WINDOW_WEAPON_ENABLE_DESCRIPTION"] =
+	"將武器上缺失或即將結束的毒藥、武器強化、油和磨刀石，與你的自身增益一起顯示在視窗頂部。點擊即可施加。可在武器增益中選擇要顯示哪些。"
 
 -- The window itself
 L["BUFF_WINDOW_SELF_HEADER"] = "自身增益"
 L["BUFF_WINDOW_FAVOR_HEADER"] = "禮尚往來"
 L["BUFF_WINDOW_TARGET_HEADER"] = "目標"
 L["BUFF_WINDOW_TOOLTIP_CAST"] = "點擊對 %s 施放。"
+-- %s is the client's "Main Hand" or "Off Hand".
+L["BUFF_WINDOW_TOOLTIP_WEAPON"] = "點擊施加到你的%s武器。"
+L["BUFF_WINDOW_TOOLTIP_USE"] = "你的隊伍中沒有人有靈魂石。點擊對 %s 使用一顆。"
+L["BUFF_WINDOW_TOOLTIP_CREATE"] = "你的隊伍中沒有人有靈魂石。點擊製造一顆。"
 L["BUFF_WINDOW_TOOLTIP_GROUP"] = "點擊對 %s 及其隊伍施放。"
 L["BUFF_WINDOW_TOOLTIP_FAVOR"] = "點擊選取 %s 為目標並施放。"
 L["BUFF_WINDOW_TOOLTIP_DISMISS"] = "右鍵點擊將 %s 從列表中移除。"
+-- The window's close button; %s is the options slash command.
+L["BUFF_WINDOW_CLOSED"] =
+	"增益值班已關閉。要重新開啟，請 Shift + 右鍵點擊小地圖按鈕，或輸入 %s。"
+
+-- The Buff Keys (Key Bindings, and the Keybinds section of Buff Duty)
+L["BUFF_KEYS_HEADER"] = "按鍵綁定"
+L["BUFF_KEYS_DESCRIPTION"] =
+	"脫離戰鬥時，用一個按鍵或巨集施放清單中的下一個增益。武器增益仍需在視窗中點擊施加。"
+L["BUFF_KEY_SINGLE"] = "單體增益按鈕"
+L["BUFF_KEY_SINGLE_DESCRIPTION"] =
+	"每按一次施放下一個缺少的增益：先復活死亡的目標（牧師和聖騎士），然後是自身增益、禮尚往來、你的目標和你的隊伍。"
+L["BUFF_KEY_GROUP"] = "隊伍增益按鈕"
+L["BUFF_KEY_GROUP_DESCRIPTION"] =
+	"每按一次施放下一個缺少的隊伍增益：先復活死亡的目標（牧師和聖騎士），然後是自身增益，再是你目標所在的小隊和其他小隊。一個小隊會等到所有缺少該增益的成員都進入範圍。"
+-- %s is a player's name.
+L["BUFF_KEY_WAITING"] = "正在等待 %s 進入範圍。"
+L["BUFF_KEY_DONE"] = "沒有需要施放的增益了。"
+-- The caption beside the read-only box that holds a Buff Key's macro line.
+L["BUFF_KEY_MACRO_CAPTION"] = "巨集："
 
 --------------------------------------------------------------------------------
 -- Options: Thank You Button
@@ -305,6 +376,10 @@ L["BUTTON_SECTION"] = "感謝按鈕 %d"
 L["BUTTON_EMOTE"] = "表情"
 L["BUTTON_EMOTE_DESCRIPTION"] = "設定此按鈕對你的目標使用的表情，選擇'無'則不使用表情。"
 L["BUTTON_EMOTE_NONE"] = "無"
+L["BUTTON_ICON"] = "圖示"
+L["BUTTON_ICON_DESCRIPTION"] = "設定此按鈕的巨集在巨集清單和快捷列上顯示的圖示。"
+-- The Icon dropdown's first choice, the macros' own icon; every other choice is a picture alone.
+L["BUTTON_ICON_DEFAULT"] = "預設"
 --[[
     The toggle owns the macro in both directions, so the label is ENABLE rather
     than CREATE. Both strings carry the macro's name: with five buttons stacked,

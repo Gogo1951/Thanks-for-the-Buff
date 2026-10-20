@@ -28,12 +28,30 @@ function ns.BuildGeneralOptions()
 					ns.db.profile.showWelcome = value
 				end,
 			},
+			spaceMinimap = ns.OptionsSpacer(4.5),
+			enableMinimap = {
+				type = "toggle",
+				name = L["OPTIONS_ENABLE_MINIMAP"],
+				desc = L["OPTIONS_ENABLE_MINIMAP_DESCRIPTION"],
+				width = "full",
+				order = 5,
+				get = function()
+					return not ns.db.profile.minimap.hide
+				end,
+				set = function(_, value)
+					ns.db.profile.minimap.hide = not value
+					ns.RefreshMinimapButton()
+				end,
+			},
 			-- Features
 			spaceFeatures0 = ns.OptionsSpacer(10),
 			headerFeatures = ns.OptionsHeader(L["OPTIONS_FEATURES_HEADER"], 11),
 			spaceFeatures1 = ns.OptionsSpacer(12),
 			descFeatures = ns.OptionsDesc(L["OPTIONS_FEATURES_DESCRIPTION"], 12.3),
 			spaceFeatures2 = ns.OptionsSpacer(12.6),
+			-- The feature rows fill 13 onward; the note sits below them.
+			spaceFeatures3 = ns.OptionsSpacer(50),
+			noteFeatures = ns.OptionsFeaturesNote(51),
 			-- /Commands
 			spaceCommands0 = ns.OptionsSpacer(60),
 			headerCommands = ns.OptionsHeader(L["OPTIONS_COMMANDS_HEADER"], 61),
