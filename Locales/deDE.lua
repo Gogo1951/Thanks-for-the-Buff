@@ -34,10 +34,6 @@ L["MESSAGE_WHISPER_THANKS"] = "Danke für %s"
 L["MESSAGE_SELECT_PLAYER"] = "Nehmt zuerst einen Spieler ins Ziel."
 L["MESSAGE_CANT_THANK_SELF"] = "Ihr könnt Euch nicht selbst danken!"
 
--- Peer Pressure
-L["MESSAGE_PEER_PRESSURE"] = "%s hat %s eingesetzt!"
-L["MESSAGE_PEER_PRESSURE_TARGET"] = "%s hat %s auf %s eingesetzt!"
-
 --------------------------------------------------------------------------------
 -- Text Fragments
 --------------------------------------------------------------------------------
@@ -68,11 +64,11 @@ L["OPTIONS_ENABLE_MINIMAP"] = "Minikarten-Schaltfläche aktivieren"
 L["OPTIONS_ENABLE_MINIMAP_DESCRIPTION"] =
 	"Zeigt die TFTB-Schaltfläche an Eurer Minikarte, mit der Ihr Funktionen per Klick ein- und ausschaltet."
 L["OPTIONS_DESCRIPTION"] =
-	"Bedankt Euch per Flüstern oder Emote bei jedem Spieler, der Euch bufft, und haltet Euren Schlachtzug, Euch selbst und Eure Waffen mit einer Buff-Erinnerung gebufft, die per Klick wirkt. Dazu Benachrichtigungen für Festmähler, Portale, Beschwörungen, Seelenbrunnen und Abklingzeiten Eurer Klasse. Gute Manieren, automatisiert."
+	"Bedankt Euch automatisch per Flüstern oder Emote bei jedem Spieler, der Euch bufft, und haltet Euren Schlachtzug, Euch selbst und Eure Waffen gebufft, mit einer Erinnerung an fehlende Buffs, die per Klick wirkt. Dazu Benachrichtigungen für Festmähler, Portale, Beschwörungen und Seelenbrunnen. Gute Manieren, automatisiert."
 L["OPTIONS_FEATURES_HEADER"] = "Funktionen"
 L["OPTIONS_FEATURES_DESCRIPTION"] = "Schaltet jede Funktion hier oder auf ihrer eigenen Seite ein oder aus."
 L["OPTIONS_FEATURES_NOTE"] =
-	'Mögliche anstehende Änderungen: Einige unserer neueren Funktionen, wie "%s", gehen über den bisherigen Rahmen von "Thanks for the Buff" hinaus. Schaltet ruhig alles aus, was Ihr nicht braucht. Diese Funktionen könnten in unser anderes Add-on "Connoisseur & Restocker" umziehen, oder alles wird zu einem größeren Add-on zusammengeführt, vielleicht "Buttons, Buffs, & Bags". Teilt uns Eure Meinung auf Discord, CurseForge oder GitHub mit. Danke!'
+	'Einige unserer neueren Funktionen, wie "%s", gehen über den bisherigen Rahmen von "Thanks for the Buff" hinaus. Schaltet ruhig alles aus, was Ihr nicht braucht. Diese Funktionen könnten in unser anderes Add-on "Connoisseur & Restocker" umziehen, oder alles wird zu einem größeren Add-on zusammengeführt, vielleicht "Buttons, Buffs, & Bags". Teilt uns Eure Meinung auf Discord, CurseForge oder GitHub mit. Danke!'
 L["OPTIONS_COMMANDS_HEADER"] = "/Commands"
 L["OPTIONS_COMMAND"] = "/tftb"
 L["OPTIONS_COMMAND_DESCRIPTION"] = "Öffnet das Optionsmenü dieses Add-ons."
@@ -171,20 +167,11 @@ L["GOOD_NEWS_MESSAGE_TOKENS"] = "%a wird zum Fähigkeitslink, samt Dauer, wenn s
 ]]
 L["GOOD_NEWS_DURATION_CLAUSE"] = "für %s"
 
--- Peer Pressure
+-- Peer Pressure (TEMPORARY: delete on or after 2026-11-21, with Options/Options-Peer-Pressure.lua)
 L["TAB_PEER_PRESSURE"] = "Gruppenzwang"
-L["PEER_PRESSURE_DESCRIPTION"] =
-	"Werdet benachrichtigt, wenn andere Spieler Eurer Klasse ihre Abklingzeiten einsetzen, damit Ihr dem Gruppenzwang nachgeben könnt."
-L["PEER_PRESSURE_ENABLE"] = "Gruppenzwang aktivieren"
-L["PEER_PRESSURE_ENABLE_DESCRIPTION"] =
-	"Aktiviert Hinweise, wenn ein anderer Spieler Eurer Klasse eine verfolgte Abklingzeit einsetzt."
-L["PEER_PRESSURE_PRINT_DESCRIPTION"] =
-	"Gibt eine Nachricht aus, die nur Ihr seht, wenn eine Abklingzeit Eurer Klasse eingesetzt wird."
-L["PEER_PRESSURE_OWN_CASTS"] = "Bei eigenen Zaubern auslösen"
-L["PEER_PRESSURE_OWN_CASTS_DESCRIPTION"] =
-	"Löst auch aus, wenn Ihr Eure eigenen Abklingzeiten einsetzt, nicht nur bei anderen Spielern."
-L["PEER_PRESSURE_SOUND_DESCRIPTION"] =
-	"Spielt einen Ton ab, wenn eine Abklingzeit Eurer Klasse eingesetzt wird. Nur Ihr hört ihn."
+L["PEER_PRESSURE_CONTROL_FREAK"] = "Control Freak"
+L["PEER_PRESSURE_MOVED"] =
+	'WoW Forever lässt Add-ons das Kampflog nicht lesen, deshalb bauen wir unsere Add-ons so um, dass sie in jeder Version des Spiels gleich funktionieren. "Gruppenzwang" ist in unser anderes Add-on "Control Freak" umgezogen. Installiert es, um weiterhin benachrichtigt zu werden, wenn Spieler Eurer Klasse ihre Abklingzeiten einsetzen.'
 
 -- Shared across the buff panels
 L["TRACKED_HEADER"] = "Verfolgte Fähigkeiten"
@@ -203,9 +190,8 @@ L["WHISPER_MESSAGE_RESET_DESCRIPTION"] = "Setzt die Flüsternachricht auf den St
 
 --[[
     The two section headers every buff panel is built from: what the other player
-    sees, then what only you get. Peer Pressure sends nothing outward, so it
-    carries the Notifications header alone. Key prefixes match the header the
-    control appears under.
+    sees, then what only you get. Key prefixes match the header the control
+    appears under.
 ]]
 L["PRAISE_HEADER"] = "Dankesflüstern & Emotes"
 L["NOTIFICATIONS_HEADER"] = "Benachrichtigungen"
@@ -256,6 +242,20 @@ L["BUFF_WINDOW_ENABLE_DESCRIPTION"] =
 	"Aktiviert den Buff-Dienst, das Fenster mit den Gruppenmitgliedern, denen ein Buff fehlt, den Ihr geben könnt."
 L["BUFF_WINDOW_NO_BUFFS"] =
 	"Eure Klasse hat keine Buffs auf dieser Liste, daher erscheint das Fenster bei diesem Charakter nie."
+-- When to Show: Solo and In Group, each with Always or In Instance, then the classes.
+L["BUFF_WINDOW_WHEN_HEADER"] = "Wann anzeigen"
+L["BUFF_WINDOW_WHEN_DESCRIPTION"] = "Legt fest, wann das Fenster erscheinen kann."
+L["BUFF_WINDOW_WHEN_SOLO"] = "Solo"
+L["BUFF_WINDOW_WHEN_SOLO_DESCRIPTION"] =
+	"Zeigt das Fenster, während Ihr nicht in einer Gruppe oder einem Schlachtzug seid."
+L["BUFF_WINDOW_WHEN_GROUP"] = "In Gruppe"
+L["BUFF_WINDOW_WHEN_GROUP_DESCRIPTION"] = "Zeigt das Fenster, während Ihr in einer Gruppe oder einem Schlachtzug seid."
+L["BUFF_WINDOW_WHERE_DESCRIPTION"] =
+	"Legt fest, wo das Fenster erscheint: überall oder nur in Dungeons, Schlachtzügen, Schlachtfeldern und Arenen."
+L["BUFF_WINDOW_WHERE_ALWAYS"] = "Immer"
+L["BUFF_WINDOW_WHERE_INSTANCE"] = "In Instanz"
+L["BUFF_WINDOW_CLASSES_DESCRIPTION"] = "Zeigt das Fenster, wenn Ihr eine dieser Klassen spielt."
+L["BUFF_WINDOW_CLASS_DESCRIPTION"] = "Zeigt das Fenster, während Ihr diese Klasse spielt."
 L["BUFF_WINDOW_HEADER"] = "Fenster"
 L["BUFF_WINDOW_WINDOW_DESCRIPTION"] =
 	"Lasst das Fenster dort, wo Ihr es abgelegt habt, oder haltet es im Kampf aus dem Weg."
@@ -341,7 +341,7 @@ L["BUFF_WINDOW_SELF_ENABLE_DESCRIPTION"] =
 	"Zeigt oben im Fenster die Buffs, die nur Ihr Euch selbst geben könnt, etwa eine Rüstung oder Inneres Feuer, wenn sie fehlen oder bald ablaufen. Welche, legt Ihr unter Selbstbuffs fest."
 L["BUFF_WINDOW_WEAPON_ENABLE"] = "Eure Waffenbuffs"
 L["BUFF_WINDOW_WEAPON_ENABLE_DESCRIPTION"] =
-	"Zeigt die Gifte, Waffenverzauberungen, Öle und Steine, die Euren Waffen fehlen oder bald ablaufen, zusammen mit Euren Selbstbuffs oben im Fenster. Klickt auf einen, um ihn aufzutragen. Welche, legt Ihr unter Waffenbuffs fest."
+	"Zeigt die Gifte, Waffenverzauberungen, Öle, Steine und Köder, die Euren Waffen fehlen oder bald ablaufen, zusammen mit Euren Selbstbuffs oben im Fenster. Klickt auf einen Eintrag, um ihn aufzutragen. Welche, legt Ihr unter Waffenbuffs fest."
 
 -- The window itself
 L["BUFF_WINDOW_SELF_HEADER"] = "Selbstbuffs"
@@ -355,25 +355,25 @@ L["BUFF_WINDOW_TOOLTIP_CREATE"] = "Niemand in Eurer Gruppe hat einen Seelenstein
 L["BUFF_WINDOW_TOOLTIP_GROUP"] = "Klicken, um auf %s samt Gruppe zu wirken."
 L["BUFF_WINDOW_TOOLTIP_FAVOR"] = "Klicken, um %s ins Ziel zu nehmen und zu wirken."
 L["BUFF_WINDOW_TOOLTIP_DISMISS"] = "Rechtsklick, um %s von der Liste zu nehmen."
--- The window's close button; %s is the options slash command.
+-- The window's close button: the class name in its color, then the options command.
 L["BUFF_WINDOW_CLOSED"] =
-	"Buff-Dienst ist aus. Um ihn wieder einzuschalten, macht Umschalt + Rechtsklick auf die Minikarten-Schaltfläche oder gebt %s ein."
+	"Buff-Dienst ist für die Klasse %s aus. Um ihn wieder einzuschalten, macht Umschalt + Rechtsklick auf die Minikarten-Schaltfläche oder gebt %s ein."
 
--- The Buff Keys (Key Bindings, and the Keybinds section of Buff Duty)
+-- The Buff Key (Key Bindings, and the Keybinds section of Buff Duty)
 L["BUFF_KEYS_HEADER"] = "Tastenbelegungen"
 L["BUFF_KEYS_DESCRIPTION"] =
 	"Wirkt den nächsten Buff Eurer Liste mit einer Taste oder einem Makro, außerhalb des Kampfes. Waffenbuffs bleiben ein Klick im Fenster."
-L["BUFF_KEY_SINGLE"] = "Einzelbuff-Knopf"
-L["BUFF_KEY_SINGLE_DESCRIPTION"] =
-	"Wirkt Euren nächsten fehlenden Buff, einen pro Tastendruck: eine Wiederbelebung auf Euer totes Ziel (Priester und Paladine), dann Eure Selbstbuffs, Gefallen erwidern, Euer Ziel und Eure Gruppe."
-L["BUFF_KEY_GROUP"] = "Gruppenbuff-Knopf"
-L["BUFF_KEY_GROUP_DESCRIPTION"] =
-	"Wirkt Euren nächsten fehlenden Gruppenbuff, einen pro Tastendruck: eine Wiederbelebung auf Euer totes Ziel (Priester und Paladine), dann Eure Selbstbuffs, dann die Gruppe Eures Ziels und die übrigen. Eine Gruppe wartet, bis alle, denen der Buff fehlt, in Reichweite sind."
+L["BUFF_KEY"] = "Buff-Knopf"
+L["BUFF_KEY_DESCRIPTION"] =
+	"Wirkt Euren nächsten fehlenden Buff, einen pro Tastendruck: eine Wiederbelebung auf Euer totes Ziel, dann auf die Toten Eurer Gruppe (Priester, Paladine und Schamanen), dann Eure Selbstbuffs, Gefallen erwidern, Euer Ziel und Eure Gruppe. Eine Gruppe erhält den Gruppenbuff, wenn er weniger Mana kostet, als alle in Reichweite einzeln zu buffen."
+L["BUFF_KEY_SKIP_COOLDOWNS"] = "Buffs mit Abklingzeit überspringen"
+L["BUFF_KEY_SKIP_COOLDOWNS_DESCRIPTION"] =
+	"Übergeht Buffs mit Abklingzeit, etwa Furchtzauberschutz, und macht mit dem nächsten Buff weiter."
 -- %s is a player's name.
 L["BUFF_KEY_WAITING"] = "Warte darauf, dass %s in Reichweite kommt."
 L["BUFF_KEY_DONE"] = "Nichts mehr zu buffen."
 -- The caption beside the read-only box that holds a Buff Key's macro line.
-L["BUFF_KEY_MACRO_CAPTION"] = "Makro:"
+L["BUFF_KEY_MACRO_CAPTION"] = "Makro"
 
 --------------------------------------------------------------------------------
 -- Options: Thank You Button

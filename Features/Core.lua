@@ -38,9 +38,6 @@ local function OnProfileChanged()
 	if ns.PopulateWatchedBuffs then
 		ns.PopulateWatchedBuffs()
 	end
-	if ns.PopulatePeerPressureWatched then
-		ns.PopulatePeerPressureWatched()
-	end
 	if ns.PopulateBuffWindowAudience then
 		ns.PopulateBuffWindowAudience()
 		ns.RefreshBuffWindow()
@@ -59,6 +56,10 @@ end
 
 local function InitializeDatabase()
 	ns.db = LibStub("AceDB-3.0"):New("TFTBDB", ns.DATABASE_DEFAULTS, true)
+	-- MIGRATION (remove after 2026-11-21): Peer Pressure moved to Control Freak, which imports nothing from TFTBDB.
+	for _, profile in pairs(ns.db.profiles) do
+		profile.peerPressure = nil
+	end
 	ns.db.RegisterCallback(ns, "OnProfileChanged", OnProfileChanged)
 	ns.db.RegisterCallback(ns, "OnProfileCopied", OnProfileChanged)
 	ns.db.RegisterCallback(ns, "OnProfileReset", OnProfileChanged)
@@ -93,6 +94,7 @@ ns.EVENT_NAMES = {
 	"UNIT_INVENTORY_CHANGED",
 	"BAG_UPDATE_DELAYED",
 	"REPLACE_ENCHANT",
+	"UI_ERROR_MESSAGE",
 }
 
 -- Forever has no combat log, and registering COMBAT_LOG_EVENT_UNFILTERED there errors.
@@ -169,10 +171,6 @@ local function OnPlayerLogin()
 		ns.SetupBuffTracking()
 	end
 
-	if ns.SetupPeerPressure then
-		ns.SetupPeerPressure()
-	end
-
 	if ns.SetupBuffWindow then
 		ns.SetupBuffWindow()
 	end
@@ -196,6 +194,10 @@ end
 local function OnPlayerEnteringWorld()
 	if ns.db then
 		ns.PrintWelcome()
+		-- Buff Duty's In Instance: every way into or out of one is a loading screen.
+		if ns.RequestBuffWindowRefresh then
+			ns.RequestBuffWindowRefresh()
+		end
 	end
 end
 

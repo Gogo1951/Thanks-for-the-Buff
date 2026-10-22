@@ -267,36 +267,6 @@ function ns:WhisperThanks(target, link)
 end
 
 --[[
-    Peer Pressure: a same-class player popped a tracked cooldown. The body renders
-    in the caster's class color (always your own class), the spell link keeps
-    the standard link blue, and the target's name wears the TARGET's class color
-    (falling back to the body color when their class isn't known) -- only the
-    "TFTB //" brand keeps the house colors. Trap: a closing |r resets the
-    fontstring to white, so the body color is re-opened right after the link and
-    after the target's name or the rest of the sentence loses it. Split
-    builder/announcer so the options panel can show a pipeline-true sample.
-]]
-function ns:BuildPeerPressureMessage(class, sourceName, spellID, targetName, targetClass)
-	local color = "|cff" .. (Data.CLASS_COLORS[class] or ns.PALETTE.TEXT)
-	local link = (ns.GetSpellLink(spellID) or L["UNKNOWN_SPELL"]) .. color
-	local body
-	if targetName then
-		local targetColor = targetClass and Data.CLASS_COLORS[targetClass]
-		if targetColor then
-			targetName = "|cff" .. targetColor .. targetName .. "|r" .. color
-		end
-		body = L["MESSAGE_PEER_PRESSURE_TARGET"]:format(sourceName, link, targetName)
-	else
-		body = L["MESSAGE_PEER_PRESSURE"]:format(sourceName, link)
-	end
-	return color .. body .. "|r"
-end
-
-function ns:AnnouncePeerPressure(class, sourceName, spellID, targetName, targetClass)
-	ns:PrintMessage(ns:BuildPeerPressureMessage(class, sourceName, spellID, targetName, targetClass))
-end
-
---[[
     The print out for any helpful buff from a non-grouped friendly player. Its
     thank-you whisper goes out through ns:WhisperThanks.
 ]]

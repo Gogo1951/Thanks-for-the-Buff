@@ -20,7 +20,8 @@ local RankFor = BuffWindow.RankFor
 --[[
     Each unit's buffs as last read, keyed by GUID so an aura change reported on
     any of a player's tokens marks the one record: spell id -> expiration time,
-    -> duration, and -> true for the auras you cast. A record is read again only
+    -> duration, -> strength (see AuraStrength), and -> true for the auras you
+    cast. A record is read again only
     once its GUID is marked dirty, a MarkAllAurasDirty has passed since its
     read, or its unit has died, revived or changed connection, so a raid's aura
     traffic re-reads only the members it touched.
@@ -30,14 +31,62 @@ local dirtyGUIDs = {}
 local generation = 0
 
 local function NewRecord()
-	return { expires = {}, durations = {}, mine = {} }
+	return { expires = {}, durations = {}, strengths = {}, mine = {} }
 end
 
 -- Read fresh every time: a unit whose GUID can't be read has no record to keep.
 local uncachedRecord = NewRecord()
 
 -- The record ReadAuras last selected, which Has reads.
-local auraExpires, auraDurations, auraMine = uncachedRecord.expires, uncachedRecord.durations, uncachedRecord.mine
+local auraExpires, auraDurations, auraStrengths, auraMine =
+	uncachedRecord.expires, uncachedRecord.durations, uncachedRecord.strengths, uncachedRecord.mine
+
+--[[
+    Spell id -> the strength your own cast of it landed with, learned from
+    every aura of yours ReadAuras sees, on anyone. Talents raise it (Improved
+    Mark of the Wild), so it is only known once you have cast that rank this
+    session; until then Has falls back to comparing ranks.
+]]
+local myStrengths = {}
+
+-- Talents and new ranks change what your casts land with, so it is learned again.
+function BuffWindow.ForgetMyStrengths()
+	wipe(myStrengths)
+end
+
+--[[
+    GUID -> buff key -> { aura id -> expiration time }: the versions of a buff
+    the game refused to cast over ("A more powerful spell is already active").
+    Classic Era and TBC Anniversary give no strength for another caster's buff,
+    so a stronger talented one only shows itself this way. Has counts the
+    buff as had while that same version, by its expiration time, is still on
+    them; a refresh or a new one is looked at afresh.
+]]
+local bounced = {}
+
+-- The GUID whose record ReadAuras last selected, nil for an uncached one.
+local auraGUID
+
+--[[
+    How strong an aura is: the sum of its effect values (`points`), the armor,
+    stats or attack power it gives, talents included. Every version of a buff
+    -- its ranks, its group and Greater versions -- shares one effect layout,
+    so the sums compare across them. Nil when the client gives no values, or
+    only zeros, or keeps them secret.
+]]
+local function AuraStrength(points)
+	if not ns.IsPlain(points) or type(points) ~= "table" then
+		return nil
+	end
+	local total = 0
+	for _, value in ipairs(points) do
+		if not ns.IsPlain(value) or type(value) ~= "number" then
+			return nil
+		end
+		total = total + value
+	end
+	return total > 0 and total or nil
+end
 
 --------------------------------------------------------------------------------
 -- Unit Reads
@@ -78,6 +127,11 @@ function BuffWindow.MarkAllAurasDirty()
 			auraCache[guid] = nil
 		end
 	end
+	for guid in pairs(bounced) do
+		if not auraCache[guid] then
+			bounced[guid] = nil
+		end
+	end
 	wipe(dirtyGUIDs)
 	generation = generation + 1
 end
@@ -95,7 +149,9 @@ end
 function BuffWindow.ReadAuras(unit)
 	local guid = UnitGUID(unit)
 	local record = uncachedRecord
+	auraGUID = nil
 	if guid and ns.IsPlain(guid) then
+		auraGUID = guid
 		local dead = UnitIsDeadOrGhost(unit) and true or false
 		local connected = UnitIsConnected(unit) and true or false
 		record = auraCache[guid]
@@ -106,7 +162,8 @@ function BuffWindow.ReadAuras(unit)
 			and record.dead == dead
 			and record.connected == connected
 		then
-			auraExpires, auraDurations, auraMine = record.expires, record.durations, record.mine
+			auraExpires, auraDurations, auraStrengths, auraMine =
+				record.expires, record.durations, record.strengths, record.mine
 			return
 		end
 		record = record or NewRecord()
@@ -117,9 +174,11 @@ function BuffWindow.ReadAuras(unit)
 		dirtyGUIDs[guid] = nil
 	end
 
-	auraExpires, auraDurations, auraMine = record.expires, record.durations, record.mine
+	auraExpires, auraDurations, auraStrengths, auraMine =
+		record.expires, record.durations, record.strengths, record.mine
 	wipe(auraExpires)
 	wipe(auraDurations)
+	wipe(auraStrengths)
 	wipe(auraMine)
 	for i = 1, 40 do
 		local data = C_UnitAuras.GetBuffDataByIndex(unit, i, "HELPFUL")
@@ -130,9 +189,12 @@ function BuffWindow.ReadAuras(unit)
 			local expires, duration = data.expirationTime, data.duration
 			auraExpires[data.spellId] = ns.IsPlain(expires) and expires or 0
 			auraDurations[data.spellId] = ns.IsPlain(duration) and duration or 0
+			local strength = AuraStrength(data.points)
+			auraStrengths[data.spellId] = strength
 			local source = data.sourceUnit
 			if ns.IsPlain(source) and source == "player" then
 				auraMine[data.spellId] = true
+				myStrengths[data.spellId] = strength or myStrengths[data.spellId]
 			end
 		end
 	end
@@ -208,27 +270,67 @@ end
     gone: otherwise a 10-minute Thorns under a 10-minute setting would read as
     missing the moment it landed, and never stop.
 
-    A single-target rank lower than the one you would cast on `unit` -- the
-    highest you know that their level can take -- counts as missing too, so a
-    stranger's Rank 2 Arcane Intellect doesn't hide your Rank 5. Group and
-    Greater versions always count: they aren't ranked against the single ones.
+    Strength comes first, once both sides are known: the version on them
+    against what your cast of the rank you'd use landed with (myStrengths). A
+    stronger one -- another caster's talents, or a rank you don't have -- counts
+    as had however little is left, since the game refuses to cast over it ("A
+    more powerful spell is already active"). A weaker one counts as missing
+    however much is left, so your talented version replaces it. An equal one
+    goes by time, as above.
+
+    With either side unknown, ranks decide instead. A single-target rank lower
+    than the one you would cast on `unit` -- the highest you know that their
+    level can take -- counts as missing, so a stranger's Rank 2 Arcane
+    Intellect doesn't hide your Rank 5, and a higher one counts as had however
+    little is left. Group and Greater versions go by time: they aren't ranked
+    against the single ones.
+
+    A version the game already refused to cast over (BuffWindow.NoteBounce)
+    counts as had, by either rule, for as long as it stays on them.
 
     An exclusive buff (a blessing) also counts as had when the unit carries
     ANOTHER of yours from the same family, even one running low: you can only
     have one on them, so casting this one would replace yours rather than add
     to it. With none of yours on them, every one you turned on is offered.
+
+    When it counts as missing because a version is running low, the second and
+    third returns are that version's expiration time and full duration, which
+    the window draws as the time left on the icon.
 ]]
 local function Has(buff, unit)
 	local now = GetTime()
 	-- A self buff carries its own time; every other buff uses the window's.
 	local threshold = buff.refreshSeconds or BuffWindow.refreshSeconds
 	local best = RankFor(buff, unit and UnitLevel(unit))
+	local mine = (best and myStrengths[best.id]) or (buff.groupId and myStrengths[buff.groupId])
+	local bounce = auraGUID and bounced[auraGUID] and bounced[auraGUID][buff.key]
+	local lowExpires, lowDuration
 	for id in pairs(buff.auraIds) do
 		local expires = auraExpires[id]
-		local level = buff.rankLevels[id]
-		if expires and not (best and level and level < best.level) then
-			if expires == 0 or auraDurations[id] <= threshold or expires - now >= threshold then
+		if expires then
+			if bounce and bounce[id] == expires then
 				return true
+			end
+			local level = buff.rankLevels[id]
+			local strength = auraStrengths[id]
+			local counts
+			if mine and strength then
+				if strength > mine then
+					return true
+				end
+				counts = strength == mine
+			elseif best and level and level > best.level then
+				return true
+			else
+				counts = not (best and level and level < best.level)
+			end
+			if counts then
+				if expires == 0 or auraDurations[id] <= threshold or expires - now >= threshold then
+					return true
+				end
+				if not lowExpires or expires > lowExpires then
+					lowExpires, lowDuration = expires, auraDurations[id]
+				end
 			end
 		end
 	end
@@ -239,9 +341,42 @@ local function Has(buff, unit)
 			end
 		end
 	end
-	return false
+	return false, lowExpires, lowDuration
 end
 BuffWindow.Has = Has
+
+--[[
+    The game refused a cast of the buff with this key on `unit`: record every
+    version of it they carry now, so Has leaves them alone until it changes.
+    Read straight off the unit rather than the cache, which may be older.
+]]
+function BuffWindow.NoteBounce(unit, buffKey)
+	local guid = UnitGUID(unit)
+	if not guid or not ns.IsPlain(guid) then
+		return
+	end
+	for _, buff in ipairs(buffs) do
+		if buff.key == buffKey then
+			local seen = {}
+			for i = 1, 40 do
+				local data = C_UnitAuras.GetBuffDataByIndex(unit, i, "HELPFUL")
+				if not data then
+					break
+				end
+				local id, expires = data.spellId, data.expirationTime
+				if ns.IsPlain(id) and ns.IsPlain(expires) and buff.auraIds[id] then
+					seen[id] = expires
+				end
+			end
+			if next(seen) then
+				bounced[guid] = bounced[guid] or {}
+				bounced[guid][buffKey] = seen
+				dirtyGUIDs[guid] = true
+			end
+			return
+		end
+	end
+end
 
 --[[
     A pet in Phase Shift (a warlock's imp) can't be targeted, so no buff
@@ -415,9 +550,22 @@ local function SingleIcon(buff, unit, castUnit, targetName, fullName, favorGUID)
 		targetName = targetName,
 		macrotext = not castUnit and TargetMacro(fullName, rank.castText) or nil,
 		favorGUID = favorGUID,
+		buffKey = buff.key,
 	}
 end
 BuffWindow.SingleIcon = SingleIcon
+
+--[[
+    Stamps an icon with the version running low that Has reported, so the
+    window draws how much of it is left; an icon for a buff that is gone
+    entirely carries none and draws whole. Returns the icon.
+]]
+function BuffWindow.WithTimeLeft(icon, expires, duration)
+	if icon and expires and duration and duration > 0 then
+		icon.buffExpires, icon.buffDuration = expires, duration
+	end
+	return icon
+end
 
 --------------------------------------------------------------------------------
 -- Resurrections
@@ -484,7 +632,7 @@ end
 --[[
     The icon that resurrects `unit`, cast at `castUnit`, or nil when you have
     no resurrection or they can't take one. Cast by its bare name, which
-    resolves to the highest rank you know; castIds lets the Buff Keys match
+    resolves to the highest rank you know; castIds lets the Buff Key match
     the cast whichever rank that is.
 ]]
 function BuffWindow.ResurrectionIcon(unit, castUnit, targetName)
@@ -531,8 +679,9 @@ local function PetWants(buff, unit)
 	return true
 end
 
+-- A phase-shifted imp drops off the list: nothing can reach it until it phases back in.
 local function CanBuffPet(unit)
-	return UnitExists(unit) and not UnitIsPlayer(unit) and not UnitIsDeadOrGhost(unit)
+	return UnitExists(unit) and not UnitIsPlayer(unit) and not UnitIsDeadOrGhost(unit) and not IsPhaseShifted(unit)
 end
 BuffWindow.CanBuffPet = CanBuffPet
 
@@ -560,8 +709,11 @@ function BuffWindow.PetRow(unit, castUnit, ownerClass, ownerName)
 	local name = GetUnitName(unit, false) or ""
 	local icons = {}
 	for _, buff in ipairs(buffs) do
-		if buff.singleName and PetWants(buff, unit) and not Has(buff, unit) then
-			icons[#icons + 1] = SingleIcon(buff, unit, castUnit, name)
+		if buff.singleName and PetWants(buff, unit) then
+			local has, expires, duration = Has(buff, unit)
+			if not has then
+				icons[#icons + 1] = BuffWindow.WithTimeLeft(SingleIcon(buff, unit, castUnit, name), expires, duration)
+			end
 		end
 	end
 	if #icons == 0 then

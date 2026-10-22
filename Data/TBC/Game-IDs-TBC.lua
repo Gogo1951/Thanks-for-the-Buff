@@ -5,7 +5,6 @@ ns.GAME_IDS = {
 	PHASE_SHIFT_SPELL_ID = 4511, -- Phase Shift
 	SAMPLE_BUFF_SPELL_ID = 1459, -- Arcane Intellect
 	SAMPLE_GOOD_NEWS_SPELL_ID = 10060, -- Power Infusion
-	SAMPLE_PEER_PRESSURE_SPELL_ID = 13877, -- Blade Flurry
 	SAMPLE_SERVICE_SPELL_ID = 10059, -- Portal: Stormwind
 }
 
@@ -37,12 +36,11 @@ ns.THANK_YOU_MACRO_ICONS = {
 How We Got the Data
 
 Last Validated
-	2026-10-19, TBC Anniversary 2.5.6.70006
+	2026-10-22, TBC Anniversary 2.5.6.70006
 
 Notes
 	- Spell IDs that feature code needs by name rather than from a list: the sample spells the options panels use for their preview messages.
 	- SAMPLE_GOOD_NEWS_SPELL_ID (Power Infusion) is the spell linked in the Good News sample whisper (Options/Options-Send-Good-News.lua).
-	- SAMPLE_PEER_PRESSURE_SPELL_ID (Blade Flurry) is the cooldown in the Peer Pressure sample alert (Options/Options-Peer-Pressure.lua). It must be a rogue spell, since the sample names a rogue.
 	- THANK_YOU_MACRO_ICONS are the icons a Thank You Button macro can wear (Options/Options-Thank-You-Button.lua): bold, distinct item art nobody keeps on a bar, so a Thank You macro stands out. Each is a texture file ID present under the same ID on Classic Era, TBC Anniversary and WoW Forever. The client gives an icon no name, so the Icon dropdown shows each one as its picture alone, in this order. The second field is the button that starts on it, so buttons 2 through 5 each start on their own icon.
 
 SQL (CMaNGOS)

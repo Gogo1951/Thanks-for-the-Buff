@@ -33,10 +33,6 @@ L["MESSAGE_WHISPER_THANKS"] = "Merci pour %s"
 L["MESSAGE_SELECT_PLAYER"] = "Ciblez d'abord un joueur."
 L["MESSAGE_CANT_THANK_SELF"] = "Vous ne pouvez pas vous remercier vous-même !"
 
--- Peer Pressure
-L["MESSAGE_PEER_PRESSURE"] = "%s a utilisé %s !"
-L["MESSAGE_PEER_PRESSURE_TARGET"] = "%s a utilisé %s sur %s !"
-
 --------------------------------------------------------------------------------
 -- Text Fragments
 --------------------------------------------------------------------------------
@@ -67,11 +63,11 @@ L["OPTIONS_ENABLE_MINIMAP"] = "Activer le bouton de la minicarte"
 L["OPTIONS_ENABLE_MINIMAP_DESCRIPTION"] =
 	"Affiche le bouton TFTB sur votre minicarte, qui active ou désactive les fonctionnalités d'un clic."
 L["OPTIONS_DESCRIPTION"] =
-	"Remerciez d'un chuchotement ou d'une emote chaque joueur qui vous améliore, et ne laissez plus votre raid, vous-même ni vos armes sans leurs améliorations, grâce à un rappel où un clic suffit pour les lancer. Soyez aussi averti des festins, portails, invocations, puits des âmes et temps de recharge de votre classe. La politesse, en automatique."
+	"Remerciez automatiquement d'un chuchotement ou d'une emote chaque joueur qui vous améliore, et ne laissez plus votre raid, vous-même ni vos armes sans leurs améliorations, grâce à un rappel des améliorations manquantes où un clic suffit pour les lancer. Soyez aussi averti des festins, portails, invocations et puits des âmes. La politesse, en automatique."
 L["OPTIONS_FEATURES_HEADER"] = "Fonctionnalités"
 L["OPTIONS_FEATURES_DESCRIPTION"] = "Activez ou désactivez chaque fonctionnalité ici, ou dans son propre panneau."
 L["OPTIONS_FEATURES_NOTE"] =
-	'Changements possibles à venir : certaines de nos fonctionnalités les plus récentes, comme "%s", dépassent le cadre habituel de "Thanks for the Buff". N\'hésitez pas à désactiver tout ce dont vous n\'avez pas besoin. Ces fonctionnalités pourraient rejoindre notre autre add-on, "Connoisseur & Restocker", ou tout pourrait fusionner en un add-on plus grand, peut-être "Buttons, Buffs, & Bags". Donnez-nous votre avis sur Discord, CurseForge ou GitHub. Merci !'
+	'Certaines de nos fonctionnalités les plus récentes, comme "%s", dépassent le cadre habituel de "Thanks for the Buff". N\'hésitez pas à désactiver tout ce dont vous n\'avez pas besoin. Ces fonctionnalités pourraient rejoindre notre autre add-on, "Connoisseur & Restocker", ou tout pourrait fusionner en un add-on plus grand, peut-être "Buttons, Buffs, & Bags". Donnez-nous votre avis sur Discord, CurseForge ou GitHub. Merci !'
 L["OPTIONS_COMMANDS_HEADER"] = "/Commands"
 L["OPTIONS_COMMAND"] = "/tftb"
 L["OPTIONS_COMMAND_DESCRIPTION"] = "Ouvre l'interface des options de cet add-on."
@@ -172,20 +168,11 @@ L["GOOD_NEWS_MESSAGE_TOKENS"] =
 ]]
 L["GOOD_NEWS_DURATION_CLAUSE"] = "pendant %s"
 
--- Peer Pressure
+-- Peer Pressure (TEMPORARY: delete on or after 2026-11-21, with Options/Options-Peer-Pressure.lua)
 L["TAB_PEER_PRESSURE"] = "Pression sociale"
-L["PEER_PRESSURE_DESCRIPTION"] =
-	"Soyez averti quand d'autres joueurs de votre classe utilisent leurs capacités à temps de recharge, pour pouvoir céder à la pression sociale."
-L["PEER_PRESSURE_ENABLE"] = "Activer la pression sociale"
-L["PEER_PRESSURE_ENABLE_DESCRIPTION"] =
-	"Active les alertes quand un autre joueur de votre classe utilise une capacité à temps de recharge suivie."
-L["PEER_PRESSURE_PRINT_DESCRIPTION"] =
-	"Affiche un message que vous seul pouvez voir quand une capacité à temps de recharge de votre classe est utilisée."
-L["PEER_PRESSURE_OWN_CASTS"] = "Déclencher sur vos propres sorts"
-L["PEER_PRESSURE_OWN_CASTS_DESCRIPTION"] =
-	"Se déclenche aussi lorsque vous utilisez vos propres capacités à temps de recharge, pas seulement lorsque d'autres joueurs le font."
-L["PEER_PRESSURE_SOUND_DESCRIPTION"] =
-	"Joue un son quand une capacité à temps de recharge de votre classe est utilisée. Vous êtes seul à l'entendre."
+L["PEER_PRESSURE_CONTROL_FREAK"] = "Control Freak"
+L["PEER_PRESSURE_MOVED"] =
+	'WoW Forever empêche les add-ons de lire le journal de combat, nous réorganisons donc nos add-ons pour qu\'ils fonctionnent de la même façon dans toutes les versions du jeu. "Pression sociale" a rejoint notre autre add-on, "Control Freak". Installez-le pour continuer à être averti quand des joueurs de votre classe utilisent leurs temps de recharge.'
 
 -- Shared across the buff panels
 L["TRACKED_HEADER"] = "Capacités suivies"
@@ -204,9 +191,8 @@ L["WHISPER_MESSAGE_RESET_DESCRIPTION"] = "Rétablit le texte par défaut du mess
 
 --[[
     The two section headers every buff panel is built from: what the other player
-    sees, then what only you get. Peer Pressure sends nothing outward, so it
-    carries the Notifications header alone. Key prefixes match the header the
-    control appears under.
+    sees, then what only you get. Key prefixes match the header the control
+    appears under.
 ]]
 L["PRAISE_HEADER"] = "Chuchotements de remerciement et emotes"
 L["NOTIFICATIONS_HEADER"] = "Notifications"
@@ -258,6 +244,19 @@ L["BUFF_WINDOW_ENABLE_DESCRIPTION"] =
 	"Active la corvée d'améliorations, la fenêtre des membres du groupe à qui il manque une amélioration que vous pouvez lancer."
 L["BUFF_WINDOW_NO_BUFFS"] =
 	"Votre classe n'a aucune amélioration dans cette liste, la fenêtre n'apparaît donc jamais sur ce personnage."
+-- When to Show: Solo and In Group, each with Always or In Instance, then the classes.
+L["BUFF_WINDOW_WHEN_HEADER"] = "Quand afficher"
+L["BUFF_WINDOW_WHEN_DESCRIPTION"] = "Choisissez quand la fenêtre peut apparaître."
+L["BUFF_WINDOW_WHEN_SOLO"] = "Solo"
+L["BUFF_WINDOW_WHEN_SOLO_DESCRIPTION"] = "Affiche la fenêtre quand vous n'êtes pas en groupe ou en raid."
+L["BUFF_WINDOW_WHEN_GROUP"] = "En groupe"
+L["BUFF_WINDOW_WHEN_GROUP_DESCRIPTION"] = "Affiche la fenêtre quand vous êtes en groupe ou en raid."
+L["BUFF_WINDOW_WHERE_DESCRIPTION"] =
+	"Définit où la fenêtre s'affiche : partout, ou seulement dans les donjons, raids, champs de bataille et arènes."
+L["BUFF_WINDOW_WHERE_ALWAYS"] = "Toujours"
+L["BUFF_WINDOW_WHERE_INSTANCE"] = "En instance"
+L["BUFF_WINDOW_CLASSES_DESCRIPTION"] = "Affiche la fenêtre quand vous jouez ces classes."
+L["BUFF_WINDOW_CLASS_DESCRIPTION"] = "Affiche la fenêtre quand vous jouez cette classe."
 L["BUFF_WINDOW_HEADER"] = "Fenêtre"
 L["BUFF_WINDOW_WINDOW_DESCRIPTION"] =
 	"Gardez la fenêtre là où vous l'avez placée, ou écartez-la pendant le combat."
@@ -343,7 +342,7 @@ L["BUFF_WINDOW_SELF_ENABLE_DESCRIPTION"] =
 	"Affiche en haut de la fenêtre les améliorations que vous seul pouvez vous lancer, comme une armure ou Feu intérieur, quand elles manquent ou arrivent bientôt à expiration. Choisissez lesquelles dans Améliorations personnelles."
 L["BUFF_WINDOW_WEAPON_ENABLE"] = "Vos améliorations d'arme"
 L["BUFF_WINDOW_WEAPON_ENABLE_DESCRIPTION"] =
-	"Affiche les poisons, imprégnations, huiles et pierres qui manquent à vos armes ou arrivent bientôt à expiration, avec vos améliorations personnelles en haut de la fenêtre. Cliquez sur l'une d'elles pour l'appliquer. Choisissez lesquelles dans Améliorations d'arme."
+	"Affiche les poisons, imprégnations, huiles, pierres et appâts qui manquent à vos armes ou arrivent bientôt à expiration, avec vos améliorations personnelles en haut de la fenêtre. Cliquez sur l'un d'eux pour l'appliquer. Choisissez lesquelles dans Améliorations d'arme."
 
 -- The window itself
 L["BUFF_WINDOW_SELF_HEADER"] = "Améliorations personnelles"
@@ -357,25 +356,25 @@ L["BUFF_WINDOW_TOOLTIP_CREATE"] = "Personne dans votre groupe n'a de pierre d'â
 L["BUFF_WINDOW_TOOLTIP_GROUP"] = "Cliquez pour la lancer sur %s et son groupe."
 L["BUFF_WINDOW_TOOLTIP_FAVOR"] = "Cliquez pour cibler %s et lancer le sort."
 L["BUFF_WINDOW_TOOLTIP_DISMISS"] = "Clic droit pour retirer %s de la liste."
--- The window's close button; %s is the options slash command.
+-- The window's close button: the class name in its color, then the options command.
 L["BUFF_WINDOW_CLOSED"] =
-	"Corvée d'améliorations est désactivée. Pour la réactiver, faites Maj + Clic droit sur le bouton de la minicarte ou tapez %s."
+	"Corvée d'améliorations est désactivée pour la classe %s. Pour la réactiver, faites Maj + Clic droit sur le bouton de la minicarte ou tapez %s."
 
--- The Buff Keys (Key Bindings, and the Keybinds section of Buff Duty)
+-- The Buff Key (Key Bindings, and the Keybinds section of Buff Duty)
 L["BUFF_KEYS_HEADER"] = "Raccourcis"
 L["BUFF_KEYS_DESCRIPTION"] =
 	"Lancez l'amélioration suivante de votre liste d'une touche ou d'une macro, hors combat. Les améliorations d'arme restent un clic dans la fenêtre."
-L["BUFF_KEY_SINGLE"] = "Bouton d'amélioration individuelle"
-L["BUFF_KEY_SINGLE_DESCRIPTION"] =
-	"Lance votre prochaine amélioration manquante, une par appui : une résurrection sur votre cible morte (prêtres et paladins), puis vos améliorations personnelles, Rendre la pareille, votre cible et votre groupe."
-L["BUFF_KEY_GROUP"] = "Bouton d'amélioration de groupe"
-L["BUFF_KEY_GROUP_DESCRIPTION"] =
-	"Lance votre prochaine amélioration de groupe manquante, une par appui : une résurrection sur votre cible morte (prêtres et paladins), puis vos améliorations personnelles, puis le groupe de votre cible et les autres. Un groupe attend que tous ceux à qui l'amélioration manque soient à portée."
+L["BUFF_KEY"] = "Bouton d'amélioration"
+L["BUFF_KEY_DESCRIPTION"] =
+	"Lance votre prochaine amélioration manquante, une par appui : une résurrection sur votre cible morte, puis sur les morts de votre groupe (prêtres, paladins et chamans), puis vos améliorations personnelles, Rendre la pareille, votre cible et votre groupe. Un groupe reçoit l'amélioration de groupe quand elle coûte moins de mana que d'améliorer un par un tous ceux à portée."
+L["BUFF_KEY_SKIP_COOLDOWNS"] = "Ignorer les améliorations avec temps de recharge"
+L["BUFF_KEY_SKIP_COOLDOWNS_DESCRIPTION"] =
+	"Passe les améliorations qui ont un temps de recharge, comme Gardien de peur, et continue avec la suivante."
 -- %s is a player's name.
 L["BUFF_KEY_WAITING"] = "En attente que %s soit à portée."
 L["BUFF_KEY_DONE"] = "Plus rien à améliorer."
 -- The caption beside the read-only box that holds a Buff Key's macro line.
-L["BUFF_KEY_MACRO_CAPTION"] = "Macro :"
+L["BUFF_KEY_MACRO_CAPTION"] = "Macro"
 
 --------------------------------------------------------------------------------
 -- Options: Thank You Button

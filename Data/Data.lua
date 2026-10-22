@@ -94,8 +94,7 @@ ns.OPTIONS_REGISTRY = {
 	SendGoodNewsTracked = ADDON_NAME .. "_SendGoodNewsTracked",
 	ServiceAlerts = ADDON_NAME .. "_ServiceAlerts",
 	ServiceAlertsTracked = ADDON_NAME .. "_ServiceAlertsTracked",
-	PeerPressure = ADDON_NAME .. "_PeerPressure",
-	PeerPressureTracked = ADDON_NAME .. "_PeerPressureTracked",
+	PeerPressure = ADDON_NAME .. "_PeerPressure", -- TEMPORARY: see Options/Options-Peer-Pressure.lua
 	ThankYouButton = ADDON_NAME .. "_ThankYouButton",
 	BuffWindow = ADDON_NAME .. "_BuffWindow",
 	BuffWindowBuffs = ADDON_NAME .. "_BuffWindowBuffs",
@@ -193,6 +192,18 @@ Data.TANK_WHEN_ORDER = { "NEVER", "SOLO", "ALWAYS" }
 Data.TANK_WHEN_PET = "PET"
 
 --[[
+    Where the Buff Window shows while Solo or In Group lets it show at all
+    ("When to Show"): ALWAYS, or INSTANCE for inside a dungeon, raid,
+    battleground or arena only. BUFF_WINDOW_WHERE_ORDER is the dropdown's
+    order; the labels come from the locale (BUFF_WINDOW_WHERE_*).
+]]
+Data.BUFF_WINDOW_WHERE = {
+	ALWAYS = "ALWAYS",
+	INSTANCE = "INSTANCE",
+}
+Data.BUFF_WINDOW_WHERE_ORDER = { "ALWAYS", "INSTANCE" }
+
+--[[
     When a self buff or the Soulstone shows on the Buff Window: OFF, MISSING
     (only once it's gone), or a number of minutes left. Doubles as the
     dropdown's order. The Weapon Buffs dropdown reuses MISSING for When
@@ -273,6 +284,7 @@ ns.LINKS = {
 	DISCORD = "https://discord.gg/eh8hKq992Q",
 	WAGO = "https://addons.wago.io/addons/thanks-for-the-buff",
 }
+ns.CONTROL_FREAK_URL = "https://www.curseforge.com/wow/addons/control-freak" -- TEMPORARY: see Options/Options-Peer-Pressure.lua
 
 --------------------------------------------------------------------------------
 -- Tracking Codes

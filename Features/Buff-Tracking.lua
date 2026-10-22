@@ -3,7 +3,6 @@ local Data = ns.Data
 
 local GetAuraEntry = ns.GetAuraEntry
 local GetCastEntry = ns.GetCastEntry
-local GetPetOwnerUnit = ns.GetPetOwnerUnit
 local HandleStrangersBuff = ns.HandleStrangersBuff
 local HandleTracked = ns.HandleTracked
 local IsOnCooldown = ns.IsOnCooldown
@@ -50,6 +49,28 @@ end
 --------------------------------------------------------------------------------
 -- Source Resolution
 --------------------------------------------------------------------------------
+
+--[[
+    A buff's combat-log source can be a pet or guardian (a hunter's Roar of
+    Sacrifice, for example). Credit the owner so the message names the player,
+    not the pet — owners are found by matching the pet's GUID to a group pet unit.
+]]
+local function GetPetOwnerUnit(petGUID)
+	if UnitGUID("pet") == petGUID then
+		return "player"
+	end
+	for i = 1, 4 do
+		if UnitGUID("partypet" .. i) == petGUID then
+			return "party" .. i
+		end
+	end
+	for i = 1, 40 do
+		if UnitGUID("raidpet" .. i) == petGUID then
+			return "raid" .. i
+		end
+	end
+	return nil
+end
 
 --[[
     Credit for a buff goes to a player or to nobody. A pet/guardian source is
@@ -104,7 +125,7 @@ local function OnCombatLogEventUnfiltered()
 		return
 	end
 
-	local _, subEvent, _, sourceGUID, sourceName, sourceFlags, _, destGUID, destName, _, _, spellID =
+	local _, subEvent, _, sourceGUID, sourceName, sourceFlags, _, destGUID, _, _, _, spellID =
 		CombatLogGetCurrentEventInfo()
 
 	--[[
@@ -149,18 +170,6 @@ local function OnCombatLogEventUnfiltered()
 			ns.db.profile.watchedBuffs and ns.db.profile.watchedBuffs[spellID],
 			(isResurrect and "REZ") or (isCast and "CAST") or "AURA"
 		)
-	end
-
-	--[[
-	    Peer Pressure: same-class cooldown pops. Sits above the own-source drop below
-	    because "Trigger on Own Casts" lets your own cooldowns fire the alert too;
-	    CheckPeerPressure applies that setting itself. sourceFlags rides along because
-	    affiliation is the only reliable read on whether the caster is in your group --
-	    Era's combat log carries every nearby player, not just yours. A cheap tap --
-	    its first line is a lookup that misses for everything untracked.
-	]]
-	if isCast and ns.CheckPeerPressure then
-		ns.CheckPeerPressure(spellID, sourceGUID, sourceName, sourceFlags, destGUID, destName)
 	end
 
 	--[[
@@ -273,7 +282,7 @@ end
     second is already on cooldown).
 ]]
 local function OnUnitSpellcastSucceeded(unitTarget, castGUID, spellID)
-	-- The Buff Keys hear their own casts go off, whether or not tracking is ready.
+	-- The Buff Key hears its own casts go off, whether or not tracking is ready.
 	if ns.OnBuffKeyCastSucceeded then
 		ns.OnBuffKeyCastSucceeded(unitTarget, spellID)
 	end

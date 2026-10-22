@@ -7,10 +7,9 @@ local GetClientHeader = ns.GetDiagnosticClientHeader
 --------------------------------------------------------------------------------
 
 --[[
-    For every event TFTB registers (ns.EVENT_NAMES, exported by Core.lua),
-    report whether it is valid on this client (C_EventUtils.IsEventValid) and
-    whether registering it the way Core does (RegisterUnitEvent for
-    ns.EVENT_UNITS, RegisterEvent otherwise) succeeds. The probe
+    For every event Magic Eraser registers (ns.EVENT_NAMES, exported by
+    Core.lua), report whether it is valid on this client
+    (C_EventUtils.IsEventValid) and whether RegisterEvent succeeds. The probe
     frame registers then immediately unregisters each event with no handler
     attached, so nothing is ever processed. The list is sourced from Core so it
     can never drift from the events the add-on actually uses.
@@ -35,13 +34,7 @@ function ns:RunEventChecks()
 		if hasIsEventValid then
 			valid = C_EventUtils.IsEventValid(event) and "valid" or "INVALID"
 		end
-		local units = ns.EVENT_UNITS and ns.EVENT_UNITS[event]
-		local ok
-		if units then
-			ok = pcall(probe.RegisterUnitEvent, probe, event, unpack(units))
-		else
-			ok = pcall(probe.RegisterEvent, probe, event)
-		end
+		local ok = pcall(probe.RegisterEvent, probe, event)
 		if ok then
 			probe:UnregisterEvent(event)
 		else

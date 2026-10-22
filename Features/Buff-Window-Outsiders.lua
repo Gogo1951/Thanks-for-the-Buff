@@ -130,14 +130,20 @@ local function OutsiderIcons(unit, class, short, fullName, castUnit, given, favo
 	local icons = {}
 	for _, buff in ipairs(buffs) do
 		local wanted = buff.singleName and Wants(buff, class, role)
-		if wanted and unit and Has(buff, unit) then
-			if given then
-				given[buff.key] = true
+		local expires, duration
+		if wanted and unit then
+			local has
+			has, expires, duration = Has(buff, unit)
+			if has then
+				if given then
+					given[buff.key] = true
+				end
+				wanted = false
 			end
-			wanted = false
 		end
 		if wanted and not (given and given[buff.key]) then
-			icons[#icons + 1] = SingleIcon(buff, unit, castUnit, short, fullName, favorGUID)
+			local icon = SingleIcon(buff, unit, castUnit, short, fullName, favorGUID)
+			icons[#icons + 1] = BuffWindow.WithTimeLeft(icon, expires, duration)
 		end
 	end
 	return icons
@@ -198,11 +204,47 @@ local function OwnerPatterns()
 end
 
 --[[
+    A unit's tooltip as plain left-hand lines, title first. Some facts about a
+    unit reach add-ons only as tooltip text -- whose pet a pet is, above all --
+    so the Buff Window reads them here. C_TooltipInfo hands the lines over as
+    data where the client ships its GetUnit getter (WoW Forever); elsewhere they
+    are read off a hidden tooltip that is never shown (Classic Era and TBC
+    Anniversary), the same split Diagnostics makes for items and spells.
+    Resolved once at load.
+]]
+local UNIT_SCAN_TOOLTIP_NAME = "TFTBUnitScanTooltip"
+local GetUnitTooltipData = C_TooltipInfo and C_TooltipInfo.GetUnit
+local unitScanTooltip
+
+local function GetUnitTooltipLines(unit)
+	local lines = {}
+	if GetUnitTooltipData then
+		local data = GetUnitTooltipData(unit)
+		for _, line in ipairs(data and data.lines or {}) do
+			lines[#lines + 1] = line.leftText
+		end
+		return lines
+	end
+
+	if not unitScanTooltip then
+		unitScanTooltip = CreateFrame("GameTooltip", UNIT_SCAN_TOOLTIP_NAME, nil, "GameTooltipTemplate")
+	end
+	unitScanTooltip:SetOwner(WorldFrame, "ANCHOR_NONE")
+	unitScanTooltip:SetUnit(unit)
+	for i = 1, unitScanTooltip:NumLines() do
+		local region = _G[UNIT_SCAN_TOOLTIP_NAME .. "TextLeft" .. i]
+		lines[#lines + 1] = region and region:GetText()
+	end
+	unitScanTooltip:Hide()
+	return lines
+end
+
+--[[
     The pet's owner as the tooltip names them, and the class that wording gives
     away (or nil); nil, nil when no line matches.
 ]]
 local function PetOwnerName(unit)
-	for _, line in ipairs(ns.GetUnitTooltipLines(unit)) do
+	for _, line in ipairs(GetUnitTooltipLines(unit)) do
 		if ns.IsPlain(line) and line then
 			for _, pattern in ipairs(OwnerPatterns()) do
 				local owner = line:match(pattern[1])

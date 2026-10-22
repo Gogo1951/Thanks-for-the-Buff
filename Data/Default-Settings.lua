@@ -81,12 +81,12 @@ ns.DATABASE_DEFAULTS = {
 		teammates = {
 			-- Master switch for the whole panel. On by default, like strangers.
 			enabled = true,
-			printEnabled = true,
+			printEnabled = false,
 			whisperEnabled = true,
 			praiseDelayEnabled = false,
 			praiseDelay = 2,
 			emotesEnabled = false,
-			soundEnabled = false,
+			soundEnabled = true,
 			emotes = GetDefaultEmoteSettings(true),
 		},
 		--[[
@@ -133,23 +133,8 @@ ns.DATABASE_DEFAULTS = {
 			watched = {},
 		},
 		--[[
-		    Peer Pressure: alert when another player of your class pops
-		    a cooldown from ns.PEER_PRESSURE_ABILITIES -- or you do, while triggerOnOwnCasts is on.
-		    Self-only reactions, so they default on -- except own casts, which are
-		    opt-in: you already know what you just pressed, and the point of the
-		    feature is what everyone else is doing. The watched list seeds from
-		    the default digits in this client's Peer-Pressure-Abilities file.
-		]]
-		peerPressure = {
-			enabled = true,
-			printEnabled = true,
-			triggerOnOwnCasts = false,
-			soundEnabled = true,
-			watched = {},
-		},
-		--[[
 		    Buff Window: the click-to-cast list of group members missing a buff
-		    you can give. On by default, like Peer Pressure: it is self-only, and it
+		    you can give. On by default: it is self-only, and it
 		    only appears when there is something you can fix. `audience` holds who
 		    each buff is offered to (Data.BUFF_AUDIENCE), keyed by the row's first
 		    single-target id, and seeds from the row defaults in this client's
@@ -159,13 +144,27 @@ ns.DATABASE_DEFAULTS = {
 		]]
 		buffWindow = {
 			enabled = true,
+			--[[
+			    When to Show: whether the window shows solo and in a party or
+			    raid, each with where (one of Data.BUFF_WINDOW_WHERE), and
+			    which of your classes it shows on, keyed by class token. An
+			    unset class reads as ticked. Paladins start off: most of them
+			    run Pally Power for their blessings.
+			]]
+			showSolo = true,
+			showSoloWhere = "ALWAYS",
+			showGroup = true,
+			showGroupWhere = "INSTANCE",
+			showClasses = {
+				PALADIN = false,
+			},
 			locked = false,
 			hideInCombat = true,
 			--[[
 			    Minutes left under which a buff counts as missing; one of
 			    Data.BUFF_WINDOW_REFRESH_CHOICES.
 			]]
-			refreshMinutes = 5,
+			refreshMinutes = 3,
 			--[[
 			    When each class, and pets (Data.TANK_WHEN_PET), take Tanks buffs
 			    (Thorns) without a role of their own: one of Data.TANK_WHEN, keyed
@@ -187,6 +186,8 @@ ns.DATABASE_DEFAULTS = {
 			]]
 			selfEnabled = true,
 			selfRefresh = {},
+			-- MIGRATION (remove after 2026-11-21): the selfRefresh keys already moved from 5 minutes to 3.
+			selfRefreshMigrated = {},
 			--[[
 			    Whether each poison or imbue is ticked for each hand, keyed
 			    "ROGUE_MAIN" and so on, then by the BUFF_WINDOW_WEAPON_ENCHANTS
@@ -206,6 +207,8 @@ ns.DATABASE_DEFAULTS = {
 			-- One of Data.BUFF_WINDOW_FAVOR_CHOICES.
 			favorSeconds = 40,
 			targetEnabled = true,
+			-- Whether the Buff Key passes over spells with a cooldown of their own (Fear Ward).
+			keySkipCooldowns = false,
 			audience = {},
 		},
 		watchedBuffs = {},

@@ -23,14 +23,15 @@ ns.BUFF_WINDOW_WEAPON_HANDS = {}
     and in the window, strongest first.
 ]]
 local OIL, STONE, LURE = "OIL", "STONE", "LURE"
+local ON_QUEL_DANAS = { instances = { 585, 580 }, uiMaps = { 122 } } -- Magisters' Terrace, Sunwell Plateau; Isle of Quel'Danas
 
--- { item id, level required, enchant id, weapon types, kind, item level }, -- Name
+-- { item id, level required, enchant id, weapon types, kind, item level, zones }, -- Name
 ns.BUFF_WINDOW_WEAPON_ITEMS = {
 	{ 23529, 60, 2713, 33219, STONE, 70 }, -- Adamantite Sharpening Stone
 	{ 28421, 60, 2955, 9264, STONE, 70 }, -- Adamantite Weightstone
 	{ 6533, 0, 266, 1048576, LURE, 30 }, -- Aquadynamic Fish Attractor
 	{ 6811, 0, 264, 1048576, LURE, 20 }, -- Aquadynamic Fish Lens
-	{ 34538, 70, 3265, 0, OIL, 70 }, -- Blessed Weapon Coating
+	{ 34538, 70, 3265, 0, OIL, 70, ON_QUEL_DANAS }, -- Blessed Weapon Coating
 	{ 23123, 50, 3592, 0, OIL, 55 }, -- Blessed Wizard Oil
 	{ 31535, 0, 3102, 173555, OIL, 105 }, -- Bloodboil Poison
 	{ 6532, 0, 265, 1048576, LURE, 30 }, -- Bright Baubles
@@ -59,7 +60,7 @@ ns.BUFF_WINDOW_WEAPON_ITEMS = {
 	{ 20745, 20, 2624, 0, OIL, 30 }, -- Minor Mana Oil
 	{ 20744, 5, 2623, 0, OIL, 15 }, -- Minor Wizard Oil
 	{ 6530, 0, 264, 1048576, LURE, 20 }, -- Nightcrawlers
-	{ 34539, 70, 3266, 0, OIL, 70 }, -- Righteous Weapon Coating
+	{ 34539, 70, 3266, 0, OIL, 70, ON_QUEL_DANAS }, -- Righteous Weapon Coating
 	{ 2862, 1, 40, 33219, STONE, 5 }, -- Rough Sharpening Stone
 	{ 3239, 1, 19, 9264, STONE, 5 }, -- Rough Weightstone
 	{ 3824, 24, 25, 173555, OIL, 34 }, -- Shadow Oil
@@ -75,7 +76,7 @@ ns.BUFF_WINDOW_WEAPON_ITEMS = {
 -- The Soulstone reminder; nil until this client's stones are listed.
 ns.BUFF_WINDOW_SOULSTONE = nil
 
--- { class, ranks = { spell ids } }: the Buff Keys' resurrection on a dead target
+-- { class, ranks = { spell ids } }: the Buff Key's resurrection on a dead target
 ns.BUFF_WINDOW_RESURRECTIONS = {}
 
 --[[
@@ -87,7 +88,7 @@ Last Validated
 Notes
 	- Declared empty until this flavor's buffs are picked: no TOC ships this folder yet, and the Vanilla and TBC rows don't carry over (the ranks differ, and later expansions merge or rename these buffs). BUFF_WINDOW_WEAPON_ITEMS is the one list filled in ahead, from the IDs supplied on 2026-10-19.
 	- BUFF_WINDOW_PET_ICONS picks the icon in front of a pet's name: a warlock demon wears its own summoning spell's icon, found by the creature ID inside the pet's GUID, and any other pet wears Call Pet's. Only the spell IDs are stored; the icons come from the client.
-	- BUFF_WINDOW_WEAPON_ITEMS is every other temporary weapon enchant, offered to any class: each item with the level it requires, the enchant id it puts on (SpellEffect's ENCHANT_ITEM_TEMPORARY misc value, through ItemEffect), and the weapon types its spell takes (SpellEquippedItems' EquippedItemSubclass mask, 0 for any weapon). kind files it under Oils, Stones or Lures on the Weapon Buffs panel: LURE for a fishing pole's, STONE for a sharpening stone or weightstone, OIL for the rest (oils, coatings, Bloodboil Poison, Scourgebane, the Weapon Cleaning Cloth). item level (ItemSparse) ranks them, strongest first: it orders a line Rough to Dense where the required level can't (every lure needs level 0). Fishing lures take only a fishing pole, a sharpening stone only a bladed weapon, a weightstone only a blunt one. Picked from the IDs supplied on 2026-10-19, keeping only items whose spell enchants a hand weapon or fishing pole. Left out: rogue-only poisons (the rogue rows above), armor runes and other enchants that go on armor, shield coatings, and test or placeholder items.
+	- BUFF_WINDOW_WEAPON_ITEMS is every other temporary weapon enchant, offered to any class: each item with the level it requires, the enchant id it puts on (SpellEffect's ENCHANT_ITEM_TEMPORARY misc value, through ItemEffect), and the weapon types its spell takes (SpellEquippedItems' EquippedItemSubclass mask, 0 for any weapon). kind files it under Oils, Stones or Lures on the Weapon Buffs panel: LURE for a fishing pole's, STONE for a sharpening stone or weightstone, OIL for the rest (oils, coatings, Bloodboil Poison, Scourgebane, the Weapon Cleaning Cloth). item level (ItemSparse) ranks them, strongest first: it orders a line Rough to Dense where the required level can't (every lure needs level 0). Fishing lures take only a fishing pole, a sharpening stone only a bladed weapon, a weightstone only a blunt one. Picked from the IDs supplied on 2026-10-19, keeping only items whose spell enchants a hand weapon or fishing pole. Left out: rogue-only poisons (the rogue rows above), armor runes and other enchants that go on armor, shield coatings, and test or placeholder items. zones, on an item whose tooltip says it only works in certain places, names those places: instances by the map ID GetInstanceInfo reports and outdoor zones by the UiMap ID C_Map.GetBestMapForUnit reports, both from this client's Map and UiMap tables. The window offers such an item only there (Features/Buff-Window-Self.lua); an item without zones, anywhere. Here the Blessed and Righteous Weapon Coatings carry one: Magisters' Terrace (Map 585), Sunwell Plateau (Map 580, "The Sunwell") and the Isle of Quel'Danas (UiMap 122).
 
 SQL (CMaNGOS)
 	TODO: Add SQL Query
@@ -100,4 +101,6 @@ wago.tools
 	https://wago.tools/db2/ItemEffect?build=5.5.4.70449
 	https://wago.tools/db2/SpellEffect?build=5.5.4.70449
 	https://wago.tools/db2/SpellEquippedItems?build=5.5.4.70449
+	https://wago.tools/db2/Map?build=5.5.4.70449
+	https://wago.tools/db2/UiMap?build=5.5.4.70449
 ]]

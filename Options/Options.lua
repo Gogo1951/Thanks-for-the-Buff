@@ -57,15 +57,14 @@ function ns.RegisterOptionsPanels()
 		AddTrackedSubPanel(registry.ServiceAlertsTracked, ns.BuildServicesTrackedOptions, servicesID)
 	end
 
+	-- TEMPORARY: the Peer Pressure moved notice; see Options/Options-Peer-Pressure.lua for when to delete it.
 	if ns.BuildPeerPressureOptions then
-		AceConfig:RegisterOptionsTable(registry.PeerPressure, ns.BuildPeerPressureOptions)
-		local _, peerPressureID =
-			AceConfigDialog:AddToBlizOptions(registry.PeerPressure, L["TAB_PEER_PRESSURE"], parent)
-		AddTrackedSubPanel(registry.PeerPressureTracked, ns.BuildPeerPressureTrackedOptions, peerPressureID)
+		AceConfig:RegisterOptionsTable(registry.PeerPressure, ns.BuildPeerPressureOptions())
+		AceConfigDialog:AddToBlizOptions(registry.PeerPressure, L["TAB_PEER_PRESSURE"], parent)
 	end
 
 	if ns.BuildBuffWindowOptions then
-		-- Builders, like Peer Pressure: the class lists exist only after login.
+		-- Builders: the class lists exist only after login.
 		AceConfig:RegisterOptionsTable(registry.BuffWindow, ns.BuildBuffWindowOptions)
 		local _, buffWindowID = AceConfigDialog:AddToBlizOptions(registry.BuffWindow, L["TAB_BUFF_WINDOW"], parent)
 

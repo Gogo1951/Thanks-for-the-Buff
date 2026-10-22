@@ -109,10 +109,10 @@ end
 
 --[[
     The picks a hand needs offered. None while the weapon carries one of them
-    with time enough left; just that one once it runs low, to top it up;
-    every pick otherwise (a bare weapon, or one carrying something not
-    picked), so the player chooses. A client that names no enchant lets any
-    enchant count, held to the most lenient pick.
+    with time enough left; every pick otherwise (a bare weapon, one running
+    low, or one carrying something not picked), so the player chooses -- a
+    rogue topping up Instant Poison can switch to Deadly. A client that names
+    no enchant lets any enchant count, held to the most lenient pick.
 ]]
 local function PicksToOffer(hand, left, enchants)
 	local seconds = left[hand.slot]
@@ -120,17 +120,9 @@ local function PicksToOffer(hand, left, enchants)
 		return hand.picks
 	end
 	local enchant = enchants[hand.slot]
-	if not enchant then
-		for _, pick in ipairs(hand.picks) do
-			if PickHolds(pick, seconds) then
-				return {}
-			end
-		end
-		return hand.picks
-	end
 	for _, pick in ipairs(hand.picks) do
-		if pick.enchants[enchant] then
-			return PickHolds(pick, seconds) and {} or { pick }
+		if (not enchant or pick.enchants[enchant]) and PickHolds(pick, seconds) then
+			return {}
 		end
 	end
 	return hand.picks
@@ -151,6 +143,21 @@ local function ImbueLandsOn(left)
 	return main
 end
 
+--[[
+    Whether you're somewhere a weapon item works, for one that only works in
+    certain places: an instance it names, by the map ID GetInstanceInfo
+    reports, or an outdoor zone it names, by C_Map.GetBestMapForUnit's map.
+    Asked at every refresh, so the backstop catches a zone change.
+]]
+local function InItemZones(zones)
+	local instanceId = select(8, GetInstanceInfo())
+	if ns.IsPlain(instanceId) and tContains(zones.instances or {}, instanceId) then
+		return true
+	end
+	local uiMapId = C_Map.GetBestMapForUnit("player")
+	return ns.IsPlain(uiMapId) and uiMapId ~= nil and tContains(zones.uiMaps or {}, uiMapId)
+end
+
 -- The best item of a pick in your bags that your level can use, { id, level, itemLevel? }, or nil.
 local function BestItem(items)
 	local level = UnitLevel("player")
@@ -168,11 +175,14 @@ end
     secure template picks that slot. An imbue never asks -- see ImbueLandsOn
     -- so its button just casts. Either way the game's "replace your
     enchant?" question is answered for you (confirmReplace): the click was
-    the answer. The Buff Keys pass every weapon icon by (weapon). `level`
+    the answer. The Buff Key passes every weapon icon by (weapon). `level`
     ranks what it uses, for SortWeaponIcons: an oil's, stone's or lure's item
     level, a poison's required level, or an imbue rank's learn level.
 ]]
 local function WeaponIcon(hand, pick)
+	if pick.zones and not InItemZones(pick.zones) then
+		return nil
+	end
 	local handName = ns.WEAPON_HAND_LABELS[hand.hand]
 	local spec = {
 		targetName = handName,
@@ -291,7 +301,8 @@ end
     Nothing while anyone in your group carries a Soulstone, yours or another
     warlock's. Otherwise the stone in your bags goes on a healer, one in range
     if any is, or on you when the group has none (or you have no group). With
-    no stone in your bags, the button makes one.
+    no stone in your bags, the button makes one. A stone running low on
+    someone shows its time left on the icon.
 ]]
 local function SoulstoneIcon()
 	local buff = BuffWindow.soulstoneBuff
@@ -299,12 +310,17 @@ local function SoulstoneIcon()
 		return nil
 	end
 	local healers = {}
+	local lowExpires, lowDuration
 	for _, member in ipairs(GroupMembers()) do
 		local unit = member.unit
 		if CanBuff(unit) then
 			ReadAuras(unit)
-			if Has(buff, unit) then
+			local has, expires, duration = Has(buff, unit)
+			if has then
 				return nil
+			end
+			if expires and (not lowExpires or expires > lowExpires) then
+				lowExpires, lowDuration = expires, duration
 			end
 			if RoleOf(unit) == "HEALER" then
 				healers[#healers + 1] = unit
@@ -314,7 +330,7 @@ local function SoulstoneIcon()
 
 	local itemId = BestStone(buff.items)
 	if not itemId then
-		return {
+		return BuffWindow.WithTimeLeft({
 			spellId = buff.create.id,
 			column = buff.column,
 			spellName = buff.create.name,
@@ -322,7 +338,7 @@ local function SoulstoneIcon()
 			unit = "player",
 			targetName = GetUnitName("player", false) or "",
 			hint = L["BUFF_WINDOW_TOOLTIP_CREATE"],
-		}
+		}, lowExpires, lowDuration)
 	end
 	local target = "player"
 	for _, unit in ipairs(healers) do
@@ -335,14 +351,14 @@ local function SoulstoneIcon()
 		target = healers[1]
 	end
 	local targetName = GetUnitName(target, false) or ""
-	return {
+	return BuffWindow.WithTimeLeft({
 		itemId = itemId,
 		item = "item:" .. itemId,
 		column = buff.column,
 		unit = target,
 		targetName = targetName,
 		hint = L["BUFF_WINDOW_TOOLTIP_USE"]:format(targetName),
-	}
+	}, lowExpires, lowDuration)
 end
 
 --------------------------------------------------------------------------------
@@ -367,8 +383,12 @@ function BuffWindow.AddSelfSection(sections)
 	ReadAuras("player")
 	local name = GetUnitName("player", false) or ""
 	for _, buff in ipairs(selfEnabled and selfBuffs or {}) do
-		if (HasPet() or not buff.needsPet) and not Has(buff, "player") then
-			icons[#icons + 1] = SingleIcon(buff, "player", "player", name)
+		if HasPet() or not buff.needsPet then
+			local has, expires, duration = Has(buff, "player")
+			if not has then
+				icons[#icons + 1] =
+					BuffWindow.WithTimeLeft(SingleIcon(buff, "player", "player", name), expires, duration)
+			end
 		end
 	end
 

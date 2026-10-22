@@ -33,10 +33,6 @@ L["MESSAGE_WHISPER_THANKS"] = "Obrigado por %s"
 L["MESSAGE_SELECT_PLAYER"] = "Primeiro, selecione um jogador como alvo."
 L["MESSAGE_CANT_THANK_SELF"] = "Você não pode agradecer a si mesmo!"
 
--- Peer Pressure
-L["MESSAGE_PEER_PRESSURE"] = "%s usou %s!"
-L["MESSAGE_PEER_PRESSURE_TARGET"] = "%s usou %s em %s!"
-
 --------------------------------------------------------------------------------
 -- Text Fragments
 --------------------------------------------------------------------------------
@@ -67,11 +63,11 @@ L["OPTIONS_ENABLE_MINIMAP"] = "Ativar botão do minimapa"
 L["OPTIONS_ENABLE_MINIMAP_DESCRIPTION"] =
 	"Mostra o botão do TFTB no seu minimapa, que liga e desliga recursos com um clique."
 L["OPTIONS_DESCRIPTION"] =
-	"Agradeça com um sussurro ou uma expressão a cada jogador que der um buff em você, e nunca deixe faltar buff na sua raide, em você e nas suas armas, com um lembrete de buffs em que basta um clique para lançá-los. E ainda avisos de banquetes, portais, invocações, poços de almas e recargas da sua classe. Boas maneiras, no automático."
+	"Agradeça automaticamente com um sussurro ou uma expressão a cada jogador que der um buff em você, e nunca deixe faltar buff na sua raide, em você e nas suas armas, com um lembrete de buffs em falta em que basta um clique para lançá-los. E ainda avisos de banquetes, portais, invocações e poços de almas. Boas maneiras, no automático."
 L["OPTIONS_FEATURES_HEADER"] = "Recursos"
 L["OPTIONS_FEATURES_DESCRIPTION"] = "Ative ou desative cada recurso aqui ou no painel dele."
 L["OPTIONS_FEATURES_NOTE"] =
-	'Possíveis mudanças a caminho: alguns dos nossos recursos mais novos, como "%s", vão além do escopo tradicional do "Thanks for the Buff". Fique à vontade para desativar o que você não precisa. Esses recursos podem ir para nosso outro add-on, "Connoisseur & Restocker", ou tudo pode se juntar em um add-on maior, talvez "Buttons, Buffs, & Bags". Conte o que você acha no Discord, CurseForge ou GitHub. Obrigado!'
+	'Alguns dos nossos recursos mais novos, como "%s", vão além do escopo tradicional do "Thanks for the Buff". Fique à vontade para desativar o que você não precisa. Esses recursos podem ir para nosso outro add-on, "Connoisseur & Restocker", ou tudo pode se juntar em um add-on maior, talvez "Buttons, Buffs, & Bags". Conte o que você acha no Discord, CurseForge ou GitHub. Obrigado!'
 L["OPTIONS_COMMANDS_HEADER"] = "/Commands"
 L["OPTIONS_COMMAND"] = "/tftb"
 L["OPTIONS_COMMAND_DESCRIPTION"] = "Abre a interface de opções deste add-on."
@@ -168,20 +164,11 @@ L["GOOD_NEWS_MESSAGE_TOKENS"] = "%a vira o link da habilidade, com a duração q
 ]]
 L["GOOD_NEWS_DURATION_CLAUSE"] = "por %s"
 
--- Peer Pressure
+-- Peer Pressure (TEMPORARY: delete on or after 2026-11-21, with Options/Options-Peer-Pressure.lua)
 L["TAB_PEER_PRESSURE"] = "Pressão do grupo"
-L["PEER_PRESSURE_DESCRIPTION"] =
-	"Receba um aviso quando outros jogadores da sua classe usarem suas habilidades com recarga, para você ceder à pressão do grupo."
-L["PEER_PRESSURE_ENABLE"] = "Habilitar pressão do grupo"
-L["PEER_PRESSURE_ENABLE_DESCRIPTION"] =
-	"Ativa os avisos quando outro jogador da sua classe usa uma habilidade com recarga rastreada."
-L["PEER_PRESSURE_PRINT_DESCRIPTION"] =
-	"Exibe uma mensagem que só você vê quando uma habilidade com recarga da sua classe é usada."
-L["PEER_PRESSURE_OWN_CASTS"] = "Ativar com seus próprios feitiços"
-L["PEER_PRESSURE_OWN_CASTS_DESCRIPTION"] =
-	"Também dispara quando você usa suas próprias habilidades com recarga, não só quando outros jogadores usam as deles."
-L["PEER_PRESSURE_SOUND_DESCRIPTION"] =
-	"Toca um som quando uma habilidade com recarga da sua classe é usada. Só você ouve."
+L["PEER_PRESSURE_CONTROL_FREAK"] = "Control Freak"
+L["PEER_PRESSURE_MOVED"] =
+	'O WoW Forever não deixa os add-ons lerem o registro de combate, então estamos reorganizando nossos add-ons para funcionarem do mesmo jeito em todas as versões do jogo. A "Pressão do grupo" foi para nosso outro add-on, "Control Freak". Instale-o para continuar recebendo alertas quando jogadores da sua classe usarem suas recargas.'
 
 -- Shared across the buff panels
 L["TRACKED_HEADER"] = "Habilidades rastreadas"
@@ -200,9 +187,8 @@ L["WHISPER_MESSAGE_RESET_DESCRIPTION"] = "Redefine a mensagem de sussurro para o
 
 --[[
     The two section headers every buff panel is built from: what the other player
-    sees, then what only you get. Peer Pressure sends nothing outward, so it
-    carries the Notifications header alone. Key prefixes match the header the
-    control appears under.
+    sees, then what only you get. Key prefixes match the header the control
+    appears under.
 ]]
 L["PRAISE_HEADER"] = "Sussurros de agradecimento e expressões"
 L["NOTIFICATIONS_HEADER"] = "Notificações"
@@ -251,6 +237,19 @@ L["BUFF_WINDOW_ENABLE"] = "Habilitar plantão de buffs"
 L["BUFF_WINDOW_ENABLE_DESCRIPTION"] =
 	"Ativa o plantão de buffs, a janela de membros do grupo sem um buff que você pode dar."
 L["BUFF_WINDOW_NO_BUFFS"] = "Sua classe não tem buffs nesta lista, então a janela nunca aparece neste personagem."
+-- When to Show: Solo and In Group, each with Always or In Instance, then the classes.
+L["BUFF_WINDOW_WHEN_HEADER"] = "Quando mostrar"
+L["BUFF_WINDOW_WHEN_DESCRIPTION"] = "Escolha quando a janela pode aparecer."
+L["BUFF_WINDOW_WHEN_SOLO"] = "Sozinho"
+L["BUFF_WINDOW_WHEN_SOLO_DESCRIPTION"] = "Mostra a janela quando você não está em grupo ou raide."
+L["BUFF_WINDOW_WHEN_GROUP"] = "Em grupo"
+L["BUFF_WINDOW_WHEN_GROUP_DESCRIPTION"] = "Mostra a janela quando você está em grupo ou raide."
+L["BUFF_WINDOW_WHERE_DESCRIPTION"] =
+	"Define onde a janela aparece: em qualquer lugar, ou só dentro de masmorras, raides, campos de batalha e arenas."
+L["BUFF_WINDOW_WHERE_ALWAYS"] = "Sempre"
+L["BUFF_WINDOW_WHERE_INSTANCE"] = "Em instância"
+L["BUFF_WINDOW_CLASSES_DESCRIPTION"] = "Mostra a janela quando você joga com estas classes."
+L["BUFF_WINDOW_CLASS_DESCRIPTION"] = "Mostra a janela quando você joga com esta classe."
 L["BUFF_WINDOW_HEADER"] = "Janela"
 L["BUFF_WINDOW_WINDOW_DESCRIPTION"] = "Mantenha a janela onde você a deixou, ou tire-a do caminho em combate."
 L["BUFF_WINDOW_LOCK"] = "Travar janela"
@@ -334,7 +333,7 @@ L["BUFF_WINDOW_SELF_ENABLE_DESCRIPTION"] =
 	"Mostra no topo da janela os buffs que só você pode lançar em si mesmo, como uma armadura ou Fogo Interior, quando estão faltando ou acabando. Escolha quais em Buffs próprios."
 L["BUFF_WINDOW_WEAPON_ENABLE"] = "Seus buffs de arma"
 L["BUFF_WINDOW_WEAPON_ENABLE_DESCRIPTION"] =
-	"Mostra os venenos, imbuições, óleos e pedras que estão faltando ou acabando nas suas armas, junto com seus buffs próprios no topo da janela. Clique em um para aplicá-lo. Escolha quais em Buffs de arma."
+	"Mostra os venenos, imbuições, óleos, pedras e iscas que estão faltando ou acabando nas suas armas, junto com seus buffs próprios no topo da janela. Clique em um para aplicá-lo. Escolha quais em Buffs de arma."
 
 -- The window itself
 L["BUFF_WINDOW_SELF_HEADER"] = "Buffs próprios"
@@ -348,25 +347,25 @@ L["BUFF_WINDOW_TOOLTIP_CREATE"] = "Ninguém no seu grupo tem uma Pedra da Alma. 
 L["BUFF_WINDOW_TOOLTIP_GROUP"] = "Clique para lançar em %s e no grupo dele."
 L["BUFF_WINDOW_TOOLTIP_FAVOR"] = "Clique para selecionar %s como alvo e lançar."
 L["BUFF_WINDOW_TOOLTIP_DISMISS"] = "Clique com o botão direito para tirar %s da lista."
--- The window's close button; %s is the options slash command.
+-- The window's close button: the class name in its color, then the options command.
 L["BUFF_WINDOW_CLOSED"] =
-	"Plantão de buffs está desligado. Para ligá-lo de novo, use Shift + Clique direito no botão do minimapa ou digite %s."
+	"Plantão de buffs está desligado para a classe %s. Para ligá-lo de novo, use Shift + Clique direito no botão do minimapa ou digite %s."
 
--- The Buff Keys (Key Bindings, and the Keybinds section of Buff Duty)
+-- The Buff Key (Key Bindings, and the Keybinds section of Buff Duty)
 L["BUFF_KEYS_HEADER"] = "Atalhos"
 L["BUFF_KEYS_DESCRIPTION"] =
 	"Lance o próximo buff da sua lista com uma tecla ou macro, fora de combate. Os buffs de arma continuam sendo um clique na janela."
-L["BUFF_KEY_SINGLE"] = "Botão de buff individual"
-L["BUFF_KEY_SINGLE_DESCRIPTION"] =
-	"Lança seu próximo buff em falta, um por toque: uma ressurreição no seu alvo morto (sacerdotes e paladinos), depois seus buffs próprios, Retribuir o favor, seu alvo e seu grupo."
-L["BUFF_KEY_GROUP"] = "Botão de buff de grupo"
-L["BUFF_KEY_GROUP_DESCRIPTION"] =
-	"Lança seu próximo buff de grupo em falta, um por toque: uma ressurreição no seu alvo morto (sacerdotes e paladinos), depois seus buffs próprios, depois o grupo do seu alvo e os demais. Um grupo espera até que todos sem o buff estejam ao alcance."
+L["BUFF_KEY"] = "Botão de buff"
+L["BUFF_KEY_DESCRIPTION"] =
+	"Lança seu próximo buff em falta, um por toque: uma ressurreição no seu alvo morto, depois nos mortos do seu grupo (sacerdotes, paladinos e xamãs), depois seus buffs próprios, Retribuir o favor, seu alvo e seu grupo. Um grupo recebe o buff de grupo quando ele custa menos mana do que buffar um por um todos ao alcance."
+L["BUFF_KEY_SKIP_COOLDOWNS"] = "Pular buffs com tempo de recarga"
+L["BUFF_KEY_SKIP_COOLDOWNS_DESCRIPTION"] =
+	"Ignora buffs com tempo de recarga, como Proteção contra Medo, e passa para o próximo."
 -- %s is a player's name.
 L["BUFF_KEY_WAITING"] = "Esperando %s chegar ao alcance."
 L["BUFF_KEY_DONE"] = "Nada mais para buffar."
 -- The caption beside the read-only box that holds a Buff Key's macro line.
-L["BUFF_KEY_MACRO_CAPTION"] = "Macro:"
+L["BUFF_KEY_MACRO_CAPTION"] = "Macro"
 
 --------------------------------------------------------------------------------
 -- Options: Thank You Button

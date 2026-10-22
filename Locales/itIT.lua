@@ -34,10 +34,6 @@ L["MESSAGE_WHISPER_THANKS"] = "Grazie per %s"
 L["MESSAGE_SELECT_PLAYER"] = "Prima prendi un giocatore come bersaglio."
 L["MESSAGE_CANT_THANK_SELF"] = "Non puoi ringraziare te stesso!"
 
--- Peer Pressure
-L["MESSAGE_PEER_PRESSURE"] = "%s ha usato %s!"
-L["MESSAGE_PEER_PRESSURE_TARGET"] = "%s ha usato %s su %s!"
-
 --------------------------------------------------------------------------------
 -- Text Fragments
 --------------------------------------------------------------------------------
@@ -68,11 +64,11 @@ L["OPTIONS_ENABLE_MINIMAP"] = "Abilita pulsante della minimappa"
 L["OPTIONS_ENABLE_MINIMAP_DESCRIPTION"] =
 	"Mostra il pulsante di TFTB sulla minimappa, che attiva e disattiva le funzioni con un clic."
 L["OPTIONS_DESCRIPTION"] =
-	"Ringrazia con un sussurro o un'emote ogni giocatore che ti potenzia e non lasciare mai senza potenziamenti la tua incursione, te e le tue armi, grazie a un promemoria dove basta un clic per lanciarli. In più, avvisi per banchetti, portali, evocazioni, pozzi delle anime e tempi di recupero della tua classe. Buone maniere, in automatico."
+	"Ringrazia automaticamente con un sussurro o un'emote ogni giocatore che ti potenzia e non lasciare mai senza potenziamenti la tua incursione, te e le tue armi, grazie a un promemoria dei potenziamenti mancanti dove basta un clic per lanciarli. In più, avvisi per banchetti, portali, evocazioni e pozzi delle anime. Buone maniere, in automatico."
 L["OPTIONS_FEATURES_HEADER"] = "Funzionalità"
 L["OPTIONS_FEATURES_DESCRIPTION"] = "Attiva o disattiva ogni funzionalità qui o nel suo pannello."
 L["OPTIONS_FEATURES_NOTE"] =
-	'Possibili modifiche in arrivo: alcune delle nostre funzionalità più recenti, come "%s", vanno oltre l\'ambito tradizionale di "Thanks for the Buff". Sentiti libero di disattivare tutto ciò che non ti serve. Queste funzionalità potrebbero passare al nostro altro add-on, "Connoisseur & Restocker", oppure tutto potrebbe confluire in un add-on più grande, magari "Buttons, Buffs, & Bags". Facci sapere cosa ne pensi su Discord, CurseForge o GitHub. Grazie!'
+	'Alcune delle nostre funzionalità più recenti, come "%s", vanno oltre l\'ambito tradizionale di "Thanks for the Buff". Sentiti libero di disattivare tutto ciò che non ti serve. Queste funzionalità potrebbero passare al nostro altro add-on, "Connoisseur & Restocker", oppure tutto potrebbe confluire in un add-on più grande, magari "Buttons, Buffs, & Bags". Facci sapere cosa ne pensi su Discord, CurseForge o GitHub. Grazie!'
 L["OPTIONS_COMMANDS_HEADER"] = "/Commands"
 L["OPTIONS_COMMAND"] = "/tftb"
 L["OPTIONS_COMMAND_DESCRIPTION"] = "Apre l'interfaccia delle opzioni di questo add-on."
@@ -173,20 +169,11 @@ L["GOOD_NEWS_MESSAGE_TOKENS"] =
 ]]
 L["GOOD_NEWS_DURATION_CLAUSE"] = "per %s"
 
--- Peer Pressure
+-- Peer Pressure (TEMPORARY: delete on or after 2026-11-21, with Options/Options-Peer-Pressure.lua)
 L["TAB_PEER_PRESSURE"] = "Pressione sociale"
-L["PEER_PRESSURE_DESCRIPTION"] =
-	"Ricevi una notifica quando altri giocatori della tua classe usano le loro capacità con tempo di recupero, così puoi cedere alla pressione sociale."
-L["PEER_PRESSURE_ENABLE"] = "Abilita pressione sociale"
-L["PEER_PRESSURE_ENABLE_DESCRIPTION"] =
-	"Attiva gli avvisi quando un altro giocatore della tua classe usa una capacità con tempo di recupero tracciata."
-L["PEER_PRESSURE_PRINT_DESCRIPTION"] =
-	"Mostra un messaggio visibile solo a te quando viene usata una capacità con tempo di recupero della tua classe."
-L["PEER_PRESSURE_OWN_CASTS"] = "Attiva con i tuoi incantesimi"
-L["PEER_PRESSURE_OWN_CASTS_DESCRIPTION"] =
-	"Si attiva anche quando usi le tue capacità con tempo di recupero, non solo quando lo fanno gli altri giocatori."
-L["PEER_PRESSURE_SOUND_DESCRIPTION"] =
-	"Riproduce un suono quando viene usata una capacità con tempo di recupero della tua classe. Lo senti solo tu."
+L["PEER_PRESSURE_CONTROL_FREAK"] = "Control Freak"
+L["PEER_PRESSURE_MOVED"] =
+	'WoW Forever non permette agli add-on di leggere il registro di combattimento, quindi stiamo riorganizzando i nostri add-on perché funzionino allo stesso modo in ogni versione del gioco. "Pressione sociale" si è spostata nel nostro altro add-on, "Control Freak". Installalo per continuare a ricevere avvisi quando i giocatori della tua classe usano i loro tempi di recupero.'
 
 -- Shared across the buff panels
 L["TRACKED_HEADER"] = "Abilità tracciate"
@@ -205,9 +192,8 @@ L["WHISPER_MESSAGE_RESET_DESCRIPTION"] = "Ripristina il testo predefinito del me
 
 --[[
     The two section headers every buff panel is built from: what the other player
-    sees, then what only you get. Peer Pressure sends nothing outward, so it
-    carries the Notifications header alone. Key prefixes match the header the
-    control appears under.
+    sees, then what only you get. Key prefixes match the header the control
+    appears under.
 ]]
 L["PRAISE_HEADER"] = "Sussurri di ringraziamento ed emote"
 L["NOTIFICATIONS_HEADER"] = "Notifiche"
@@ -257,6 +243,19 @@ L["BUFF_WINDOW_ENABLE_DESCRIPTION"] =
 	"Attiva il turno dei potenziamenti, la finestra dei membri del gruppo a cui manca un potenziamento che puoi lanciare."
 L["BUFF_WINDOW_NO_BUFFS"] =
 	"La tua classe non ha potenziamenti in questa lista, quindi la finestra non compare mai con questo personaggio."
+-- When to Show: Solo and In Group, each with Always or In Instance, then the classes.
+L["BUFF_WINDOW_WHEN_HEADER"] = "Quando mostrare"
+L["BUFF_WINDOW_WHEN_DESCRIPTION"] = "Scegli quando la finestra può apparire."
+L["BUFF_WINDOW_WHEN_SOLO"] = "Da solo"
+L["BUFF_WINDOW_WHEN_SOLO_DESCRIPTION"] = "Mostra la finestra quando non sei in un gruppo o in un'incursione."
+L["BUFF_WINDOW_WHEN_GROUP"] = "In gruppo"
+L["BUFF_WINDOW_WHEN_GROUP_DESCRIPTION"] = "Mostra la finestra quando sei in un gruppo o in un'incursione."
+L["BUFF_WINDOW_WHERE_DESCRIPTION"] =
+	"Imposta dove appare la finestra: ovunque, o solo in spedizioni, incursioni, campi di battaglia e arene."
+L["BUFF_WINDOW_WHERE_ALWAYS"] = "Sempre"
+L["BUFF_WINDOW_WHERE_INSTANCE"] = "In istanza"
+L["BUFF_WINDOW_CLASSES_DESCRIPTION"] = "Mostra la finestra quando giochi queste classi."
+L["BUFF_WINDOW_CLASS_DESCRIPTION"] = "Mostra la finestra quando giochi questa classe."
 L["BUFF_WINDOW_HEADER"] = "Finestra"
 L["BUFF_WINDOW_WINDOW_DESCRIPTION"] = "Tieni la finestra dove l'hai messa, o toglila di mezzo in combattimento."
 L["BUFF_WINDOW_LOCK"] = "Blocca la finestra"
@@ -281,7 +280,7 @@ L["BUFF_WINDOW_REFRESH_DESCRIPTION"] =
 -- Count as Tanks: one dropdown per class, then Pets, each with these three choices.
 L["BUFF_WINDOW_TANKS_HEADER"] = "Considera come difensori"
 L["BUFF_WINDOW_TANKS_DESCRIPTION"] =
-	"Chi riceve i potenziamenti che offri ai Difensori, come Spine, quando non ha un ruolo proprio."
+	"Chi riceve i potenziamenti che offri ai Difensori, come Thorns, quando non ha un ruolo proprio."
 L["BUFF_WINDOW_TANKS_CLASS_DESCRIPTION"] =
 	"Imposta quando i giocatori di questa classe contano come difensori. Un ruolo da difensore o guaritore che abbiano ha sempre la precedenza."
 L["BUFF_WINDOW_TANKS_PETS"] = "Famigli"
@@ -337,10 +336,10 @@ L["BUFF_WINDOW_WEAPON_PICK_DESCRIPTION"] =
 	"Offre %s per la tua arma (%s). Finché l'arma non ha nessuna delle scelte spuntate, viene offerta ognuna di quelle che possiedi."
 L["BUFF_WINDOW_SELF_ENABLE"] = "I tuoi potenziamenti personali"
 L["BUFF_WINDOW_SELF_ENABLE_DESCRIPTION"] =
-	"Mostra in cima alla finestra i potenziamenti che solo tu puoi lanciare su te stesso, come un'armatura o Fuoco Interiore, quando mancano o stanno per scadere. Scegli quali in Potenziamenti personali."
+	"Mostra in cima alla finestra i potenziamenti che solo tu puoi lanciare su te stesso, come un'armatura o Inner Fire, quando mancano o stanno per scadere. Scegli quali in Potenziamenti personali."
 L["BUFF_WINDOW_WEAPON_ENABLE"] = "I tuoi potenziamenti delle armi"
 L["BUFF_WINDOW_WEAPON_ENABLE_DESCRIPTION"] =
-	"Mostra i veleni, le infusioni, gli oli e le pietre che mancano alle tue armi o stanno per scadere, insieme ai tuoi potenziamenti personali in cima alla finestra. Cliccane uno per applicarlo. Scegli quali in Potenziamenti delle armi."
+	"Mostra i veleni, le infusioni, gli oli, le pietre e le esche che mancano alle tue armi o stanno per scadere, insieme ai tuoi potenziamenti personali in cima alla finestra. Cliccane uno per applicarlo. Scegli quali in Potenziamenti delle armi."
 
 -- The window itself
 L["BUFF_WINDOW_SELF_HEADER"] = "Potenziamenti personali"
@@ -354,25 +353,25 @@ L["BUFF_WINDOW_TOOLTIP_CREATE"] = "Nessuno nel tuo gruppo ha una Pietra dell'Ani
 L["BUFF_WINDOW_TOOLTIP_GROUP"] = "Clicca per lanciarlo su %s e sul suo gruppo."
 L["BUFF_WINDOW_TOOLTIP_FAVOR"] = "Clicca per selezionare %s come bersaglio e lanciarlo."
 L["BUFF_WINDOW_TOOLTIP_DISMISS"] = "Clic destro per togliere %s dalla lista."
--- The window's close button; %s is the options slash command.
+-- The window's close button: the class name in its color, then the options command.
 L["BUFF_WINDOW_CLOSED"] =
-	"Turno dei potenziamenti è disattivato. Per riattivarlo, usa Maiusc + Clic destro sul pulsante della minimappa o digita %s."
+	"Turno dei potenziamenti è disattivato per la classe %s. Per riattivarlo, usa Maiusc + Clic destro sul pulsante della minimappa o digita %s."
 
--- The Buff Keys (Key Bindings, and the Keybinds section of Buff Duty)
+-- The Buff Key (Key Bindings, and the Keybinds section of Buff Duty)
 L["BUFF_KEYS_HEADER"] = "Tasti rapidi"
 L["BUFF_KEYS_DESCRIPTION"] =
 	"Lancia il prossimo potenziamento della tua lista con un tasto o una macro, fuori dal combattimento. I potenziamenti delle armi restano un clic sulla finestra."
-L["BUFF_KEY_SINGLE"] = "Pulsante potenziamento singolo"
-L["BUFF_KEY_SINGLE_DESCRIPTION"] =
-	"Lancia il tuo prossimo potenziamento mancante, uno per pressione: una resurrezione sul tuo bersaglio morto (sacerdoti e paladini), poi i tuoi potenziamenti personali, Ricambia il favore, il tuo bersaglio e il tuo gruppo."
-L["BUFF_KEY_GROUP"] = "Pulsante potenziamento di gruppo"
-L["BUFF_KEY_GROUP_DESCRIPTION"] =
-	"Lancia il tuo prossimo potenziamento di gruppo mancante, uno per pressione: una resurrezione sul tuo bersaglio morto (sacerdoti e paladini), poi i tuoi potenziamenti personali, poi il gruppo del tuo bersaglio e gli altri. Un gruppo attende finché tutti quelli a cui manca il potenziamento non sono a portata."
+L["BUFF_KEY"] = "Pulsante potenziamento"
+L["BUFF_KEY_DESCRIPTION"] =
+	"Lancia il tuo prossimo potenziamento mancante, uno per pressione: una resurrezione sul tuo bersaglio morto, poi sui morti del tuo gruppo (sacerdoti, paladini e sciamani), poi i tuoi potenziamenti personali, Ricambia il favore, il tuo bersaglio e il tuo gruppo. Un gruppo riceve il potenziamento di gruppo quando costa meno mana che potenziare uno alla volta tutti quelli a portata."
+L["BUFF_KEY_SKIP_COOLDOWNS"] = "Salta i potenziamenti con tempo di recupero"
+L["BUFF_KEY_SKIP_COOLDOWNS_DESCRIPTION"] =
+	"Salta i potenziamenti con un tempo di recupero, come Fear Ward, e passa al successivo."
 -- %s is a player's name.
 L["BUFF_KEY_WAITING"] = "In attesa che %s sia a portata."
 L["BUFF_KEY_DONE"] = "Niente più da potenziare."
 -- The caption beside the read-only box that holds a Buff Key's macro line.
-L["BUFF_KEY_MACRO_CAPTION"] = "Macro:"
+L["BUFF_KEY_MACRO_CAPTION"] = "Macro"
 
 --------------------------------------------------------------------------------
 -- Options: Thank You Button

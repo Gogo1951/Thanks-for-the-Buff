@@ -6,8 +6,8 @@ local GetColor = ns.GetColor
 
 --[[
     "Tracked Abilities" panel, under Buff Duty: who each buff you can give to others is
-    offered to, and when a buff counts as missing. Lists every class, like Peer
-    Pressure, because the default profile is shared account-wide. Not hidden
+    offered to, and when a buff counts as missing. Lists every class, because
+    the default profile is shared account-wide. Not hidden
     behind the Buff Duty switch: these are choices worth making before
     turning the window on, and the parent panel says whether it is.
 ]]
@@ -91,35 +91,9 @@ function ns.BuildBuffWindowBuffsOptions()
 		}
 	end
 
-	local classes = {}
-	for _, list in ipairs({
-		ns.TRACKED_ABILITIES,
-		ns.BUFF_WINDOW_SPELLS,
-		ns.BUFF_WINDOW_SELF_SPELLS,
-		ns.BUFF_WINDOW_WEAPON_ENCHANTS,
-	}) do
-		for _, row in ipairs(list) do
-			if row.class then
-				classes[row.class] = true
-			end
-		end
-	end
-	for _, row in ipairs(ns.PEER_PRESSURE_ABILITIES) do
-		classes[row[1]] = true
-	end
-	local classNames = {}
-	for class in pairs(classes) do
-		classNames[#classNames + 1] = class
-	end
-	table.sort(classNames)
-
 	local tankOrder = 31
-	for _, class in ipairs(classNames) do
-		local caption = "|cff"
-			.. (Data.CLASS_COLORS[class] or ns.PALETTE.TEXT)
-			.. (LOCALIZED_CLASS_NAMES_MALE[class] or class)
-			.. "|r"
-		TankRow(class, caption, L["BUFF_WINDOW_TANKS_CLASS_DESCRIPTION"], tankOrder)
+	for _, class in ipairs(ns.OptionsClassList()) do
+		TankRow(class, ns.OptionsClassName(class), L["BUFF_WINDOW_TANKS_CLASS_DESCRIPTION"], tankOrder)
 		tankOrder = tankOrder + 1
 	end
 	TankRow(Data.TANK_WHEN_PET, L["BUFF_WINDOW_TANKS_PETS"], L["BUFF_WINDOW_TANKS_PETS_DESCRIPTION"], tankOrder)

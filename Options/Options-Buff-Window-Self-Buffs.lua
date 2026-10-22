@@ -18,25 +18,6 @@ local GetColor = ns.GetColor
 ]]
 
 --[[
-    The Off / When Missing / Under labels for a list of choices this panel and
-    Weapon Buffs share, "Under 5 Minutes" built from the client's own duration
-    string.
-]]
-function ns.BuffWindowRefreshValues(choices)
-	local values = {}
-	for _, choice in ipairs(choices) do
-		if choice == Data.SELF_REFRESH_OFF then
-			values[choice] = L["BUFF_WINDOW_SELF_REFRESH_OFF"]
-		elseif choice == Data.SELF_REFRESH_MISSING then
-			values[choice] = L["BUFF_WINDOW_SELF_REFRESH_MISSING"]
-		else
-			values[choice] = L["BUFF_WINDOW_SELF_REFRESH_UNDER"]:format(D_MINUTES:format(choice))
-		end
-	end
-	return values
-end
-
---[[
     "Hunter · any one aspect counts": a class with two or more self buffs from
     one exclusive family says so after its name, since any one of them up is
     enough. A family of one (Lightning Shield alone) needs no note.

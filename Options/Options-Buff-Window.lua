@@ -1,4 +1,5 @@
 local _, ns = ...
+local Data = ns.Data
 local L = ns.L
 
 local GetColor = ns.GetColor
@@ -9,8 +10,8 @@ local GetColor = ns.GetColor
     Data/{Game}/Buff-Window-Spells-{Game}.lua). The enable switch at the top,
     twinned in the General panel's Features section, is the master; everything
     below it hides while it is off. Each optional row of the window has its
-    switch here, Self Buffs and Weapon Buffs included, and so do the two Buff
-    Keys' bindings (Features/Buff-Window-Keys.lua); what each buff is offered
+    switch here, Self Buffs and Weapon Buffs included, and so do the Buff
+    Key's binding (Features/Buff-Window-Keys.lua); what each buff is offered
     to lives in three sub-panels of this one: Tracked Abilities
     (Options-Buff-Window-Buffs.lua), Self-Buffs
     (Options-Buff-Window-Self-Buffs.lua) and Weapon Buffs
@@ -104,8 +105,38 @@ function ns.BuildBuffWindowOptions()
 		}
 	end
 
-	local singleMacro = MacroLine(ns.BUFF_KEY_MACROS.SINGLE, 22.2)
-	local groupMacro = MacroLine(ns.BUFF_KEY_MACROS.GROUP, 24.2)
+	local keyMacro = MacroLine(ns.BUFF_KEY_MACRO, 22.2)
+
+	--[[
+	    The right half of a Solo or In Group row: where the window shows, Always
+	    or In Instance. Like Return the Favor's, it appears only while the
+	    toggle beside it is on.
+	]]
+	local whereValues = {}
+	for _, value in ipairs(Data.BUFF_WINDOW_WHERE_ORDER) do
+		whereValues[value] = L["BUFF_WINDOW_WHERE_" .. value]
+	end
+	local function Where(toggleKey, key, order)
+		return {
+			type = "select",
+			name = "",
+			desc = L["BUFF_WINDOW_WHERE_DESCRIPTION"],
+			values = whereValues,
+			sorting = Data.BUFF_WINDOW_WHERE_ORDER,
+			width = ns.OPTIONS_CONTROL_WIDTH,
+			order = order,
+			hidden = function()
+				return Hidden() or not Settings()[toggleKey]
+			end,
+			get = function()
+				return Settings()[key]
+			end,
+			set = function(_, value)
+				Settings()[key] = value
+				ns.RefreshBuffWindow()
+			end,
+		}
+	end
 
 	local options = {
 		name = L["TAB_BUFF_WINDOW"],
@@ -130,6 +161,44 @@ function ns.BuildBuffWindowOptions()
 			spaceNote = ns.OptionsSpacer(4.3),
 			note = ns.OptionsFeaturesNote(4.6),
 			space1 = ns.OptionsSpacer(5, Hidden),
+
+			--[[
+			    When the window may show at all: solo or in a group, and on
+			    which classes. The class toggles are added to `classes` below.
+			]]
+			headerWhen = ns.OptionsHeader(L["BUFF_WINDOW_WHEN_HEADER"], 5.1, Hidden),
+			spaceWhen0 = ns.OptionsSpacer(5.11, Hidden),
+			descWhen = ns.OptionsDesc(L["BUFF_WINDOW_WHEN_DESCRIPTION"], 5.12, Hidden),
+			spaceWhen1 = ns.OptionsSpacer(5.13, Hidden),
+			showSolo = Toggle(
+				"showSolo",
+				L["BUFF_WINDOW_WHEN_SOLO"],
+				L["BUFF_WINDOW_WHEN_SOLO_DESCRIPTION"],
+				5.14,
+				ns.OPTIONS_LABEL_WIDTH
+			),
+			showSoloWhere = Where("showSolo", "showSoloWhere", 5.15),
+			spaceWhen2 = ns.OptionsSpacer(5.16, Hidden),
+			showGroup = Toggle(
+				"showGroup",
+				L["BUFF_WINDOW_WHEN_GROUP"],
+				L["BUFF_WINDOW_WHEN_GROUP_DESCRIPTION"],
+				5.17,
+				ns.OPTIONS_LABEL_WIDTH
+			),
+			showGroupWhere = Where("showGroup", "showGroupWhere", 5.18),
+			spaceWhen3 = ns.OptionsSpacer(5.19, Hidden),
+			descClasses = ns.OptionsDesc(L["BUFF_WINDOW_CLASSES_DESCRIPTION"], 5.2, Hidden),
+			spaceClasses0 = ns.OptionsSpacer(5.21, Hidden),
+			classes = {
+				type = "group",
+				name = "",
+				order = 5.3,
+				inline = true,
+				hidden = Hidden,
+				args = {},
+			},
+			spaceClasses1 = ns.OptionsSpacer(5.4, Hidden),
 
 			--[[
 			    The window's optional rows, in the order it shows them: your self
@@ -218,18 +287,45 @@ function ns.BuildBuffWindowOptions()
 			space9 = ns.OptionsSpacer(21, Hidden),
 			descKeys = ns.OptionsDesc(L["BUFF_KEYS_DESCRIPTION"], 21.3, Hidden),
 			spaceKeys = ns.OptionsSpacer(21.6, Hidden),
-			singleKeyLabel = ns.OptionsRowLabel(L["BUFF_KEY_SINGLE"], 22, nil, Hidden),
-			singleKey = KeyBinding(ns.BUFF_KEY_COMMANDS.SINGLE, L["BUFF_KEY_SINGLE_DESCRIPTION"], 22.1),
-			singleMacroLabel = singleMacro.label,
-			singleMacro = singleMacro.box,
+			keyLabel = ns.OptionsRowLabel(L["BUFF_KEY"], 22, nil, Hidden),
+			key = KeyBinding(ns.BUFF_KEY_COMMAND, L["BUFF_KEY_DESCRIPTION"], 22.1),
+			keyMacroLabel = keyMacro.label,
+			keyMacro = keyMacro.box,
 			space10 = ns.OptionsSpacer(23, Hidden),
-			groupKeyLabel = ns.OptionsRowLabel(L["BUFF_KEY_GROUP"], 24, nil, Hidden),
-			groupKey = KeyBinding(ns.BUFF_KEY_COMMANDS.GROUP, L["BUFF_KEY_GROUP_DESCRIPTION"], 24.1),
-			groupMacroLabel = groupMacro.label,
-			groupMacro = groupMacro.box,
+			keySkipCooldowns = Toggle(
+				"keySkipCooldowns",
+				L["BUFF_KEY_SKIP_COOLDOWNS"],
+				L["BUFF_KEY_SKIP_COOLDOWNS_DESCRIPTION"],
+				24
+			),
 			space11 = ns.OptionsSpacer(25, Hidden),
 		},
 	}
+
+	--[[
+	    One toggle per class this client has, each with the game's class icon
+	    beside its name, flowing three to a row in an unnamed inline group.
+	    Unset reads as ticked, so a class the profile has never seen shows the
+	    window.
+	]]
+	for index, class in ipairs(ns.OptionsClassList()) do
+		options.args.classes.args[class] = {
+			type = "toggle",
+			name = ns.OptionsClassName(class),
+			desc = L["BUFF_WINDOW_CLASS_DESCRIPTION"],
+			image = "Interface\\GLUES\\CHARACTERCREATE\\UI-CHARACTERCREATE-CLASSES",
+			imageCoords = CLASS_ICON_TCOORDS[class],
+			width = "normal",
+			order = index,
+			get = function()
+				return Settings().showClasses[class] ~= false
+			end,
+			set = function(_, value)
+				Settings().showClasses[class] = value
+				ns.RefreshBuffWindow()
+			end,
+		}
+	end
 
 	return options
 end

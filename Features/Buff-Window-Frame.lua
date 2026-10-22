@@ -17,7 +17,8 @@ local GetColor = ns.GetColor
     Two frames stack so combat visibility and our own never fight: the anchor
     belongs to a secure state driver (Hide in Combat), and the content inside it
     is shown and hidden by this file, out of combat only. The content carries a
-    title bar whose close button turns Buff Duty off (ns.CloseBuffWindow).
+    title bar whose close button turns Buff Duty off for the class you're
+    playing (ns.CloseBuffWindow).
 ]]
 
 --------------------------------------------------------------------------------
@@ -42,7 +43,8 @@ local MIN_NAME_WIDTH = 80
 local MAX_NAME_WIDTH = 260
 -- Room between the end of the longest name and the first icon.
 local NAME_GAP = 8
-local MEMBER_INDENT = 10
+-- A member's role icon lines up with the header above it.
+local MEMBER_INDENT = 0
 --[[
     Parties sit two to a row, reading across -- 1 2, then 3 4 -- and the
     columns stand this far apart.
@@ -50,7 +52,7 @@ local MEMBER_INDENT = 10
 local PARTIES_PER_ROW = 2
 local COLUMN_GAP = 16
 -- A pet sits one step further in, under its owner.
-local PET_INDENT = 20
+local PET_INDENT = 10
 local PADDING = 7
 --[[
     The title bar: one icon-high row for the title and close button, then one
@@ -153,11 +155,17 @@ end
 --[[
     PreClick, because the secure click fires the game's "replace your
     enchant?" question before PostClick runs (Buff-Window-Self.lua answers it).
+    Every cast is noted too, so a "more powerful spell" refusal can be pinned
+    on who it was aimed at (ns.NoteBuffCastAttempt).
 ]]
 local function OnIconPreClick(self, button)
-	if button == "LeftButton" and self.spec and self.spec.confirmReplace then
+	if button ~= "LeftButton" or not self.spec then
+		return
+	end
+	if self.spec.confirmReplace then
 		ns.ExpectReplaceEnchant()
 	end
+	ns.NoteBuffCastAttempt(self.spec)
 end
 
 --[[
@@ -213,7 +221,7 @@ end
     "type" to fall back on, so it casts nothing and is free for dismissing a
     favor. Every attribute is written on every use, nil included, because a
     pooled button still carries whatever its last spec set; a nil spec clears
-    them all. Shared with the Buff Keys, which write the same attributes.
+    them all. Shared with the Buff Key, which writes the same attributes.
 ]]
 function ns.SetBuffButtonAttributes(button, spec)
 	if not spec then
@@ -307,11 +315,18 @@ end
     included. Every rank shares one cooldown, so the spec's own id is enough. A
     value the client keeps secret leaves the swipe as it was rather than
     erroring; the next update after combat corrects it.
+
+    With no cooldown running, an icon for a buff that is running low (not gone)
+    shows how much of it is left as a sliver: reversed, so the bright part is
+    the time remaining and the dark part the time spent. No countdown, ours or
+    a cooldown-count add-on's (noCooldownCount): the sliver alone reads at a
+    glance. It ends whole once the buff runs out.
 ]]
 local function UpdateCooldowns()
 	if not content or not content:IsVisible() then
 		return
 	end
+	local now = GetTime()
 	for i = 1, usedIcons do
 		local button = icons[i]
 		local spec = button.spec
@@ -320,10 +335,19 @@ local function UpdateCooldowns()
 			start, duration, modRate = GetCooldown(spec)
 		end
 		if ns.IsPlain(start) and ns.IsPlain(duration) then
+			local cooldown = button.cooldown
 			if start and duration and duration > 0 then
-				button.cooldown:SetCooldown(start, duration, modRate or 1)
+				cooldown:SetReverse(false)
+				cooldown:SetHideCountdownNumbers(false)
+				cooldown.noCooldownCount = nil
+				cooldown:SetCooldown(start, duration, modRate or 1)
+			elseif spec.buffExpires and spec.buffExpires > now then
+				cooldown:SetReverse(true)
+				cooldown:SetHideCountdownNumbers(true)
+				cooldown.noCooldownCount = true
+				cooldown:SetCooldown(spec.buffExpires - spec.buffDuration, spec.buffDuration)
 			else
-				button.cooldown:Clear()
+				cooldown:Clear()
 			end
 		end
 	end
@@ -344,7 +368,7 @@ local IsItemInRange = C_Item.IsItemInRange
 --[[
     An item used on someone (a Soulstone) asks the item's own range, and
     falls back on the buffs' check when the client has no answer. The Buff
-    Keys ask it too.
+    Key asks it too.
 ]]
 local function InRange(spec)
 	if spec.itemId and spec.unit then
@@ -404,6 +428,8 @@ local function Signature(sections)
 				.. (spec.unit or "")
 				.. (spec.targetSlot or "")
 				.. (spec.macrotext or "")
+				.. "~"
+				.. (spec.buffExpires or "")
 		end
 	end
 	for _, section in ipairs(sections) do
@@ -435,7 +461,7 @@ end
     leaves no more room above it than the sides do.
 ]]
 local function ContentHeight(line)
-	if #line.specs > 0 or line.indent > 0 then
+	if #line.specs > 0 or not line.header then
 		return ICON_SIZE
 	end
 	return line.label:GetStringHeight()
@@ -573,12 +599,12 @@ function ns.RenderBuffWindow(sections)
 				table.insert(partyRows[index], lines)
 			end
 			local grid = section.grid or MAIN_GRID
-			local function Measure(text, indent, specs, lineGrid)
+			local function Measure(text, indent, specs, lineGrid, header)
 				local label, width = MeasureLabel(text, indent)
-				lines[#lines + 1] = { label = label, indent = indent, specs = specs, grid = lineGrid }
+				lines[#lines + 1] = { label = label, indent = indent, specs = specs, grid = lineGrid, header = header }
 				nameWidth = math.max(nameWidth, width)
 			end
-			Measure(GetColor("TITLE") .. section.label .. "|r", 0, section.icons, grid)
+			Measure(GetColor("TITLE") .. section.label .. "|r", 0, section.icons, grid, true)
 			for _, row in ipairs(section.rows) do
 				-- A row can set its own indent: the weapon hands sit flush with their header.
 				Measure(row.label, row.indent or (row.pet and PET_INDENT or MEMBER_INDENT), row.icons, row.grid or grid)
