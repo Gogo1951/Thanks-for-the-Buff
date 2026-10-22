@@ -36,13 +36,13 @@ local RequestLoadQuest = C_QuestLog.RequestLoadQuestByID
 --[[
     The spell and area kinds' own reads, through _G because an add-on whose
     data holds no spell or area never names them anywhere else. IsSpellKnown is
-    the namespaced C_SpellBook one: the Retail engine has dropped the legacy
-    global, so on WoW Forever it would leave the column blank.
+    the namespaced C_SpellBook one where the client ships it, since the Retail
+    engine has dropped the legacy global, and the global everywhere else.
 ]]
 local GetSpellName = C_Spell.GetSpellName
 local DoesSpellExist = C_Spell.DoesSpellExist
 local IsPlayerSpell = _G.IsPlayerSpell
-local IsSpellKnown = type(_G.C_SpellBook) == "table" and _G.C_SpellBook.IsSpellKnown or nil
+local IsSpellKnown = type(_G.C_SpellBook) == "table" and _G.C_SpellBook.IsSpellKnown or _G.IsSpellKnown
 local GetAreaInfo = type(_G.C_Map) == "table" and _G.C_Map.GetAreaInfo or nil
 
 --[[
@@ -182,6 +182,7 @@ local KIND_API_CHECKS = {
 	{ "spell", "C_Spell", "GetSpellName" },
 	{ "spell", nil, "IsPlayerSpell" },
 	{ "spell", "C_SpellBook", "IsSpellKnown" },
+	{ "spell", nil, "IsSpellKnown" },
 	{ "area", "C_Map", "GetAreaInfo" },
 }
 
@@ -675,13 +676,7 @@ local function CollectIds(entry)
 					for _, column in ipairs(columns) do
 						data[column[1]] = column[2](found.key, found.row)
 					end
-					ids[#ids + 1] = {
-						id = found.id,
-						source = source.table,
-						kind = source.kind,
-						data = data,
-						problem = found.problem,
-					}
+					ids[#ids + 1] = { id = found.id, source = source.table, kind = source.kind, data = data }
 				end
 			end
 		end

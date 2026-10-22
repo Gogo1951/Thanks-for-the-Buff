@@ -72,7 +72,7 @@ BuffWindow.weaponByEnchant = weaponByEnchant
 ]]
 BuffWindow.soulstoneEntry = nil
 BuffWindow.soulstoneBuff = nil
--- The resurrection the Buff Keys cast on a dead target, { id, name, ids }, or nil.
+-- The resurrection the Buff Key casts on a dead target, { id, name, ids }, or nil.
 BuffWindow.resurrection = nil
 --[[
     Seconds left under which a buff counts as missing; set from the profile at
@@ -229,8 +229,9 @@ function BuffWindow.BuildLookup()
 	end
 
 	--[[
-	    Every other weapon item, one entry each: its enchant, and the weapon
-	    types it takes (a subclass mask, 0 for any weapon).
+	    Every other weapon item, one entry each: its enchant, the weapon types
+	    it takes (a subclass mask, 0 for any weapon), and the only places it
+	    works, for an item that has them.
 	]]
 	wipe(weaponItemEntries)
 	for _, row in ipairs(ns.BUFF_WINDOW_WEAPON_ITEMS or {}) do
@@ -244,6 +245,7 @@ function BuffWindow.BuildLookup()
 			types = row[4],
 			kind = row[5],
 			itemLevel = row[6],
+			zones = row[7],
 		}
 		weaponItemEntries[#weaponItemEntries + 1] = entry
 		weaponByEnchant[row[3]] = weaponByEnchant[row[3]] or entry
@@ -301,8 +303,7 @@ function BuffWindow.BuildLookup()
 end
 
 --[[
-    Same contract as PopulatePeerPressureWatched: seed what the player never set
-    from the row's default, drop any value that isn't a choice the dropdown
+    Seed what the player never set from the row's default, drop any value that isn't a choice the dropdown
     offers, and never touch a key this client lacks. Re-run on profile changes.
 ]]
 local function PopulateBuffWindowAudience()
@@ -361,6 +362,29 @@ local function PopulateBuffWindowAudience()
 	local stone = BuffWindow.soulstoneEntry
 	if stone and selfRefresh[stone.key] == nil then
 		selfRefresh[stone.key] = stone.row.default
+	end
+
+	--[[
+	    MIGRATION (remove after 2026-11-21): self buffs whose default went from 5
+	    minutes to 3 move a stored 5 to 3, and the Soulstone moves When Missing
+	    to 3. Each key moves once, recorded in selfRefreshMigrated, so a player
+	    who picks 5 again keeps it. A key this client lacks waits for the client
+	    that has it: Classic Era and Season of Discovery share a profile.
+	]]
+	local migrated = ns.db.profile.buffWindow.selfRefreshMigrated
+	for key, entry in pairs(selfLookup) do
+		if not migrated[key] then
+			if entry.row.default == 3 and selfRefresh[key] == 5 then
+				selfRefresh[key] = 3
+			end
+			migrated[key] = true
+		end
+	end
+	if stone and not migrated[stone.key] then
+		if selfRefresh[stone.key] == Data.SELF_REFRESH_MISSING then
+			selfRefresh[stone.key] = 3
+		end
+		migrated[stone.key] = true
 	end
 
 	--[[
@@ -634,6 +658,7 @@ function BuffWindow.BuildBuffs()
 				items = entry.items,
 				enchants = entry.enchants,
 				types = entry.types,
+				zones = entry.zones,
 				refreshSeconds = when * 60,
 				durationSeconds = entry.row.duration and entry.row.duration * 60,
 				classPick = classPick,
@@ -694,7 +719,7 @@ function BuffWindow.BuildBuffs()
 	end
 
 	--[[
-	    The Buff Keys' resurrection (ns.BUFF_WINDOW_RESURRECTIONS): any rank
+	    The Buff Key's resurrection (ns.BUFF_WINDOW_RESURRECTIONS): any rank
 	    you know, cast by its bare name, which resolves to your highest.
 	]]
 	BuffWindow.resurrection = nil

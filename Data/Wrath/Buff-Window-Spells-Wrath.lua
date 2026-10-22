@@ -21,13 +21,13 @@ ns.BUFF_WINDOW_WEAPON_HANDS = {}
     weapon-subclass mask (0 for any weapon but a fishing pole); kind is the
     Weapon Buffs panel group it's listed under ("OIL", "STONE" or "LURE").
 ]]
--- { item id, level required, enchant id, weapon types, kind, item level }, -- Name
+-- { item id, level required, enchant id, weapon types, kind, item level, zones }, -- Name
 ns.BUFF_WINDOW_WEAPON_ITEMS = {}
 
 -- The Soulstone reminder; nil until this client's stones are listed.
 ns.BUFF_WINDOW_SOULSTONE = nil
 
--- { class, ranks = { spell ids } }: the Buff Keys' resurrection on a dead target
+-- { class, ranks = { spell ids } }: the Buff Key's resurrection on a dead target
 ns.BUFF_WINDOW_RESURRECTIONS = {}
 
 --[[

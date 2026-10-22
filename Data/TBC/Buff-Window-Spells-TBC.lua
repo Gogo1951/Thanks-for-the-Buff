@@ -183,13 +183,13 @@ ns.BUFF_WINDOW_SELF_SPELLS = {
 	{
 		class = "DRUID",
 		ranks = { { 16864, 20 } },
-		default = 5,
+		default = 3,
 	}, -- Omen of Clarity
 	-- Hunter --------------------------------------------------------------------
 	{
 		class = "HUNTER",
 		ranks = { { 19506, 40 }, { 20905, 50 }, { 20906, 60 }, { 27066, 70 } },
-		default = 5,
+		default = 3,
 	}, -- Trueshot Aura
 	{
 		class = "HUNTER",
@@ -256,19 +256,19 @@ ns.BUFF_WINDOW_SELF_SPELLS = {
 			{ 27124, 69 },
 		},
 		exclusive = MAGE_ARMOR,
-		default = 5,
+		default = 3,
 	}, -- Frost Armor, Ice Armor
 	{
 		class = "MAGE",
 		ranks = { { 6117, 34 }, { 22782, 46 }, { 22783, 58 }, { 27125, 69 } },
 		exclusive = MAGE_ARMOR,
-		default = 5,
+		default = 3,
 	}, -- Mage Armor
 	{
 		class = "MAGE",
 		ranks = { { 30482, 62 } },
 		exclusive = MAGE_ARMOR,
-		default = 5,
+		default = 3,
 	}, -- Molten Armor
 	-- Paladin -------------------------------------------------------------------
 	{
@@ -337,7 +337,7 @@ ns.BUFF_WINDOW_SELF_SPELLS = {
 	{
 		class = "PRIEST",
 		ranks = { { 588, 12 }, { 7128, 20 }, { 602, 30 }, { 1006, 40 }, { 10951, 50 }, { 10952, 60 }, { 25431, 69 } },
-		default = 5,
+		default = 3,
 	}, -- Inner Fire
 	{
 		class = "PRIEST",
@@ -350,7 +350,7 @@ ns.BUFF_WINDOW_SELF_SPELLS = {
 			{ 19312, 60 },
 			{ 25477, 68 },
 		},
-		default = 5,
+		default = 3,
 	}, -- Shadowguard
 	{
 		class = "PRIEST",
@@ -363,7 +363,7 @@ ns.BUFF_WINDOW_SELF_SPELLS = {
 			{ 19266, 60 },
 			{ 25461, 70 },
 		},
-		default = 5,
+		default = 3,
 	}, -- Touch of Weakness
 	{
 		class = "PRIEST",
@@ -385,13 +385,13 @@ ns.BUFF_WINDOW_SELF_SPELLS = {
 			{ 25472, 70 },
 		},
 		exclusive = SHAMAN_SHIELD,
-		default = 5,
+		default = 3,
 	}, -- Lightning Shield
 	{
 		class = "SHAMAN",
 		ranks = { { 24398, 62 }, { 33736, 69 } },
 		exclusive = SHAMAN_SHIELD,
-		default = 5,
+		default = 3,
 	}, -- Water Shield
 	-- Warlock -------------------------------------------------------------------
 	{
@@ -407,13 +407,13 @@ ns.BUFF_WINDOW_SELF_SPELLS = {
 			{ 27260, 70 },
 		},
 		exclusive = WARLOCK_ARMOR,
-		default = 5,
+		default = 3,
 	}, -- Demon Skin, Demon Armor
 	{
 		class = "WARLOCK",
 		ranks = { { 28176, 62 }, { 28189, 69 } },
 		exclusive = WARLOCK_ARMOR,
-		default = 5,
+		default = 3,
 	}, -- Fel Armor
 	{
 		class = "WARLOCK",
@@ -552,14 +552,15 @@ ns.BUFF_WINDOW_WEAPON_HANDS = {
     and in the window, strongest first.
 ]]
 local OIL, STONE, LURE = "OIL", "STONE", "LURE"
+local ON_QUEL_DANAS = { instances = { 585, 580 }, uiMaps = { 1957 } } -- Magisters' Terrace, Sunwell Plateau; Isle of Quel'Danas
 
--- { item id, level required, enchant id, weapon types, kind, item level }, -- Name
+-- { item id, level required, enchant id, weapon types, kind, item level, zones }, -- Name
 ns.BUFF_WINDOW_WEAPON_ITEMS = {
 	{ 23529, 60, 2713, 33219, STONE, 70 }, -- Adamantite Sharpening Stone
 	{ 28421, 60, 2955, 9264, STONE, 70 }, -- Adamantite Weightstone
 	{ 6533, 0, 266, 1048576, LURE, 30 }, -- Aquadynamic Fish Attractor
 	{ 6811, 0, 264, 1048576, LURE, 20 }, -- Aquadynamic Fish Lens
-	{ 34538, 70, 3265, 0, OIL, 70 }, -- Blessed Weapon Coating
+	{ 34538, 70, 3265, 0, OIL, 70, ON_QUEL_DANAS }, -- Blessed Weapon Coating
 	{ 23123, 50, 2685, 0, OIL, 55 }, -- Blessed Wizard Oil
 	{ 31535, 0, 3102, 173555, OIL, 105 }, -- Bloodboil Poison
 	{ 6532, 0, 265, 1048576, LURE, 30 }, -- Bright Baubles
@@ -582,7 +583,7 @@ ns.BUFF_WINDOW_WEAPON_ITEMS = {
 	{ 20745, 20, 2624, 0, OIL, 30 }, -- Minor Mana Oil
 	{ 20744, 5, 2623, 0, OIL, 15 }, -- Minor Wizard Oil
 	{ 6530, 0, 264, 1048576, LURE, 20 }, -- Nightcrawlers
-	{ 34539, 70, 3266, 0, OIL, 70 }, -- Righteous Weapon Coating
+	{ 34539, 70, 3266, 0, OIL, 70, ON_QUEL_DANAS }, -- Righteous Weapon Coating
 	{ 2862, 1, 40, 33219, STONE, 5 }, -- Rough Sharpening Stone
 	{ 3239, 1, 19, 9264, STONE, 5 }, -- Rough Weightstone
 	{ 30696, 0, 3093, 173555, OIL, 52 }, -- Scourgebane
@@ -602,7 +603,7 @@ ns.BUFF_WINDOW_SOULSTONE = {
 	create = { { 693, 18 }, { 20752, 30 }, { 20755, 40 }, { 20756, 50 }, { 20757, 60 }, { 27238, 70 } },
 	auras = { 20707, 20762, 20763, 20764, 20765, 27239 },
 	items = { 5232, 16892, 16893, 16895, 16896, 22116 },
-	default = MISSING,
+	default = 3,
 }
 
 -- { class, ranks = { spell ids } }, -- Name
@@ -616,7 +617,7 @@ ns.BUFF_WINDOW_RESURRECTIONS = {
 How We Got the Data
 
 Last Validated
-	2026-10-19, TBC Anniversary 2.5.6.70006
+	2026-10-22, TBC Anniversary 2.5.6.70006
 
 Notes
 	- Every buff one player can put on another that lasts more than two minutes: the ones worth keeping up on a group, and the ones a player may want to hand out on request. Only the rows for the player's own class are read, and only the ranks the player knows are cast.
@@ -639,7 +640,7 @@ Notes
 	- Demonic Sacrifice and Soul Link share exclusive = WARLOCK_DEMON: a Soul Link warlock keeps a demon out, so with Soul Link up the sacrifice stops asking, and the other way round. Soul Link starts OFF, and needsPet keeps it from asking while there is no demon to link to.
 	- ranks is every rank, with the level it is learned at; the row casts the highest one known. Where ranks change name (Frost Armor into Ice Armor, Demon Skin into Demon Armor) they share a row, since they are one line of the same buff.
 	- exclusive groups the self buffs only one of which can be up at a time (an armor, a paladin aura, an aspect, a shaman shield): with any one of yours up, the rest of its family stop asking. Turn on every one you might use, and the window offers them all only when none is up.
-	- default is when the self buff shows until the player picks: minutes left (5) to recast before it drops, MISSING for one with no timer (an aura or aspect is either up or not), or OFF. Battle Shout starts on MISSING too: it lasts two minutes, so any minutes-left choice would only ask once it's gone anyway. Every aspect but Hawk starts off: Cheetah and the rest are swapped in for a moment, and Hawk is the one to come back to. A player's own choice is never overwritten.
+	- default is when the self buff shows until the player picks: minutes left (3) to recast before it drops, MISSING for one with no timer (an aura or aspect is either up or not), or OFF. Battle Shout starts on MISSING too: it lasts two minutes, so any minutes-left choice would only ask once it's gone anyway. Every aspect but Hawk starts off: Cheetah and the rest are swapped in for a moment, and Hawk is the one to come back to. A player's own choice is never overwritten.
 	- The self-buff learn levels are checked the same way.
 	- Shadowguard (Troll) and Touch of Weakness (Undead) are priest racial self buffs. Only a priest of that race knows them, and a row offers only the ranks the player knows. Their learn levels come from SpellLevels.
 	- Left out of the self buffs: tracking, stealth, mounts, pet spells, Feign Death, totems, and cooldowns spent on the next action (Presence of Mind, Nature's Swiftness, Inner Focus, Cold Blood, Divine Favor, Elemental Mastery, Combustion). Moonkin Aura is left out because Moonkin Form puts it up, not a cast.
@@ -652,8 +653,8 @@ Notes
 	- Each poison item and imbue rank carries the enchant id it puts on the weapon, which is what GetWeaponEnchantInfo reports, so the window can tell which of the player's picks a hand holds. Pulled from this client's SpellEffect (the ENCHANT_ITEM_TEMPORARY effect's misc value) and ItemEffect tables on wago.tools.
 	- BUFF_WINDOW_WEAPON_HANDS is which hands each class is asked about: both, since a TBC shaman can dual wield.
 	- BUFF_WINDOW_SOULSTONE is the Soulstone reminder: create is every Create Soulstone rank (cast by its bare name, which casts the best rank known), auras the Soulstone Resurrection buff each stone leaves, and items the stones, lowest first, the same lists as Consumable Connoisseur's Soulstones-TBC.lua and Conjure-Spells-TBC.lua.
-	- BUFF_WINDOW_RESURRECTIONS is what the Buff Keys cast first, on a dead target: every rank of each class's resurrection, cast by its bare name, which resolves to the highest known. Only priests and paladins are listed.
-	- BUFF_WINDOW_WEAPON_ITEMS is every other temporary weapon enchant, offered to any class: each item with the level it requires, the enchant id it puts on (SpellEffect's ENCHANT_ITEM_TEMPORARY misc value, through ItemEffect), and the weapon types its spell takes (SpellEquippedItems' EquippedItemSubclass mask, 0 for any weapon). kind files it under Oils, Stones or Lures on the Weapon Buffs panel: LURE for a fishing pole's, STONE for a sharpening stone or weightstone, OIL for the rest (oils, coatings, Bloodboil Poison, Scourgebane, the Weapon Cleaning Cloth). item level (ItemSparse) ranks them, strongest first: it orders a line Rough to Dense where the required level can't (every lure needs level 0). Fishing lures take only a fishing pole, a sharpening stone only a bladed weapon, a weightstone only a blunt one. Picked from the IDs supplied on 2026-10-19, plus every item this client's tables say puts a temporary enchant on a hand weapon, keeping only items whose spell enchants a hand weapon or fishing pole. Left out: rogue-only poisons (the rogue rows above), armor runes and other enchants that go on armor, shield coatings, and test or placeholder items.
+	- BUFF_WINDOW_RESURRECTIONS is what the Buff Key casts first, on a dead target: every rank of each class's resurrection, cast by its bare name, which resolves to the highest known. Paladins, priests and shamans are listed. Rebirth stays out: it's a combat resurrection on a 20-minute cooldown. Mass Resurrection (32841) stays out too: this client's tables carry it with a priest skill row, but it isn't a rank of Resurrection, and no Validate Data run has shown a priest can learn it here.
+	- BUFF_WINDOW_WEAPON_ITEMS is every other temporary weapon enchant, offered to any class: each item with the level it requires, the enchant id it puts on (SpellEffect's ENCHANT_ITEM_TEMPORARY misc value, through ItemEffect), and the weapon types its spell takes (SpellEquippedItems' EquippedItemSubclass mask, 0 for any weapon). kind files it under Oils, Stones or Lures on the Weapon Buffs panel: LURE for a fishing pole's, STONE for a sharpening stone or weightstone, OIL for the rest (oils, coatings, Bloodboil Poison, Scourgebane, the Weapon Cleaning Cloth). item level (ItemSparse) ranks them, strongest first: it orders a line Rough to Dense where the required level can't (every lure needs level 0). Fishing lures take only a fishing pole, a sharpening stone only a bladed weapon, a weightstone only a blunt one. Picked from the IDs supplied on 2026-10-19, plus every item this client's tables say puts a temporary enchant on a hand weapon, keeping only items whose spell enchants a hand weapon or fishing pole. Left out: rogue-only poisons (the rogue rows above), armor runes and other enchants that go on armor, shield coatings, and test or placeholder items. zones, on an item whose tooltip says it only works in certain places, names those places: instances by the map ID GetInstanceInfo reports and outdoor zones by the UiMap ID C_Map.GetBestMapForUnit reports, both from this client's Map and UiMap tables. The window offers such an item only there (Features/Buff-Window-Self.lua); an item without zones, anywhere. Here the Blessed and Righteous Weapon Coatings carry one: Magisters' Terrace (Map 585), Sunwell Plateau (Map 580, "The Sunwell") and the Isle of Quel'Danas (UiMap 1957).
 	- Also left out of the weapon items: the Weather-Beaten Fishing Hat, whose lure only works while the hat is worn, and which using from the bags would put on instead; and Instant Toxin (5654), a poison that neither QuestieDB nor any spell on this client gives a source for, so likely unobtainable here.
 
 SQL (CMaNGOS)
@@ -677,6 +678,8 @@ wago.tools
 	https://wago.tools/db2/SpellEquippedItems?build=2.5.6.70006
 	https://wago.tools/db2/Item?build=2.5.6.70006
 	https://wago.tools/db2/Talent?build=2.5.6.70006
+	https://wago.tools/db2/Map?build=2.5.6.70006
+	https://wago.tools/db2/UiMap?build=2.5.6.70006
 
 QuestieDB
 	https://raw.githubusercontent.com/Questie/QuestieDB/master/data/TBC/tbcItemDB.lua

@@ -33,10 +33,6 @@ L["MESSAGE_WHISPER_THANKS"] = "Gracias por %s"
 L["MESSAGE_SELECT_PLAYER"] = "Primero selecciona a un jugador como objetivo."
 L["MESSAGE_CANT_THANK_SELF"] = "¡No puedes agradecerte a ti mismo!"
 
--- Peer Pressure
-L["MESSAGE_PEER_PRESSURE"] = "¡%s ha usado %s!"
-L["MESSAGE_PEER_PRESSURE_TARGET"] = "¡%s ha usado %s sobre %s!"
-
 --------------------------------------------------------------------------------
 -- Text Fragments
 --------------------------------------------------------------------------------
@@ -67,11 +63,11 @@ L["OPTIONS_ENABLE_MINIMAP"] = "Habilitar botón del minimapa"
 L["OPTIONS_ENABLE_MINIMAP_DESCRIPTION"] =
 	"Muestra el botón de TFTB en tu minimapa, que activa y desactiva funciones con un clic."
 L["OPTIONS_DESCRIPTION"] =
-	"Agradece con un susurro o una emoción a cada jugador que te dé un beneficio, y que a tu banda, a ti y a tus armas nunca les falte un beneficio, con un recordatorio que los lanza con un clic. Además, avisos de festines, portales, invocaciones, pozos de almas y reutilizaciones de tu clase. Buenos modales, en automático."
+	"Agradece automáticamente con un susurro o una emoción a cada jugador que te dé un beneficio, y que a tu banda, a ti y a tus armas nunca les falte un beneficio, con un recordatorio de los beneficios que faltan, que se lanzan con un clic. Además, avisos de festines, portales, invocaciones y pozos de almas. Buenos modales, en automático."
 L["OPTIONS_FEATURES_HEADER"] = "Funciones"
 L["OPTIONS_FEATURES_DESCRIPTION"] = "Activa o desactiva cada función aquí o en su propio panel."
 L["OPTIONS_FEATURES_NOTE"] =
-	'Posibles cambios próximos: algunas de nuestras funciones más nuevas, como "%s", van más allá del alcance tradicional de "Thanks for the Buff". Puedes desactivar todo lo que no necesites. Estas funciones podrían pasar a nuestro otro accesorio, "Connoisseur & Restocker", o todo podría unirse en un accesorio más grande, quizá "Buttons, Buffs, & Bags". Danos tu opinión en Discord, CurseForge o GitHub. ¡Gracias!'
+	'Algunas de nuestras funciones más nuevas, como "%s", van más allá del alcance tradicional de "Thanks for the Buff". Puedes desactivar todo lo que no necesites. Estas funciones podrían pasar a nuestro otro accesorio, "Connoisseur & Restocker", o todo podría unirse en un accesorio más grande, quizá "Buttons, Buffs, & Bags". Danos tu opinión en Discord, CurseForge o GitHub. ¡Gracias!'
 L["OPTIONS_COMMANDS_HEADER"] = "/Commands"
 L["OPTIONS_COMMAND"] = "/tftb"
 L["OPTIONS_COMMAND_DESCRIPTION"] = "Abre la interfaz de opciones de este accesorio."
@@ -171,20 +167,11 @@ L["GOOD_NEWS_MESSAGE_TOKENS"] =
 ]]
 L["GOOD_NEWS_DURATION_CLAUSE"] = "durante %s"
 
--- Peer Pressure
+-- Peer Pressure (TEMPORARY: delete on or after 2026-11-21, with Options/Options-Peer-Pressure.lua)
 L["TAB_PEER_PRESSURE"] = "Presión de grupo"
-L["PEER_PRESSURE_DESCRIPTION"] =
-	"Recibe una notificación cuando otros jugadores de tu clase usen sus habilidades con reutilización, para que cedas a la presión de grupo."
-L["PEER_PRESSURE_ENABLE"] = "Habilitar presión de grupo"
-L["PEER_PRESSURE_ENABLE_DESCRIPTION"] =
-	"Activa los avisos cuando otro jugador de tu clase usa una habilidad con reutilización rastreada."
-L["PEER_PRESSURE_PRINT_DESCRIPTION"] =
-	"Muestra un mensaje que solo tú puedes ver cuando se usa una habilidad con reutilización de tu clase."
-L["PEER_PRESSURE_OWN_CASTS"] = "Activar con tus propios lanzamientos"
-L["PEER_PRESSURE_OWN_CASTS_DESCRIPTION"] =
-	"También se activa cuando usas tus propias habilidades con reutilización, no solo cuando lo hacen otros jugadores."
-L["PEER_PRESSURE_SOUND_DESCRIPTION"] =
-	"Reproduce un sonido cuando se usa una habilidad con reutilización de tu clase. Solo tú lo oyes."
+L["PEER_PRESSURE_CONTROL_FREAK"] = "Control Freak"
+L["PEER_PRESSURE_MOVED"] =
+	'WoW Forever no deja que los accesorios lean el registro de combate, así que estamos reorganizando nuestros accesorios para que funcionen igual en todas las versiones del juego. "Presión de grupo" se ha trasladado a nuestro otro accesorio, "Control Freak". Instálalo para seguir recibiendo avisos cuando los jugadores de tu clase usen sus tiempos de reutilización.'
 
 -- Shared across the buff panels
 L["TRACKED_HEADER"] = "Habilidades rastreadas"
@@ -203,9 +190,8 @@ L["WHISPER_MESSAGE_RESET_DESCRIPTION"] = "Restablece el mensaje de susurro al te
 
 --[[
     The two section headers every buff panel is built from: what the other player
-    sees, then what only you get. Peer Pressure sends nothing outward, so it
-    carries the Notifications header alone. Key prefixes match the header the
-    control appears under.
+    sees, then what only you get. Key prefixes match the header the control
+    appears under.
 ]]
 L["PRAISE_HEADER"] = "Susurros de agradecimiento y emociones"
 L["NOTIFICATIONS_HEADER"] = "Notificaciones"
@@ -255,6 +241,19 @@ L["BUFF_WINDOW_ENABLE_DESCRIPTION"] =
 	"Activa el turno de beneficios, la ventana de miembros del grupo a los que les falta un beneficio que puedes dar."
 L["BUFF_WINDOW_NO_BUFFS"] =
 	"Tu clase no tiene beneficios en esta lista, así que la ventana nunca aparece con este personaje."
+-- When to Show: Solo and In Group, each with Always or In Instance, then the classes.
+L["BUFF_WINDOW_WHEN_HEADER"] = "Cuándo mostrar"
+L["BUFF_WINDOW_WHEN_DESCRIPTION"] = "Elige cuándo puede aparecer la ventana."
+L["BUFF_WINDOW_WHEN_SOLO"] = "En solitario"
+L["BUFF_WINDOW_WHEN_SOLO_DESCRIPTION"] = "Muestra la ventana cuando no estás en un grupo o banda."
+L["BUFF_WINDOW_WHEN_GROUP"] = "En grupo"
+L["BUFF_WINDOW_WHEN_GROUP_DESCRIPTION"] = "Muestra la ventana cuando estás en un grupo o banda."
+L["BUFF_WINDOW_WHERE_DESCRIPTION"] =
+	"Define dónde se muestra la ventana: en todas partes, o solo en mazmorras, bandas, campos de batalla y arenas."
+L["BUFF_WINDOW_WHERE_ALWAYS"] = "Siempre"
+L["BUFF_WINDOW_WHERE_INSTANCE"] = "En instancia"
+L["BUFF_WINDOW_CLASSES_DESCRIPTION"] = "Muestra la ventana cuando juegas estas clases."
+L["BUFF_WINDOW_CLASS_DESCRIPTION"] = "Muestra la ventana cuando juegas esta clase."
 L["BUFF_WINDOW_HEADER"] = "Ventana"
 L["BUFF_WINDOW_WINDOW_DESCRIPTION"] = "Mantén la ventana donde la dejaste, o apártala durante el combate."
 L["BUFF_WINDOW_LOCK"] = "Bloquear ventana"
@@ -338,7 +337,7 @@ L["BUFF_WINDOW_SELF_ENABLE_DESCRIPTION"] =
 	"Muestra en la parte superior de la ventana los beneficios que solo puedes lanzarte a ti mismo, como una armadura o Fuego interno, cuando faltan o están por agotarse. Elige cuáles en Beneficios propios."
 L["BUFF_WINDOW_WEAPON_ENABLE"] = "Tus beneficios de arma"
 L["BUFF_WINDOW_WEAPON_ENABLE_DESCRIPTION"] =
-	"Muestra los venenos, imbuiciones, aceites y piedras que faltan o están por agotarse en tus armas, junto con tus beneficios propios en la parte superior de la ventana. Haz clic en uno para aplicarlo. Elige cuáles en Beneficios de arma."
+	"Muestra los venenos, imbuiciones, aceites, piedras y cebos que faltan o están por agotarse en tus armas, junto con tus beneficios propios en la parte superior de la ventana. Haz clic en uno para aplicarlo. Elige cuáles en Beneficios de arma."
 
 -- The window itself
 L["BUFF_WINDOW_SELF_HEADER"] = "Beneficios propios"
@@ -352,25 +351,25 @@ L["BUFF_WINDOW_TOOLTIP_CREATE"] = "Nadie en tu grupo tiene una piedra de alma. H
 L["BUFF_WINDOW_TOOLTIP_GROUP"] = "Haz clic para lanzarlo sobre %s y su grupo."
 L["BUFF_WINDOW_TOOLTIP_FAVOR"] = "Haz clic para seleccionar a %s como objetivo y lanzarlo."
 L["BUFF_WINDOW_TOOLTIP_DISMISS"] = "Haz clic derecho para quitar a %s de la lista."
--- The window's close button; %s is the options slash command.
+-- The window's close button: the class name in its color, then the options command.
 L["BUFF_WINDOW_CLOSED"] =
-	"Turno de beneficios está desactivado. Para volver a activarlo, usa Mayús + Clic derecho en el botón del minimapa o escribe %s."
+	"Turno de beneficios está desactivado para la clase %s. Para volver a activarlo, usa Mayús + Clic derecho en el botón del minimapa o escribe %s."
 
--- The Buff Keys (Key Bindings, and the Keybinds section of Buff Duty)
+-- The Buff Key (Key Bindings, and the Keybinds section of Buff Duty)
 L["BUFF_KEYS_HEADER"] = "Atajos de teclado"
 L["BUFF_KEYS_DESCRIPTION"] =
 	"Lanza el siguiente beneficio de tu lista con una tecla o una macro, fuera de combate. Los beneficios de arma siguen siendo un clic en la ventana."
-L["BUFF_KEY_SINGLE"] = "Botón de beneficio individual"
-L["BUFF_KEY_SINGLE_DESCRIPTION"] =
-	"Lanza tu siguiente beneficio pendiente, uno por pulsación: una resurrección sobre tu objetivo muerto (sacerdotes y paladines), luego tus beneficios propios, Devolver el favor, tu objetivo y tu grupo."
-L["BUFF_KEY_GROUP"] = "Botón de beneficio de grupo"
-L["BUFF_KEY_GROUP_DESCRIPTION"] =
-	"Lanza tu siguiente beneficio de grupo pendiente, uno por pulsación: una resurrección sobre tu objetivo muerto (sacerdotes y paladines), luego tus beneficios propios, luego el grupo de tu objetivo y los demás. Un grupo espera hasta que todos a los que les falta el beneficio estén a tu alcance."
+L["BUFF_KEY"] = "Botón de beneficio"
+L["BUFF_KEY_DESCRIPTION"] =
+	"Lanza tu siguiente beneficio pendiente, uno por pulsación: una resurrección sobre tu objetivo muerto, luego sobre los muertos de tu grupo (sacerdotes, paladines y chamanes), luego tus beneficios propios, Devolver el favor, tu objetivo y tu grupo. Un grupo recibe el beneficio de grupo cuando cuesta menos maná que lanzarlo uno a uno a todos los que están a tu alcance."
+L["BUFF_KEY_SKIP_COOLDOWNS"] = "Omitir beneficios con reutilización"
+L["BUFF_KEY_SKIP_COOLDOWNS_DESCRIPTION"] =
+	"Pasa por alto los beneficios con tiempo de reutilización, como Custodia de miedo, y sigue con el siguiente."
 -- %s is a player's name.
 L["BUFF_KEY_WAITING"] = "Esperando a que %s esté a tu alcance."
 L["BUFF_KEY_DONE"] = "No queda nada por lanzar."
 -- The caption beside the read-only box that holds a Buff Key's macro line.
-L["BUFF_KEY_MACRO_CAPTION"] = "Macro:"
+L["BUFF_KEY_MACRO_CAPTION"] = "Macro"
 
 --------------------------------------------------------------------------------
 -- Options: Thank You Button

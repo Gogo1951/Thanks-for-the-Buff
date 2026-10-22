@@ -152,13 +152,13 @@ ns.BUFF_WINDOW_SELF_SPELLS = {
 	{
 		class = "DRUID",
 		ranks = { { 16864, 20 } },
-		default = 5,
+		default = 3,
 	}, -- Omen of Clarity
 	-- Hunter --------------------------------------------------------------------
 	{
 		class = "HUNTER",
 		ranks = { { 19506, 40 }, { 20905, 50 }, { 20906, 60 }, { 1299346, 25 }, { 1299348, 32 } },
-		default = 5,
+		default = 3,
 	}, -- Trueshot Aura
 	{
 		class = "HUNTER",
@@ -209,13 +209,13 @@ ns.BUFF_WINDOW_SELF_SPELLS = {
 		class = "MAGE",
 		ranks = { { 168, 1 }, { 7300, 10 }, { 7301, 20 }, { 7302, 30 }, { 7320, 40 }, { 10219, 50 }, { 10220, 60 } },
 		exclusive = MAGE_ARMOR,
-		default = 5,
+		default = 3,
 	}, -- Frost Armor, Ice Armor
 	{
 		class = "MAGE",
 		ranks = { { 6117, 34 }, { 22782, 46 }, { 22783, 58 } },
 		exclusive = MAGE_ARMOR,
-		default = 5,
+		default = 3,
 	}, -- Mage Armor
 	-- Paladin -------------------------------------------------------------------
 	{
@@ -269,17 +269,17 @@ ns.BUFF_WINDOW_SELF_SPELLS = {
 	{
 		class = "PRIEST",
 		ranks = { { 588, 12 }, { 7128, 20 }, { 602, 30 }, { 1006, 40 }, { 10951, 50 }, { 10952, 60 } },
-		default = 5,
+		default = 3,
 	}, -- Inner Fire
 	{
 		class = "PRIEST",
 		ranks = { { 18137, 20 }, { 19308, 28 }, { 19309, 36 }, { 19310, 44 }, { 19311, 52 }, { 19312, 60 } },
-		default = 5,
+		default = 3,
 	}, -- Shadowguard
 	{
 		class = "PRIEST",
 		ranks = { { 2652, 10 }, { 19261, 20 }, { 19262, 30 }, { 19264, 40 }, { 19265, 50 }, { 19266, 60 } },
-		default = 5,
+		default = 3,
 	}, -- Touch of Weakness
 	{
 		class = "PRIEST",
@@ -291,20 +291,20 @@ ns.BUFF_WINDOW_SELF_SPELLS = {
 		class = "SHAMAN",
 		ranks = { { 324, 8 }, { 325, 16 }, { 905, 24 }, { 945, 32 }, { 8134, 40 }, { 10431, 48 }, { 10432, 56 } },
 		exclusive = SHAMAN_SHIELD,
-		default = 5,
+		default = 3,
 	}, -- Lightning Shield
 	{
 		class = "SHAMAN",
 		ranks = { { 408510, 20 } },
 		exclusive = SHAMAN_SHIELD,
-		default = 5,
+		default = 3,
 	}, -- Water Shield
 	-- Warlock -------------------------------------------------------------------
 	{
 		class = "WARLOCK",
 		ranks = { { 687, 1 }, { 696, 10 }, { 706, 20 }, { 1086, 30 }, { 11733, 40 }, { 11734, 50 }, { 11735, 60 } },
 		exclusive = WARLOCK_ARMOR,
-		default = 5,
+		default = 3,
 	}, -- Demon Skin, Demon Armor
 	{
 		class = "WARLOCK",
@@ -412,13 +412,14 @@ ns.BUFF_WINDOW_WEAPON_HANDS = {
     and in the window, strongest first.
 ]]
 local OIL, STONE, LURE = "OIL", "STONE", "LURE"
+local IN_BLACKFATHOM_DEEPS = { instances = { 48 } } -- Blackfathom Deeps
 
--- { item id, level required, enchant id, weapon types, kind, item level }, -- Name
+-- { item id, level required, enchant id, weapon types, kind, item level, zones }, -- Name
 ns.BUFF_WINDOW_WEAPON_ITEMS = {
 	{ 268880, 0, 263, 1048576, LURE, 10 }, -- "Secret" Bait
 	{ 6533, 0, 266, 1048576, LURE, 30 }, -- Aquadynamic Fish Attractor
 	{ 6811, 0, 264, 1048576, LURE, 20 }, -- Aquadynamic Fish Lens
-	{ 211845, 0, 7098, 42483, STONE, 25 }, -- Blackfathom Sharpening Stone
+	{ 211845, 0, 7098, 42483, STONE, 25, IN_BLACKFATHOM_DEEPS }, -- Blackfathom Sharpening Stone
 	{ 23123, 50, 2685, 0, OIL, 55 }, -- Blessed Wizard Oil
 	{ 6532, 0, 265, 1048576, LURE, 30 }, -- Bright Baubles
 	{ 20748, 45, 2629, 0, OIL, 55 }, -- Brilliant Mana Oil
@@ -465,7 +466,7 @@ ns.BUFF_WINDOW_SOULSTONE = {
 	create = { { 693, 18 }, { 20752, 30 }, { 20755, 40 }, { 20756, 50 }, { 20757, 60 } },
 	auras = { 20707, 20762, 20763, 20764, 20765 },
 	items = { 5232, 16892, 16893, 16895, 16896 },
-	default = MISSING,
+	default = 3,
 }
 
 -- { class, ranks = { spell ids } }, -- Name
@@ -502,7 +503,7 @@ Notes
 	- Demonic Sacrifice and Soul Link share exclusive = WARLOCK_DEMON: a Soul Link warlock keeps a demon out, so with Soul Link up the sacrifice stops asking, and the other way round. Soul Link starts OFF, and needsPet keeps it from asking while there is no demon to link to.
 	- ranks is every rank, with the level it is learned at; the row casts the highest one known. Where ranks change name (Frost Armor into Ice Armor, Demon Skin into Demon Armor) they share a row, since they are one line of the same buff.
 	- exclusive groups the self buffs only one of which can be up at a time (an armor, a paladin aura, an aspect, a shaman shield): with any one of yours up, the rest of its family stop asking. Turn on every one you might use, and the window offers them all only when none is up.
-	- default is when the self buff shows until the player picks: minutes left (5) to recast before it drops, MISSING for one with no timer (an aura or aspect is either up or not), or OFF. Battle Shout starts on MISSING too: it lasts two minutes, so any minutes-left choice would only ask once it's gone anyway. Every aspect but Hawk starts off: Cheetah and the rest are swapped in for a moment, and Hawk is the one to come back to. A player's own choice is never overwritten.
+	- default is when the self buff shows until the player picks: minutes left (3) to recast before it drops, MISSING for one with no timer (an aura or aspect is either up or not), or OFF. Battle Shout starts on MISSING too: it lasts two minutes, so any minutes-left choice would only ask once it's gone anyway. Every aspect but Hawk starts off: Cheetah and the rest are swapped in for a moment, and Hawk is the one to come back to. A player's own choice is never overwritten.
 	- The self-buff learn levels are checked the same way.
 	- Shadowguard (Troll) and Touch of Weakness (Undead) are priest racial self buffs. Only a priest of that race knows them, and a row offers only the ranks the player knows. Their learn levels come from SpellLevels.
 	- Left out of the self buffs: tracking, stealth, mounts, pet spells, Feign Death, totems, and cooldowns spent on the next action (Presence of Mind, Nature's Swiftness, Inner Focus, Cold Blood, Divine Favor, Elemental Mastery, Combustion). Moonkin Aura is left out because Moonkin Form puts it up, not a cast.
@@ -512,11 +513,11 @@ Notes
 	- Each poison item and imbue rank carries the enchant id it puts on the weapon, which is what GetWeaponEnchantInfo reports, so the window can tell which of the player's picks a hand holds. Pulled from this client's SpellEffect (the ENCHANT_ITEM_TEMPORARY effect's misc value) and ItemEffect tables on wago.tools.
 	- BUFF_WINDOW_WEAPON_HANDS is which hands each class is asked about: a shaman only the main hand, since nothing here teaches one to dual wield.
 	- BUFF_WINDOW_SOULSTONE is the Soulstone reminder: create is every Create Soulstone rank (cast by its bare name), auras the Soulstone Resurrection buff each stone leaves, and items the stones, lowest first, the same lists as Consumable Connoisseur's Soulstones-Camelot.lua and Conjure-Spells-Camelot.lua.
-	- BUFF_WINDOW_RESURRECTIONS is what the Buff Keys cast first, on a dead target: every rank of each class's resurrection, cast by its bare name, which resolves to the highest known. Only priests and paladins are listed.
+	- BUFF_WINDOW_RESURRECTIONS is what the Buff Key casts first, on a dead target: every rank of each class's resurrection, cast by its bare name, which resolves to the highest known. Only priests and paladins are listed.
 	- Water Shield (408510) is learned at 20 on this client, and its text is WoW Forever's own. Aspect of the Beast ranks 2 to 4 (1299445 to 1299447) are WoW Forever's new ranks, learned at 40, 50 and 60.
 	- Trueshot Aura's ranks 1 and 2 (1299346 and 1299348) are WoW Forever's new ranks, learned at 25 and 32, below the talent rank (19506) at 40. They're listed after the talent's ranks so the row keeps 19506 as its key, and with it each player's saved choice; the row casts the highest rank known whatever the order.
 	- Season of Discovery's rune buffs sit in this client's tables unchanged (Beacon of Light, Earth Shield, Spirit of the Alpha, Fel Armor, Aspect of the Viper, Aspect of the Falcon, Heart of the Lion, the second Righteous Fury) with no learn level, as does Commanding Shout. WoW Forever has no runes to teach them, so they're left out. Swift Judgement is left out because it's spent on the next Judgement.
-	- BUFF_WINDOW_WEAPON_ITEMS is every other temporary weapon enchant, offered to any class: each item with the level it requires, the enchant id it puts on (SpellEffect's ENCHANT_ITEM_TEMPORARY misc value, through ItemXItemEffect), and the weapon types its spell takes (SpellEquippedItems' EquippedItemSubclass mask, 0 for any weapon). kind files it under Oils, Stones or Lures on the Weapon Buffs panel: LURE for a fishing pole's, STONE for a sharpening stone or weightstone, OIL for the rest (oils, coatings, Bloodboil Poison, Scourgebane, the Weapon Cleaning Cloth, and here the warlock's Firestones and Spellstones and the Scrolls of Imbue). item level (ItemSparse) ranks them, strongest first: it orders a line Rough to Dense where the required level can't (every lure needs level 0). Fishing lures take only a fishing pole, a sharpening stone only a bladed weapon, a weightstone only a blunt one. Picked from the IDs supplied on 2026-10-19, keeping only items whose spell enchants a hand weapon or fishing pole. Left out: rogue-only poisons (the rogue rows above), armor runes and other enchants that go on armor, shield coatings, and test or placeholder items.
+	- BUFF_WINDOW_WEAPON_ITEMS is every other temporary weapon enchant, offered to any class: each item with the level it requires, the enchant id it puts on (SpellEffect's ENCHANT_ITEM_TEMPORARY misc value, through ItemXItemEffect), and the weapon types its spell takes (SpellEquippedItems' EquippedItemSubclass mask, 0 for any weapon). kind files it under Oils, Stones or Lures on the Weapon Buffs panel: LURE for a fishing pole's, STONE for a sharpening stone or weightstone, OIL for the rest (oils, coatings, Bloodboil Poison, Scourgebane, the Weapon Cleaning Cloth, and here the warlock's Firestones and Spellstones and the Scrolls of Imbue). item level (ItemSparse) ranks them, strongest first: it orders a line Rough to Dense where the required level can't (every lure needs level 0). Fishing lures take only a fishing pole, a sharpening stone only a bladed weapon, a weightstone only a blunt one. Picked from the IDs supplied on 2026-10-19, keeping only items whose spell enchants a hand weapon or fishing pole. Left out: rogue-only poisons (the rogue rows above), armor runes and other enchants that go on armor, shield coatings, and test or placeholder items. zones, on an item whose tooltip says it only works in certain places, names those places: instances by the map ID GetInstanceInfo reports and outdoor zones by the UiMap ID C_Map.GetBestMapForUnit reports, both from this client's Map and UiMap tables. The window offers such an item only there (Features/Buff-Window-Self.lua); an item without zones, anywhere. Here the Blackfathom Sharpening Stone carries one: Blackfathom Deeps (Map 48).
 	- The weapon items were then checked against this client's tables: every item whose use spell puts a temporary enchant on a hand weapon or fishing pole (SpellEffect 54, or 360, which this client's rogue poisons use with the same enchant ids). That added the warlock's Firestones and Spellstones, which this client makes weapon enchants (Create Firestone and Create Spellstone make them), and the two Scrolls of Imbue that QuestieDB has dropping from a Bundle of Scrolls (Lesser Flame, Chillknife). A Firestone or Spellstone needs no level here, by ItemSparse.
 	- Left out from that check: the other fourteen Scrolls of Imbue, which neither QuestieDB nor any spell here gives a source for, so likely unobtainable for now; Creeping Anguish and Creeping Torment, poisons whose creating spells nobody can learn; Season of Discovery's poisons (Sebacious, Numbing, Atrophic, Occult) and its other weapon items, whose IDs this client's tables carry just as the Classic Era client's do; and the Wide-Brimmed Fishing Hat, whose lure only works while the hat is worn, and which using from the bags would put on instead.
 
@@ -541,6 +542,7 @@ wago.tools
 	https://wago.tools/db2/SpellEquippedItems?build=1.60.1.70450
 	https://wago.tools/db2/Item?build=1.60.1.70450
 	https://wago.tools/db2/Talent?build=1.60.1.70450
+	https://wago.tools/db2/Map?build=1.60.1.70450
 
 QuestieDB
 	https://raw.githubusercontent.com/Questie/QuestieDB/master/data/Forever/foreverItemDB.lua

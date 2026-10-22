@@ -224,6 +224,40 @@ function ns.OptionsRowLabel(text, order, width, hidden)
 end
 
 --[[
+    Every class this client's data names, sorted by token: the classes this
+    game version has. Count as Tanks and Buff Duty's Classes list draw from it.
+]]
+function ns.OptionsClassList()
+	local classes = {}
+	for _, list in ipairs({
+		ns.TRACKED_ABILITIES,
+		ns.BUFF_WINDOW_SPELLS,
+		ns.BUFF_WINDOW_SELF_SPELLS,
+		ns.BUFF_WINDOW_WEAPON_ENCHANTS,
+	}) do
+		for _, row in ipairs(list) do
+			if row.class then
+				classes[row.class] = true
+			end
+		end
+	end
+	local classNames = {}
+	for class in pairs(classes) do
+		classNames[#classNames + 1] = class
+	end
+	table.sort(classNames)
+	return classNames
+end
+
+-- A class's name in the client's language, in its class color.
+function ns.OptionsClassName(class)
+	return "|cff"
+		.. (Data.CLASS_COLORS[class] or ns.PALETTE.TEXT)
+		.. (LOCALIZED_CLASS_NAMES_MALE[class] or class)
+		.. "|r"
+end
+
+--[[
     A row label naming an ability, which shows the game's own tooltip for it
     on hover, the same one an action bar shows. `hyperlink` returns
     "spell:<id>" or "item:<id>". A plain Label takes no mouse, so this one is
@@ -312,22 +346,12 @@ end
 ns.FEATURE_SWITCHES = {
 	--[[
 	    key: the profile subtable, setting: its on/off field, name/desc: locale keys,
-	    loaded: present only for a feature a flavor's TOC can leave out,
 	    onChange: present only for a feature that must react the moment either copy flips.
 	]]
 	{ key = "strangers", setting = "enabled", name = "STRANGERS_ENABLE", desc = "STRANGERS_ENABLE_DESCRIPTION" },
 	{ key = "teammates", setting = "enabled", name = "TEAMMATES_ENABLE", desc = "TEAMMATES_ENABLE_DESCRIPTION" },
 	{ key = "goodNews", setting = "whisperEnabled", name = "GOOD_NEWS_ENABLE", desc = "GOOD_NEWS_ENABLE_DESCRIPTION" },
 	{ key = "services", setting = "enabled", name = "SERVICES_ENABLE", desc = "SERVICES_ENABLE_DESCRIPTION" },
-	{
-		key = "peerPressure",
-		setting = "enabled",
-		name = "PEER_PRESSURE_ENABLE",
-		desc = "PEER_PRESSURE_ENABLE_DESCRIPTION",
-		loaded = function()
-			return ns.BuildPeerPressureOptions ~= nil
-		end,
-	},
 	{
 		key = "buffWindow",
 		setting = "enabled",
@@ -768,6 +792,25 @@ end
 --------------------------------------------------------------------------------
 -- Spell Dropdown Rows
 --------------------------------------------------------------------------------
+
+--[[
+    The Off / When Missing / Under labels for a list of choices the Self-Buffs
+    and Weapon Buffs panels share, "Under 5 Minutes" built from the client's
+    own duration string.
+]]
+function ns.BuffWindowRefreshValues(choices)
+	local values = {}
+	for _, choice in ipairs(choices) do
+		if choice == Data.SELF_REFRESH_OFF then
+			values[choice] = L["BUFF_WINDOW_SELF_REFRESH_OFF"]
+		elseif choice == Data.SELF_REFRESH_MISSING then
+			values[choice] = L["BUFF_WINDOW_SELF_REFRESH_MISSING"]
+		else
+			values[choice] = L["BUFF_WINDOW_SELF_REFRESH_UNDER"]:format(D_MINUTES:format(choice))
+		end
+	end
+	return values
+end
 
 --[[
     One spell's row inside a class's inline group: its icon and name as the

@@ -119,13 +119,14 @@ local function DumpTable(value, indent, depth, lines)
 end
 
 --[[
-    Dumps the single AceDB-managed table (profiles, profileKeys, global) so a
-    player can paste their exact configuration: every setting in each profile,
-    every watched-buff, Good News and Peer Pressure choice, every Buff Window
-    audience, tank, self-buff and weapon choice and its saved position, every
-    Thank You button's text, icon and emotes, and the welcome message's last
-    version. The Buff Keys' bindings are the game's, not saved here: Buff
-    Window Context reads them.
+    Dumps the single AceDB-managed table (profiles, profileKeys) so a player
+    can paste their exact configuration: every setting each profile has saved
+    (AceDB fills the rest in from the defaults, which the context reports
+    print as read), every watched-buff and Good News choice, every
+    Buff Window audience, tank, self-buff and weapon choice and its saved
+    position, every Thank You button's text, icon and emotes, and the mini-map
+    button's place. The Buff Key's binding is the game's, not saved here: Buff
+    Window Context reads it.
 ]]
 function ns:BuildSavedVariablesReport()
 	local lines = { GetClientHeader(), "", ns.SAVED_VARIABLES_NAME .. " = {" }

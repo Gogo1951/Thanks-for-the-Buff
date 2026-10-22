@@ -119,7 +119,11 @@ ns.DIAGNOSTIC_API_CHECKS = {
 	{ "GetNumMacros", HasGlobalFunction("GetNumMacros") },
 	{ "GetMacroInfo", HasGlobalFunction("GetMacroInfo") },
 	{ "PlaySoundFile", HasGlobalFunction("PlaySoundFile") },
-	-- The Buff Window's group read, role guesses and range check.
+	-- The Buff Window's group read, role guesses and range check, and When to Show's In Instance.
+	{ "IsInInstance", HasGlobalFunction("IsInInstance") },
+	-- Where a zone-limited weapon item works.
+	{ "GetInstanceInfo", HasGlobalFunction("GetInstanceInfo") },
+	{ "C_Map.GetBestMapForUnit", HasFunction("C_Map", "GetBestMapForUnit") },
 	{ "GetNumGroupMembers", HasGlobalFunction("GetNumGroupMembers") },
 	{ "GetRaidRosterInfo", HasGlobalFunction("GetRaidRosterInfo") },
 	{ "GetPartyAssignment (guarded)", HasGlobalFunction("GetPartyAssignment") },
@@ -157,8 +161,17 @@ ns.DIAGNOSTIC_API_CHECKS = {
 	-- The game's "replace your enchant?" question, answered when a weapon icon's click asked it.
 	{ "C_Item.ReplaceEnchant", HasFunction("C_Item", "ReplaceEnchant") },
 	{ "StaticPopup_Hide", HasGlobalFunction("StaticPopup_Hide") },
-	-- The Buff Keys: what a press can cast, and the bindings Buff Duty sets.
+	-- The Buff Key: what a press can cast, and the binding Buff Duty sets.
 	{ "C_Spell.IsSpellUsable", HasFunction("C_Spell", "IsSpellUsable") },
+	-- Weighs a group buff's mana against its members' single casts.
+	{
+		"C_Spell.GetSpellPowerCost or GetSpellPowerCost",
+		function()
+			return HasFunction("C_Spell", "GetSpellPowerCost")() or HasGlobalFunction("GetSpellPowerCost")()
+		end,
+	},
+	-- Skip Buffs with Cooldowns.
+	{ "GetSpellBaseCooldown", HasGlobalFunction("GetSpellBaseCooldown") },
 	{ "UnitHasIncomingResurrection (guarded)", HasGlobalFunction("UnitHasIncomingResurrection") },
 	{ "GetBindingKey", HasGlobalFunction("GetBindingKey") },
 	{ "SetBinding", HasGlobalFunction("SetBinding") },
@@ -181,6 +194,7 @@ ns.DIAGNOSTIC_API_CHECKS = {
 	{ "SecureActionButtonTemplate", HasTemplate("SecureActionButtonTemplate") },
 	{ "CooldownFrameTemplate", HasTemplate("CooldownFrameTemplate") },
 	{ "BackdropTemplate", HasTemplate("BackdropTemplate") },
+	{ "UIPanelCloseButton", HasTemplate("UIPanelCloseButton") },
 	{ "GameTooltipTemplate", HasTemplate("GameTooltipTemplate") },
 	-- Validate Data's reads beyond the reader lists it adds itself.
 	{ "C_Item.DoesItemExistByID", HasFunction("C_Item", "DoesItemExistByID") },
@@ -231,20 +245,6 @@ ns.DIAGNOSTIC_SPELLS = {}
 -- Tracked-trigger coverage on the running client, filled at login by
 -- Features/Tracked-Lookups.lua.
 ns.DIAGNOSTIC_TRACKED = { entriesLive = 0, entriesTotal = 0, auraIds = 0, castIds = 0 }
-
--- How many entries of a saved on/off list are switched on, out of how many it holds.
-local function CountOn(list)
-	local on, total = 0, 0
-	if type(list) == "table" then
-		for _, value in pairs(list) do
-			total = total + 1
-			if value then
-				on = on + 1
-			end
-		end
-	end
-	return on, total
-end
 
 --[[
     How many of a panel's toggles are on, out of how many it shows. A toggle
@@ -335,9 +335,11 @@ end
 
 --[[
     Who the player has targeted and whether TFTB would praise them right now:
-    the Thank You Button's player and faction checks, and the per-source praise
-    and whisper throttles for that GUID. A target whose identity is secret
-    (WoW Forever) is reported as such and never read further.
+    the Thank You Button's player and faction checks, whether they're in your
+    party or raid (Good News on Only Group Members whispers no one else), and the
+    per-source praise and whisper throttles for that GUID. A target whose
+    identity is secret (WoW Forever) is reported as such and never read
+    further.
 ]]
 local function CurrentTargetLine()
 	if not UnitExists("target") then
@@ -351,8 +353,17 @@ local function CurrentTargetLine()
 	if ns.IsPlain(playerFaction) and ns.IsPlain(targetFaction) then
 		sameFaction = tostring(playerFaction == targetFaction)
 	end
-	local line =
-		string.format("Current target: player=%s sameFaction=%s", PlainText(UnitIsPlayer("target")), sameFaction)
+	local inParty, inRaid = UnitInParty("target"), UnitInRaid("target")
+	local inGroup = "<secret>"
+	if ns.IsPlain(inParty) and ns.IsPlain(inRaid) then
+		inGroup = tostring((inParty or inRaid) and true or false)
+	end
+	local line = string.format(
+		"Current target: player=%s sameFaction=%s inGroup=%s",
+		PlainText(UnitIsPlayer("target")),
+		sameFaction,
+		inGroup
+	)
 	local guid = UnitGUID("target")
 	if guid and ns.IsPlain(guid) then
 		local _, source, whisper = ns.GetPraiseCooldownState(guid)
@@ -370,7 +381,7 @@ end
     of each panel's toggles are on, the praise throttles, the sound settings
     the Master channel answers to, how much of the tracked data is live on this
     client, which tracked spells of their class they know and whether Good
-    News and Peer Pressure watch each one, where /tftb goes, and what stops
+    News watches each one, where /tftb goes, and what stops
     each Thank You button: its command, its toggle, its macro and the icon it
     wears, its whisper text and its emotes.
 ]]
@@ -476,7 +487,8 @@ function ns:BuildContextReport()
 		local goodNewsOn, goodNewsTotal = CountCategoryToggles(ns.GoodNewsCategories, goodNews.watched)
 		local message = goodNews.message
 		local template = "default"
-		if type(message) == "string" and not message:match("^%s*$") and message ~= ns.L["DEFAULT_GOOD_NEWS"] then
+		local default = ns.DATABASE_DEFAULTS.profile.goodNews.message
+		if type(message) == "string" and not message:match("^%s*$") and message ~= default then
 			template = string.format("custom (%d bytes)", #message)
 		end
 		lines[#lines + 1] = string.format(
@@ -486,19 +498,6 @@ function ns:BuildContextReport()
 			goodNewsOn,
 			goodNewsTotal,
 			template
-		)
-
-		local peerPressure = db.peerPressure or {}
-		local peerOn, peerTotal = CountOn(peerPressure.watched)
-		lines[#lines + 1] = string.format(
-			"Peer Pressure: loaded=%s enabled=%s print=%s ownCasts=%s sound=%s watched=%d/%d",
-			tostring(ns.CheckPeerPressure ~= nil),
-			tostring(peerPressure.enabled),
-			tostring(peerPressure.printEnabled),
-			tostring(peerPressure.triggerOnOwnCasts),
-			tostring(peerPressure.soundEnabled),
-			peerOn,
-			peerTotal
 		)
 	else
 		lines[#lines + 1] = "Saved variables not initialized."
@@ -536,36 +535,6 @@ function ns:BuildContextReport()
 		end
 	else
 		lines[#lines + 1] = "  (no tracked spells for this class)"
-	end
-
-	lines[#lines + 1] = ""
-	lines[#lines + 1] = "Peer Pressure spells for your class (known / watched):"
-	if not ns.CheckPeerPressure then
-		lines[#lines + 1] = "  (Peer Pressure is not loaded on this flavor)"
-	else
-		local category
-		for _, candidate in ipairs(ns.PeerPressureCategories or {}) do
-			if candidate.id == class then
-				category = candidate
-			end
-		end
-		if category then
-			local watched = db and db.peerPressure and db.peerPressure.watched or {}
-			for _, entry in ipairs(category.entries) do
-				local on = false
-				for _, id in ipairs(entry.ids) do
-					on = on or watched[id] and true or false
-				end
-				lines[#lines + 1] = string.format(
-					"  %s = known:%s watched:%s",
-					entry.spellName,
-					tostring(KnowsAny(entry.ids)),
-					OnOff(on)
-				)
-			end
-		else
-			lines[#lines + 1] = "  (no Peer Pressure spells for this class)"
-		end
 	end
 
 	-- Read only: the macros are looked up by name, never created or deleted here.
@@ -762,7 +731,7 @@ end
     every buff and self buff your class has on this client with who it's
     offered to, the ranks you know, and the rank and group version the window
     would cast; each hand's weapon and what your bags hold for it, the
-    Soulstone, and the Buff Keys' bindings; then every group member and your
+    Soulstone, and the Buff Key's binding; then every group member and your
     target as the window reads them, each with which of your buffs they have
     on or are missing. The group read is skipped
     in combat, as the window skips it. Existence/value reads only: nothing is
@@ -796,6 +765,27 @@ function ns:BuildBuffWindowContextReport()
 		tostring(db.selfEnabled),
 		tostring(db.favorEnabled),
 		tostring(db.targetEnabled)
+	)
+	local hiddenClasses = {}
+	for classToken, shown in pairs(db.showClasses or {}) do
+		if shown == false then
+			hiddenClasses[#hiddenClasses + 1] = classToken
+		end
+	end
+	table.sort(hiddenClasses)
+	-- The read BW.ShowsHere's In Instance takes, and the kind of instance it says this is.
+	local inInstance, instanceType = IsInInstance()
+	lines[#lines + 1] = string.format(
+		"When to Show: solo=%s (%s) group=%s (%s) hiddenClasses=%s inGroup=%s inInstance=%s (%s) shows here now=%s",
+		tostring(db.showSolo),
+		tostring(db.showSoloWhere),
+		tostring(db.showGroup),
+		tostring(db.showGroupWhere),
+		#hiddenClasses > 0 and table.concat(hiddenClasses, ",") or "none",
+		tostring(IsInGroup() and true or false),
+		tostring(inInstance and true or false),
+		tostring(instanceType),
+		tostring(BW.ShowsHere and BW.ShowsHere())
 	)
 	local tankWhen = {}
 	for key, when in pairs(db.tankWhen) do
@@ -1010,31 +1000,36 @@ function ns:BuildBuffWindowContextReport()
 	end
 
 	--[[
-	    The Buff Keys: each key's binding (unbound, a press can't happen), the
-	    hidden button it clicks and a macro's /click reaches, and the
-	    resurrection a press casts on a dead target first. A press also does
-	    nothing in combat, while you're dead, and while the window is off, not
-	    set up or reading secret auras (the switches and gates above).
+	    The Buff Key: its binding (unbound, a press can't happen), the hidden
+	    button it clicks and a macro's /click reaches, Skip Buffs with
+	    Cooldowns, any key still on the old Group Buff key (moved at login,
+	    out of combat), and the resurrection a press casts on a dead target
+	    first. A press also does nothing in combat, while you're dead, and
+	    while the window is off, not set up or reading secret auras (the
+	    switches and gates above).
 	]]
 	lines[#lines + 1] = ""
 	lines[#lines + 1] = string.format(
-		"Buff Keys: resurrection=%s",
-		BW.resurrection and string.format("%s (%d)", tostring(BW.resurrection.name), BW.resurrection.id) or "none known"
+		"Buff Key: resurrection=%s skipCooldowns=%s",
+		BW.resurrection and string.format("%s (%d)", tostring(BW.resurrection.name), BW.resurrection.id) or "none known",
+		tostring(db.keySkipCooldowns)
 	)
-	for _, key in ipairs({ "SINGLE", "GROUP" }) do
-		local command = ns.BUFF_KEY_COMMANDS and ns.BUFF_KEY_COMMANDS[key]
-		if command then
-			local bound = { GetBindingKey(command) }
-			local buttonName = command:match("^CLICK ([^:]+)")
-			lines[#lines + 1] = string.format(
-				"  %s: bound=%s button=%s",
-				command,
-				#bound > 0 and table.concat(bound, " ") or "NONE",
-				(buttonName and _G[buttonName]) and buttonName or "MISSING"
-			)
-		else
-			lines[#lines + 1] = "  " .. key .. ": not loaded"
-		end
+	local command = ns.BUFF_KEY_COMMAND
+	if command then
+		local bound = { GetBindingKey(command) }
+		local buttonName = command:match("^CLICK ([^:]+)")
+		lines[#lines + 1] = string.format(
+			"  %s: bound=%s button=%s",
+			command,
+			#bound > 0 and table.concat(bound, " ") or "NONE",
+			(buttonName and _G[buttonName]) and buttonName or "MISSING"
+		)
+	else
+		lines[#lines + 1] = "  not loaded"
+	end
+	local oldGroup = { GetBindingKey("CLICK TFTBBuffGroup:LeftButton") }
+	if #oldGroup > 0 then
+		lines[#lines + 1] = "  old Group Buff key still bound: " .. table.concat(oldGroup, " ")
 	end
 
 	lines[#lines + 1] = ""
@@ -1126,8 +1121,10 @@ end
     set built from this client's Buff-Window-Spells data, on the first firing
     while logging). For GET_ITEM_INFO_RECEIVED it is an item of a tracked
     trigger, the set the panels' repaint watches (built from
-    ns.TRACKED_ABILITIES the same way), or one the Buff Window uses.
-    Everything else is counted.
+    ns.TRACKED_ABILITIES the same way), or one the Buff Window uses. For
+    UI_ERROR_MESSAGE it is the "more powerful spell" refusal, whose error type
+    Buff Duty learns from its text the first time it acts on one and logs that
+    firing itself (ns.IsBuffBounceError). Everything else is counted.
 ]]
 local trackedItems
 local IsBuffWindowSpell -- defined under Validate Data Sources, from the same collectors
@@ -1153,6 +1150,9 @@ function ns.IsCorrelatedMessage(event, id)
 	if event == "UNIT_SPELLCAST_SUCCEEDED" then
 		return ns.GetCastEntry(id) ~= nil or ns.GetGivenEntry(id) ~= nil or IsBuffWindowSpell(id)
 	end
+	if event == "UI_ERROR_MESSAGE" then
+		return ns.IsBuffBounceError ~= nil and ns.IsBuffBounceError(id)
+	end
 	return false
 end
 
@@ -1165,7 +1165,7 @@ end
     (labelled AURA), while logging is on, before any of its own filtering.
 
     An aura on you, and a cast or revive TFTB acts on (a tracked entry, a buff
-    you give for Good News, or a Peer Pressure cooldown), records in full:
+    you give for Good News), records in full:
     spell id and name, source, the decoded affiliation/reaction flags, and
     whether the add-on tracks and watches that id. tracked=true watched=true
     means the cast reached the add-on and the issue is downstream. A cable that
@@ -1177,10 +1177,7 @@ end
 function ns:LogCombatCast(spellID, sourceName, sourceFlags, tracked, watched, label)
 	label = label or "CAST"
 	local name = C_Spell.GetSpellName(spellID) or "?"
-	local correlated = label == "AURA"
-		or tracked
-		or ns.GetGivenEntry(spellID) ~= nil
-		or (ns.IsPeerPressureSpell and ns.IsPeerPressureSpell(spellID))
+	local correlated = label == "AURA" or tracked or ns.GetGivenEntry(spellID) ~= nil
 	if not correlated then
 		ns:CountUncorrelated("COMBAT_LOG_EVENT_UNFILTERED", spellID, label .. " " .. name)
 		return
@@ -1290,7 +1287,7 @@ end
     - every ns.GAME_IDS constant, a spell named through C_Spell.GetSpellName
       (what ns.GetSpellLink builds the panel samples from), requested when it
       loads late;
-    - every class token this client's tracked, Peer Pressure and Buff Window
+    - every class token this client's tracked and Buff Window
       data carries, named through LOCALIZED_CLASS_NAMES_MALE as the panels show
       it;
     - the client's duration strings, through ns.FormatDuration as the Good News
@@ -1298,8 +1295,9 @@ end
     - the pet-owner tooltip formats the Buff Window turns into patterns to find
       a targeted pet's owner (NIL means that wording is skipped on this client);
     - the group labels the Buff Window heads its party sections with, the
-      hand names its weapon rows and the Weapon Buffs panel show, and the
-      error a Buff Key pressed in combat shows;
+      hand names its weapon rows and the Weapon Buffs panel show, the error a
+      Buff Key pressed in combat shows, and the "more powerful spell" refusal
+      Buff Duty matches by its text (NIL means it never learns a buff bounced);
     - every curated emote token the praise panels pick from, named by the
       command this client gives it (NIL means the client has no such emote, so
       a pick of it never plays).
@@ -1330,11 +1328,6 @@ do
 	for _, entry in ipairs(ns.TRACKED_ABILITIES or {}) do
 		if entry.class then
 			classes[entry.class] = true
-		end
-	end
-	for _, row in ipairs(ns.PEER_PRESSURE_ABILITIES or {}) do
-		if row[1] then
-			classes[row[1]] = true
 		end
 	end
 	for _, list in ipairs({ ns.BUFF_WINDOW_SPELLS or {}, ns.BUFF_WINDOW_SELF_SPELLS or {} }) do
@@ -1380,6 +1373,7 @@ do
 		"INVTYPE_WEAPONMAINHAND",
 		"INVTYPE_WEAPONOFFHAND",
 		"ERR_NOT_IN_COMBAT",
+		"SPELL_FAILED_AURA_BOUNCED",
 	}) do
 		rows[#rows + 1] = UiLabel(constant)
 	end
@@ -1594,11 +1588,9 @@ end
 --[[
     Weapon enchants: an imbue's ranks are spells, a poison's items; `kind`
     picks which, and a row of the other kind adds nothing. A rank with no
-    enchant id is flagged ERROR: the Buff Window can't tell it's on a weapon,
-    and keeps offering it.
+    enchant id shows a blank DATA_ENCHANT_ID: the Buff Window can't tell it's
+    on a weapon, and keeps offering it.
 ]]
-local NO_ENCHANT_ID = "No enchant id: the Buff Window can't see it on a weapon"
-
 local function CollectWeaponEnchants(kind)
 	return function(rows)
 		local found = {}
@@ -1614,7 +1606,6 @@ local function CollectWeaponEnchants(kind)
 					id = rank[1],
 					key = index,
 					row = { row = row, level = rank[2], enchant = EnchantText(rank[3]) },
-					problem = rank[3] == nil and NO_ENCHANT_ID or nil,
 				}
 			end
 		end
@@ -1622,15 +1613,35 @@ local function CollectWeaponEnchants(kind)
 	end
 end
 
--- Weapon items: { item id, level required, enchant id, weapon types, kind, item level }, flagged ERROR without an enchant id.
+-- Weapon items: { item id, level required, enchant id, weapon types, kind, item level }; a blank DATA_ENCHANT_ID is a missing enchant id.
+-- A weapon item's zones as one cell, "instances 585 580; uiMaps 1957", or nil for an item that works anywhere.
+local function ZonesText(zones)
+	if not zones then
+		return nil
+	end
+	local parts = {}
+	for _, kind in ipairs({ "instances", "uiMaps" }) do
+		if zones[kind] then
+			parts[#parts + 1] = kind .. " " .. table.concat(zones[kind], " ")
+		end
+	end
+	return table.concat(parts, "; ")
+end
+
 local function CollectWeaponItems(rows)
 	local found = {}
 	for index, row in ipairs(rows) do
 		found[#found + 1] = {
 			id = row[1],
 			key = index,
-			row = { level = row[2], enchant = row[3], types = row[4], kind = row[5], itemLevel = row[6] },
-			problem = row[3] == nil and NO_ENCHANT_ID or nil,
+			row = {
+				level = row[2],
+				enchant = row[3],
+				types = row[4],
+				kind = row[5],
+				itemLevel = row[6],
+				zones = ZonesText(row[7]),
+			},
 		}
 	end
 	return found
@@ -1656,7 +1667,7 @@ local function CollectSoulstone(kind)
 	end
 end
 
--- The Buff Keys' resurrections: bare rank ids, one row per class.
+-- The Buff Key's resurrections: bare rank ids, one row per class.
 local function CollectResurrections(rows)
 	local found = {}
 	for index, row in ipairs(rows) do
@@ -1700,16 +1711,6 @@ function IsBuffWindowSpell(id)
 		end
 	end
 	return buffWindowSpells[id] == true
-end
-
-local function CollectPeerPressure(rows)
-	local found = {}
-	for index, row in ipairs(rows) do
-		for _, id in ipairs(row[2] or {}) do
-			found[#found + 1] = { id = id, key = index, row = row }
-		end
-	end
-	return found
 end
 
 ns.DIAGNOSTIC_DATA_SOURCES = {
@@ -1776,30 +1777,6 @@ ns.DIAGNOSTIC_DATA_SOURCES = {
 		},
 	},
 	{
-		label = "Peer-Pressure-Abilities",
-		sources = {
-			{
-				table = "PEER_PRESSURE_ABILITIES",
-				kind = "spell",
-				collect = CollectPeerPressure,
-				dataColumns = {
-					{
-						"DATA_CLASS",
-						function(_, row)
-							return row[1]
-						end,
-					},
-					{
-						"DATA_DEFAULT",
-						function(_, row)
-							return row[3]
-						end,
-					},
-				},
-			},
-		},
-	},
-	{
 		label = "Buff-Window-Spells",
 		sources = {
 			{
@@ -1859,6 +1836,7 @@ ns.DIAGNOSTIC_DATA_SOURCES = {
 					{ "DATA_WEAPON_TYPES", FoundField("types") },
 					{ "DATA_KIND", FoundField("kind") },
 					{ "DATA_ITEM_LEVEL", FoundField("itemLevel") },
+					{ "DATA_ZONES", FoundField("zones") },
 				},
 			},
 			{

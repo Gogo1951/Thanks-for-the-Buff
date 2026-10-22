@@ -443,7 +443,7 @@ ns.TRACKED_ABILITIES = {
 How We Got the Data
 
 Last Validated
-	2026-10-19, TBC Anniversary 2.5.6.70006
+	2026-10-22, TBC Anniversary 2.5.6.70006
 
 Notes
 	- The buffs, cooldowns and services other players spend on you, behind the Buffs from Teammates, Group Services and Good News panels. Buffs from Strangers has no list: any helpful buff from a player outside your group counts.

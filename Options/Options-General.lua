@@ -63,12 +63,10 @@ function ns.BuildGeneralOptions()
 		},
 	}
 
-	-- Every feature's switch, two to a line; a feature this flavor's TOC leaves out has none.
+	-- Every feature's switch, two to a line.
 	local toggles = {}
 	for _, feature in ipairs(ns.FEATURE_SWITCHES) do
-		if not feature.loaded or feature.loaded() then
-			toggles[#toggles + 1] = ns.OptionsFeatureToggle(feature)
-		end
+		toggles[#toggles + 1] = ns.OptionsFeatureToggle(feature)
 	end
 	ns.OptionsTogglePairs(options.args, "rowFeatures", 12, toggles)
 

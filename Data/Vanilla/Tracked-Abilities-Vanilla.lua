@@ -299,7 +299,7 @@ ns.TRACKED_ABILITIES = {
 How We Got the Data
 
 Last Validated
-	2026-10-19, Classic Era 1.15.9.70003
+	2026-10-22, Classic Era 1.15.9.70003
 
 Notes
 	- The buffs, cooldowns and services other players spend on you, behind the Buffs from Teammates, Group Services and Good News panels. Buffs from Strangers has no list: any helpful buff from a player outside your group counts.

@@ -1,5 +1,5 @@
 ## Title: Thanks for the Buff (TFTB)
-## Notes: Thank every player who buffs you with a whisper or emote, and keep your raid, yourself, and your weapons buffed with a click-to-cast buff reminder. Plus alerts for feasts, portals, summons, soulwells, and class cooldowns. Manners, automated.
+## Notes: Auto thank every player who buffs you with a whisper or emote, and keep your raid, yourself, and your weapons buffed with a click-to-cast reminder for missing buffs. Plus alerts for feasts, portals, summons, and soulwells. Manners, automated.
 ## Author: Gogo1951
 
 ## IconTexture: Interface/AddOns/TFTB/Includes/Images/Thanks-for-the-Buff.tga
@@ -56,7 +56,6 @@ Locales/zhTW.lua
 Data/Flavor.lua
 Data/Data.lua
 Data/TBC/Tracked-Abilities-TBC.lua
-Data/TBC/Peer-Pressure-Abilities-TBC.lua
 Data/TBC/Game-IDs-TBC.lua
 Data/TBC/Buff-Window-Spells-TBC.lua
 Data/Default-Settings.lua
@@ -69,7 +68,6 @@ Features/Tracked-Lookups.lua
 Features/Praise.lua
 Features/Buff-Tracking.lua
 Features/Good-News.lua
-Features/Peer-Pressure.lua
 Features/Thank-You-Button.lua
 Features/Buff-Window-Frame.lua
 Features/Buff-Window-Castable.lua
@@ -101,7 +99,6 @@ Options/Options-Send-Good-News-Tracked.lua
 Options/Options-Service-Alerts.lua
 Options/Options-Service-Alerts-Tracked.lua
 Options/Options-Peer-Pressure.lua
-Options/Options-Peer-Pressure-Tracked.lua
 Options/Options-Thank-You-Button.lua
 Options/Options-Buff-Window.lua
 Options/Options-Buff-Window-Buffs.lua

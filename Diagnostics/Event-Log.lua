@@ -47,10 +47,14 @@ ns.DIAGNOSTIC_EVENT_EXCLUDE = {
     - GET_ITEM_INFO_RECEIVED fires for every item any add-on or the game's own
       UI loads, so a bag or auction add-on can send hundreds; its id is the
       item id, and only a tracked item's matters.
+    - UI_ERROR_MESSAGE fires on every red error the game shows; its id is the
+      error type, and only "A more powerful spell is already active" matters,
+      which Buff Duty acts on.
 ]]
 ns.MESSAGE_ID_FILTERED_EVENTS = {
 	UNIT_SPELLCAST_SUCCEEDED = 3,
 	GET_ITEM_INFO_RECEIVED = 1,
+	UI_ERROR_MESSAGE = 1,
 }
 
 -- The counter id a secret id (WoW Forever) folds into, since a secret can't key a table.

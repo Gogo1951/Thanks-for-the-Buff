@@ -33,10 +33,6 @@ L["MESSAGE_WHISPER_THANKS"] = "Thanks for the %s"
 L["MESSAGE_SELECT_PLAYER"] = "Target a player first."
 L["MESSAGE_CANT_THANK_SELF"] = "You can't thank yourself!"
 
--- Peer Pressure
-L["MESSAGE_PEER_PRESSURE"] = "%s used %s!"
-L["MESSAGE_PEER_PRESSURE_TARGET"] = "%s used %s on %s!"
-
 --------------------------------------------------------------------------------
 -- Text Fragments
 --------------------------------------------------------------------------------
@@ -67,7 +63,7 @@ L["OPTIONS_ENABLE_MINIMAP"] = "Enable Mini-map Button"
 L["OPTIONS_ENABLE_MINIMAP_DESCRIPTION"] =
 	"Shows the TFTB button on your mini-map, which turns features on and off with a click."
 L["OPTIONS_DESCRIPTION"] =
-	"Thank every player who buffs you with a whisper or emote, and keep your raid, yourself, and your weapons buffed with a click-to-cast buff reminder. Plus alerts for feasts, portals, summons, soulwells, and class cooldowns. Manners, automated."
+	"Auto thank every player who buffs you with a whisper or emote, and keep your raid, yourself, and your weapons buffed with a click-to-cast reminder for missing buffs. Plus alerts for feasts, portals, summons, and soulwells. Manners, automated."
 L["OPTIONS_FEATURES_HEADER"] = "Features"
 L["OPTIONS_FEATURES_DESCRIPTION"] = "Turn each feature on or off here, or on its own panel."
 L["OPTIONS_FEATURES_NOTE"] =
@@ -165,17 +161,11 @@ L["GOOD_NEWS_MESSAGE_TOKENS"] = "%a becomes the ability link, plus its duration 
 ]]
 L["GOOD_NEWS_DURATION_CLAUSE"] = "for %s"
 
--- Peer Pressure
+-- Peer Pressure (TEMPORARY: delete on or after 2026-11-21, with Options/Options-Peer-Pressure.lua)
 L["TAB_PEER_PRESSURE"] = "Peer Pressure"
-L["PEER_PRESSURE_DESCRIPTION"] =
-	"Get notified when other players of your class use their cooldowns, so you can give in to Peer Pressure."
-L["PEER_PRESSURE_ENABLE"] = "Enable Peer Pressure"
-L["PEER_PRESSURE_ENABLE_DESCRIPTION"] = "Turns on alerts when another player of your class uses a tracked cooldown."
-L["PEER_PRESSURE_PRINT_DESCRIPTION"] = "Prints a message only you can see when a same-class cooldown is used."
-L["PEER_PRESSURE_OWN_CASTS"] = "Trigger on Own Casts"
-L["PEER_PRESSURE_OWN_CASTS_DESCRIPTION"] =
-	"Also triggers when you use your own cooldowns, not just when other players do."
-L["PEER_PRESSURE_SOUND_DESCRIPTION"] = "Plays a sound when a same-class cooldown is used. Only you hear it."
+L["PEER_PRESSURE_CONTROL_FREAK"] = "Control Freak"
+L["PEER_PRESSURE_MOVED"] =
+	'WoW Forever doesn\'t let add-ons read the combat log, so we\'re restructuring our add-ons to work the same on every version of the game. "Peer Pressure" has moved to our other add-on, "Control Freak." Install it to keep getting alerts when players of your class use their cooldowns.'
 
 -- Shared across the buff panels
 L["TRACKED_HEADER"] = "Tracked Abilities"
@@ -194,9 +184,8 @@ L["WHISPER_MESSAGE_RESET_DESCRIPTION"] = "Resets the whisper message to the defa
 
 --[[
     The two section headers every buff panel is built from: what the other player
-    sees, then what only you get. Peer Pressure sends nothing outward, so it
-    carries the Notifications header alone. Key prefixes match the header the
-    control appears under.
+    sees, then what only you get. Key prefixes match the header the control
+    appears under.
 ]]
 L["PRAISE_HEADER"] = "Praise Whispers & Emotes"
 L["NOTIFICATIONS_HEADER"] = "Notifications"
@@ -243,6 +232,19 @@ L["BUFF_WINDOW_DESCRIPTION"] = "Shows who's missing your buffs. Click an icon to
 L["BUFF_WINDOW_ENABLE"] = "Enable Buff Duty"
 L["BUFF_WINDOW_ENABLE_DESCRIPTION"] = "Turns on Buff Duty, the window of group members missing a buff you can give."
 L["BUFF_WINDOW_NO_BUFFS"] = "Your class has no buffs on this list, so the window never appears on this character."
+-- When to Show: Solo and In Group, each with Always or In Instance, then the classes.
+L["BUFF_WINDOW_WHEN_HEADER"] = "When to Show"
+L["BUFF_WINDOW_WHEN_DESCRIPTION"] = "Choose when the window can appear."
+L["BUFF_WINDOW_WHEN_SOLO"] = "Solo"
+L["BUFF_WINDOW_WHEN_SOLO_DESCRIPTION"] = "Shows the window while you're not in a party or raid."
+L["BUFF_WINDOW_WHEN_GROUP"] = "In Group"
+L["BUFF_WINDOW_WHEN_GROUP_DESCRIPTION"] = "Shows the window while you're in a party or raid."
+L["BUFF_WINDOW_WHERE_DESCRIPTION"] =
+	"Sets where the window shows: everywhere, or only inside dungeons, raids, battlegrounds, and arenas."
+L["BUFF_WINDOW_WHERE_ALWAYS"] = "Always"
+L["BUFF_WINDOW_WHERE_INSTANCE"] = "In Instance"
+L["BUFF_WINDOW_CLASSES_DESCRIPTION"] = "Show the window when you're playing these classes."
+L["BUFF_WINDOW_CLASS_DESCRIPTION"] = "Shows the window while you're playing this class."
 L["BUFF_WINDOW_HEADER"] = "Window"
 L["BUFF_WINDOW_WINDOW_DESCRIPTION"] = "Keep the window where you put it, or out of the way in combat."
 L["BUFF_WINDOW_LOCK"] = "Lock Window"
@@ -254,7 +256,7 @@ L["BUFF_WINDOW_SHOW_HEADER"] = "Show in Window"
 L["BUFF_WINDOW_SHOW_DESCRIPTION"] = "Add your own buffs, the strangers who buffed you, and your target to the window."
 L["BUFF_WINDOW_FAVOR_ENABLE"] = "Return the Favor"
 L["BUFF_WINDOW_FAVOR_ENABLE_DESCRIPTION"] =
-	"Lists the strangers who recently buffed you, with the buffs you can give them back. Right-click an icon to take someone off the list."
+	"Lists the strangers who recently buffed you, with the buffs you can give them back. Right-Click an icon to take someone off the list."
 L["BUFF_WINDOW_FAVOR_SECONDS_DESCRIPTION"] = "Sets how long a stranger stays on the list after their last buff."
 L["BUFF_WINDOW_TARGET_ENABLE"] = "Your Target"
 L["BUFF_WINDOW_TARGET_ENABLE_DESCRIPTION"] =
@@ -304,7 +306,7 @@ L["BUFF_WINDOW_SELF_REFRESH_DESCRIPTION"] =
 -- The Weapon Buffs panel, under Buff Duty after Self-Buffs.
 L["BUFF_WINDOW_WEAPON_PANEL_HEADER"] = "Weapon Buffs"
 L["BUFF_WINDOW_WEAPON_DESCRIPTION"] =
-	"Tick what each weapon should carry. The window offers it when it's missing or running low, if it's in your bags and fits the weapon."
+	"Check what each weapon should carry. The window offers it when it's missing or running low, if it's in your bags and fits the weapon."
 -- The one timing for every weapon buff, at the top of the panel.
 L["BUFF_WINDOW_WEAPON_REFRESH"] = "Reapply"
 L["BUFF_WINDOW_WEAPON_REFRESH_DESCRIPTION"] =
@@ -318,13 +320,13 @@ L["BUFF_WINDOW_WEAPON_KIND_LURE"] = "Lures"
     oil, stone or lure, the second the client's "Main Hand" or "Off Hand".
 ]]
 L["BUFF_WINDOW_WEAPON_PICK_DESCRIPTION"] =
-	"Offers %s for your %s. While the weapon carries none of your ticked choices, each one you have is offered."
+	"Offers %s for your %s. While the weapon carries none of your checked choices, each one you have is offered."
 L["BUFF_WINDOW_SELF_ENABLE"] = "Your Self-Buffs"
 L["BUFF_WINDOW_SELF_ENABLE_DESCRIPTION"] =
 	"Shows the buffs only you can put on yourself, like an armor or Inner Fire, at the top of the window when they're missing or running low. Pick which ones under Self-Buffs."
 L["BUFF_WINDOW_WEAPON_ENABLE"] = "Your Weapon Buffs"
 L["BUFF_WINDOW_WEAPON_ENABLE_DESCRIPTION"] =
-	"Shows the poisons, imbues, oils, stones and lures your weapons are missing or running low on, with your self-buffs at the top of the window. Click one to put it on. Pick which ones under Weapon Buffs."
+	"Shows the poisons, imbues, oils, stones, and lures your weapons are missing or running low on, with your self-buffs at the top of the window. Click one to put it on. Pick which ones under Weapon Buffs."
 
 -- The window itself
 L["BUFF_WINDOW_SELF_HEADER"] = "Self-Buffs"
@@ -337,25 +339,26 @@ L["BUFF_WINDOW_TOOLTIP_USE"] = "Nobody in your group has a Soulstone. Click to u
 L["BUFF_WINDOW_TOOLTIP_CREATE"] = "Nobody in your group has a Soulstone. Click to create one."
 L["BUFF_WINDOW_TOOLTIP_GROUP"] = "Click to cast on %s and their party."
 L["BUFF_WINDOW_TOOLTIP_FAVOR"] = "Click to target %s and cast."
-L["BUFF_WINDOW_TOOLTIP_DISMISS"] = "Right-click to take %s off the list."
--- The window's close button; %s is the options slash command.
-L["BUFF_WINDOW_CLOSED"] = "Buff Duty is off. To turn it back on, Shift + Right-Click the mini-map button or type %s."
+L["BUFF_WINDOW_TOOLTIP_DISMISS"] = "Right-Click to take %s off the list."
+-- The window's close button: the class name in its color, then the options command.
+L["BUFF_WINDOW_CLOSED"] =
+	"Buff Duty is off for the %s class. To turn it back on, Shift + Right-Click the mini-map button or type %s."
 
--- The Buff Keys (Key Bindings, and the Keybinds section of Buff Duty)
+-- The Buff Key (Key Bindings, and the Keybinds section of Buff Duty)
 L["BUFF_KEYS_HEADER"] = "Keybinds"
 L["BUFF_KEYS_DESCRIPTION"] =
 	"Cast the next buff on your list with one key or macro, out of combat. Weapon buffs stay a click on the window."
-L["BUFF_KEY_SINGLE"] = "Individual Buff Button"
-L["BUFF_KEY_SINGLE_DESCRIPTION"] =
-	"Casts your next missing buff, one per press: a resurrection on your dead target, then your group's dead (priests, paladins and shamans), then your Self-Buffs, Return the Favor, your target, and your group."
-L["BUFF_KEY_GROUP"] = "Group Buff Button"
-L["BUFF_KEY_GROUP_DESCRIPTION"] =
-	"Casts your next missing group buff, one per press: a resurrection on your dead target, then your group's dead (priests, paladins and shamans), then your Self-Buffs, then your target's party and the rest. A party waits until everyone missing the buff is in range."
+L["BUFF_KEY"] = "Buff Button"
+L["BUFF_KEY_DESCRIPTION"] =
+	"Casts your next missing buff, one per press: a resurrection on your dead target, then your group's dead (priests, paladins, and shamans), then your Self-Buffs, Return the Favor, your target, and your group. A party gets the group buff when it costs less mana than buffing everyone in range one at a time."
+L["BUFF_KEY_SKIP_COOLDOWNS"] = "Skip Buffs with Cooldowns"
+L["BUFF_KEY_SKIP_COOLDOWNS_DESCRIPTION"] =
+	"Passes over buffs with a cooldown, like Fear Ward, and moves on to the next buff."
 -- %s is a player's name.
 L["BUFF_KEY_WAITING"] = "Waiting on %s to get in range."
 L["BUFF_KEY_DONE"] = "Nothing left to buff."
 -- The caption beside the read-only box that holds a Buff Key's macro line.
-L["BUFF_KEY_MACRO_CAPTION"] = "Macro:"
+L["BUFF_KEY_MACRO_CAPTION"] = "Macro"
 
 --------------------------------------------------------------------------------
 -- Options: Thank You Button

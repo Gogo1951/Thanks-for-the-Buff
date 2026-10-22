@@ -1,10 +1,9 @@
 <!--
-    Buff Duty's two Buff Keys (Features/Buff-Window-Keys.lua). Each clicks a
-    hidden secure button, which picks the next buff on the list and casts it.
-    A macro clicks the same buttons: /click TFTBBuffIndividual, /click TFTBBuffGroup.
+    Buff Duty's Buff Key (Features/Buff-Window-Keys.lua). It clicks a hidden
+    secure button, which picks the next buff on the list and casts it.
+    A macro clicks the same button: /click TFTBBuffIndividual.
     The client loads this file on its own; it is not listed in the TOCs.
 -->
 <Bindings>
 	<Binding name="CLICK TFTBBuffIndividual:LeftButton" header="TFTB" category="ADDONS" />
-	<Binding name="CLICK TFTBBuffGroup:LeftButton" category="ADDONS" />
 </Bindings>

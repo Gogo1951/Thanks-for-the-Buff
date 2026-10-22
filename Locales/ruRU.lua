@@ -34,10 +34,6 @@ L["MESSAGE_WHISPER_THANKS"] = "Спасибо за %s"
 L["MESSAGE_SELECT_PLAYER"] = "Сначала выберите игрока в качестве цели."
 L["MESSAGE_CANT_THANK_SELF"] = "Вы не можете благодарить себя!"
 
--- Peer Pressure
-L["MESSAGE_PEER_PRESSURE"] = "%s применяет %s!"
-L["MESSAGE_PEER_PRESSURE_TARGET"] = "%s применяет %s к %s!"
-
 --------------------------------------------------------------------------------
 -- Text Fragments
 --------------------------------------------------------------------------------
@@ -69,12 +65,12 @@ L["OPTIONS_ENABLE_MINIMAP"] = "Включить кнопку у миникарт
 L["OPTIONS_ENABLE_MINIMAP_DESCRIPTION"] =
 	"Показывает кнопку TFTB у миникарты, которая включает и выключает функции одним щелчком."
 L["OPTIONS_DESCRIPTION"] =
-	"Благодарите шепотом или эмоцией каждого игрока, который накладывает на вас бафф, и держите под баффами свой рейд, себя и свое оружие с помощью напоминания о баффах, где их можно наложить одним щелчком. А еще получайте оповещения о пиршествах, порталах, призывах, колодцах душ и способностях игроков вашего класса. Вежливость на автомате."
+	"Автоматически благодарите шепотом или эмоцией каждого игрока, который накладывает на вас бафф, и держите под баффами свой рейд, себя и свое оружие с помощью напоминания о недостающих баффах, где их можно наложить одним щелчком. А еще получайте оповещения о пиршествах, порталах, призывах и колодцах душ. Вежливость на автомате."
 L["OPTIONS_FEATURES_HEADER"] = "Функции"
 L["OPTIONS_FEATURES_DESCRIPTION"] =
 	"Включайте и отключайте каждую функцию здесь или на ее собственной панели."
 L["OPTIONS_FEATURES_NOTE"] =
-	'Возможные грядущие изменения: некоторые наши новые функции, например "%s", выходят за привычные рамки "Thanks for the Buff". Смело отключайте всё, что вам не нужно. Эти функции могут переехать в наш другой аддон, "Connoisseur & Restocker", или всё может объединиться в один большой аддон, например "Buttons, Buffs, & Bags". Поделитесь мнением в Discord, на CurseForge или GitHub. Спасибо!'
+	'Некоторые наши новые функции, например "%s", выходят за привычные рамки "Thanks for the Buff". Смело отключайте всё, что вам не нужно. Эти функции могут переехать в наш другой аддон, "Connoisseur & Restocker", или всё может объединиться в один большой аддон, например "Buttons, Buffs, & Bags". Поделитесь мнением в Discord, на CurseForge или GitHub. Спасибо!'
 L["OPTIONS_COMMANDS_HEADER"] = "/Commands"
 L["OPTIONS_COMMAND"] = "/tftb"
 L["OPTIONS_COMMAND_DESCRIPTION"] = "Открывает окно настроек этого аддона."
@@ -180,20 +176,11 @@ L["GOOD_NEWS_MESSAGE_TOKENS"] =
 ]]
 L["GOOD_NEWS_DURATION_CLAUSE"] = "на %s"
 
--- Peer Pressure
+-- Peer Pressure (TEMPORARY: delete on or after 2026-11-21, with Options/Options-Peer-Pressure.lua)
 L["TAB_PEER_PRESSURE"] = "Групповое давление"
-L["PEER_PRESSURE_DESCRIPTION"] =
-	"Получайте уведомления, когда другие игроки вашего класса используют свои способности, и поддавайтесь групповому давлению."
-L["PEER_PRESSURE_ENABLE"] = "Включить групповое давление"
-L["PEER_PRESSURE_ENABLE_DESCRIPTION"] =
-	"Включает оповещения, когда другой игрок вашего класса использует отслеживаемую способность."
-L["PEER_PRESSURE_PRINT_DESCRIPTION"] =
-	"Выводит сообщение, которое видите только вы, когда используется способность вашего класса."
-L["PEER_PRESSURE_OWN_CASTS"] = "Срабатывать на свои заклинания"
-L["PEER_PRESSURE_OWN_CASTS_DESCRIPTION"] =
-	"Также срабатывает, когда свои способности используете вы сами, а не только другие игроки."
-L["PEER_PRESSURE_SOUND_DESCRIPTION"] =
-	"Воспроизводит звук, когда используется способность вашего класса. Слышите его только вы."
+L["PEER_PRESSURE_CONTROL_FREAK"] = "Control Freak"
+L["PEER_PRESSURE_MOVED"] =
+	'WoW Forever не позволяет аддонам читать журнал боя, поэтому мы перестраиваем наши аддоны, чтобы они одинаково работали во всех версиях игры. "Групповое давление" переехало в наш другой аддон, "Control Freak". Установите его, чтобы и дальше получать оповещения, когда игроки вашего класса используют свои способности с перезарядкой.'
 
 -- Shared across the buff panels
 L["TRACKED_HEADER"] = "Отслеживаемые способности"
@@ -213,9 +200,8 @@ L["WHISPER_MESSAGE_RESET_DESCRIPTION"] =
 
 --[[
     The two section headers every buff panel is built from: what the other player
-    sees, then what only you get. Peer Pressure sends nothing outward, so it
-    carries the Notifications header alone. Key prefixes match the header the
-    control appears under.
+    sees, then what only you get. Key prefixes match the header the control
+    appears under.
 ]]
 L["PRAISE_HEADER"] = "Благодарственный шепот и эмоции"
 L["NOTIFICATIONS_HEADER"] = "Уведомления"
@@ -273,6 +259,23 @@ L["BUFF_WINDOW_ENABLE_DESCRIPTION"] =
 	"Включает дежурство по баффам: окно с участниками группы, которым не хватает баффа, доступного вам."
 L["BUFF_WINDOW_NO_BUFFS"] =
 	"У вашего класса нет баффов из этого списка, поэтому на этом персонаже окно никогда не появится."
+-- When to Show: Solo and In Group, each with Always or In Instance, then the classes.
+L["BUFF_WINDOW_WHEN_HEADER"] = "Когда показывать"
+L["BUFF_WINDOW_WHEN_DESCRIPTION"] = "Выберите, когда может появляться окно."
+L["BUFF_WINDOW_WHEN_SOLO"] = "Соло"
+L["BUFF_WINDOW_WHEN_SOLO_DESCRIPTION"] =
+	"Показывает окно, когда вы не в группе или рейде."
+L["BUFF_WINDOW_WHEN_GROUP"] = "В группе"
+L["BUFF_WINDOW_WHEN_GROUP_DESCRIPTION"] =
+	"Показывает окно, когда вы в группе или рейде."
+L["BUFF_WINDOW_WHERE_DESCRIPTION"] =
+	"Определяет, где показывается окно: везде или только в подземельях, рейдах, на полях боя и аренах."
+L["BUFF_WINDOW_WHERE_ALWAYS"] = "Всегда"
+L["BUFF_WINDOW_WHERE_INSTANCE"] = "В подземелье"
+L["BUFF_WINDOW_CLASSES_DESCRIPTION"] =
+	"Показывает окно, когда вы играете этими классами."
+L["BUFF_WINDOW_CLASS_DESCRIPTION"] =
+	"Показывает окно, когда вы играете этим классом."
 L["BUFF_WINDOW_HEADER"] = "Окно"
 L["BUFF_WINDOW_WINDOW_DESCRIPTION"] =
 	"Оставьте окно там, где вы его поставили, или уберите его с глаз в бою."
@@ -360,7 +363,7 @@ L["BUFF_WINDOW_SELF_ENABLE_DESCRIPTION"] =
 	"Показывает вверху окна баффы, которые вы можете наложить только на себя, например броню или Внутренний огонь, когда их нет или они скоро закончатся. Выберите нужные в разделе Баффы на себя."
 L["BUFF_WINDOW_WEAPON_ENABLE"] = "Ваши баффы оружия"
 L["BUFF_WINDOW_WEAPON_ENABLE_DESCRIPTION"] =
-	"Показывает яды, чары оружия, масла и камни, которых нет на вашем оружии или которые скоро закончатся, вместе с баффами на себя вверху окна. Нажмите на один из них, чтобы нанести его. Выберите нужные в разделе Баффы оружия."
+	"Показывает яды, чары оружия, масла, камни и приманки, которых нет на вашем оружии или которые скоро закончатся, вместе с баффами на себя вверху окна. Нажмите на один из них, чтобы нанести его. Выберите нужные в разделе Баффы оружия."
 
 -- The window itself
 L["BUFF_WINDOW_SELF_HEADER"] = "Баффы на себя"
@@ -378,25 +381,25 @@ L["BUFF_WINDOW_TOOLTIP_GROUP"] =
 L["BUFF_WINDOW_TOOLTIP_FAVOR"] =
 	"Нажмите, чтобы выбрать игрока %s целью и применить."
 L["BUFF_WINDOW_TOOLTIP_DISMISS"] = "Правый клик, чтобы убрать игрока %s из списка."
--- The window's close button; %s is the options slash command.
+-- The window's close button: the class name in its color, then the options command.
 L["BUFF_WINDOW_CLOSED"] =
-	"Дежурство по баффам выключено. Чтобы включить его снова, нажмите Shift + Правый клик по кнопке у миникарты или введите %s."
+	"Дежурство по баффам выключено для класса %s. Чтобы включить его снова, нажмите Shift + Правый клик по кнопке у миникарты или введите %s."
 
--- The Buff Keys (Key Bindings, and the Keybinds section of Buff Duty)
+-- The Buff Key (Key Bindings, and the Keybinds section of Buff Duty)
 L["BUFF_KEYS_HEADER"] = "Клавиши"
 L["BUFF_KEYS_DESCRIPTION"] =
 	"Накладывайте следующий бафф из списка одной клавишей или макросом вне боя. Баффы оружия по-прежнему наносятся щелчком в окне."
-L["BUFF_KEY_SINGLE"] = "Кнопка одиночных баффов"
-L["BUFF_KEY_SINGLE_DESCRIPTION"] =
-	"Накладывает следующий недостающий бафф, по одному за нажатие: воскрешение мертвой цели (жрецы и паладины), затем баффы на себя, Ответная любезность, ваша цель и ваша группа."
-L["BUFF_KEY_GROUP"] = "Кнопка групповых баффов"
-L["BUFF_KEY_GROUP_DESCRIPTION"] =
-	"Накладывает следующий недостающий групповой бафф, по одному за нажатие: воскрешение мертвой цели (жрецы и паладины), затем баффы на себя, затем группа вашей цели и остальные. Группа ждет, пока все, кому не хватает баффа, не окажутся в радиусе действия."
+L["BUFF_KEY"] = "Кнопка баффов"
+L["BUFF_KEY_DESCRIPTION"] =
+	"Накладывает следующий недостающий бафф, по одному за нажатие: воскрешение мертвой цели, затем мертвых в вашей группе (жрецы, паладины и шаманы), затем баффы на себя, Ответная любезность, ваша цель и ваша группа. Группа получает групповой бафф, если он стоит меньше маны, чем баффать по одному всех в радиусе действия."
+L["BUFF_KEY_SKIP_COOLDOWNS"] = "Пропускать баффы с перезарядкой"
+L["BUFF_KEY_SKIP_COOLDOWNS_DESCRIPTION"] =
+	"Пропускает баффы с перезарядкой (например, Защита от страха) и переходит к следующему."
 -- %s is a player's name.
 L["BUFF_KEY_WAITING"] = "Ожидание, пока игрок %s окажется в радиусе действия."
 L["BUFF_KEY_DONE"] = "Больше нечего накладывать."
 -- The caption beside the read-only box that holds a Buff Key's macro line.
-L["BUFF_KEY_MACRO_CAPTION"] = "Макрос:"
+L["BUFF_KEY_MACRO_CAPTION"] = "Макрос"
 
 --------------------------------------------------------------------------------
 -- Options: Thank You Button

@@ -1,4 +1,5 @@
 local _, ns = ...
+local Data = ns.Data
 local L = ns.L
 
 --[[
@@ -18,7 +19,7 @@ local L = ns.L
     buffs, weapons and Soulstone, pinned on top), Buff-Window-Outsiders.lua
     (your target, and strangers who just buffed you, listed above the parties),
     this file (your group's sections, the refresh, events and setup), and
-    Buff-Window-Keys.lua (the two key bindings that cast from the same list).
+    Buff-Window-Keys.lua (the key binding that casts from the same list).
 
     Nothing is read in combat: the window's buttons are secure and can't be
     redrawn there anyway (see the frame file), so a change mid-fight waits for
@@ -104,7 +105,7 @@ local function AddGroupSections(sections)
 	for _, member in ipairs(GroupMembers()) do
 		local party = parties[member.subgroup]
 		if not party then
-			party = { missing = {}, rows = {} }
+			party = { missing = {}, low = {}, rows = {} }
 			parties[member.subgroup] = party
 		end
 
@@ -116,14 +117,31 @@ local function AddGroupSections(sections)
 			ReadAuras(unit)
 			local role = RoleOf(unit, class)
 			for _, buff in ipairs(buffs) do
-				if Wants(buff, class, role) and not Has(buff, unit) then
+				local has, expires, duration = true, nil, nil
+				if Wants(buff, class, role) then
+					has, expires, duration = Has(buff, unit)
+				end
+				if not has then
 					local missing = party.missing[buff] or {}
 					party.missing[buff] = missing
 					missing[#missing + 1] = unit
+					--[[
+					    The group icon shows time left only while every member it
+					    is for has some: the soonest of theirs. One with none
+					    makes it whole.
+					]]
+					local low = party.low[buff] or { count = 0 }
+					party.low[buff] = low
+					if expires then
+						low.count = low.count + 1
+						if not low.expires or expires < low.expires then
+							low.expires, low.duration = expires, duration
+						end
+					end
 					local icon = buff.singleName and SingleIcon(buff, unit, unit, name)
 					if icon then
 						row = row or { label = PlayerLabel(name, class, unit), icons = {} }
-						row.icons[#row.icons + 1] = icon
+						row.icons[#row.icons + 1] = BuffWindow.WithTimeLeft(icon, expires, duration)
 					end
 				end
 			end
@@ -154,7 +172,9 @@ local function AddGroupSections(sections)
 				local missing = party.missing[buff]
 				if buff.groupName and missing and grouped then
 					local target = PickGroupTarget(missing, buff.groupName)
-					icons[#icons + 1] = {
+					local low = party.low[buff]
+					local partial = low.count == #missing
+					icons[#icons + 1] = BuffWindow.WithTimeLeft({
 						spellId = buff.groupId,
 						castIds = buff.groupIds,
 						column = buff.column,
@@ -163,13 +183,14 @@ local function AddGroupSections(sections)
 						unit = target,
 						targetName = GetUnitName(target, false) or "",
 						isGroup = true,
+						buffKey = buff.key,
 						--[[
-						    For the Group Buff key, which casts this only while
-						    everyone who needs it stands in range.
+						    For the Buff Key, which weighs this against the
+						    members' single casts (GroupChoices).
 						]]
 						subgroup = subgroup,
 						members = missing,
-					}
+					}, partial and low.expires, partial and low.duration)
 				end
 			end
 			if #icons > 0 or #party.rows > 0 then
@@ -195,7 +216,7 @@ end
     Every section the window would show, in display order: your own buffs,
     then the players outside your group (Target, Return the Favor), then the
     parties, which the frame lays out two to a row in a raid. The Buff
-    Keys read the same list, so a key casts only what the window offers.
+    Key reads the same list, so it casts only what the window offers.
 ]]
 function BuffWindow.BuildSections()
 	BuffWindow.refreshSeconds = (ns.db.profile.buffWindow.refreshMinutes or 0) * 60
@@ -204,6 +225,30 @@ function BuffWindow.BuildSections()
 	BuffWindow.AddOutsiderSections(sections)
 	AddGroupSections(sections)
 	return sections
+end
+
+--[[
+    When to Show: your class ticked, then Solo or In Group, whichever you are
+    now, switched on, and In Instance kept to dungeons, raids, battlegrounds
+    and arenas. The Buff Key asks the same, so it casts nothing the window
+    hides.
+]]
+function BuffWindow.ShowsHere()
+	local db = ns.db.profile.buffWindow
+	local _, class = UnitClass("player")
+	if db.showClasses[class] == false then
+		return false
+	end
+	local show, where
+	if IsInGroup() then
+		show, where = db.showGroup, db.showGroupWhere
+	else
+		show, where = db.showSolo, db.showSoloWhere
+	end
+	if not show then
+		return false
+	end
+	return where ~= Data.BUFF_WINDOW_WHERE.INSTANCE or (IsInInstance())
 end
 
 local function Refresh()
@@ -216,7 +261,7 @@ local function Refresh()
 	end
 
 	local db = ns.db.profile.buffWindow
-	if not db.enabled or not HasAnythingToOffer() or ns.AreAurasSecret() then
+	if not db.enabled or not HasAnythingToOffer() or ns.AreAurasSecret() or not BuffWindow.ShowsHere() then
 		ns.HideBuffWindow()
 		return
 	end
@@ -257,14 +302,96 @@ function ns.RefreshBuffWindow()
 end
 
 --[[
-    The window's close button. Turns Buff Duty off through its feature switch,
-    so the options panels and the mini-map button agree, and says how to turn
-    it back on. In combat the window stays up until combat ends, like any
-    other change to it.
+    Buff Duty on the class you're playing: the feature switch on and your
+    class ticked under Classes. The close button and the mini-map button work
+    per class through these, so closing the window on a rogue leaves it up on
+    a druid. Turning it on ticks your class and flips the switch on with it.
+]]
+function ns.IsBuffDutyOnForClass()
+	local _, class = UnitClass("player")
+	return ns.IsFeatureOn("buffWindow") and ns.db.profile.buffWindow.showClasses[class] ~= false
+end
+
+function ns.SetBuffDutyForClass(on)
+	local _, class = UnitClass("player")
+	ns.db.profile.buffWindow.showClasses[class] = on
+	-- Through the feature switch, which redraws the window and repaints the panels.
+	ns.SetFeatureSwitch("buffWindow", on or ns.IsFeatureOn("buffWindow"))
+end
+
+--[[
+    The window's close button. Turns Buff Duty off for your class and says
+    how to turn it back on. In combat the window stays up until combat ends,
+    like any other change to it.
 ]]
 function ns.CloseBuffWindow()
-	ns.SetFeatureSwitch("buffWindow", false)
-	ns:PrintMessage(L["BUFF_WINDOW_CLOSED"]:format(ns.GetColor("INFO") .. L["OPTIONS_COMMAND"] .. "|r"))
+	ns.SetBuffDutyForClass(false)
+	local _, class = UnitClass("player")
+	ns:PrintMessage(
+		L["BUFF_WINDOW_CLOSED"]:format(ns.OptionsClassName(class), ns.GetColor("INFO") .. L["OPTIONS_COMMAND"] .. "|r")
+	)
+end
+
+--------------------------------------------------------------------------------
+-- More Powerful Spell
+--------------------------------------------------------------------------------
+
+--[[
+    How long after a click or Buff Key press a "more powerful spell" refusal
+    still belongs to that cast; the error comes back from the server.
+]]
+local BOUNCE_WINDOW = 2
+local lastAttempt -- { guid, unit, key, at }: the last buff cast the window or key made
+-- The error type this client gives the refusal, learned from its text, for Diagnostics.
+local bounceErrorType
+
+-- Called from a window icon's PreClick and the Buff Key's, for every cast they make.
+function ns.NoteBuffCastAttempt(spec)
+	lastAttempt = nil
+	if not spec or not spec.buffKey then
+		return
+	end
+	local guid = spec.favorGUID or (spec.unit and UnitGUID(spec.unit))
+	if guid and ns.IsPlain(guid) then
+		lastAttempt = { guid = guid, unit = spec.unit, key = spec.buffKey, at = GetTime() }
+	end
+end
+
+-- Diagnostics' event-log filter asks whether an error type is the one this file acts on.
+function ns.IsBuffBounceError(errorType)
+	return bounceErrorType ~= nil and errorType == bounceErrorType
+end
+
+--[[
+    The refusal names no target, so it is pinned on the cast the window or
+    the Buff Key just made. A favor's macro leaves them targeted, so a unit
+    is found for them by GUID. The text is the client's own
+    SPELL_FAILED_AURA_BOUNCED, so it matches in every locale.
+]]
+local function OnUIErrorMessage(errorType, message)
+	if not lastAttempt or not ns.IsPlain(message) or message ~= SPELL_FAILED_AURA_BOUNCED then
+		return
+	end
+	if ns.IsPlain(errorType) and errorType ~= bounceErrorType then
+		-- The event log counted this firing before the type was known; log it in full.
+		if ns.diagnostics and ns.diagnostics.logging then
+			ns:LogEventNow("UI_ERROR_MESSAGE", errorType, message)
+		end
+		bounceErrorType = errorType
+	end
+	local attempt = lastAttempt
+	lastAttempt = nil
+	if GetTime() - attempt.at > BOUNCE_WINDOW then
+		return
+	end
+	local unit = attempt.unit
+	if not unit or UnitGUID(unit) ~= attempt.guid then
+		unit = ns.GetUnitByGUID(attempt.guid)
+	end
+	if unit then
+		BuffWindow.NoteBounce(unit, attempt.key)
+		ns.RequestBuffWindowRefresh()
+	end
 end
 
 -- A change that can move who a unit token names, or what the window offers.
@@ -320,6 +447,7 @@ end
 
 local function OnSpellsChanged()
 	if BuffWindow.isSetUp then
+		BuffWindow.ForgetMyStrengths()
 		BuffWindow.BuildBuffs()
 		RequestFullRefresh()
 	end
@@ -384,6 +512,8 @@ function ns.SetupBuffWindow()
 	BuffWindow.BuildBuffs()
 	ns.CreateBuffWindowFrame()
 	ApplySettings()
+	-- MIGRATION (remove after 2026-11-21): the old Group Buff key's binding moves to the Buff Key.
+	ns.MigrateBuffKeys()
 	BuffWindow.isSetUp = true
 	ns.RequestBuffWindowRefresh()
 	C_Timer.NewTicker(BACKSTOP_INTERVAL, OnBackstopTick)
@@ -397,3 +527,4 @@ ns.SetEventHandler("UNIT_INVENTORY_CHANGED", OnUnitInventoryChanged)
 ns.SetEventHandler("BAG_UPDATE_DELAYED", OnBagUpdateDelayed)
 ns.SetEventHandler("PLAYER_REGEN_DISABLED", OnPlayerRegenDisabled)
 ns.SetEventHandler("PLAYER_REGEN_ENABLED", OnPlayerRegenEnabled)
+ns.SetEventHandler("UI_ERROR_MESSAGE", OnUIErrorMessage)

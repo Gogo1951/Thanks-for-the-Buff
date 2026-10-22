@@ -9,8 +9,8 @@ local LibDBIcon = LibStub("LibDBIcon-1.0")
 --[[
     The mini-map button: a launcher of feature switches. Each click flips one
     feature through ns.SetFeatureSwitch, the same path as its options toggle,
-    and Shift + Middle-Click opens the options panel. Wears the Thank You
-    macro's ribbon.
+    Buff Duty's only for the class you're playing, and Shift + Middle-Click
+    opens the options panel. Wears the Thank You macro's ribbon.
 ]]
 
 --------------------------------------------------------------------------------
@@ -34,6 +34,25 @@ local CLICK_FEATURES = {
 	RightButton = { plain = "teammates", shift = "buffWindow" },
 }
 
+--[[
+    Buff Duty's click is per class, like the window's close button: off
+    leaves the window up on your other classes, and on ticks your class.
+]]
+local function IsOn(key)
+	if key == "buffWindow" and ns.IsBuffDutyOnForClass then
+		return ns.IsBuffDutyOnForClass()
+	end
+	return ns.IsFeatureOn(key)
+end
+
+local function Toggle(key)
+	if key == "buffWindow" and ns.SetBuffDutyForClass then
+		ns.SetBuffDutyForClass(not IsOn(key))
+	else
+		ns.SetFeatureSwitch(key, not IsOn(key))
+	end
+end
+
 --------------------------------------------------------------------------------
 -- Tooltip
 --------------------------------------------------------------------------------
@@ -49,7 +68,7 @@ local function RefreshTooltip(anchor)
 	tooltip:AddLine(" ")
 
 	for _, feature in ipairs(FEATURE_CLICKS) do
-		local state = ns.IsFeatureOn(feature.key) and (GetColor("ON") .. L["ENABLED"] .. "|r")
+		local state = IsOn(feature.key) and (GetColor("ON") .. L["ENABLED"] .. "|r")
 			or (GetColor("OFF") .. L["DISABLED"] .. "|r")
 		tooltip:AddDoubleLine(GetColor("TITLE") .. L[feature.name] .. "|r", state)
 		tooltip:AddLine(GetColor("BODY") .. L[feature.desc] .. "|r", 1, 1, 1, true)
@@ -86,7 +105,7 @@ ns.dataBrokerObject = LibDataBroker:NewDataObject(ADDON_NAME, {
 			return
 		end
 		local key = IsShiftKeyDown() and features.shift or features.plain
-		ns.SetFeatureSwitch(key, not ns.IsFeatureOn(key))
+		Toggle(key)
 
 		if GameTooltip:GetOwner() == self then
 			RefreshTooltip(self)

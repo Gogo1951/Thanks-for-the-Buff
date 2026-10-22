@@ -1,6 +1,6 @@
 # Thanks for the Buff (TFTB)
 
-Thank every player who buffs you with a whisper or emote, and keep your raid, yourself, and your weapons buffed with a click-to-cast buff reminder. Plus alerts for feasts, portals, summons, soulwells, and class cooldowns. Manners, automated.
+Auto thank every player who buffs you with a whisper or emote, and keep your raid, yourself, and your weapons buffed with a click-to-cast reminder for missing buffs. Plus alerts for feasts, portals, summons, and soulwells. Manners, automated.
 
 **TL;DR**: For players who want to stay polite and keep their raid buffed without stopping what they're doing. Every buff you get earns a thank-you, and every buff you owe is one click away.
 
@@ -13,8 +13,6 @@ Thank every player who buffs you with a whisper or emote, and keep your raid, yo
 🛡️ **Buff Duty** // One click-to-cast window, or one key, for every buff you owe: your group, the stranger who just buffed you, your own armor or aura, and the poisons, oils and stones on your weapons.
 
 📣 **Send Good News** // Whisper the players you buff with what they got and how long it lasts, perfect for Power Infusion, a clutch Innervate, or a soulstone before the pull.
-
-🚂 **Feel Peer Pressure** // Get pinged the moment another player of your class pops a cooldown, so you can stack yours on top.
 
 🙏 **Thank You Buttons** // Up to five one-click macros that emote at your target and whisper your own words: thank the healer, ask a mage for water, or heckle a guildie.
 
@@ -40,11 +38,10 @@ A small window of everyone missing a buff you can give. Click an icon to cast it
 | Strangers who buffed you | The buffs you can give them back |
 | Your target | Any buff you can give a player outside your group |
 
+* One key, Pally Power style: each press casts the next buff on your list, picks the group buff when it saves mana, and raises the dead first. Prefer a bar button? Put `/click TFTBBuffIndividual` in a macro.
 * Picks the right rank for lowbies, so you can buff anyone you meet.
-* Hidden in combat, unless you'd rather see it.
-* Close it with the X to turn Buff Duty off; Shift + Right-Click the mini-map button to bring it back.
-* Two keys, Pally Power style: each press casts the next buff on your list, one for single-target buffs and one for group buffs. A group buff waits until the whole party is in range, and priests, paladins and shamans resurrect the dead first: your target, then your group.
-* Prefer a bar button? Put `/click TFTBBuffIndividual` or `/click TFTBBuffGroup` in a macro.
+* Shows up where you want it, solo or grouped, and stays out of the way in combat. Paladins start with it off, since most already run Pally Power.
+* Close it with the X to turn it off for that class; Shift + Right-Click the mini-map button brings it back.
 
 | Own-Buffs Reminders | Return the Favor | In Raid |
 | --- | --- | --- |
@@ -59,16 +56,15 @@ Hover it to see which features are on. Click to flip one.
 | Left-Click | Turns Stranger Buffs on or off |
 | Right-Click | Turns Teammate Buffs on or off |
 | Shift + Left-Click | Turns Send Good News on or off |
-| Shift + Right-Click | Turns Buff Duty on or off |
+| Shift + Right-Click | Turns Buff Duty on or off for the class you're playing |
 | Shift + Middle-Click | Opens the options |
 
 ### Options
 
 * **Stranger Buffs** // Thank players outside your group for their buffs, without a wave of world buffs turning into spam.
 * **Teammate Buffs** // Thank your party and raid for the cooldowns they burn on you, ability by ability.
-* **Service Alerts** // Know the moment a feast, soulwell, portal, summon, or repair bot goes down.
 * **Send Good News** // Tell the players you buff what they just got, in your own words.
-* **Peer Pressure** // Get pinged when another player of your class pops a cooldown.
+* **Service Alerts** // Know the moment a feast, soulwell, portal, summon, or repair bot goes down.
 * **Buff Duty** // Pick who gets each of your buffs, which self-buffs and weapon buffs to watch, where the window sits, and your buff keys.
 * **Thank You Button** // Five buttons, each with its own whisper and emote.
 * **Profiles** // Copy a setup to another character, or reset to defaults.
@@ -109,9 +105,9 @@ Hover it to see which features are on. Click to flip one.
 
 ### 🟢 Pairs With
 
-* Gogo1951's [Connoisseur & Restocker](https://www.curseforge.com/wow/addons/consumable-connoisseur)
+* Gogo1951's [Connoisseur & Restocker](https://www.curseforge.com/wow/addons/connoisseur-restocker)
+* Gogo1951's [Control Freak](https://www.curseforge.com/wow/addons/control-freak)
 * shimoro's [MageAssistant](https://www.curseforge.com/wow/addons/mage-assist)
-* lumumba's [MageSphere](https://www.curseforge.com/wow/addons/magesphere)
 * Gogo1951's [Play It Forward](https://www.curseforge.com/wow/addons/play-it-forward)
 * Gogo1951's [Water Dispenser](https://www.curseforge.com/wow/addons/water-dispenser-revisited)
 
@@ -119,12 +115,14 @@ Hover it to see which features are on. Click to flip one.
 
 * kvakvs's [Buffomat Classic](https://www.curseforge.com/wow/addons/buffomat-classic)
 * Pupp3h's [Buffwatch Classic](https://www.curseforge.com/wow/addons/buffwatch-classic)
+* funki's [Clickable Raid Buffs](https://www.curseforge.com/wow/addons/clickable-raid-buffs)
 * aznamir's [PallyPower](https://www.curseforge.com/wow/addons/pally-power)
 * Codermik's [SmartBuff](https://www.curseforge.com/wow/addons/smartbuff-retail-burning-crusade-classic)
-* Nitrak's [Vocal Raid Assistant](https://www.curseforge.com/wow/addons/vocalraidassistant)
 
 ### 🔴 Alternatives
 
-* esNaglfar's [AutoThank](https://www.curseforge.com/wow/addons/autothank)
 * tf4482's [BuffResponder](https://www.curseforge.com/wow/addons/buffresponder)
+* Sinestro's [forever\_thanks](https://www.curseforge.com/wow/addons/forever-thanks)
 * Iamthedot's [Kindred](https://www.curseforge.com/wow/addons/kindred)
+* GideonWhitlock's [Thanks for Buffing: Forever](https://www.curseforge.com/wow/addons/thanks-for-buffing-forever)
+* Videocat's [Thanks for the Buff Forever](https://www.curseforge.com/wow/addons/thanks-for-the-buff-forever)

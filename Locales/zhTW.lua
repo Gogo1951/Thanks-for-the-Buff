@@ -33,10 +33,6 @@ L["MESSAGE_WHISPER_THANKS"] = "感謝你的 %s"
 L["MESSAGE_SELECT_PLAYER"] = "請先以一名玩家為目標。"
 L["MESSAGE_CANT_THANK_SELF"] = "你不能感謝自己！"
 
--- Peer Pressure
-L["MESSAGE_PEER_PRESSURE"] = "%s 使用了 %s！"
-L["MESSAGE_PEER_PRESSURE_TARGET"] = "%s 使用了 %s，目標是 %s！"
-
 --------------------------------------------------------------------------------
 -- Text Fragments
 --------------------------------------------------------------------------------
@@ -67,11 +63,11 @@ L["OPTIONS_ENABLE_MINIMAP"] = "啟用小地圖按鈕"
 L["OPTIONS_ENABLE_MINIMAP_DESCRIPTION"] =
 	"在小地圖上顯示 TFTB 按鈕，點擊即可開啟或關閉各項功能。"
 L["OPTIONS_DESCRIPTION"] =
-	"透過密語或表情感謝每一位為你施加增益的玩家，並用一鍵施放的增益提醒，讓你的團隊、你自己和你的武器始終保持增益。還會提醒你大餐、傳送門、召喚、靈魂之井和同職業的冷卻技能。禮數周到，全自動。"
+	"自動透過密語或表情感謝每一位為你施加增益的玩家，並用一鍵施放的缺失增益提醒，讓你的團隊、你自己和你的武器始終保持增益。還會提醒你大餐、傳送門、召喚和靈魂之井。禮數周到，全自動。"
 L["OPTIONS_FEATURES_HEADER"] = "功能"
 L["OPTIONS_FEATURES_DESCRIPTION"] = "在此處或各功能自己的面板中開啟或關閉每項功能。"
 L["OPTIONS_FEATURES_NOTE"] =
-	'可能的變化：一些新功能（例如"%s"）已超出"Thanks for the Buff"的傳統範圍。不需要的功能可以隨時關閉。這些功能可能會移到我們的另一個插件"Connoisseur & Restocker"中，或者全部合併成一個更大的插件，也許叫"Buttons, Buffs, & Bags"。歡迎在 Discord、CurseForge 或 GitHub 上告訴我們你的想法。謝謝！'
+	'一些新功能（例如"%s"）已超出"Thanks for the Buff"的傳統範圍。不需要的功能可以隨時關閉。這些功能可能會移到我們的另一個插件"Connoisseur & Restocker"中，或者全部合併成一個更大的插件，也許叫"Buttons, Buffs, & Bags"。歡迎在 Discord、CurseForge 或 GitHub 上告訴我們你的想法。謝謝！'
 L["OPTIONS_COMMANDS_HEADER"] = "/Commands"
 L["OPTIONS_COMMAND"] = "/tftb"
 L["OPTIONS_COMMAND_DESCRIPTION"] = "打開此插件的選項介面。"
@@ -167,18 +163,11 @@ L["GOOD_NEWS_MESSAGE_TOKENS"] = "%a 會變成技能連結，持續時間不足�
 ]]
 L["GOOD_NEWS_DURATION_CLAUSE"] = "持續 %s"
 
--- Peer Pressure
+-- Peer Pressure (TEMPORARY: delete on or after 2026-11-21, with Options/Options-Peer-Pressure.lua)
 L["TAB_PEER_PRESSURE"] = "同儕壓力"
-L["PEER_PRESSURE_DESCRIPTION"] =
-	"當你的同職業玩家使用冷卻技能時收到通知，讓你也屈服於同儕壓力。"
-L["PEER_PRESSURE_ENABLE"] = "啟用同儕壓力"
-L["PEER_PRESSURE_ENABLE_DESCRIPTION"] = "開啟其他同職業玩家使用追蹤的冷卻技能時的提醒。"
-L["PEER_PRESSURE_PRINT_DESCRIPTION"] =
-	"有同職業冷卻技能被使用時，顯示一則只有你能看到的訊息。"
-L["PEER_PRESSURE_OWN_CASTS"] = "自己施放時也觸發"
-L["PEER_PRESSURE_OWN_CASTS_DESCRIPTION"] =
-	"你自己使用冷卻技能時也會觸發，而不僅限於其他玩家使用時。"
-L["PEER_PRESSURE_SOUND_DESCRIPTION"] = "有同職業冷卻技能被使用時播放音效。只有你能聽到。"
+L["PEER_PRESSURE_CONTROL_FREAK"] = "Control Freak"
+L["PEER_PRESSURE_MOVED"] =
+	'WoW Forever 不允許插件讀取戰鬥紀錄，所以我們正在調整插件架構，讓它們在每個遊戲版本中都以相同方式運作。"同儕壓力"已移到我們的另一個插件"Control Freak"中。安裝它即可繼續在同職業玩家使用冷卻技能時收到提醒。'
 
 -- Shared across the buff panels
 L["TRACKED_HEADER"] = "追蹤的技能"
@@ -197,9 +186,8 @@ L["WHISPER_MESSAGE_RESET_DESCRIPTION"] = "將密語訊息恢復為預設文字�
 
 --[[
     The two section headers every buff panel is built from: what the other player
-    sees, then what only you get. Peer Pressure sends nothing outward, so it
-    carries the Notifications header alone. Key prefixes match the header the
-    control appears under.
+    sees, then what only you get. Key prefixes match the header the control
+    appears under.
 ]]
 L["PRAISE_HEADER"] = "感謝密語與表情"
 L["NOTIFICATIONS_HEADER"] = "通知"
@@ -248,6 +236,19 @@ L["BUFF_WINDOW_ENABLE_DESCRIPTION"] =
 	"開啟增益值班，即列出缺少你可施放增益的隊伍成員的視窗。"
 L["BUFF_WINDOW_NO_BUFFS"] =
 	"你的職業沒有此列表中的增益，因此該視窗在這個角色上永遠不會出現。"
+-- When to Show: Solo and In Group, each with Always or In Instance, then the classes.
+L["BUFF_WINDOW_WHEN_HEADER"] = "顯示時機"
+L["BUFF_WINDOW_WHEN_DESCRIPTION"] = "選擇視窗何時可以出現。"
+L["BUFF_WINDOW_WHEN_SOLO"] = "單人"
+L["BUFF_WINDOW_WHEN_SOLO_DESCRIPTION"] = "不在隊伍或團隊中時顯示視窗。"
+L["BUFF_WINDOW_WHEN_GROUP"] = "在隊伍中"
+L["BUFF_WINDOW_WHEN_GROUP_DESCRIPTION"] = "在隊伍或團隊中時顯示視窗。"
+L["BUFF_WINDOW_WHERE_DESCRIPTION"] =
+	"設定視窗在哪裡顯示：任何地方，或僅在地城、團隊副本、戰場和競技場內。"
+L["BUFF_WINDOW_WHERE_ALWAYS"] = "總是"
+L["BUFF_WINDOW_WHERE_INSTANCE"] = "在副本中"
+L["BUFF_WINDOW_CLASSES_DESCRIPTION"] = "在玩這些職業時顯示視窗。"
+L["BUFF_WINDOW_CLASS_DESCRIPTION"] = "在玩此職業時顯示視窗。"
 L["BUFF_WINDOW_HEADER"] = "視窗"
 L["BUFF_WINDOW_WINDOW_DESCRIPTION"] = "讓視窗留在你放置的位置，或在戰鬥中不擋視線。"
 L["BUFF_WINDOW_LOCK"] = "鎖定視窗"
@@ -331,7 +332,7 @@ L["BUFF_WINDOW_SELF_ENABLE_DESCRIPTION"] =
 	"當只能對自己施放的增益（例如護甲類法術或心靈之火）缺失或即將結束時，將其顯示在視窗頂部。可在自身增益中選擇要顯示哪些。"
 L["BUFF_WINDOW_WEAPON_ENABLE"] = "你的武器增益"
 L["BUFF_WINDOW_WEAPON_ENABLE_DESCRIPTION"] =
-	"將武器上缺失或即將結束的毒藥、武器強化、油和磨刀石，與你的自身增益一起顯示在視窗頂部。點擊即可施加。可在武器增益中選擇要顯示哪些。"
+	"將武器上缺失或即將結束的毒藥、武器強化、油、磨刀石和魚餌，與你的自身增益一起顯示在視窗頂部。點擊即可施加。可在武器增益中選擇要顯示哪些。"
 
 -- The window itself
 L["BUFF_WINDOW_SELF_HEADER"] = "自身增益"
@@ -345,25 +346,25 @@ L["BUFF_WINDOW_TOOLTIP_CREATE"] = "你的隊伍中沒有人有靈魂石。點擊
 L["BUFF_WINDOW_TOOLTIP_GROUP"] = "點擊對 %s 及其隊伍施放。"
 L["BUFF_WINDOW_TOOLTIP_FAVOR"] = "點擊選取 %s 為目標並施放。"
 L["BUFF_WINDOW_TOOLTIP_DISMISS"] = "右鍵點擊將 %s 從列表中移除。"
--- The window's close button; %s is the options slash command.
+-- The window's close button: the class name in its color, then the options command.
 L["BUFF_WINDOW_CLOSED"] =
-	"增益值班已關閉。要重新開啟，請 Shift + 右鍵點擊小地圖按鈕，或輸入 %s。"
+	"已為%s職業關閉增益值班。要重新開啟，請 Shift + 右鍵點擊小地圖按鈕，或輸入 %s。"
 
--- The Buff Keys (Key Bindings, and the Keybinds section of Buff Duty)
+-- The Buff Key (Key Bindings, and the Keybinds section of Buff Duty)
 L["BUFF_KEYS_HEADER"] = "按鍵綁定"
 L["BUFF_KEYS_DESCRIPTION"] =
 	"脫離戰鬥時，用一個按鍵或巨集施放清單中的下一個增益。武器增益仍需在視窗中點擊施加。"
-L["BUFF_KEY_SINGLE"] = "單體增益按鈕"
-L["BUFF_KEY_SINGLE_DESCRIPTION"] =
-	"每按一次施放下一個缺少的增益：先復活死亡的目標（牧師和聖騎士），然後是自身增益、禮尚往來、你的目標和你的隊伍。"
-L["BUFF_KEY_GROUP"] = "隊伍增益按鈕"
-L["BUFF_KEY_GROUP_DESCRIPTION"] =
-	"每按一次施放下一個缺少的隊伍增益：先復活死亡的目標（牧師和聖騎士），然後是自身增益，再是你目標所在的小隊和其他小隊。一個小隊會等到所有缺少該增益的成員都進入範圍。"
+L["BUFF_KEY"] = "增益按鈕"
+L["BUFF_KEY_DESCRIPTION"] =
+	"每按一次施放下一個缺少的增益：先復活死亡的目標，再復活隊伍中死亡的成員（牧師、聖騎士和薩滿），然後是自身增益、禮尚往來、你的目標和你的隊伍。當隊伍增益比逐一為範圍內所有人施放單體增益消耗更少法力時，就施放隊伍增益。"
+L["BUFF_KEY_SKIP_COOLDOWNS"] = "跳過有冷卻時間的增益"
+L["BUFF_KEY_SKIP_COOLDOWNS_DESCRIPTION"] =
+	"跳過有冷卻時間的增益（例如防護恐懼結界），繼續施放下一個。"
 -- %s is a player's name.
 L["BUFF_KEY_WAITING"] = "正在等待 %s 進入範圍。"
 L["BUFF_KEY_DONE"] = "沒有需要施放的增益了。"
 -- The caption beside the read-only box that holds a Buff Key's macro line.
-L["BUFF_KEY_MACRO_CAPTION"] = "巨集："
+L["BUFF_KEY_MACRO_CAPTION"] = "巨集"
 
 --------------------------------------------------------------------------------
 -- Options: Thank You Button

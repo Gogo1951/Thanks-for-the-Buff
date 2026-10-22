@@ -189,8 +189,8 @@ end
 --------------------------------------------------------------------------------
 
 --[[
-    Both sounds play on the Master channel so they stay audible for players who
-    run with game sound effects turned down. File names must match
+    The sound plays on the Master channel so it stays audible for players who
+    run with game sound effects turned down. The file name must match
     Includes/Sounds/ exactly.
 ]]
 local SOUND_ROOT = "Interface/AddOns/" .. ADDON_NAME .. "/Includes/Sounds/"
@@ -198,10 +198,6 @@ local SOUND_ROOT = "Interface/AddOns/" .. ADDON_NAME .. "/Includes/Sounds/"
 -- Any buff landing on you shares this one, stranger or teammate alike.
 function ns.PlayBuffSound()
 	PlaySoundFile(SOUND_ROOT .. "Buff.ogg", "Master")
-end
-
-function ns.PlayPeerPressureSound()
-	PlaySoundFile(SOUND_ROOT .. "Thunder.ogg", "Master")
 end
 
 --------------------------------------------------------------------------------
@@ -229,28 +225,6 @@ end
 --------------------------------------------------------------------------------
 -- Unit Resolution
 --------------------------------------------------------------------------------
-
---[[
-    A buff's combat-log source can be a pet or guardian (a hunter's Roar of
-    Sacrifice, for example). Credit the owner so the message names the player,
-    not the pet — owners are found by matching the pet's GUID to a group pet unit.
-]]
-function ns.GetPetOwnerUnit(petGUID)
-	if UnitGUID("pet") == petGUID then
-		return "player"
-	end
-	for i = 1, 4 do
-		if UnitGUID("partypet" .. i) == petGUID then
-			return "party" .. i
-		end
-	end
-	for i = 1, 40 do
-		if UnitGUID("raidpet" .. i) == petGUID then
-			return "raid" .. i
-		end
-	end
-	return nil
-end
 
 --[[
     A usable emote target must be a live unit token: C_ChatInfo.PerformEmote
@@ -286,44 +260,4 @@ function ns.GetUnitByGUID(guid)
 		end
 	end
 	return nil
-end
-
---------------------------------------------------------------------------------
--- Unit Tooltip
---------------------------------------------------------------------------------
-
---[[
-    A unit's tooltip as plain left-hand lines, title first. Some facts about a
-    unit reach add-ons only as tooltip text -- whose pet a pet is, above all --
-    so the Buff Window reads them here. C_TooltipInfo hands the lines over as
-    data where the client ships its GetUnit getter (WoW Forever); elsewhere they
-    are read off a hidden tooltip that is never shown (Classic Era and TBC
-    Anniversary), the same split Diagnostics makes for items and spells.
-    Resolved once at load.
-]]
-local UNIT_SCAN_TOOLTIP_NAME = "TFTBUnitScanTooltip"
-local GetUnitTooltipData = C_TooltipInfo and C_TooltipInfo.GetUnit
-local unitScanTooltip
-
-function ns.GetUnitTooltipLines(unit)
-	local lines = {}
-	if GetUnitTooltipData then
-		local data = GetUnitTooltipData(unit)
-		for _, line in ipairs(data and data.lines or {}) do
-			lines[#lines + 1] = line.leftText
-		end
-		return lines
-	end
-
-	if not unitScanTooltip then
-		unitScanTooltip = CreateFrame("GameTooltip", UNIT_SCAN_TOOLTIP_NAME, nil, "GameTooltipTemplate")
-	end
-	unitScanTooltip:SetOwner(WorldFrame, "ANCHOR_NONE")
-	unitScanTooltip:SetUnit(unit)
-	for i = 1, unitScanTooltip:NumLines() do
-		local region = _G[UNIT_SCAN_TOOLTIP_NAME .. "TextLeft" .. i]
-		lines[#lines + 1] = region and region:GetText()
-	end
-	unitScanTooltip:Hide()
-	return lines
 end
