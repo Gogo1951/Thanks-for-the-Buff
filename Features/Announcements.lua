@@ -18,7 +18,6 @@ function ns.GetPrintPrefix()
 	return GetColor("INFO") .. L["ADDON_SHORT_NAME"] .. "|r " .. GetColor("SEPARATOR") .. "//" .. "|r "
 end
 
--- Format: |cff[INFO]TFTB|r |cff[SEPARATOR]//|r |cff[TEXT]Message|r
 function ns:PrintMessage(message)
 	local prefix = ns.GetPrintPrefix()
 	--[[
@@ -41,13 +40,10 @@ end
     {rt1} Message // TFTB. BuildAnnounceMessage assembles the decorated string and
     Announce sends it. The body carries a spell link and the leading raid-
     target marker; the chat system renders both on send (the marker becomes the
-    Star icon), so the pipes and braces pass through unchanged. WoW Forever blocks
-    raid-marker tokens in chat, so there the marker is left off.
+    Star icon), so the pipes and braces pass through unchanged. Every flavor
+    carries the marker, WoW Forever included.
 ]]
 local function MarkerPrefix()
-	if ns.FLAVOR == "Camelot" then
-		return ""
-	end
 	return ns.TARGET_MARKER .. " "
 end
 
@@ -132,6 +128,25 @@ local function PerformEmote(token, target)
 end
 
 --[[
+    The picked emotes this client can actually perform, as a list. A saved
+    profile can hold keys that are not emote tokens here (an old "YES" key, or
+    an emote from another flavor), and picking one would be a silent no-op, so
+    each key is checked against the client catalog.
+]]
+function ns.GetPickableEmotes(emotes)
+	local available = {}
+	if type(emotes) ~= "table" then
+		return available
+	end
+	for token, picked in pairs(emotes) do
+		if picked and ns.IsClientEmote(token) then
+			available[#available + 1] = token
+		end
+	end
+	return available
+end
+
+--[[
     Perform a random enabled emote from the given selection. `target` is what to
     direct the emote at: a live unit token ("target", "party3") when the caller
     holds one, else a bare character name the client may resolve to a visible
@@ -155,17 +170,7 @@ function ns:DoRandomEmote(emotes, target)
 	if not emotes or not target then
 		return
 	end
-	--[[
-        Driven by Data.EMOTES rather than by the saved table's own keys: a saved
-        profile can hold keys that are not real emote tokens (a "YES" key, say),
-        and picking one would be a silent no-op.
-    ]]
-	local available = {}
-	for _, data in ipairs(Data.EMOTES) do
-		if emotes[data.token] then
-			available[#available + 1] = data.token
-		end
-	end
+	local available = ns.GetPickableEmotes(emotes)
 	if #available > 0 then
 		PerformEmote(available[math.random(#available)], target)
 	end
@@ -175,9 +180,8 @@ end
     Perform ONE specific emote, for the buttons that choose from a dropdown
     instead of randomizing over a checklist.
 
-    Validated against the CLIENT catalog rather than Data.EMOTES: that dropdown
-    offers every emote this build has, which is far more than the twelve
-    Data.EMOTES curates for Stranger Buffs and Thank You Button 1. An unknown token is dropped rather than handed on,
+    Validated against the CLIENT catalog: that dropdown offers every emote this
+    build has, and a profile can carry a token from another flavor. An unknown token is dropped rather than handed on,
     because C_ChatInfo.PerformEmote given a bad token is a silent no-op --
     indistinguishable, to whoever pressed the button, from the button being
     broken.
@@ -221,13 +225,34 @@ function ns.GetBuffLink(spellID)
 end
 
 --[[
-    The thank-you whisper behind the Stranger Buffs reaction. Separate from the
-    print below: the whisper is praise the other player sees
-    and can be held back by the Praise Delay, while the print is your own
-    heads-up and always fires immediately.
+    The Give Thanks whisper: the player's own message with "{spell}" swapped for
+    the buff's link, signed off like every sent message. nil for an empty
+    message, which sends no whisper. A message that runs past the chat ceiling
+    once the link is in falls back to the default text rather than being
+    rejected. Unlike the print, the other player sees it, and the Praise Delay
+    can hold it back.
 ]]
-function ns:WhisperThanks(target, link)
-	ns:Announce("WHISPER", target, "MESSAGE_WHISPER_THANKS", link)
+function ns:BuildThanksWhisper(template, link)
+	if not template or template == "" then
+		return nil
+	end
+	local function Fill(text)
+		return SignOff((text:gsub("{spell}", function()
+			return link
+		end)))
+	end
+	local message = Fill(template)
+	if #message > ns.CHAT_MESSAGE_MAX_LENGTH then
+		message = Fill(L["DEFAULT_GIVE_THANKS_WHISPER"])
+	end
+	return message
+end
+
+function ns:WhisperThanks(target, link, template)
+	local message = ns:BuildThanksWhisper(template, link)
+	if message then
+		C_ChatInfo.SendChatMessage(message, "WHISPER", nil, target)
+	end
 end
 
 --[[

@@ -51,20 +51,86 @@ end
     found by matching the pet's GUID to a group pet unit.
 ]]
 local function GetPetOwnerUnit(petGUID)
-	if UnitGUID("pet") == petGUID then
+	if ns.UnitHasGUID("pet", petGUID) then
 		return "player"
 	end
 	for i = 1, 4 do
-		if UnitGUID("partypet" .. i) == petGUID then
+		if ns.UnitHasGUID("partypet" .. i, petGUID) then
 			return "party" .. i
 		end
 	end
 	for i = 1, 40 do
-		if UnitGUID("raidpet" .. i) == petGUID then
+		if ns.UnitHasGUID("raidpet" .. i, petGUID) then
 			return "raid" .. i
 		end
 	end
 	return nil
+end
+
+--[[
+    Is this GUID, or this name, anyone in your group -- a member OR a member's
+    pet? A group hunter's pet counts as the hunter: on Forever pets cast real
+    buffs on players, and that buff must not reach a stranger thank-you.
+
+    Checked against the whole roster rather than the one unit token the aura
+    happened to carry, because that token can be a nameplate, or missing, or
+    belong to the pet instead of its owner. The name check backs up the GUID
+    check: a caster that only resolves by name (UnitNameFromGUID) still matches
+    its roster entry. Names compare with the realm's spaces dropped, so the
+    "Name-Realm" we build matches GetUnitName's form, while Forever's realm-free
+    "First Last" names keep their space and compare as they are.
+]]
+local function NormalizeName(name)
+	if not name or not ns.IsPlain(name) or name == "" then
+		return nil
+	end
+	local base, realm = name:match("^(.-)%-(.+)$")
+	if base then
+		return base .. "-" .. realm:gsub("%s", "")
+	end
+	return name
+end
+
+local function UnitMatches(unit, guid, name)
+	if not UnitExists(unit) then
+		return false
+	end
+	if guid then
+		local unitGUID = UnitGUID(unit)
+		if unitGUID and ns.IsPlain(unitGUID) and unitGUID == guid then
+			return true
+		end
+	end
+	if name then
+		local unitName = NormalizeName(GetUnitName(unit, true))
+		if unitName and unitName == name then
+			return true
+		end
+	end
+	return false
+end
+
+local function IsGroupMemberOrPet(guid, name)
+	if guid and not ns.IsPlain(guid) then
+		guid = nil
+	end
+	name = NormalizeName(name)
+	if not guid and not name then
+		return false
+	end
+	if UnitMatches("pet", guid, name) then
+		return true
+	end
+	local prefix, petPrefix, count = "party", "partypet", 4
+	if IsInRaid() then
+		prefix, petPrefix, count = "raid", "raidpet", 40
+	end
+	for i = 1, count do
+		if UnitMatches(prefix .. i, guid, name) or UnitMatches(petPrefix .. i, guid, name) then
+			return true
+		end
+	end
+	return false
 end
 
 --------------------------------------------------------------------------------
@@ -124,13 +190,18 @@ local function OnCombatLogEventUnfiltered()
 	if bit.band(sourceFlags or 0, COMBATLOG_OBJECT_AFFILIATION_OUTSIDER) == 0 then
 		return
 	end
+	-- Backstop for the affiliation flag: a group member is never a stranger.
+	if IsGroupMemberOrPet(sourceGUID, sourceName) then
+		return
+	end
 
 	HandleStrangersBuff(sourceGUID, sourceName, spellID)
 end
 
 --[[
-    Who to credit for an aura on you, as creditGUID, creditName, and the unit token
-    we hold for them (nil for a stranger we can only name): a player or nobody,
+    Who to credit for an aura on you, as creditGUID, creditName, the unit token
+    we hold for them (nil for a stranger we can only name), and the raw caster's
+    GUID (the pet's own, when a pet cast it): a player or nobody,
     with a pet traded for its owner so a group member's pet still reads as the
     group member and is left alone.
 
@@ -142,7 +213,7 @@ end
 ]]
 local function ResolveAuraCaster(aura)
 	local sourceUnit = aura.sourceUnit
-	local creditUnit
+	local creditUnit, casterGUID
 	if sourceUnit then
 		if not ns.IsPlain(sourceUnit) then
 			return nil
@@ -151,13 +222,15 @@ local function ResolveAuraCaster(aura)
 		if not sourceGUID or not ns.IsPlain(sourceGUID) then
 			return nil
 		end
+		casterGUID = sourceGUID
 		creditUnit = ns.IsPlayerGUID(sourceGUID) and sourceUnit or GetPetOwnerUnit(sourceGUID)
 	else
 		local instanceID = aura.auraInstanceID
 		if not instanceID or not ns.IsPlain(instanceID) then
 			return nil
 		end
-		local ok, casterGUID = pcall(C_UnitAuras.GetAuraCasterGUID, "player", instanceID)
+		local ok
+		ok, casterGUID = pcall(C_UnitAuras.GetAuraCasterGUID, "player", instanceID)
 		if not ok or not casterGUID or not ns.IsPlain(casterGUID) then
 			return nil
 		end
@@ -176,7 +249,7 @@ local function ResolveAuraCaster(aura)
 			if realm and ns.IsPlain(realm) and realm ~= "" then
 				name = name .. "-" .. realm:gsub("%s", "")
 			end
-			return casterGUID, name, nil
+			return casterGUID, name, nil, casterGUID
 		end
 	end
 
@@ -185,7 +258,7 @@ local function ResolveAuraCaster(aura)
 	if not (creditGUID and creditName and ns.IsPlain(creditGUID) and ns.IsPlain(creditName)) then
 		return nil
 	end
-	return creditGUID, creditName, creditUnit
+	return creditGUID, creditName, creditUnit, casterGUID
 end
 
 --[[
@@ -203,13 +276,21 @@ local function HandleAddedAura(aura)
 		return
 	end
 
-	local creditGUID, creditName, creditUnit = ResolveAuraCaster(aura)
+	local creditGUID, creditName, creditUnit, casterGUID = ResolveAuraCaster(aura)
 	if not creditGUID or creditGUID == playerGUID then
 		return
 	end
 
-	-- A group member is not a stranger.
+	--[[
+	    A group member is not a stranger, and neither is their pet. Both the
+	    credited player and the raw caster are checked against the whole roster,
+	    so a buff from a group hunter's pet is left alone however the aura named
+	    its caster.
+	]]
 	if creditUnit and (UnitInParty(creditUnit) or UnitInRaid(creditUnit)) then
+		return
+	end
+	if IsGroupMemberOrPet(creditGUID, creditName) or IsGroupMemberOrPet(casterGUID) then
 		return
 	end
 	if ns.IsPlayerGUID(creditGUID) then

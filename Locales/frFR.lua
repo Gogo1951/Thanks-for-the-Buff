@@ -22,8 +22,7 @@ L["CHAT_OPTIONS_IN_COMBAT"] = "Par précaution, l'interface des options ne peut 
 -- Buff print out
 L["MESSAGE_BUFFED"] = "%s vous a amélioré avec %s !"
 
--- Thank-you
-L["MESSAGE_WHISPER_THANKS"] = "Merci pour %s"
+-- Thank You Button
 L["MESSAGE_SELECT_PLAYER"] = "Ciblez d'abord un joueur."
 L["MESSAGE_CANT_THANK_SELF"] = "Vous ne pouvez pas vous remercier vous-même !"
 
@@ -32,6 +31,7 @@ L["MESSAGE_CANT_THANK_SELF"] = "Vous ne pouvez pas vous remercier vous-même !"
 --------------------------------------------------------------------------------
 
 L["UNKNOWN_SPELL"] = "Sort inconnu"
+L["SAMPLE_EXAMPLE"] = "Exemple : %s"
 
 --------------------------------------------------------------------------------
 -- Options: Main Panel
@@ -40,13 +40,12 @@ L["UNKNOWN_SPELL"] = "Sort inconnu"
 L["OPTIONS_WELCOME_TOGGLE"] = "Activer le message de bienvenue"
 L["OPTIONS_WELCOME_DESCRIPTION"] = "Affiche un message que vous seul pouvez voir lorsque vous vous connectez."
 L["OPTIONS_DESCRIPTION"] =
-	"Remerciez automatiquement d'un chuchotement ou d'une emote chaque joueur qui vous améliore, et remerciez qui vous voulez à la main d'un clic sur vos macros de remerciement. La politesse, en automatique."
+	"Remerciez automatiquement d'une emote ou d'un chuchotement les joueurs qui vous améliorent. Les inconnus qui vous lancent Robustesse, Intelligence des arcanes ou Marque du fauve sont remerciés sur-le-champ, et un clic sur vos macros de remerciement remercie qui vous ciblez."
 L["OPTIONS_FEATURES_HEADER"] = "Fonctionnalités"
 L["OPTIONS_FEATURES_DESCRIPTION"] = "Activez ou désactivez chaque fonctionnalité ici, ou dans son propre panneau."
 L["OPTIONS_COMMANDS_HEADER"] = "/Commands"
 L["OPTIONS_COMMAND"] = "/tftb"
 L["OPTIONS_COMMAND_DESCRIPTION"] = "Ouvre l'interface des options de cet add-on."
-L["SAMPLE_EXAMPLE"] = "Exemple : %s"
 
 -- Looking for Other Features?
 L["OPTIONS_GOOD_TO_GO_HEADER"] = "Vous cherchez d'autres fonctionnalités ?"
@@ -81,52 +80,44 @@ L["OPTIONS_COPY_LINK"] = "Pour copier un lien, cliquez dans son champ, puis appu
 L["OPTIONS_VERSION"] = "Version %s"
 
 --------------------------------------------------------------------------------
--- Options: Stranger Buffs
+-- Options: Give Thanks
 --------------------------------------------------------------------------------
 
-L["TAB_STRANGERS"] = "Améliorations d'inconnus"
-L["STRANGERS_ENABLE"] = "Activer les remerciements pour les améliorations d'inconnus"
-L["STRANGERS_ENABLE_DESCRIPTION"] =
+L["TAB_GIVE_THANKS"] = "Remerciements"
+L["GIVE_THANKS_ENABLE"] = "Activer les remerciements"
+L["GIVE_THANKS_ENABLE_DESCRIPTION"] =
 	"Active les remerciements pour les améliorations reçues de joueurs hors de votre groupe."
-L["STRANGERS_DESCRIPTION"] = "Remerciez les joueurs hors de votre groupe quand ils vous améliorent en monde ouvert."
+L["GIVE_THANKS_DESCRIPTION"] = "Remerciez les joueurs hors de votre groupe quand ils vous améliorent en monde ouvert."
+
+-- Praise Limits
+L["PRAISE_HEADER"] = "Limites de remerciements"
+L["PRAISE_DESCRIPTION"] =
+	"Ces réglages retiennent à la fois l'emote et le chuchotement, pour qu'une vague d'améliorations ne tourne jamais au spam."
 -- The dropdown values carry the unit, so these labels do not repeat it.
-L["STRANGERS_OVERALL_COOLDOWN"] = "Délai entre deux remerciements"
-L["STRANGERS_OVERALL_COOLDOWN_DESCRIPTION"] =
+L["GIVE_THANKS_OVERALL_COOLDOWN"] = "Délai entre deux remerciements"
+L["GIVE_THANKS_OVERALL_COOLDOWN_DESCRIPTION"] =
 	"Définit le délai entre une série de remerciements et la suivante, quel que soit le joueur qui vous a amélioré. Réglez sur zéro pour remercier chaque amélioration."
-L["STRANGERS_SOURCE_COOLDOWN"] = "Délai de remerciement pour un même joueur"
-L["STRANGERS_SOURCE_COOLDOWN_DESCRIPTION"] =
+L["GIVE_THANKS_SOURCE_COOLDOWN"] = "Délai de remerciement pour un même joueur"
+L["GIVE_THANKS_SOURCE_COOLDOWN_DESCRIPTION"] =
 	"Définit le délai entre deux remerciements adressés au même joueur. Réglez sur zéro pour remercier chaque amélioration."
-L["STRANGERS_MIN_DURATION"] = "Durée minimale de l'amélioration"
-L["STRANGERS_MIN_DURATION_DESCRIPTION"] =
+L["GIVE_THANKS_MIN_DURATION"] = "Durée minimale de l'amélioration"
+L["GIVE_THANKS_MIN_DURATION_DESCRIPTION"] =
 	"Ignore les améliorations plus courtes que cette durée. Réglez sur zéro pour réagir à chaque amélioration."
-
---------------------------------------------------------------------------------
--- Options: Praise and Notifications
---------------------------------------------------------------------------------
-
---[[
-    The two section headers the Stranger Buffs panel is built from: what the
-    other player sees, then what only you get. Key prefixes match the header
-    the control appears under.
-]]
-L["PRAISE_HEADER"] = "Chuchotements de remerciement et emotes"
-L["NOTIFICATIONS_HEADER"] = "Notifications"
-L["PRAISE_DESCRIPTION"] = "Ce que voit l'autre joueur : un chuchotement de remerciement, une emote, ou les deux."
-L["NOTIFICATIONS_DESCRIPTION"] = "Ce que vous seul recevez : un message texte, un son, ou les deux."
-
--- Also titles the Thank You Button's emote grid, so it carries no PRAISE_ prefix.
-L["EMOTES_SELECT"] = "Sélectionner les emotes"
-
-L["PRAISE_WHISPER_ENABLE"] = "Activer les chuchotements de remerciement"
-L["PRAISE_WHISPER_DESCRIPTION"] = "Chuchote un remerciement au joueur qui vous a amélioré."
-L["PRAISE_EMOTES_ENABLE"] = "Activer les emotes"
-L["PRAISE_EMOTES_DESCRIPTION"] =
-	"Exprime votre reconnaissance par une emote. Les emotes sont différées tant que vous êtes en combat."
 L["PRAISE_DELAY_ENABLE"] = "Activer le délai de remerciement"
 L["PRAISE_DELAY_DESCRIPTION"] =
 	"Attend un instant avant le chuchotement et l'emote, afin que vos remerciements n'arrivent pas au même moment que l'amélioration. Les notifications ne sont pas affectées."
 L["PRAISE_DELAY_LENGTH_DESCRIPTION"] = "Définit le temps d'attente avant l'envoi du chuchotement et de l'emote."
 
+-- Thank-You Whispers
+L["WHISPERS_HEADER"] = "Chuchotements de remerciement"
+L["PRAISE_WHISPER_ENABLE"] = "Activer les chuchotements de remerciement"
+L["PRAISE_WHISPER_DESCRIPTION"] = "Chuchote un remerciement au joueur qui vous a amélioré."
+L["PRAISE_WHISPER_MESSAGE_DESCRIPTION"] =
+	"Définit ce que TFTB chuchote au joueur qui vous a amélioré. {spell} est remplacé par l'amélioration. Laissez vide pour n'envoyer aucun chuchotement."
+
+-- Notifications
+L["NOTIFICATIONS_HEADER"] = "Notifications"
+L["NOTIFICATIONS_DESCRIPTION"] = "Ce que vous seul recevez : un message texte, un son, ou les deux."
 L["NOTIFICATIONS_PRINT_ENABLE"] = "Activer les messages texte"
 L["NOTIFICATIONS_PRINT_DESCRIPTION"] =
 	"Affiche un message que vous seul pouvez voir lorsque vous recevez une amélioration."
@@ -134,6 +125,42 @@ L["NOTIFICATIONS_SOUND_ENABLE"] = "Activer les effets sonores"
 L["NOTIFICATIONS_SOUND_DESCRIPTION"] =
 	"Joue un son lorsque vous recevez une amélioration. Vous êtes seul à l'entendre."
 L["NOTIFICATIONS_SOUND_PREVIEW_DESCRIPTION"] = "Joue le son pour que vous puissiez l'écouter avant de l'activer."
+
+-- Emotes: the grid's group keys are EMOTE_GROUP_ plus each Data.EMOTE_GROUPS entry, upper-cased.
+L["TAB_EMOTES_LIST"] = "Liste des emotes"
+L["EMOTES_GRID_DESCRIPTION"] =
+	"Cochez les emotes parmi lesquelles la fonction Remerciements peut choisir quand un joueur hors de votre groupe vous améliore ; elle en utilise une au hasard. Les emotes sont différées tant que vous êtes en combat."
+L["EMOTE_GROUP_COUNT"] = "%s (%d sur %d cochées)"
+L["EMOTE_GROUP_TEXT"] = "Texte"
+L["EMOTE_GROUP_TEXT_DESCRIPTION"] = "Affiche uniquement la ligne de l'emote."
+L["EMOTE_GROUP_VOICE"] = "Voix"
+L["EMOTE_GROUP_VOICE_DESCRIPTION"] = "Joue une réplique vocale."
+L["EMOTE_GROUP_GESTURE"] = "Geste"
+L["EMOTE_GROUP_GESTURE_DESCRIPTION"] = "Joue une courte animation."
+L["EMOTE_GROUP_POSE"] = "Posture"
+L["EMOTE_GROUP_POSE_DESCRIPTION"] = "Dure jusqu'à ce que vous bougiez."
+L["EMOTES_RESET"] = "Réinitialiser les emotes"
+L["EMOTES_RESET_DESCRIPTION"] = "Remet la liste sur les emotes de remerciement par défaut."
+L["EMOTES_RESET_CONFIRM"] = "Réinitialiser la liste des emotes aux valeurs par défaut ?"
+
+--------------------------------------------------------------------------------
+-- Options: Ignored Buffs
+--------------------------------------------------------------------------------
+
+L["TAB_IGNORED_BUFFS"] = "Améliorations ignorées"
+L["IGNORED_BUFFS_DESCRIPTION"] =
+	"Les améliorations de cette liste ne reçoivent jamais de remerciement, quel que soit le lanceur. Vous recevez toujours votre message texte et votre son."
+L["IGNORED_BUFFS_ADD_CURRENT"] = "Ignorer une amélioration active"
+L["IGNORED_BUFFS_ADD_CURRENT_DESCRIPTION"] = "Ajoute l'une des améliorations actives sur vous en ce moment."
+L["IGNORED_BUFFS_ADD"] = "Ajouter une amélioration"
+L["IGNORED_BUFFS_ADD_DESCRIPTION"] =
+	"Saisissez un ID de sort, ou faites Maj-clic sur le lien d'une amélioration pour l'insérer dans le champ, puis appuyez sur Entrée."
+L["IGNORED_BUFFS_EMPTY"] = "Aucune amélioration ignorée pour l'instant. Ajoutez-en une ci-dessus."
+L["IGNORED_BUFFS_REMOVE"] = "Retire cette amélioration de la liste."
+L["IGNORED_BUFFS_NOT_FOUND"] = "Aucune amélioration trouvée pour %s."
+L["IGNORED_BUFFS_ALL_CHARACTERS"] = "Tous les personnages"
+L["IGNORED_BUFFS_PROMOTE_DESCRIPTION"] =
+	"Déplace cette amélioration dans la liste Tous les personnages, pour qu'elle ne soit remerciée sur aucun personnage."
 
 --------------------------------------------------------------------------------
 -- Options: Thank You Button
@@ -148,6 +175,8 @@ L["BUTTON_EMOTE"] = "Emote"
 L["BUTTON_EMOTE_DESCRIPTION"] =
 	"Définit l'emote que ce bouton adresse à votre cible, ou Aucune pour ne faire aucune emote."
 L["BUTTON_EMOTE_NONE"] = "Aucune"
+-- Titles Thank You Button 1's emote checklist.
+L["EMOTES_SELECT"] = "Sélectionner les emotes"
 L["BUTTON_ICON"] = "Icône"
 L["BUTTON_ICON_DESCRIPTION"] =
 	"Définit l'icône que la macro de ce bouton affiche dans votre liste de macros et sur vos barres d'action."
@@ -163,7 +192,11 @@ L["BUTTON_MACRO_ENABLE_DESCRIPTION"] = "Crée une macro nommée %s et la supprim
 L["BUTTON_WHISPER_DESCRIPTION"] =
 	"Définit ce que ce bouton chuchote à votre cible. Laissez vide pour n'envoyer aucun chuchotement."
 
--- Each button's whisper box
+--------------------------------------------------------------------------------
+-- Options: Whisper Message Row
+--------------------------------------------------------------------------------
+
+-- The caption and Reset button beside every whisper box, on Give Thanks and each Thank You Button.
 L["WHISPER_MESSAGE"] = "Message chuchoté"
 L["WHISPER_MESSAGE_RESET"] = "Réinitialiser"
 L["WHISPER_MESSAGE_RESET_DESCRIPTION"] = "Rétablit le texte par défaut du message chuchoté."
@@ -173,20 +206,5 @@ L["WHISPER_MESSAGE_RESET_DESCRIPTION"] = "Rétablit le texte par défaut du mess
 --------------------------------------------------------------------------------
 
 L["DEFAULT_WHISPER"] = "Merci, t'es au top ! (="
-
---------------------------------------------------------------------------------
--- Emotes
---------------------------------------------------------------------------------
-
-L["EMOTE_CHEER_DESCRIPTION"] = "Vous acclamez <Target>."
-L["EMOTE_DRINK_DESCRIPTION"] = "Vous portez un toast à <Target>."
-L["EMOTE_FLEX_DESCRIPTION"] = "Vous montrez vos muscles à <Target>."
-L["EMOTE_GRIN_DESCRIPTION"] = "Vous faites un sourire malicieux à <Target>."
-L["EMOTE_HIGHFIVE_DESCRIPTION"] = "Vous tapez dans la main de <Target>."
-L["EMOTE_PRAISE_DESCRIPTION"] = "Vous faites l'éloge de <Target>."
-L["EMOTE_SALUTE_DESCRIPTION"] = "Vous saluez <Target> avec respect."
-L["EMOTE_SMILE_DESCRIPTION"] = "Vous souriez à <Target>."
-L["EMOTE_THANK_DESCRIPTION"] = "Vous remerciez <Target>."
-L["EMOTE_WHOA_DESCRIPTION"] = "Vous vous exclamez 'Waouh !' devant <Target>."
-L["EMOTE_WINK_DESCRIPTION"] = "Vous faites un clin d'œil à <Target>."
-L["EMOTE_YES_DESCRIPTION"] = "Vous faites un signe de tête approbateur à <Target>."
+-- TRANSLATORS: keep {spell} exactly as written; TFTB swaps in the buff's link.
+L["DEFAULT_GIVE_THANKS_WHISPER"] = "Merci pour {spell}"

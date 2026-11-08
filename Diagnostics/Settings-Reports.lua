@@ -69,8 +69,8 @@ end
     Dumps the single AceDB-managed table (profiles, profileKeys) so a player
     can paste their exact configuration: every setting each profile has saved
     (AceDB fills the rest in from the defaults, which the context report
-    prints as read), every Stranger Buffs switch, throttle and emote pick,
-    and every Thank You button's text, icon and emotes.
+    prints as read), every Give Thanks switch, throttle, emote pick and
+    ignored buff, and every Thank You button's text, icon and emotes.
 ]]
 function ns:BuildSavedVariablesReport()
 	local lines = { GetClientHeader(), "", ns.SAVED_VARIABLES_NAME .. " = {" }

@@ -52,7 +52,7 @@ end
     The dropdown's contents: every emote the client has, plus an explicit "none",
     ordered by slash command. Built from ns.GetEmoteCatalog rather than
     Data.EMOTES -- these buttons are a free choice from the whole client set, not
-    from the twelve Data.EMOTES curates for Stranger Buffs and Thank You Button 1.
+    from the twelve Data.EMOTES curates for Give Thanks and Thank You Button 1.
 
     Cached: the catalog cannot change during a session, and this table is rebuilt
     on every panel open otherwise.
@@ -163,8 +163,13 @@ local function AddButtonSection(args, button, index)
 	}
 
 	args["space_b" .. index] = ns.OptionsSpacer(base + 4, sectionHidden)
-	args["whisperLabel" .. index] =
-		ns.OptionsRowLabel(L["WHISPER_MESSAGE"], base + 5, WHISPER_LABEL_WIDTH, sectionHidden)
+	args["whisperLabel" .. index] = ns.OptionsRowLabel(
+		L["WHISPER_MESSAGE"],
+		base + 5,
+		WHISPER_LABEL_WIDTH,
+		sectionHidden,
+		L["BUTTON_WHISPER_DESCRIPTION"]
+	)
 	args["whisperMsg" .. index] = {
 		type = "input",
 		name = "",
@@ -191,11 +196,26 @@ local function AddButtonSection(args, button, index)
 		end,
 	}
 
+	-- The whisper as your target receives it; RunThankYou sends the text as typed.
+	local function exampleHidden()
+		return sectionHidden() or (config().message or "") == ""
+	end
+	args["space_example" .. index] = ns.OptionsSpacer(base + 7.3, exampleHidden)
+	args["whisperExample" .. index] = ns.OptionsExample(function()
+		return ns.SampleWhisper(config().message or "")
+	end, base + 7.6, exampleHidden)
+
 	args["space_c" .. index] = ns.OptionsSpacer(base + 8, sectionHidden)
 
 	-- The icon row closes the section, under the emote row or grid.
 	args["space_d" .. index] = ns.OptionsSpacer(base + 11, sectionHidden)
-	args["iconLabel" .. index] = ns.OptionsRowLabel(L["BUTTON_ICON"], base + 12, WHISPER_LABEL_WIDTH, sectionHidden)
+	args["iconLabel" .. index] = ns.OptionsRowLabel(
+		L["BUTTON_ICON"],
+		base + 12,
+		WHISPER_LABEL_WIDTH,
+		sectionHidden,
+		L["BUTTON_ICON_DESCRIPTION"]
+	)
 	local choices, choiceOrder = IconChoices()
 	args["iconSelect" .. index] = {
 		type = "select",
@@ -223,8 +243,13 @@ local function AddButtonSection(args, button, index)
 	]]
 	if button.singleEmote then
 		local values, sorting = EmoteChoices()
-		args["emoteLabel" .. index] =
-			ns.OptionsRowLabel(L["BUTTON_EMOTE"], base + 9, WHISPER_LABEL_WIDTH, sectionHidden)
+		args["emoteLabel" .. index] = ns.OptionsRowLabel(
+			L["BUTTON_EMOTE"],
+			base + 9,
+			WHISPER_LABEL_WIDTH,
+			sectionHidden,
+			L["BUTTON_EMOTE_DESCRIPTION"]
+		)
 		args["emoteSelect" .. index] = {
 			type = "select",
 			name = "",
@@ -251,7 +276,7 @@ local function AddButtonSection(args, button, index)
 		return
 	end
 
-	-- The shared grid hides on emotesEnabled, which a button doesn't carry, so it follows the macro toggle instead.
+	-- The emote checklist follows the macro toggle.
 	local emoteGroup = ns.DefineEmoteGroup(config, base + 9)
 	emoteGroup.hidden = sectionHidden
 	args["emoteGroup" .. index] = emoteGroup

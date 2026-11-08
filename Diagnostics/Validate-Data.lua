@@ -162,13 +162,31 @@ local function AddApiCheck(namespace, name)
 	}
 end
 
-for _, readers in ipairs({ ITEM_READERS, SPELL_READERS, QUEST_READERS }) do
-	for _, reader in ipairs(readers) do
+-- The kinds the manifest's sources use; only their reads get API Endpoints rows.
+local kindsUsed = {}
+for _, entry in ipairs(ns.DIAGNOSTIC_DATA_SOURCES) do
+	for _, source in ipairs(entry.sources) do
+		kindsUsed[source.kind] = true
+	end
+end
+
+--[[
+    Each reader list with whether its rows are probed: an item's row also reads
+    its spell, so the spell readers count whenever items or spells are used.
+]]
+for _, list in ipairs({
+	{ ITEM_READERS, kindsUsed.item },
+	{ SPELL_READERS, kindsUsed.spell or kindsUsed.item },
+	{ QUEST_READERS, kindsUsed.quest },
+}) do
+	for _, reader in ipairs(list[1]) do
 		local namespace, name = reader[1], reader[2]
 		local library = _G[namespace]
 		reader.fn = type(library) == "table" and library[name] or nil
 		reader.count = type(reader[3]) == "table" and #reader[3] or 1
-		AddApiCheck(namespace, name)
+		if list[2] then
+			AddApiCheck(namespace, name)
+		end
 	end
 end
 
@@ -186,17 +204,9 @@ local KIND_API_CHECKS = {
 	{ "area", "C_Map", "GetAreaInfo" },
 }
 
-do
-	local kindsUsed = {}
-	for _, entry in ipairs(ns.DIAGNOSTIC_DATA_SOURCES) do
-		for _, source in ipairs(entry.sources) do
-			kindsUsed[source.kind] = true
-		end
-	end
-	for _, check in ipairs(KIND_API_CHECKS) do
-		if kindsUsed[check[1]] then
-			AddApiCheck(check[2], check[3])
-		end
+for _, check in ipairs(KIND_API_CHECKS) do
+	if kindsUsed[check[1]] then
+		AddApiCheck(check[2], check[3])
 	end
 end
 

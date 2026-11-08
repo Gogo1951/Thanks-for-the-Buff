@@ -12,8 +12,9 @@ local GetClientHeader = ns.GetDiagnosticClientHeader
     nothing incidental, and nothing the add-on does not use.
 
     Every modern/legacy pair the add-on still picks between is listed as both
-    halves: Validate Data's stat read, and its tooltip-text read
-    (C_TooltipInfo.GetItemByID and GetSpellByID, or the hidden scan tooltip).
+    halves: Validate Data's tooltip-text read (C_TooltipInfo.GetItemByID and
+    GetSpellByID, or the hidden scan tooltip). Rows for one flavor's buff
+    detection are added only on that flavor, below.
     The hidden tooltip is probed through the GameTooltip methods it inherits,
     so the check creates nothing. A FAIL on one half is the report working
     rather than a defect: the pair tells a bug report which branch that client
@@ -61,31 +62,11 @@ ns.DIAGNOSTIC_API_CHECKS = {
 	{ "C_Spell.RequestLoadSpellData", HasFunction("C_Spell", "RequestLoadSpellData") },
 	{ "C_Spell.IsSpellDataCached", HasFunction("C_Spell", "IsSpellDataCached") },
 	{ "C_Spell.GetSpellLink", HasFunction("C_Spell", "GetSpellLink") },
+	-- Ignored Buffs' row icons; a client without it lists each buff by name alone.
+	{ "C_Spell.GetSpellTexture (guarded)", HasFunction("C_Spell", "GetSpellTexture") },
 	{ "C_UnitAuras.GetBuffDataByIndex", HasFunction("C_UnitAuras", "GetBuffDataByIndex") },
-	{ "C_UnitAuras.GetAuraCasterGUID", HasFunction("C_UnitAuras", "GetAuraCasterGUID") },
-	{ "C_Secrets.ShouldUnitIdentityBeSecret", HasFunction("C_Secrets", "ShouldUnitIdentityBeSecret") },
-	{ "C_Secrets.ShouldAurasBeSecret", HasFunction("C_Secrets", "ShouldAurasBeSecret") },
 	{ "issecretvalue", HasGlobalFunction("issecretvalue") },
-	{ "CombatLogGetCurrentEventInfo", HasGlobalFunction("CombatLogGetCurrentEventInfo") },
-	{
-		"COMBATLOG_OBJECT_* affiliation / reaction / type flags",
-		function()
-			return COMBATLOG_OBJECT_TYPE_PLAYER ~= nil
-				and COMBATLOG_OBJECT_REACTION_FRIENDLY ~= nil
-				and COMBATLOG_OBJECT_AFFILIATION_MINE ~= nil
-				and COMBATLOG_OBJECT_AFFILIATION_PARTY ~= nil
-				and COMBATLOG_OBJECT_AFFILIATION_RAID ~= nil
-				and COMBATLOG_OBJECT_AFFILIATION_OUTSIDER ~= nil
-		end,
-	},
-	{
-		"bit.band",
-		function()
-			return type(bit) == "table" and type(bit.band) == "function"
-		end,
-	},
 	{ "GetPlayerInfoByGUID", HasGlobalFunction("GetPlayerInfoByGUID") },
-	{ "UnitNameFromGUID", HasGlobalFunction("UnitNameFromGUID") },
 	{ "Ambiguate", HasGlobalFunction("Ambiguate") },
 	{ "C_ChatInfo.SendChatMessage", HasFunction("C_ChatInfo", "SendChatMessage") },
 	{ "C_ChatInfo.PerformEmote", HasFunction("C_ChatInfo", "PerformEmote") },
@@ -111,17 +92,7 @@ ns.DIAGNOSTIC_API_CHECKS = {
 	{ "GetNumMacros", HasGlobalFunction("GetNumMacros") },
 	{ "GetMacroInfo", HasGlobalFunction("GetMacroInfo") },
 	{ "PlaySoundFile", HasGlobalFunction("PlaySoundFile") },
-	-- Validate Data's reads beyond the reader lists it adds itself, and its scan tooltip's template.
-	{ "C_Item.GetItemInfo", HasFunction("C_Item", "GetItemInfo") },
-	{ "C_Item.DoesItemExistByID", HasFunction("C_Item", "DoesItemExistByID") },
-	{ "C_Item.RequestLoadItemDataByID", HasFunction("C_Item", "RequestLoadItemDataByID") },
-	{ "C_Item.GetItemInfoInstant", HasFunction("C_Item", "GetItemInfoInstant") },
-	{ "C_Item.GetItemSpell", HasFunction("C_Item", "GetItemSpell") },
-	{ "C_Item.GetDetailedItemLevelInfo", HasFunction("C_Item", "GetDetailedItemLevelInfo") },
-	{ "C_Item.GetItemStats", HasFunction("C_Item", "GetItemStats") },
-	{ "GetItemStats (legacy)", HasGlobalFunction("GetItemStats") },
-	{ "C_Item.GetItemClassInfo", HasFunction("C_Item", "GetItemClassInfo") },
-	{ "C_Item.GetItemSubClassInfo", HasFunction("C_Item", "GetItemSubClassInfo") },
+	-- Validate Data's spell tooltip read: C_TooltipInfo where the client ships both getters, else the scan tooltip.
 	{ "C_TooltipInfo.GetItemByID", HasFunction("C_TooltipInfo", "GetItemByID") },
 	{ "C_TooltipInfo.GetSpellByID", HasFunction("C_TooltipInfo", "GetSpellByID") },
 	{
@@ -141,6 +112,40 @@ ns.DIAGNOSTIC_API_CHECKS = {
 	{ "SetCVar", HasGlobalFunction("SetCVar") },
 }
 
+--[[
+    Each flavor's buff detection, probed only where it runs: WoW Forever reads
+    UNIT_AURA and names a caster out of nameplate range from its GUID, and asks
+    C_Secrets before every read; every other flavor reads the combat log.
+]]
+if ns.FLAVOR == "Camelot" then
+	local checks = ns.DIAGNOSTIC_API_CHECKS
+	checks[#checks + 1] = { "C_UnitAuras.GetAuraCasterGUID", HasFunction("C_UnitAuras", "GetAuraCasterGUID") }
+	checks[#checks + 1] = { "UnitNameFromGUID", HasGlobalFunction("UnitNameFromGUID") }
+	checks[#checks + 1] =
+		{ "C_Secrets.ShouldUnitIdentityBeSecret", HasFunction("C_Secrets", "ShouldUnitIdentityBeSecret") }
+	checks[#checks + 1] = { "C_Secrets.ShouldAurasBeSecret", HasFunction("C_Secrets", "ShouldAurasBeSecret") }
+else
+	local checks = ns.DIAGNOSTIC_API_CHECKS
+	checks[#checks + 1] = { "CombatLogGetCurrentEventInfo", HasGlobalFunction("CombatLogGetCurrentEventInfo") }
+	checks[#checks + 1] = {
+		"COMBATLOG_OBJECT_* affiliation / reaction / type flags",
+		function()
+			return COMBATLOG_OBJECT_TYPE_PLAYER ~= nil
+				and COMBATLOG_OBJECT_REACTION_FRIENDLY ~= nil
+				and COMBATLOG_OBJECT_AFFILIATION_MINE ~= nil
+				and COMBATLOG_OBJECT_AFFILIATION_PARTY ~= nil
+				and COMBATLOG_OBJECT_AFFILIATION_RAID ~= nil
+				and COMBATLOG_OBJECT_AFFILIATION_OUTSIDER ~= nil
+		end,
+	}
+	checks[#checks + 1] = {
+		"bit.band",
+		function()
+			return type(bit) == "table" and type(bit.band) == "function"
+		end,
+	}
+end
+
 --------------------------------------------------------------------------------
 -- Buff Reactions Context
 --------------------------------------------------------------------------------
@@ -157,27 +162,81 @@ ns.DiagnosticsStrings.EVENT_LOG_EXAMPLES =
 	"Best for 'nobody got thanked' reports. It records each buff that lands on you, decoded: the spell, who cast it, how long it lasts, and, off WoW Forever, whether the combat log calls them a friendly player outside your group. On WoW Forever it records each buff added to you with the gate, if any, that kept TFTB from reading it."
 
 --[[
-    How many of the curated emotes a panel has picked, out of how many there
-    are, and how many of those picks this client can't perform: the random pick
-    can land on one, and then no emote plays.
+    How many emotes a list has picked, out of how many this client offers, and
+    how many picks this client can't perform. Those are skipped when the random
+    pick is made, so they only matter when they are all a list has.
 ]]
 local function EmotesPicked(emotes)
 	local picked, missing = 0, 0
 	if type(emotes) == "table" then
-		for _, data in ipairs(ns.Data.EMOTES) do
-			if emotes[data.token] then
+		for token, on in pairs(emotes) do
+			if on then
 				picked = picked + 1
-				if not ns.IsClientEmote(data.token) then
+				if not ns.IsClientEmote(token) then
 					missing = missing + 1
 				end
 			end
 		end
 	end
-	local text = string.format("%d/%d", picked, #ns.Data.EMOTES)
+	local text = string.format("%d/%d", picked, #ns.GetEmoteCatalog())
 	if missing > 0 then
 		text = text .. string.format(" (%d NOT ON CLIENT)", missing)
 	end
 	return text
+end
+
+-- A whisper's length, or none when it is empty and so never sent.
+local function WhisperLength(message)
+	if type(message) == "string" and message ~= "" then
+		return string.format("%d bytes", #message)
+	end
+	return "none"
+end
+
+--[[
+    The buffs Give Thanks never thanks for on this character -- the All
+    Characters list and this character's own, one call each -- by ID and this
+    client's name for each. A buff on the list still prints and plays the sound; it only goes
+    unthanked, which is a "nobody got thanked" report on its own.
+]]
+local function IgnoredBuffLines(lines, ignoredBuffs, scopeName)
+	local ids = {}
+	for spellId, on in pairs(type(ignoredBuffs) == "table" and ignoredBuffs or {}) do
+		if on and type(spellId) == "number" then
+			ids[#ids + 1] = spellId
+		end
+	end
+	table.sort(ids)
+	lines[#lines + 1] =
+		string.format("Ignored buffs (%s): %d (each still notifies you, but is never thanked)", scopeName, #ids)
+	for _, spellId in ipairs(ids) do
+		lines[#lines + 1] = string.format("  %d %s", spellId, C_Spell.GetSpellName(spellId) or "NOT ON CLIENT")
+	end
+end
+
+--[[
+    How this client's emotes sort into the Give Thanks panel's groups, read
+    through ns.GetEmoteGroup as the panel reads them. Every emote lands in Text
+    when this flavor's Emote-Groups file never loaded, which empties the other
+    groups.
+]]
+local function EmoteGroupsLine()
+	local counts = {}
+	for _, emote in ipairs(ns.GetEmoteCatalog()) do
+		local group = ns.GetEmoteGroup(emote.token)
+		counts[group] = (counts[group] or 0) + 1
+	end
+	local parts = {}
+	for _, group in ipairs(ns.Data.EMOTE_GROUPS) do
+		parts[#parts + 1] = string.format("%s=%d", group, counts[group] or 0)
+	end
+	return string.format(
+		"Emote groups (%s/Emote-Groups-%s.lua %s): %s",
+		tostring(ns.DATA_FOLDER),
+		tostring(ns.DATA_FOLDER),
+		type(ns.EMOTE_GROUP_BY_TOKEN) == "table" and "loaded" or "MISSING",
+		table.concat(parts, " ")
+	)
 end
 
 -- A value that may be secret on WoW Forever, as text that never tests it.
@@ -191,7 +250,7 @@ end
 --[[
     Who the player has targeted and whether TFTB would praise them right now:
     the Thank You Button's player, self and faction checks, whether they're
-    friendly and in your party or raid (Stranger Buffs reacts only to friendly
+    friendly and in your party or raid (Give Thanks reacts only to friendly
     players outside it), whether they could see an emote (visible, and in range
     where the client checks that, as Praise.lua's CanWitnessEmote reads them),
     and the per-source praise and whisper throttles for that GUID. A target
@@ -243,10 +302,11 @@ end
     report: who the player is and which profile they're on, how buffs are
     detected on this flavor and whether that path is open right now (the
     post-loading-screen pause, combat, WoW Forever's secret auras), every
-    Stranger Buffs switch, its picked emotes, minimum duration and praise
-    throttles, the sound settings the Master channel answers to, where /tftb
-    goes, and what stops each Thank You button: its command, its toggle, its
-    macro and the icon it wears, its whisper text and its emotes.
+    Give Thanks switch, its whisper text, picked emotes, minimum duration,
+    praise throttles and Ignored Buffs, how this client's emotes sort into the
+    panel's groups, the sound settings the Master channel answers to, where
+    /tftb goes, and what stops each Thank You button: its command, its toggle,
+    its macro and the icon it wears, its whisper text and its emotes.
 ]]
 function ns:BuildContextReport()
 	local lines = { GetClientHeader(), "" }
@@ -306,11 +366,11 @@ function ns:BuildContextReport()
 	if db then
 		local strangers = db.strangers or {}
 		lines[#lines + 1] = string.format(
-			"Strangers: enabled=%s print=%s whisper=%s emotes=%s emotesPicked=%s sound=%s  praiseDelay=%s/%s praiseCooldown=%s minDuration=%s cooldown=%s",
+			"Give Thanks: enabled=%s print=%s whisper=%s whisperText=%s emotesPicked=%s sound=%s  praiseDelay=%s/%s praiseCooldown=%s minDuration=%s cooldown=%s",
 			tostring(strangers.enabled),
 			tostring(strangers.printEnabled),
 			tostring(strangers.whisperEnabled),
-			tostring(strangers.emotesEnabled),
+			WhisperLength(strangers.whisperMessage),
 			EmotesPicked(strangers.emotes),
 			tostring(strangers.soundEnabled),
 			tostring(strangers.praiseDelayEnabled),
@@ -319,9 +379,12 @@ function ns:BuildContextReport()
 			tostring(strangers.minBuffDuration),
 			tostring(strangers.cooldown)
 		)
+		IgnoredBuffLines(lines, ns.GetIgnoredBuffsForScope(ns.LIST_SCOPE_GLOBAL), "All Characters")
+		IgnoredBuffLines(lines, ns.GetIgnoredBuffsForScope(ns.db.keys.char), "this character")
 	else
 		lines[#lines + 1] = "Saved variables not initialized."
 	end
+	lines[#lines + 1] = EmoteGroupsLine()
 
 	lines[#lines + 1] = ""
 	lines[#lines + 1] = "Praise cooldowns:"
@@ -342,26 +405,24 @@ function ns:BuildContextReport()
 		)
 		for index, button in ipairs(ns.Data.THANK_YOU_BUTTONS) do
 			local config = db[button.profileKey] or {}
-			local message = config.message
-			local whisper = "none"
-			if type(message) == "string" and message ~= "" then
-				whisper = string.format("%d bytes", #message)
-			end
+			local whisper = WhisperLength(config.message)
 			local emote
 			if button.singleEmote then
 				local token = config.emote
-				emote = string.format(
-					"emote=%s valid=%s",
-					(token and token ~= "") and tostring(token) or "none",
-					tostring(ns.IsClientEmote(token))
-				)
+				if token and token ~= "" then
+					emote = string.format("emote=%s valid=%s", tostring(token), tostring(ns.IsClientEmote(token)))
+				else
+					emote = "emote=none"
+				end
 			else
 				emote = "emotesPicked=" .. EmotesPicked(config.emotes)
 			end
 			-- A macro the player edited no longer runs the command, so the button does nothing.
 			local macroIndex = GetMacroIndexByName(button.macroName) or 0
 			local macro = "missing"
-			if macroIndex > 0 then
+			if macroIndex == 0 and config.createMacro and GetNumMacros() >= ns.Data.MAX_GLOBAL_MACROS then
+				macro = "missing (macro list FULL)"
+			elseif macroIndex > 0 then
 				local _, _, body = _G.GetMacroInfo(macroIndex)
 				macro = (body and body:gsub("%s+$", "") == button.command) and "runs command" or "BODY EDITED"
 			end
@@ -398,17 +459,25 @@ end
     Every emote this client can perform, as a tab-separated table. The catalog
     is read from the running client's own globals, so running this on another
     flavor extracts that build's list with no code change. The voice column
-    comes from the client's speech list, the only place an add-on can see it.
+    comes from the client's speech list, the only place an add-on can see it,
+    and the group column is the one this flavor's Emote-Groups file gives it,
+    read through ns.GetEmoteGroup as the Give Thanks panel reads it.
 ]]
 function ns:BuildEmoteReport()
 	local catalog = ns.GetEmoteCatalog()
 	local lines = { GetClientHeader(), "" }
 	lines[#lines + 1] = string.format("%d emotes", #catalog)
 	lines[#lines + 1] = ""
-	lines[#lines + 1] = "index\ttoken\tcommands\tvoice"
+	lines[#lines + 1] = "index\ttoken\tcommands\tvoice\tgroup"
 	for _, emote in ipairs(catalog) do
-		lines[#lines + 1] =
-			string.format("%d\t%s\t%s\t%s", emote.index, emote.token, emote.aliases, emote.voice and "voice" or "")
+		lines[#lines + 1] = string.format(
+			"%d\t%s\t%s\t%s\t%s",
+			emote.index,
+			emote.token,
+			emote.aliases,
+			emote.voice and "voice" or "",
+			ns.GetEmoteGroup(emote.token)
+		)
 	end
 	return table.concat(lines, "\n")
 end
@@ -423,12 +492,12 @@ end
     each SPELL_AURA_APPLIED or SPELL_AURA_REFRESH that lands on you while
     logging is on, before any of its own filtering, and it records in full
     (labeled AURA): spell id and name, source, the decoded type, reaction and
-    affiliation flags, and the buff's duration as Stranger Buffs reads it. A
+    affiliation flags, and the buff's duration as Give Thanks reads it. A
     stranger's buff reads friendly=true aff=OUTSIDER from a player; one that
     does and still went unthanked reached the add-on, and the issue is
     downstream: duration=nil (the buff wasn't found on you), a duration under
-    the minimum, a switch or a cooldown, the last three on Buff Reactions
-    Context. Your own buffs log too, and are never thanked.
+    the minimum, a switch, an ignored buff or a cooldown, the last four on Buff
+    Reactions Context. Your own buffs log too, and are never thanked.
 ]]
 function ns:LogAuraApplied(spellID, sourceName, sourceFlags)
 	local flags = sourceFlags or 0
@@ -461,7 +530,7 @@ end
     first gate that stops the update -- not ready, no db, in combat, auras
     secret, full update -- or read when the aura goes on to be classified.
     verdict read means the buff reached the add-on and the issue is
-    downstream, so a read aura also carries its duration as Stranger Buffs
+    downstream, so a read aura also carries its duration as Give Thanks
     reads it (nil when it isn't found on you). A secret value is never tested
     here: ns:LogEventNow writes it as <secret>, and the name and duration
     reads are skipped.
@@ -499,14 +568,13 @@ local function SortedKeys(set)
 	return keys
 end
 
--- The command this client gives an emote token, the same catalog the emote checks read; nil when it has none.
+--[[
+    The command this client gives an emote token, through ns.GetEmoteCommand as
+    the panels name it; nil when the client has no such emote, where the
+    accessor would fall back to the bare token.
+]]
 local function EmoteCommand(token)
-	for _, emote in ipairs(ns.GetEmoteCatalog()) do
-		if emote.token == token then
-			return emote.command
-		end
-	end
-	return nil
+	return ns.IsClientEmote(token) and ns.GetEmoteCommand(token) or nil
 end
 
 --[[
@@ -520,7 +588,7 @@ end
     - the client's seconds string, through ns.FormatDuration as the options
       panels' cooldown, duration and Praise Delay dropdowns label their
       choices, with the sample count in the ID cell;
-    - every curated emote token the Stranger Buffs and Thank You panels pick
+    - every curated emote token the Give Thanks and Thank You panels pick
       from, named by the command this client gives it (NIL means the client has
       no such emote, so a pick of it never plays).
 
@@ -584,10 +652,12 @@ local MACRO_MAX_LENGTH = 255
     ceiling is in bytes, so the overflow canary is the widest-encoding locale,
     usually ruRU.
 
-    The Stranger Buffs thank-you whisper carries the link of whatever buff
+    The Give Thanks thank-you whisper, in the player's own words, carries the link of whatever buff
     landed, and no list of buffs bounds that, so it is built with the panels'
     sample spell (ns.GAME_IDS.SAMPLE_BUFF_SPELL_ID) and a note says how long
-    any buff's link can run before the whisper goes over. Each Thank You
+    any buff's link can run before the whisper goes over. A whisper that runs
+    over is sent as the default text instead, so the row never reads OVER, and
+    a second note says when the player's own text fell back. Each Thank You
     button's whisper is the player's own text, shown only when set, and each
     macro body is its button's command.
 ]]
@@ -596,7 +666,10 @@ ns.DIAGNOSTIC_MESSAGES = function()
 
 	local sampleID = ns.GAME_IDS and ns.GAME_IDS.SAMPLE_BUFF_SPELL_ID
 	local sampleLink = sampleID and ns.GetBuffLink(sampleID) or ""
-	local whisper = ns:BuildAnnounceMessage("MESSAGE_WHISPER_THANKS", sampleLink) or ""
+	local strangers = ns.db and ns.db.profile.strangers
+	local defaultTemplate = ns.L["DEFAULT_GIVE_THANKS_WHISPER"]
+	local template = strangers and strangers.whisperMessage or defaultTemplate
+	local whisper = ns:BuildThanksWhisper(template, sampleLink) or ""
 	rows[#rows + 1] = {
 		label = "Thank-you whisper",
 		ceiling = ns.CHAT_MESSAGE_MAX_LENGTH,
@@ -607,6 +680,14 @@ ns.DIAGNOSTIC_MESSAGES = function()
 		tostring(sampleID and C_Spell.GetSpellName(sampleID) or sampleID),
 		ns.CHAT_MESSAGE_MAX_LENGTH - (#whisper - #sampleLink)
 	)
+	if
+		template ~= defaultTemplate
+		and whisper ~= ""
+		and whisper == (ns:BuildThanksWhisper(defaultTemplate, sampleLink) or "")
+	then
+		notes[#notes + 1] =
+			"Your own whisper text runs past the limit with this buff, so the default text is shown and sent instead; a buff with a shorter link may still send yours."
+	end
 
 	local profile = ns.db and ns.db.profile
 	for _, button in ipairs(ns.Data.THANK_YOU_BUTTONS) do
@@ -671,6 +752,13 @@ ns.DIAGNOSTIC_DATA_SOURCES = {
 			},
 			-- Texture file IDs, which no client API looks up, so the report counts them.
 			{ table = "THANK_YOU_MACRO_ICONS", kind = "other" },
+		},
+	},
+	{
+		label = "Emote-Groups",
+		sources = {
+			-- Emote tokens, which no client API looks up by ID, so the report counts them.
+			{ table = "EMOTE_GROUP_BY_TOKEN", kind = "other" },
 		},
 	},
 }

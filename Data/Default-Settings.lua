@@ -7,7 +7,7 @@ local Data = ns.Data
 
 --[[
     `enabled` is explicit at every call site rather than defaulted, because the
-    two answers are both real: Stranger Buffs and the first Thank You button seed
+    two answers are both real: Give Thanks and the first Thank You button seed
     every emote on, the extra Thank You buttons seed every emote off.
 ]]
 local function GetDefaultEmoteSettings(enabled)
@@ -47,6 +47,8 @@ ns.DATABASE_DEFAULTS = {
 			enabled = true,
 			printEnabled = false,
 			whisperEnabled = false,
+			-- What the thank-you whisper says; "{spell}" becomes the buff's link.
+			whisperMessage = ns.L["DEFAULT_GIVE_THANKS_WHISPER"],
 			praiseDelayEnabled = false,
 			praiseDelay = 2,
 			praiseCooldown = 0,
@@ -57,8 +59,12 @@ ns.DATABASE_DEFAULTS = {
 			    snapped value keeps what is saved and what is shown identical.
 			]]
 			minBuffDuration = 21,
-			emotesEnabled = true,
 			soundEnabled = false,
+			--[[
+			    Any client emote, not just the curated defaults: a token set true is
+			    one the random pick can land on. A curated default unticked is stored
+			    as false, so AceDB does not fill it back in.
+			]]
 			emotes = GetDefaultEmoteSettings(true),
 		},
 		slash = {
@@ -68,6 +74,20 @@ ns.DATABASE_DEFAULTS = {
 			message = ns.L["DEFAULT_WHISPER"],
 			emotes = GetDefaultEmoteSettings(true),
 		},
+	},
+	--[[
+	    Ignored Buffs live outside the profile, the way Magic Eraser's Erase List
+	    does: an All Characters list in global and each character's own list in
+	    char, both [spellId] = true. A profile switch or reset never touches them.
+	    classToken is saved at every login so the panel's tree can show any
+	    character on the account in its class color.
+	]]
+	char = {
+		ignoredBuffs = {},
+		classToken = false,
+	},
+	global = {
+		ignoredBuffs = {},
 	},
 }
 

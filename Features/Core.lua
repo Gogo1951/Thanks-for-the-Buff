@@ -103,26 +103,23 @@ local function PruneOtherClientCharacters()
 	end
 end
 
+--[[
+    Bumped when a release starts every player over from the defaults. A saved
+    table stamped with any other value is thrown away whole before AceDB reads
+    it, without a word in chat. AceDB leaves a top-level key it doesn't manage
+    alone, so the stamp survives every logout.
+]]
+local SETTINGS_RESET = 2
+
 local function InitializeDatabase()
+	if type(TFTBDB) ~= "table" or TFTBDB.settingsReset ~= SETTINGS_RESET then
+		TFTBDB = { settingsReset = SETTINGS_RESET }
+	end
 	ns.db = LibStub("AceDB-3.0"):New("TFTBDB", ns.DATABASE_DEFAULTS, true)
 	PruneOtherClientCharacters()
-	-- MIGRATION (remove after 2026-11-21): Peer Pressure moved to Control Freak, which imports nothing from TFTBDB.
-	for _, profile in pairs(ns.db.profiles) do
-		profile.peerPressure = nil
-	end
-	--[[
-	    MIGRATION (remove after 2026-12-07): Teammate Buffs, Send Good News,
-	    Service Alerts, Buff Duty and the mini-map button were retired, so
-	    their settings go.
-	]]
-	for _, profile in pairs(ns.db.profiles) do
-		profile.minimap = nil
-		profile.teammates = nil
-		profile.services = nil
-		profile.goodNews = nil
-		profile.buffWindow = nil
-		profile.watchedBuffs = nil
-	end
+	-- Saved every login so the Ignored Buffs tree can color any character by class.
+	local _, classToken = UnitClass("player")
+	ns.db.char.classToken = classToken or false
 	ns.db.RegisterCallback(ns, "OnProfileChanged", OnProfileChanged)
 	ns.db.RegisterCallback(ns, "OnProfileCopied", OnProfileChanged)
 	ns.db.RegisterCallback(ns, "OnProfileReset", OnProfileChanged)
