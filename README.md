@@ -80,11 +80,3 @@ Auto thank players who buff you with an emote or whisper. Strangers who drop For
 * Gogo1951's [Good to Go](https://www.curseforge.com/wow/addons/good-to-go)
 * Gogo1951's [Play It Forward](https://www.curseforge.com/wow/addons/play-it-forward)
 * Gogo1951's [Water Dispenser](https://www.curseforge.com/wow/addons/water-dispenser-revisited)
-
-### 🟡 Overlaps
-
-* stumb1es's [Emote Menu](https://www.curseforge.com/wow/addons/emote-menu)
-* blazze\_tv's [Emote Panel](https://www.curseforge.com/wow/addons/emote-panel)
-* palanimForever's [EmoteForever](https://www.curseforge.com/wow/addons/emoteforever)
-* felithee's [Felis Emote Button Leiste](https://www.curseforge.com/wow/addons/felis-emote-button-leiste)
-* stryker2k2's [Stryk's Emote Wheel](https://www.curseforge.com/wow/addons/stryks-emote-wheel)
