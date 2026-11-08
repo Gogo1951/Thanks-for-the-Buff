@@ -4,6 +4,8 @@ Auto thank every player who buffs you with a whisper or emote, and thank anyone 
 
 **TL;DR:** Be the friendly face in Azeroth without breaking stride. Strangers who buff you get thanked on the spot, and any thank-you you owe is one click away.
 
+<img width="800" src="https://github.com/user-attachments/assets/6a2964d0-371f-4499-8fcd-ad4be47fd0d0" />
+
 ### Stranger Buffs
 
 * **Every Buff Gets a Thank-You** // Strangers who buff you in passing get a friendly emote, automatically, so no kindness goes unnoticed.
