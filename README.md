@@ -88,11 +88,3 @@ Auto thank players who buff you with an emote or whisper. Strangers who drop For
 * palanimForever's [EmoteForever](https://www.curseforge.com/wow/addons/emoteforever)
 * felithee's [Felis Emote Button Leiste](https://www.curseforge.com/wow/addons/felis-emote-button-leiste)
 * stryker2k2's [Stryk's Emote Wheel](https://www.curseforge.com/wow/addons/stryks-emote-wheel)
-
-### 🔴 Alternatives
-
-* captainparish's [Buff Buddies Forever!](https://www.curseforge.com/wow/addons/buff-buddies-forever)
-* Sinestro's [Forever\_Thanks](https://www.curseforge.com/wow/addons/forever-thanks)
-* Iamthedot's [Kindred](https://www.curseforge.com/wow/addons/kindred)
-* GideonWhitlock's [Thanks for Buffing: Forever](https://www.curseforge.com/wow/addons/thanks-for-buffing-forever)
-* Videocat's [Thanks for the Buff Forever](https://www.curseforge.com/wow/addons/thanks-for-the-buff-forever)
