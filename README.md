@@ -15,6 +15,8 @@ Auto thank players who buff you with an emote or whisper. Strangers who drop For
 
 ### Thank You Button
 
+<img width="800" src="https://github.com/user-attachments/assets/ea37860b-ac27-4045-9171-d483384d12f5" />
+
 * **Thank Anyone** // A healer in your group, a mage who handed you water? Target them, and one click emotes and whispers your thanks.
 * **Five Buttons, Your Way** // Each has its own emote, whisper, and icon: thank a fly-by buffer, ask a mage for water, or heckle a guildie.
 
