@@ -12,50 +12,31 @@ local EVENT_LOG_MAX_ARG_LENGTH = 255
 
 --[[
     Events ns:LogEvent drops before recording. The dispatcher only ever hands
-    LogEvent the events TFTB registers (Core's ns.EVENT_NAMES), and the buff
-    engine writes the signal firings of both entries itself, decoded, through
-    ns:LogEventNow:
+    LogEvent the events TFTB registers (Core's ns.EVENT_NAMES), and each flavor
+    registers one of these two as its buff detection, whose signal firings the
+    buff engine writes itself, decoded, through ns:LogEventNow:
 
     - COMBAT_LOG_EVENT_UNFILTERED, registered on every flavor but Forever: raw
-      combat-log traffic would bury the signal, so every aura landing on you
-      and every cast or revive TFTB tracks is logged in full instead, and every
-      other cast is counted by spell id in the summary (see ns:LogCombatCast).
-    - UNIT_AURA, registered on every flavor for every unit (the Buff Window
-      reads the whole group): its update table can't be logged as text, and on
-      Forever each added aura on you is logged with the gate that decided it
-      instead (see ns:LogAuraUpdate). The Buff Window's own reads show on the
-      Buff Window Context report.
-
-    SPELL_UPDATE_COOLDOWN is dropped outright: it fires on every global
-    cooldown and carries no id to classify by, and all it drives is the Buff
-    Window's cooldown swipes, which show on the window itself.
+      combat-log traffic would bury the signal, so every aura landing on you is
+      logged in full instead (see ns:LogAuraApplied).
+    - UNIT_AURA, registered on Forever for the player only: its update table
+      can't be logged as text, so each added aura on you is logged with the
+      gate that decided it instead (see ns:LogAuraUpdate).
 ]]
 ns.DIAGNOSTIC_EVENT_EXCLUDE = {
 	COMBAT_LOG_EVENT_UNFILTERED = true,
 	UNIT_AURA = true,
-	SPELL_UPDATE_COOLDOWN = true,
 }
 
 --[[
-    Events that carry an id worth classifying, and the argument position it
-    arrives in, for ns:SuppressUncorrelatedMessage to classify per firing
-    rather than drop wholesale. A firing logs in full when TFTB correlates its
-    id (ns.IsCorrelatedMessage), and every other firing is counted.
-
-    - UNIT_SPELLCAST_SUCCEEDED fires for every unit the client tracks, so in a
-      group or a city it is a firehose; its id is the spell id.
-    - GET_ITEM_INFO_RECEIVED fires for every item any add-on or the game's own
-      UI loads, so a bag or auction add-on can send hundreds; its id is the
-      item id, and only a tracked item's matters.
-    - UI_ERROR_MESSAGE fires on every red error the game shows; its id is the
-      error type, and only "A more powerful spell is already active" matters,
-      which Buff Duty acts on.
+    Events that carry a message id, and the argument position it arrives in,
+    for ns:SuppressUncorrelatedMessage to classify per firing rather than drop
+    wholesale. Deliberately empty: TFTB registers no message-id firehose such
+    as UNIT_SPELLCAST_SUCCEEDED or UI_ERROR_MESSAGE. One that is registered
+    later goes here, and the ids the add-on correlates join the allowlist check
+    in the filter.
 ]]
-ns.MESSAGE_ID_FILTERED_EVENTS = {
-	UNIT_SPELLCAST_SUCCEEDED = 3,
-	GET_ITEM_INFO_RECEIVED = 1,
-	UI_ERROR_MESSAGE = 1,
-}
+ns.MESSAGE_ID_FILTERED_EVENTS = {}
 
 -- The counter id a secret id (WoW Forever) folds into, since a secret can't key a table.
 local SECRET_ID = 0
@@ -67,7 +48,7 @@ local SECRET_ID = 0
     secret id counts under SECRET_ID with the text <secret>. Counts only while
     logging, like ns:LogEventNow.
 ]]
-function ns:CountUncorrelated(event, id, text)
+local function CountUncorrelated(event, id, text)
 	local suppressed = ns.diagnostics.suppressed
 	if not suppressed or not ns.diagnostics.logging then
 		return
@@ -92,13 +73,13 @@ function ns:CountUncorrelated(event, id, text)
 end
 
 --[[
-    Per-firing filter for the events above. A firing whose id the add-on
-    correlates (ns.IsCorrelatedMessage) logs in full; any other folds into its
-    counter, so firehose traffic can't evict the entries the log exists to
-    carry. A secret id counts too. A plain firing carrying no numeric id in the
-    filtered position is unclassifiable, and unclassifiable is signal: it logs
-    verbatim. The counter's text is the argument after the id, or blank when
-    none follows.
+    Per-firing filter for the events above. A firing whose id the add-on does
+    not correlate folds into its counter, so firehose traffic can't evict the
+    entries the log exists to carry. A secret id counts too. A plain firing
+    carrying no numeric id in the filtered position is unclassifiable, and
+    unclassifiable is signal: it logs verbatim. With no correlated ids yet,
+    every classifiable firing is counted. The counter's text is the argument
+    after the id, or blank when none follows.
 
     Returns true when the firing was counted and must not reach the buffer.
 ]]
@@ -108,19 +89,14 @@ function ns:SuppressUncorrelatedMessage(event, ...)
 		return false
 	end
 	local messageID = select(idPosition, ...)
-	if ns.IsPlain(messageID) then
-		if type(messageID) ~= "number" then
-			return false
-		end
-		if ns.IsCorrelatedMessage and ns.IsCorrelatedMessage(event, messageID) then
-			return false
-		end
+	if ns.IsPlain(messageID) and type(messageID) ~= "number" then
+		return false
 	end
 	local text
 	if select("#", ...) > idPosition then
 		text = select(idPosition + 1, ...)
 	end
-	ns:CountUncorrelated(event, messageID, text)
+	CountUncorrelated(event, messageID, text)
 	return true
 end
 

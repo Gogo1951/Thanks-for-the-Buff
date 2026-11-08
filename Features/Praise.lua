@@ -1,10 +1,9 @@
 local _, ns = ...
-local Data = ns.Data
 
 --[[
-    Reacting to a classified buff: the praise cooldowns, the emote target, and
-    the print, sound, whisper and emote each buff panel offers. Buff-Tracking
-    classifies the event and calls ns.HandleTracked or ns.HandleStrangersBuff.
+    Reacting to a stranger's buff: the praise cooldowns, the emote target, and
+    the print, sound, whisper and emote the Stranger Buffs panel offers.
+    Buff-Tracking classifies the event and calls ns.HandleStrangersBuff.
 ]]
 
 --------------------------------------------------------------------------------
@@ -43,7 +42,7 @@ end
     self-only prints (which fire on every buff) they must not repeat: a player who
     rebuffs you several times is thanked at most once per window, which also keeps
     us clear of Blizzard's whisper spam squelch. Keyed by GUID under a "whisper:"
-    namespace so it never collides with the praise/service cooldowns on the same
+    namespace so it never collides with the praise cooldowns on the same
     GUID, and it sits underneath the user-set praise cooldowns as a floor they
     cannot lower. Checks and stamps in one call, and only stamps when a whisper is
     actually cleared to send, so the window is measured from the last whisper we sent.
@@ -67,10 +66,6 @@ end
     praise this player" (that is the per-source "praise:<guid>" key).
 ]]
 local PRAISE_OVERALL_KEY = "praise:all"
-
--- Shared with Good News, which dedupes its whispers in the same table.
-ns.IsOnCooldown = IsOnCooldown
-ns.SetCooldown = SetCooldown
 
 -- Diagnostics reads this: whether the overall, per-source and whisper throttles would hold praise back now. Never stamps.
 function ns.GetPraiseCooldownState(guid)
@@ -187,64 +182,6 @@ local function DeliverPraise(db, guid, name, link, whisperAllowed, emoteAllowed)
 	end
 end
 
---[[
-    Group/raid PRINTS and emotes are intentionally NOT rate-limited: each cast is a
-    distinct cooldown a teammate spent, so we acknowledge every one. The outgoing
-    whisper is the exception -- it is throttled per-recipient (TryWhisperCooldown)
-    so a teammate who repeatedly buffs you in a raid isn't whisper-spammed.
-]]
-local function HandleTracked(entry, spellID, creditGUID, creditName, destGUID)
-	if entry.type == Data.BUFF.SERVICE then
-		-- A service set out for the group: no per-you dest, just don't self-credit.
-		if creditGUID == ns.GetPlayerGUID() then
-			return
-		end
-	elseif destGUID ~= ns.GetPlayerGUID() then
-		-- SOLO / GROUP buffs must actually land on you.
-		return
-	end
-
-	if not ns.db.profile.watchedBuffs[spellID] then
-		return
-	end
-
-	--[[
-	    No-aura raid help reacts with the Service Alerts settings; everything cast
-	    on you (SOLO / GROUP) uses the Teammate Buffs settings.
-	]]
-	local db = (entry.type == Data.BUFF.SERVICE) and ns.db.profile.services or ns.db.profile.teammates
-	--[[
-	    Each panel's master switch, checked once here rather than at each of the
-	    four outputs below.
-	]]
-	if not db.enabled then
-		return
-	end
-	local link = ns.GetBuffLink(entry, spellID)
-
-	if db.printEnabled then
-		ns:AnnounceTracked(entry, creditGUID, creditName, link)
-	end
-
-	--[[
-	    Like the print, the sound is self-only and fires on every acknowledged
-	    cast, in or out of combat.
-	]]
-	if db.soundEnabled then
-		ns.PlayBuffSound()
-	end
-
-	--[[
-	    Emotes are visible and social, so a buff that lands while you are fighting
-	    simply goes un-emoted: suppressed, never queued for after combat.
-	]]
-	local whisperAllowed = db.whisperEnabled and TryWhisperCooldown(creditGUID)
-	local emoteAllowed = db.emotesEnabled and not InCombatLockdown()
-	if whisperAllowed or emoteAllowed then
-		DeliverPraise(db, creditGUID, creditName, link, whisperAllowed, emoteAllowed)
-	end
-end
-
 local function HandleStrangersBuff(sourceGUID, sourceName, spellID)
 	local db = ns.db.profile.strangers
 	if not db.enabled then
@@ -262,7 +199,7 @@ local function HandleStrangersBuff(sourceGUID, sourceName, spellID)
 		return
 	end
 
-	local link = ns.GetBuffLink(nil, spellID)
+	local link = ns.GetBuffLink(spellID)
 
 	--[[
 	    Notifications are self-only and fire for every qualifying buff, in or out of
@@ -305,5 +242,4 @@ local function HandleStrangersBuff(sourceGUID, sourceName, spellID)
 	DeliverPraise(db, sourceGUID, sourceName, link, whisperAllowed, emoteAllowed)
 end
 
-ns.HandleTracked = HandleTracked
 ns.HandleStrangersBuff = HandleStrangersBuff

@@ -7,8 +7,8 @@ local Data = ns.Data
 
 --[[
     `enabled` is explicit at every call site rather than defaulted, because the
-    two answers are both real: the praise panels seed every emote on, the extra
-    Thank You buttons seed every emote off.
+    two answers are both real: Stranger Buffs and the first Thank You button seed
+    every emote on, the extra Thank You buttons seed every emote off.
 ]]
 local function GetDefaultEmoteSettings(enabled)
 	local emotes = {}
@@ -31,8 +31,6 @@ end
 ns.DATABASE_DEFAULTS = {
 	profile = {
 		showWelcome = true,
-		-- LibDBIcon's own table: the button's position, and `hide` for Enable Mini-map Button.
-		minimap = {},
 		--[[
             Praise (the outgoing whisper and emote) carries its own throttles here:
             `praiseCooldown` is the gap between any two praises whoever buffed you,
@@ -70,148 +68,6 @@ ns.DATABASE_DEFAULTS = {
 			message = ns.L["DEFAULT_WHISPER"],
 			emotes = GetDefaultEmoteSettings(true),
 		},
-		--[[
-		    Teammate Buffs (party/raid buffs & cooldowns cast on you) and Service
-		    Alerts (no-aura raid help) each own their messaging settings, like
-		    strangers above. The watched-buff list is shared (ids never overlap) and
-		    seeds from the `received` defaults in this client's Tracked-Abilities file.
-		    Teammates offers the same Praise Delay as strangers, but no cooldowns: a
-		    teammate's cooldown is worth acknowledging every single time it lands.
-		]]
-		teammates = {
-			-- Master switch for the whole panel. On by default, like strangers.
-			enabled = true,
-			printEnabled = false,
-			whisperEnabled = true,
-			praiseDelayEnabled = false,
-			praiseDelay = 2,
-			emotesEnabled = false,
-			soundEnabled = true,
-			emotes = GetDefaultEmoteSettings(true),
-		},
-		--[[
-		    Services carries the same Praise Delay and sound as teammates, and no
-		    cooldowns for the same reason. Its sound ships off: a feast or a portal
-		    is ambient group help rather than something aimed at you, so it earns a
-		    chat line by default and nothing louder.
-		]]
-		services = {
-			-- Master switch for the whole panel. On by default, like teammates.
-			enabled = true,
-			printEnabled = true,
-			whisperEnabled = false,
-			praiseDelayEnabled = false,
-			praiseDelay = 2,
-			emotesEnabled = false,
-			soundEnabled = false,
-			emotes = GetDefaultEmoteSettings(true),
-		},
-		--[[
-		    Good News: whispers for buffs YOU cast on other players.
-		    `watched` is its own list (seeded from the `given` defaults in this
-		    client's Tracked-Abilities file) because its ids are the same teammate buff
-		    ids -- one shared table couldn't hold independent "thank for it" and
-		    "announce it" choices.
-		]]
-		goodNews = {
-			-- The panel's master switch. On by default, like teammates.
-			whisperEnabled = true,
-			--[[
-			    Who gets the whisper: ALWAYS (anyone you buff) or GROUP (your
-			    party/raid -- a battleground is a raid). Anything unrecognized
-			    fails closed into the group check.
-			]]
-			scope = "ALWAYS",
-			--[[
-			    The editable body of the whisper. ONE token, %a, substituted by
-			    ns:BuildGoodNewsMessage with the ability link plus -- for a short
-			    enough buff -- its duration clause. That call also adds the star
-			    marker (left off on WoW Forever) and the " // TFTB" sign-off, and
-			    trims the body's closing punctuation; neither is editable.
-			]]
-			message = ns.L["DEFAULT_GOOD_NEWS"],
-			watched = {},
-		},
-		--[[
-		    Buff Window: the click-to-cast list of group members missing a buff
-		    you can give. On by default: it is self-only, and it
-		    only appears when there is something you can fix. `audience` holds who
-		    each buff is offered to (Data.BUFF_AUDIENCE), keyed by the row's first
-		    single-target id, and seeds from the row defaults in this client's
-		    Buff-Window-Spells file. `point` is nil until the window is first
-		    dragged, and until then its top-left corner sits a little left of and
-		    above the middle of the screen.
-		]]
-		buffWindow = {
-			enabled = true,
-			--[[
-			    When to Show: whether the window shows solo and in a party or
-			    raid, each with where (one of Data.BUFF_WINDOW_WHERE), and
-			    which of your classes it shows on, keyed by class token. An
-			    unset class reads as ticked. Paladins start off: most of them
-			    run Pally Power for their blessings.
-			]]
-			showSolo = true,
-			showSoloWhere = "ALWAYS",
-			showGroup = true,
-			showGroupWhere = "INSTANCE",
-			showClasses = {
-				PALADIN = false,
-			},
-			locked = false,
-			hideInCombat = true,
-			--[[
-			    Minutes left under which a buff counts as missing; one of
-			    Data.BUFF_WINDOW_REFRESH_CHOICES.
-			]]
-			refreshMinutes = 3,
-			--[[
-			    When each class, and pets (Data.TANK_WHEN_PET), take Tanks buffs
-			    (Thorns) without a role of their own: one of Data.TANK_WHEN, keyed
-			    by class token. A class with no entry is NEVER; the classes that
-			    can fight in melee, and pets, start SOLO.
-			]]
-			tankWhen = {
-				DRUID = "SOLO",
-				PALADIN = "SOLO",
-				ROGUE = "SOLO",
-				SHAMAN = "SOLO",
-				WARRIOR = "SOLO",
-				PET = "SOLO",
-			},
-			--[[
-			    The Self Buffs row's master switch, and when each self buff shows
-			    (one of Data.SELF_REFRESH_CHOICES), keyed by the row's first rank
-			    id and seeded from this client's BUFF_WINDOW_SELF_SPELLS defaults.
-			]]
-			selfEnabled = true,
-			selfRefresh = {},
-			-- MIGRATION (remove after 2026-11-21): the selfRefresh keys already moved from 5 minutes to 3.
-			selfRefreshMigrated = {},
-			--[[
-			    Whether each poison or imbue is ticked for each hand, keyed
-			    "ROGUE_MAIN" and so on, then by the BUFF_WINDOW_WEAPON_ENCHANTS
-			    row's first id. Unset reads as ticked.
-			]]
-			weaponPicks = {},
-			--[[
-			    The Weapon Buffs switch, its one Reapply timing (one of
-			    Data.WEAPON_REFRESH_CHOICES), and whether each oil, stone or
-			    lure is ticked for each hand ("MAIN" or "OFF", then the item
-			    id; unset reads as ticked).
-			]]
-			weaponEnabled = true,
-			weaponRefresh = 3,
-			weaponItems = {},
-			favorEnabled = true,
-			-- One of Data.BUFF_WINDOW_FAVOR_CHOICES.
-			favorSeconds = 40,
-			targetEnabled = true,
-			-- Whether the Buff Key passes over spells with a cooldown of their own (Fear Ward).
-			keySkipCooldowns = false,
-			audience = {},
-		},
-		watchedBuffs = {},
 	},
 }
 

@@ -119,7 +119,7 @@ ns.DiagnosticsStrings = {
 		.. TITLE
 		.. " relies on is present on this client.",
 	CODE_RUN_ALL = "Run All Code Reports",
-	DATA_INTRO = "Checks every spell and item the add-on ships against this client. Paste a result into a spreadsheet and sort by STATUS to find what needs pruning.",
+	DATA_INTRO = "Checks every spell the add-on ships against this client. Paste a result into a spreadsheet and sort by STATUS to find what needs pruning.",
 	DATA_RUN_ALL = "Validate All Data Files",
 	LOCALIZATION_INTRO = "Playing in a language other than English and a name or prompt reads wrong? These show what your client calls everything "
 		.. TITLE
@@ -134,16 +134,14 @@ ns.DiagnosticsStrings = {
 	API_TITLE = "API Endpoints",
 	API_DESCRIPTION = "Checks that every game function " .. TITLE .. " calls exists on this client.",
 	CONTEXT_TITLE = "Buff Reactions Context",
-	CONTEXT_DESCRIPTION = "Shows your character and profile, how buffs are detected and whether that is ready right now, every panel's switches and picked emotes, the watched counts, praise cooldowns, sound settings, the tracked spells you know and which Good News watches, and each Thank You button's command, macro and its icon, whisper and emotes.",
-	BUFF_WINDOW_TITLE = "Buff Window Context",
-	BUFF_WINDOW_DESCRIPTION = "Shows every switch and gate that can keep the Buff Window hidden, each buff your class can give with who it's offered to and the ranks you know, your self buffs, each weapon and what your bags hold for it, the Soulstone, the Buff Key's binding, and every group member and your target as the window reads them, with which of your buffs each has on or is missing.",
+	CONTEXT_DESCRIPTION = "Shows your character and profile, how buffs are detected and whether that is ready right now, Stranger Buffs' switches, picked emotes and cooldowns, your current target, sound settings, and each Thank You button's command, macro and its icon, whisper and emotes.",
 	EMOTES_TITLE = "Emote Extract",
 	EMOTES_DESCRIPTION = "Lists every emote this client can perform, read from the client itself, as tab-separated text: index, token, slash commands, and whether it plays a voice line.",
 	VALIDATE_TITLE = "Validate Data: %s",
 	VALIDATE_DESCRIPTION = "Checks every id in this data file against this client and exports the results as tab-separated text.",
 	VALIDATE_PROGRESS = "%s / %s IDs",
 	DISPLAY_TITLE = "Display Context",
-	DISPLAY_DESCRIPTION = "Shows your screen size, UI scale and the Buff Window's saved position, and whether that position is on screen.",
+	DISPLAY_DESCRIPTION = "Shows your screen size and UI scale.",
 	ADDONS_TITLE = "Other Add-ons",
 	ADDONS_DESCRIPTION = "Lists every installed add-on with its version, and whether it is loadable or disabled.",
 	SAVED_TITLE = "Saved Variables",
@@ -161,7 +159,7 @@ ns.DiagnosticsStrings = {
 	MESSAGES_TITLE = "Message Length",
 	MESSAGES_DESCRIPTION = "Builds every whisper and macro "
 		.. TITLE
-		.. " sends or writes, with the longest names in your language, and checks each one fits. Nothing is sent.",
+		.. " sends or writes, in your language, and checks each one fits. Nothing is sent.",
 	MESSAGES_ALL_FIT = "all fit",
 	MESSAGES_SOME_OVER = "%d over",
 

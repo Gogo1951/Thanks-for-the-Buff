@@ -28,14 +28,14 @@ end
     hand-maintained copy would be correct on exactly one client and quietly wrong
     on the others -- and it is a long list to get wrong. Reading the client means
     a dropdown built from this offers precisely what this build can perform, and
-    Diagnostics can export the same list from any flavour without a code change.
+    Diagnostics can export the same list from any flavor without a code change.
 
     Two traps the scan has to respect. Indices are SPARSE (Era jumps 171 -> 304),
     so it cannot stop at the first gap. And a few tokens appear twice under
     different indices (INCOMING, FLEE), so tokens are deduped -- the dropdown
     should not offer the same emote twice.
 
-    Sorted by the slash command players recognise, not by token or index. Built
+    Sorted by the slash command players recognize, not by token or index. Built
     once on demand; these globals do not change during a session.
 ]]
 local EMOTE_SCAN_CEILING = 1000 -- backstop only, for a client without MAXEMOTEINDEX
@@ -195,7 +195,7 @@ end
 ]]
 local SOUND_ROOT = "Interface/AddOns/" .. ADDON_NAME .. "/Includes/Sounds/"
 
--- Any buff landing on you shares this one, stranger or teammate alike.
+-- Played when a stranger's buff lands on you.
 function ns.PlayBuffSound()
 	PlaySoundFile(SOUND_ROOT .. "Buff.ogg", "Master")
 end

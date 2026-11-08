@@ -1,5 +1,5 @@
 ## Title: Thanks for the Buff (TFTB)
-## Notes: Auto thank every player who buffs you with a whisper or emote, and keep your raid, yourself, and your weapons buffed with a click-to-cast reminder for missing buffs. Plus alerts for feasts, portals, summons, and soulwells. Manners, automated.
+## Notes: Auto thank every player who buffs you with a whisper or emote, and thank anyone by hand with a click of your Thank You macros. Manners, automated.
 ## Author: Gogo1951
 
 ## IconTexture: Interface/AddOns/TFTB/Includes/Images/Thanks-for-the-Buff.tga
@@ -36,8 +36,6 @@ Includes/Libraries/AceConfig-3.0/AceConfigCmd-3.0/AceConfigCmd-3.0.lua
 Includes/Libraries/AceConfig-3.0/AceConfigDialog-3.0/AceConfigDialog-3.0.lua
 Includes/Libraries/AceConfig-3.0/AceConfig-3.0.lua
 Includes/Libraries/AceDBOptions-3.0/AceDBOptions-3.0.lua
-Includes/Libraries/LibDataBroker-1.1/LibDataBroker-1.1.lua
-Includes/Libraries/LibDBIcon-1.0/LibDBIcon-1.0.lua
 
 # Localization
 Locales/enUS.lua
@@ -55,28 +53,16 @@ Locales/zhTW.lua
 # Data
 Data/Flavor.lua
 Data/Data.lua
-Data/Camelot/Tracked-Abilities-Camelot.lua
 Data/Camelot/Game-IDs-Camelot.lua
-Data/Camelot/Buff-Window-Spells-Camelot.lua
 Data/Default-Settings.lua
 
 # Thanks for the Buff
 Features/Core.lua
 Features/Utilities.lua
 Features/Announcements.lua
-Features/Tracked-Lookups.lua
 Features/Praise.lua
 Features/Buff-Tracking.lua
-Features/Good-News.lua
 Features/Thank-You-Button.lua
-Features/Buff-Window-Frame.lua
-Features/Buff-Window-Castable.lua
-Features/Buff-Window-Units.lua
-Features/Buff-Window-Self.lua
-Features/Buff-Window-Outsiders.lua
-Features/Buff-Window.lua
-Features/Buff-Window-Keys.lua
-Features/Minimap-Button.lua
 
 # Diagnostics
 Diagnostics/Diagnostics-Core.lua
@@ -92,17 +78,7 @@ Diagnostics/Report-Runner.lua
 Options/Options-Utilities.lua
 Options/Options-General.lua
 Options/Options-Stranger-Buffs.lua
-Options/Options-Teammate-Buffs.lua
-Options/Options-Teammate-Buffs-Tracked.lua
-Options/Options-Send-Good-News.lua
-Options/Options-Send-Good-News-Tracked.lua
-Options/Options-Service-Alerts.lua
-Options/Options-Service-Alerts-Tracked.lua
 Options/Options-Thank-You-Button.lua
-Options/Options-Buff-Window.lua
-Options/Options-Buff-Window-Buffs.lua
-Options/Options-Buff-Window-Self-Buffs.lua
-Options/Options-Buff-Window-Weapon-Buffs.lua
 Options/Options-Profiles.lua
 Options/Options-Feedback-Support.lua
 Diagnostics/Options-Diagnostics.lua

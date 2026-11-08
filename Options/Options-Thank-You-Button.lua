@@ -16,6 +16,35 @@ local WHISPER_INPUT_WIDTH = ns.OPTIONS_ROW_WIDTH - WHISPER_LABEL_WIDTH - RESET_W
 local EMOTE_SELECT_WIDTH = ns.OPTIONS_ROW_WIDTH - WHISPER_LABEL_WIDTH
 
 --------------------------------------------------------------------------------
+-- Whisper Length
+--------------------------------------------------------------------------------
+
+--[[
+    Cut to a byte budget without splitting a multi-byte character. The cap is
+    counted in bytes, not characters, because what it really protects is the
+    chat line: WoW measures that in bytes too. For English the two are the same
+    number.
+
+    A cut landing mid-character would leave a broken tail byte that renders as a
+    replacement glyph, so step back off any UTF-8 continuation byte (0x80-0xBF)
+    sitting at the cut.
+]]
+local function TrimToBytes(text, maxBytes)
+	if #text <= maxBytes then
+		return text
+	end
+	local cut = maxBytes
+	while cut > 0 do
+		local b = text:byte(cut + 1)
+		if not b or b < 128 or b >= 192 then
+			break
+		end
+		cut = cut - 1
+	end
+	return text:sub(1, cut)
+end
+
+--------------------------------------------------------------------------------
 -- Options Table
 --------------------------------------------------------------------------------
 
@@ -23,7 +52,7 @@ local EMOTE_SELECT_WIDTH = ns.OPTIONS_ROW_WIDTH - WHISPER_LABEL_WIDTH
     The dropdown's contents: every emote the client has, plus an explicit "none",
     ordered by slash command. Built from ns.GetEmoteCatalog rather than
     Data.EMOTES -- these buttons are a free choice from the whole client set, not
-    from the twelve the praise panels curate.
+    from the twelve Data.EMOTES curates for Stranger Buffs and Thank You Button 1.
 
     Cached: the catalog cannot change during a session, and this table is rebuilt
     on every panel open otherwise.
@@ -147,7 +176,7 @@ local function AddButtonSection(args, button, index)
 			return config().message
 		end,
 		set = function(_, value)
-			config().message = ns.TrimToBytes(value or "", ns.CHAT_MESSAGE_MAX_LENGTH)
+			config().message = TrimToBytes(value or "", ns.CHAT_MESSAGE_MAX_LENGTH)
 		end,
 	}
 	args["resetMsg" .. index] = {
@@ -189,7 +218,7 @@ local function AddButtonSection(args, button, index)
 
 	--[[
 	    A single-emote button gets one dropdown instead of the checklist: there is
-	    nothing to randomise between, so a grid of checkboxes would be the wrong
+	    nothing to randomize between, so a grid of checkboxes would be the wrong
 	    control for the choice being made.
 	]]
 	if button.singleEmote then
@@ -208,7 +237,7 @@ local function AddButtonSection(args, button, index)
 			get = function()
 				--[[
 				    A token this client does not have shows as "none" rather than
-				    blank: profiles travel between flavours, and an emote that only
+				    blank: profiles travel between flavors, and an emote that only
 				    exists on a later one would otherwise leave the box empty and
 				    unexplained.
 				]]

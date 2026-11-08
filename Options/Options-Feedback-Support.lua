@@ -26,12 +26,6 @@ local LINKS = {
 	{ "OPTIONS_GITHUB", "GITHUB" },
 }
 
---[[
-    The caption is one short word and the box holds a full URL, so the label
-    takes less than the usual width and the box the rest of the row.
-]]
-local LINK_LABEL_WIDTH = 0.6
-
 function ns.BuildFeedbackSupportOptions()
 	local args = {}
 	local order = 1
@@ -47,27 +41,19 @@ function ns.BuildFeedbackSupportOptions()
 
 	args.spaceLinks0 = ns.OptionsSpacer(order)
 	args.headerLinks = ns.OptionsHeader(L["OPTIONS_FEEDBACK_LINKS_HEADER"], order + 1)
-	args.spaceLinks1 = ns.OptionsSpacer(order + 2)
-	order = order + 3
+	order = order + 2
 
+	-- A spacer before every row, so the boxes don't sit flush against each other.
 	for _, link in ipairs(LINKS) do
 		local captionKey, linkKey = link[1], link[2]
-		args["label" .. linkKey] =
-			ns.OptionsRowLabel(GetColor("TITLE") .. L[captionKey] .. "|r", order, LINK_LABEL_WIDTH)
-		args["url" .. linkKey] = {
-			type = "input",
-			name = "",
-			order = order + 1,
-			width = ns.OPTIONS_ROW_WIDTH - LINK_LABEL_WIDTH,
-			get = function()
-				return ns.LINKS[linkKey]
-			end,
-			set = function() end,
-		}
+		args["space" .. linkKey] = ns.OptionsSpacer(order)
+		order = order + 1
+		ns.OptionsLinkRow(args, linkKey, L[captionKey], ns.LINKS[linkKey], order)
 		order = order + 2
 	end
 
-	args.copyCaption = ns.OptionsDesc(GetColor("HELP") .. L["OPTIONS_COPY_LINK"] .. "|r", order)
+	args.spaceCopyLink = ns.OptionsSpacer(order)
+	args.copyCaption = ns.OptionsDesc(GetColor("HELP") .. L["OPTIONS_COPY_LINK"] .. "|r", order + 1)
 
 	args.spaceVersion = {
 		type = "description",

@@ -7,8 +7,8 @@ end
 -- Add-on Identity
 --------------------------------------------------------------------------------
 
-L["ADDON_TITLE"] = "Thanks for the Buff (TFTB)"
-L["ADDON_SHORT"] = "TFTB"
+L["ADDON_TITLE"] = "Thanks for the Buff (TFTB)" -- Full Name
+L["ADDON_SHORT_NAME"] = "TFTB" -- Short Name
 
 --------------------------------------------------------------------------------
 -- Messages
@@ -20,14 +20,8 @@ L["CHAT_LOADED"] =
 L["CHAT_OPTIONS_IN_COMBAT"] =
 	"Aus Sicherheitsgründen kann das Optionsmenü während des Kampfes nicht geöffnet werden."
 
--- Buff & gift announcements
+-- Buff print out
 L["MESSAGE_BUFFED"] = "%s hat Euch mit %s gebufft!"
-L["MESSAGE_GAVE_YOU"] = "%s hat Euch %s gegeben!"
-L["MESSAGE_GAVE_GROUP"] = "%s hat Eurer Gruppe %s gegeben!"
-L["MESSAGE_USED_ITEM"] = "%s hat %s bei Euch benutzt!"
-L["MESSAGE_USED_SPELL"] = "%s hat %s auf Euch gewirkt!"
-L["MESSAGE_SET_OUT"] = "%s hat %s aufgestellt!"
-L["MESSAGE_OPENED"] = "%s hat %s geöffnet!"
 
 -- Thank-you
 L["MESSAGE_WHISPER_THANKS"] = "Danke für %s"
@@ -41,38 +35,24 @@ L["MESSAGE_CANT_THANK_SELF"] = "Ihr könnt Euch nicht selbst danken!"
 L["UNKNOWN_SPELL"] = "Unbekannter Zauber"
 
 --------------------------------------------------------------------------------
--- Mini-map Button
---------------------------------------------------------------------------------
-
-L["MINIMAP_OPTIONS"] = "Thanks for the Buff (TFTB) Optionen"
-L["LEFT_CLICK"] = "Linksklick"
-L["RIGHT_CLICK"] = "Rechtsklick"
-L["SHIFT_LEFT_CLICK"] = "Umschalt + Linksklick"
-L["SHIFT_RIGHT_CLICK"] = "Umschalt + Rechtsklick"
-L["SHIFT_MIDDLE_CLICK"] = "Umschalt + Mittelklick"
-L["ACTION_TOGGLE"] = "Umschalten"
-L["ENABLED"] = "Aktiviert"
-L["DISABLED"] = "Deaktiviert"
-
---------------------------------------------------------------------------------
 -- Options: Main Panel
 --------------------------------------------------------------------------------
 
 L["OPTIONS_WELCOME_TOGGLE"] = "Willkommensnachricht aktivieren"
 L["OPTIONS_WELCOME_DESCRIPTION"] = "Gibt beim Einloggen eine Nachricht aus, die nur Ihr seht."
-L["OPTIONS_ENABLE_MINIMAP"] = "Minikarten-Schaltfläche aktivieren"
-L["OPTIONS_ENABLE_MINIMAP_DESCRIPTION"] =
-	"Zeigt die TFTB-Schaltfläche an Eurer Minikarte, mit der Ihr Funktionen per Klick ein- und ausschaltet."
 L["OPTIONS_DESCRIPTION"] =
-	"Bedankt Euch automatisch per Flüstern oder Emote bei jedem Spieler, der Euch bufft, und haltet Euren Schlachtzug, Euch selbst und Eure Waffen gebufft, mit einer Erinnerung an fehlende Buffs, die per Klick wirkt. Dazu Benachrichtigungen für Festmähler, Portale, Beschwörungen und Seelenbrunnen. Gute Manieren, automatisiert."
+	"Bedankt Euch automatisch per Flüstern oder Emote bei jedem Spieler, der Euch bufft, und dankt jedem von Hand mit einem Klick auf Eure Dankeschön-Makros. Gute Manieren, automatisiert."
 L["OPTIONS_FEATURES_HEADER"] = "Funktionen"
 L["OPTIONS_FEATURES_DESCRIPTION"] = "Schaltet jede Funktion hier oder auf ihrer eigenen Seite ein oder aus."
-L["OPTIONS_FEATURES_NOTE"] =
-	'Einige unserer neueren Funktionen, wie "%s", gehen über den bisherigen Rahmen von "Thanks for the Buff" hinaus. Schaltet ruhig alles aus, was Ihr nicht braucht. Diese Funktionen könnten in unser anderes Add-on "Connoisseur & Restocker" umziehen, oder alles wird zu einem größeren Add-on zusammengeführt, vielleicht "Buttons, Buffs, & Bags". Teilt uns Eure Meinung auf Discord, CurseForge oder GitHub mit. Danke!'
 L["OPTIONS_COMMANDS_HEADER"] = "/Commands"
 L["OPTIONS_COMMAND"] = "/tftb"
 L["OPTIONS_COMMAND_DESCRIPTION"] = "Öffnet das Optionsmenü dieses Add-ons."
-L["OPTIONS_EXAMPLE"] = "Beispiel: %s"
+L["SAMPLE_EXAMPLE"] = "Beispiel: %s"
+
+-- Looking for Other Features?
+L["OPTIONS_GOOD_TO_GO_HEADER"] = "Sucht Ihr andere Funktionen?"
+L["OPTIONS_GOOD_TO_GO_DESCRIPTION"] =
+	"Einige Funktionen sind in unser neues Add-on Good to Go umgezogen. Ihr findet es auf CurseForge oder Wago."
 
 --------------------------------------------------------------------------------
 -- Options: Feedback & Support Panel
@@ -102,10 +82,9 @@ L["OPTIONS_COPY_LINK"] = "Um einen Link zu kopieren, klickt in sein Feld und dr�
 L["OPTIONS_VERSION"] = "Version %s"
 
 --------------------------------------------------------------------------------
--- Options: Buff Panels
+-- Options: Stranger Buffs
 --------------------------------------------------------------------------------
 
--- Stranger Buffs
 L["TAB_STRANGERS"] = "Buffs von Fremden"
 L["STRANGERS_ENABLE"] = "Dank für Buffs von Fremden aktivieren"
 L["STRANGERS_ENABLE_DESCRIPTION"] = "Aktiviert den Dank für Buffs von Spielern außerhalb Eurer Gruppe."
@@ -121,77 +100,14 @@ L["STRANGERS_MIN_DURATION"] = "Minimale Buff-Dauer"
 L["STRANGERS_MIN_DURATION_DESCRIPTION"] =
 	"Ignoriert Buffs, die kürzer als dieser Wert sind. Bei null wird auf jeden Buff reagiert."
 
--- Teammate Buffs
-L["TAB_TEAMMATES"] = "Buffs von Teammitgliedern"
-L["TEAMMATES_ENABLE"] = "Dank für Buffs von Teammitgliedern aktivieren"
-L["TEAMMATES_ENABLE_DESCRIPTION"] =
-	"Aktiviert den Dank für Buffs und Abklingzeiten, die Eure Gruppen- oder Schlachtzugsmitglieder auf Euch wirken."
-L["TEAMMATES_DESCRIPTION"] =
-	"Dankt Gruppen- und Schlachtzugsmitgliedern für Buffs und Abklingzeiten, die sie auf Euch wirken."
-
--- Service Alerts
-L["TAB_SERVICES"] = "Dienst-Hinweise"
-L["SERVICES_ENABLE"] = "Dienst-Hinweise aktivieren"
-L["SERVICES_ENABLE_DESCRIPTION"] =
-	"Aktiviert Hinweise zu Festmählern, Seelenbrunnen, Portalen und anderer Hilfe, die für Eure Gruppe aufgestellt wird."
-L["SERVICES_DESCRIPTION"] =
-	"Reagiert, wenn jemand Hilfe für Eure Gruppe aufstellt: Festmähler, Seelenbrunnen, Portale und Reparaturbots."
-
--- Send Good News
-L["TAB_GOOD_NEWS"] = "Gute Neuigkeiten senden"
-L["GOOD_NEWS_DESCRIPTION"] =
-	"Lasst die Spieler, die Ihr bufft, wissen, was Ihr auf sie gewirkt habt und, bei kurzen Buffs, wie lange es anhält."
-L["GOOD_NEWS_ENABLE"] = "Gute Neuigkeiten aktivieren"
-L["GOOD_NEWS_ENABLE_DESCRIPTION"] =
-	"Aktiviert ein Flüstern, das den Spielern, die Ihr bufft, mitteilt, was Ihr auf sie gewirkt habt."
-L["GOOD_NEWS_SCOPE"] = "Empfänger"
-L["GOOD_NEWS_SCOPE_ALWAYS"] = "Jeder, den Ihr bufft"
-L["GOOD_NEWS_SCOPE_GROUP"] = "Nur Gruppenmitglieder"
-L["GOOD_NEWS_SCOPE_DESCRIPTION"] =
-	"Legt fest, wer die Guten Neuigkeiten zugeflüstert bekommt: jeder, den Ihr bufft, oder nur Eure Gruppenmitglieder."
-L["GOOD_NEWS_MESSAGES_HEADER"] = "Nachricht für Gute Neuigkeiten"
-L["GOOD_NEWS_MESSAGES_DESCRIPTION"] = "Das Flüstern, das die Spieler erhalten, die Ihr bufft."
---[[
-    The message box's tooltip, in three parts. LIMIT's %d is a real placeholder
-    and gets formatted; TOKENS carries a literal %a for the reader to copy and so
-    must never reach string.format. Joined into one line at the point of use.
-]]
-L["GOOD_NEWS_MESSAGE_INPUT_DESCRIPTION"] =
-	"Legt fest, was das Flüstern sagt. Lasst das Feld leer, um den Standardtext zu verwenden."
-L["GOOD_NEWS_MESSAGE_LIMIT"] = "Maximale Länge: %d."
-L["GOOD_NEWS_MESSAGE_TOKENS"] = "%a wird zum Fähigkeitslink, samt Dauer, wenn sie unter einer Minute liegt."
---[[
-    Appended to the ability link inside %a when the buff has a readable duration
-    under a minute. A whole clause rather than a bare number so it can be reworded
-    per language.
-]]
-L["GOOD_NEWS_DURATION_CLAUSE"] = "für %s"
-
--- Peer Pressure (TEMPORARY: delete on or after 2026-11-21, with Options/Options-Peer-Pressure.lua)
-L["TAB_PEER_PRESSURE"] = "Gruppenzwang"
-L["PEER_PRESSURE_CONTROL_FREAK"] = "Control Freak"
-L["PEER_PRESSURE_MOVED"] =
-	'WoW Forever lässt Add-ons das Kampflog nicht lesen, deshalb bauen wir unsere Add-ons so um, dass sie in jeder Version des Spiels gleich funktionieren. "Gruppenzwang" ist in unser anderes Add-on "Control Freak" umgezogen. Installiert es, um weiterhin benachrichtigt zu werden, wenn Spieler Eurer Klasse ihre Abklingzeiten einsetzen.'
-
--- Shared across the buff panels
-L["TRACKED_HEADER"] = "Verfolgte Fähigkeiten"
-L["TRACKED_GROUP_ITEMS"] = "Gegenstände"
-L["TRACKED_ITEM_PENDING"] = "Gegenstand #%d"
-L["TRACKED_SPELL_PENDING"] = "Zauber #%d"
-
--- Shared by Send Good News and the Thank You Button
-L["WHISPER_MESSAGE"] = "Flüsternachricht"
-L["WHISPER_MESSAGE_RESET"] = "Zurücksetzen"
-L["WHISPER_MESSAGE_RESET_DESCRIPTION"] = "Setzt die Flüsternachricht auf den Standardtext zurück."
-
 --------------------------------------------------------------------------------
--- Shared: Praise and Notifications
+-- Options: Praise and Notifications
 --------------------------------------------------------------------------------
 
 --[[
-    The two section headers every buff panel is built from: what the other player
-    sees, then what only you get. Key prefixes match the header the control
-    appears under.
+    The two section headers the Stranger Buffs panel is built from: what the
+    other player sees, then what only you get. Key prefixes match the header
+    the control appears under.
 ]]
 L["PRAISE_HEADER"] = "Dankesflüstern & Emotes"
 L["NOTIFICATIONS_HEADER"] = "Benachrichtigungen"
@@ -217,163 +133,6 @@ L["NOTIFICATIONS_SOUND_ENABLE"] = "Soundeffekte aktivieren"
 L["NOTIFICATIONS_SOUND_DESCRIPTION"] = "Spielt einen Ton ab, wenn Ihr einen Buff erhaltet. Nur Ihr hört ihn."
 L["NOTIFICATIONS_SOUND_PREVIEW_DESCRIPTION"] =
 	"Spielt den Ton ab, damit Ihr ihn hören könnt, bevor Ihr ihn aktiviert."
-
---------------------------------------------------------------------------------
--- Tracked Ability Groups
---------------------------------------------------------------------------------
-
---[[
-    Labels for multi-member tracked groups that no single game record names
-    (Data/{Game}/Tracked-Abilities-{Game}.lua). Single spells and items, and a
-    group named after one of its own items, take their names from the client.
-]]
-L["GROUP_PORTALS"] = "Portale"
-L["GROUP_RESISTANCE_CAULDRONS"] = "Widerstandskessel"
-L["GROUP_REPAIR_BOTS"] = "Reparaturbots"
-
---------------------------------------------------------------------------------
--- Options: Buff Duty
---------------------------------------------------------------------------------
-
-L["TAB_BUFF_WINDOW"] = "Buff-Dienst"
-L["BUFF_WINDOW_DESCRIPTION"] = "Zeigt, wem Eure Buffs fehlen. Klickt auf ein Symbol, um zu wirken."
-L["BUFF_WINDOW_ENABLE"] = "Buff-Dienst aktivieren"
-L["BUFF_WINDOW_ENABLE_DESCRIPTION"] =
-	"Aktiviert den Buff-Dienst, das Fenster mit den Gruppenmitgliedern, denen ein Buff fehlt, den Ihr geben könnt."
-L["BUFF_WINDOW_NO_BUFFS"] =
-	"Eure Klasse hat keine Buffs auf dieser Liste, daher erscheint das Fenster bei diesem Charakter nie."
--- When to Show: Solo and In Group, each with Always or In Instance, then the classes.
-L["BUFF_WINDOW_WHEN_HEADER"] = "Wann anzeigen"
-L["BUFF_WINDOW_WHEN_DESCRIPTION"] = "Legt fest, wann das Fenster erscheinen kann."
-L["BUFF_WINDOW_WHEN_SOLO"] = "Solo"
-L["BUFF_WINDOW_WHEN_SOLO_DESCRIPTION"] =
-	"Zeigt das Fenster, während Ihr nicht in einer Gruppe oder einem Schlachtzug seid."
-L["BUFF_WINDOW_WHEN_GROUP"] = "In Gruppe"
-L["BUFF_WINDOW_WHEN_GROUP_DESCRIPTION"] = "Zeigt das Fenster, während Ihr in einer Gruppe oder einem Schlachtzug seid."
-L["BUFF_WINDOW_WHERE_DESCRIPTION"] =
-	"Legt fest, wo das Fenster erscheint: überall oder nur in Dungeons, Schlachtzügen, Schlachtfeldern und Arenen."
-L["BUFF_WINDOW_WHERE_ALWAYS"] = "Immer"
-L["BUFF_WINDOW_WHERE_INSTANCE"] = "In Instanz"
-L["BUFF_WINDOW_CLASSES_DESCRIPTION"] = "Zeigt das Fenster, wenn Ihr eine dieser Klassen spielt."
-L["BUFF_WINDOW_CLASS_DESCRIPTION"] = "Zeigt das Fenster, während Ihr diese Klasse spielt."
-L["BUFF_WINDOW_HEADER"] = "Fenster"
-L["BUFF_WINDOW_WINDOW_DESCRIPTION"] =
-	"Lasst das Fenster dort, wo Ihr es abgelegt habt, oder haltet es im Kampf aus dem Weg."
-L["BUFF_WINDOW_LOCK"] = "Fenster sperren"
-L["BUFF_WINDOW_LOCK_DESCRIPTION"] =
-	"Verhindert, dass das Fenster verschoben wird. Entsperrt lässt es sich an seinem Hintergrund ziehen."
-L["BUFF_WINDOW_HIDE_IN_COMBAT"] = "Im Kampf ausblenden"
-L["BUFF_WINDOW_HIDE_IN_COMBAT_DESCRIPTION"] =
-	"Blendet das Fenster während des Kampfes aus. Im Kampf kann die Liste nicht aktualisiert werden, daher behält ein sichtbar gelassenes Fenster seinen letzten Stand, bis der Kampf endet."
-L["BUFF_WINDOW_SHOW_HEADER"] = "Im Fenster anzeigen"
-L["BUFF_WINDOW_SHOW_DESCRIPTION"] =
-	"Fügt dem Fenster Eure eigenen Buffs, die Fremden, die Euch gebufft haben, und Euer Ziel hinzu."
-L["BUFF_WINDOW_FAVOR_ENABLE"] = "Gefallen erwidern"
-L["BUFF_WINDOW_FAVOR_ENABLE_DESCRIPTION"] =
-	"Listet die Fremden auf, die Euch kürzlich gebufft haben, samt den Buffs, die Ihr ihnen zurückgeben könnt. Rechtsklickt auf ein Symbol, um jemanden von der Liste zu nehmen."
-L["BUFF_WINDOW_FAVOR_SECONDS_DESCRIPTION"] =
-	"Legt fest, wie lange ein Fremder nach seinem letzten Buff auf der Liste bleibt."
-L["BUFF_WINDOW_TARGET_ENABLE"] = "Euer Ziel"
-L["BUFF_WINDOW_TARGET_ENABLE_DESCRIPTION"] =
-	"Listet Euer Ziel auf, wenn es ein Spieler außerhalb Eurer Gruppe ist, dem ein Buff fehlt, den Ihr geben könnt."
-L["BUFF_WINDOW_REFRESH"] = "Auffrischen unter"
-L["BUFF_WINDOW_REFRESH_DESCRIPTION"] =
-	"Legt fest, wie wenig Restzeit ein Buff haben darf, bevor er als fehlend gilt, damit Ihr ihn auffrischen könnt, bevor er ausläuft. Ein Buff, der nicht länger als diese Zeit hält, zählt erst, wenn er abgelaufen ist."
--- Count as Tanks: one dropdown per class, then Pets, each with these three choices.
-L["BUFF_WINDOW_TANKS_HEADER"] = "Als Tanks zählen"
-L["BUFF_WINDOW_TANKS_DESCRIPTION"] =
-	"Wer die Buffs erhält, die Ihr für Tanks anbietet, etwa Dornen, wenn er keine eigene Rolle hat."
-L["BUFF_WINDOW_TANKS_CLASS_DESCRIPTION"] =
-	"Legt fest, wann Spieler dieser Klasse als Tanks zählen. Eine Tank- oder Heilerrolle, die sie haben, geht immer vor."
-L["BUFF_WINDOW_TANKS_PETS"] = "Begleiter"
-L["BUFF_WINDOW_TANKS_PETS_DESCRIPTION"] =
-	"Legt fest, wann Begleiter als Tanks zählen. Begleiter erhalten außerdem die Buffs, die Ihr für Alle anbietet."
-L["BUFF_WINDOW_TANKS_NEVER"] = "Nie"
-L["BUFF_WINDOW_TANKS_SOLO"] = "Wenn nicht in einer Gruppe"
-L["BUFF_WINDOW_TANKS_ALWAYS"] = "Immer"
--- Who each buff is offered to: one dropdown per buff, these four choices.
-L["BUFF_WINDOW_AUDIENCE_OFF"] = "Aus"
-L["BUFF_WINDOW_AUDIENCE_TANK"] = "Tanks"
-L["BUFF_WINDOW_AUDIENCE_HEALER"] = "Heiler"
-L["BUFF_WINDOW_AUDIENCE_ALL"] = "Alle"
--- Each buff's dropdown tooltip; hovering the buff's name shows the spell itself.
-L["BUFF_WINDOW_AUDIENCE_DESCRIPTION"] = "Legt fest, wem %s angeboten wird."
-L["BUFF_WINDOW_BUFFS_DESCRIPTION"] =
-	"Wählt für jeden Buff, wem er angeboten wird. Tanks und Heiler richten sich nach der Gruppenrolle; wer keine hat, zählt als Schaden, sofern Als Tanks zählen weiter unten nichts anderes festlegt."
-
-L["BUFF_WINDOW_SELF_DESCRIPTION"] = "Eure eigenen Buffs, oben im Fenster angeheftet."
---[[
-    Muted note after a class name on the Self-Buffs panel, for a family of self
-    buffs only one of which can be up at a time. Keyed by the family.
-]]
-L["BUFF_WINDOW_SELF_NOTE_ASPECT"] = "ein beliebiger Aspekt genügt"
-L["BUFF_WINDOW_SELF_NOTE_MAGE_ARMOR"] = "eine beliebige Rüstung genügt"
-L["BUFF_WINDOW_SELF_NOTE_PALADIN_AURA"] = "eine beliebige Aura genügt"
-L["BUFF_WINDOW_SELF_NOTE_SHAMAN_SHIELD"] = "ein beliebiger Schild genügt"
-L["BUFF_WINDOW_SELF_NOTE_WARLOCK_ARMOR"] = "eine beliebige Rüstung genügt"
-L["BUFF_WINDOW_SELF_NOTE_WARLOCK_DEMON"] = "einer der beiden Dämonenbuffs genügt"
-L["BUFF_WINDOW_SELF_REFRESH_OFF"] = "Aus"
-L["BUFF_WINDOW_SELF_REFRESH_MISSING"] = "Bei Fehlen"
--- %s is a duration from the client, like "5 Minutes".
-L["BUFF_WINDOW_SELF_REFRESH_UNDER"] = "Unter %s"
-L["BUFF_WINDOW_SELF_REFRESH_DESCRIPTION"] =
-	"Legt fest, wann %s angezeigt wird: nie, nach dem Ablaufen oder wenn weniger als diese Zeit übrig ist."
--- The Weapon Buffs panel, under Buff Duty after Self-Buffs.
-L["BUFF_WINDOW_WEAPON_PANEL_HEADER"] = "Waffenbuffs"
-L["BUFF_WINDOW_WEAPON_DESCRIPTION"] =
-	"Hakt an, was jede Waffe tragen soll. Das Fenster bietet es an, wenn es fehlt oder bald abläuft, sofern es in Euren Taschen ist und zur Waffe passt."
--- The one timing for every weapon buff, at the top of the panel.
-L["BUFF_WINDOW_WEAPON_REFRESH"] = "Erneuern"
-L["BUFF_WINDOW_WEAPON_REFRESH_DESCRIPTION"] =
-	"Legt fest, wann ein Waffenbuff erneut angeboten wird: nach dem Ablaufen oder wenn weniger als diese Zeit übrig ist."
--- The boxes for the weapon items any class can use, after the rogue and shaman boxes.
-L["BUFF_WINDOW_WEAPON_KIND_OIL"] = "Öle"
-L["BUFF_WINDOW_WEAPON_KIND_STONE"] = "Steine"
-L["BUFF_WINDOW_WEAPON_KIND_LURE"] = "Köder"
---[[
-    One choice's checkbox under one hand. The first %s is the poison, imbue,
-    oil, stone or lure, the second the client's "Main Hand" or "Off Hand".
-]]
-L["BUFF_WINDOW_WEAPON_PICK_DESCRIPTION"] =
-	"Bietet %s für die Waffe in Eurer %s an. Solange die Waffe keine Eurer angehakten Optionen trägt, wird jede angeboten, die Ihr habt."
-L["BUFF_WINDOW_SELF_ENABLE"] = "Eure Selbstbuffs"
-L["BUFF_WINDOW_SELF_ENABLE_DESCRIPTION"] =
-	"Zeigt oben im Fenster die Buffs, die nur Ihr Euch selbst geben könnt, etwa eine Rüstung oder Inneres Feuer, wenn sie fehlen oder bald ablaufen. Welche, legt Ihr unter Selbstbuffs fest."
-L["BUFF_WINDOW_WEAPON_ENABLE"] = "Eure Waffenbuffs"
-L["BUFF_WINDOW_WEAPON_ENABLE_DESCRIPTION"] =
-	"Zeigt die Gifte, Waffenverzauberungen, Öle, Steine und Köder, die Euren Waffen fehlen oder bald ablaufen, zusammen mit Euren Selbstbuffs oben im Fenster. Klickt auf einen Eintrag, um ihn aufzutragen. Welche, legt Ihr unter Waffenbuffs fest."
-
--- The window itself
-L["BUFF_WINDOW_SELF_HEADER"] = "Selbstbuffs"
-L["BUFF_WINDOW_FAVOR_HEADER"] = "Gefallen erwidern"
-L["BUFF_WINDOW_TARGET_HEADER"] = "Ziel"
-L["BUFF_WINDOW_TOOLTIP_CAST"] = "Klicken, um auf %s zu wirken."
--- %s is the client's "Main Hand" or "Off Hand".
-L["BUFF_WINDOW_TOOLTIP_WEAPON"] = "Klicken, um es auf die Waffe in Eurer %s aufzutragen."
-L["BUFF_WINDOW_TOOLTIP_USE"] = "Niemand in Eurer Gruppe hat einen Seelenstein. Klicken, um einen auf %s anzuwenden."
-L["BUFF_WINDOW_TOOLTIP_CREATE"] = "Niemand in Eurer Gruppe hat einen Seelenstein. Klicken, um einen herzustellen."
-L["BUFF_WINDOW_TOOLTIP_GROUP"] = "Klicken, um auf %s samt Gruppe zu wirken."
-L["BUFF_WINDOW_TOOLTIP_FAVOR"] = "Klicken, um %s ins Ziel zu nehmen und zu wirken."
-L["BUFF_WINDOW_TOOLTIP_DISMISS"] = "Rechtsklick, um %s von der Liste zu nehmen."
--- The window's close button: the class name in its color, then the options command.
-L["BUFF_WINDOW_CLOSED"] =
-	"Buff-Dienst ist für die Klasse %s aus. Um ihn wieder einzuschalten, macht Umschalt + Rechtsklick auf die Minikarten-Schaltfläche oder gebt %s ein."
-
--- The Buff Key (Key Bindings, and the Keybinds section of Buff Duty)
-L["BUFF_KEYS_HEADER"] = "Tastenbelegungen"
-L["BUFF_KEYS_DESCRIPTION"] =
-	"Wirkt den nächsten Buff Eurer Liste mit einer Taste oder einem Makro, außerhalb des Kampfes. Waffenbuffs bleiben ein Klick im Fenster."
-L["BUFF_KEY"] = "Buff-Knopf"
-L["BUFF_KEY_DESCRIPTION"] =
-	"Wirkt Euren nächsten fehlenden Buff, einen pro Tastendruck: eine Wiederbelebung auf Euer totes Ziel, dann auf die Toten Eurer Gruppe (Priester, Paladine und Schamanen), dann Eure Selbstbuffs, Gefallen erwidern, Euer Ziel und Eure Gruppe. Eine Gruppe erhält den Gruppenbuff, wenn er weniger Mana kostet, als alle in Reichweite einzeln zu buffen."
-L["BUFF_KEY_SKIP_COOLDOWNS"] = "Buffs mit Abklingzeit überspringen"
-L["BUFF_KEY_SKIP_COOLDOWNS_DESCRIPTION"] =
-	"Übergeht Buffs mit Abklingzeit, etwa Furchtzauberschutz, und macht mit dem nächsten Buff weiter."
--- %s is a player's name.
-L["BUFF_KEY_WAITING"] = "Warte darauf, dass %s in Reichweite kommt."
-L["BUFF_KEY_DONE"] = "Nichts mehr zu buffen."
--- The caption beside the read-only box that holds a Buff Key's macro line.
-L["BUFF_KEY_MACRO_CAPTION"] = "Makro"
 
 --------------------------------------------------------------------------------
 -- Options: Thank You Button
@@ -404,17 +163,16 @@ L["BUTTON_MACRO_ENABLE_DESCRIPTION"] =
 L["BUTTON_WHISPER_DESCRIPTION"] =
 	"Legt fest, was dieser Knopf Eurem Ziel zuflüstert. Bleibt das Feld leer, wird nichts geflüstert."
 
+-- Each button's whisper box
+L["WHISPER_MESSAGE"] = "Flüsternachricht"
+L["WHISPER_MESSAGE_RESET"] = "Zurücksetzen"
+L["WHISPER_MESSAGE_RESET_DESCRIPTION"] = "Setzt die Flüsternachricht auf den Standardtext zurück."
+
 --------------------------------------------------------------------------------
 -- Defaults
 --------------------------------------------------------------------------------
 
 L["DEFAULT_WHISPER"] = "Danke, du bist spitze! (="
---[[
-    The star marker (left off on WoW Forever) and " // TFTB" sign-off are added
-    by the builder, which also drops the closing punctuation; neither is part of
-    the editable text.
-]]
-L["DEFAULT_GOOD_NEWS"] = "Du hast %a"
 
 --------------------------------------------------------------------------------
 -- Emotes
