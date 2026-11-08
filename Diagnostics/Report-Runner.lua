@@ -68,13 +68,6 @@ ns.DIAGNOSTIC_REPORTS = {
 			return ns:BuildContextReport()
 		end,
 	},
-	buffWindow = {
-		title = D.BUFF_WINDOW_TITLE,
-		description = D.BUFF_WINDOW_DESCRIPTION,
-		build = function()
-			return ns:BuildBuffWindowContextReport()
-		end,
-	},
 	emotes = {
 		title = D.EMOTES_TITLE,
 		description = D.EMOTES_DESCRIPTION,
@@ -156,7 +149,7 @@ ns.DIAGNOSTIC_SECTIONS = {
 	{
 		key = "settings",
 		label = D.SECTION_SETTINGS,
-		reports = { "context", "buffWindow", "emotes", "saved", "display", "addons" },
+		reports = { "context", "emotes", "saved", "display", "addons" },
 	},
 	{ key = "code", label = D.SECTION_CODE, reports = { "events", "api", "libs" } },
 	{ key = "data", label = D.SECTION_DATA, reports = {} },

@@ -27,64 +27,6 @@ function ns.RegisterOptionsPanels()
 		AceConfigDialog:AddToBlizOptions(registry.StrangerBuffs, L["TAB_STRANGERS"], parent)
 	end
 
-	--[[
-	    Each panel with a tracked list gets it as a "Tracked Abilities" sub-panel,
-	    nested by the category id AddToBlizOptions hands back, as Buff Duty's are
-	    below. The sub-panels register as functions (not prebuilt tables) so the
-	    list is rebuilt and re-sorted on open, once lazily-loaded item names are
-	    cached.
-	]]
-	local function AddTrackedSubPanel(appName, builder, parentID)
-		AceConfig:RegisterOptionsTable(appName, builder)
-		AceConfigDialog:AddToBlizOptions(appName, L["TRACKED_HEADER"], parentID)
-	end
-
-	if ns.BuildTeammatesOptions then
-		AceConfig:RegisterOptionsTable(registry.TeammateBuffs, ns.BuildTeammatesOptions)
-		local _, teammatesID = AceConfigDialog:AddToBlizOptions(registry.TeammateBuffs, L["TAB_TEAMMATES"], parent)
-		AddTrackedSubPanel(registry.TeammateBuffsTracked, ns.BuildTeammatesTrackedOptions, teammatesID)
-	end
-
-	if ns.BuildGoodNewsOptions then
-		AceConfig:RegisterOptionsTable(registry.SendGoodNews, ns.BuildGoodNewsOptions)
-		local _, goodNewsID = AceConfigDialog:AddToBlizOptions(registry.SendGoodNews, L["TAB_GOOD_NEWS"], parent)
-		AddTrackedSubPanel(registry.SendGoodNewsTracked, ns.BuildGoodNewsTrackedOptions, goodNewsID)
-	end
-
-	if ns.BuildServicesOptions then
-		AceConfig:RegisterOptionsTable(registry.ServiceAlerts, ns.BuildServicesOptions)
-		local _, servicesID = AceConfigDialog:AddToBlizOptions(registry.ServiceAlerts, L["TAB_SERVICES"], parent)
-		AddTrackedSubPanel(registry.ServiceAlertsTracked, ns.BuildServicesTrackedOptions, servicesID)
-	end
-
-	-- TEMPORARY: the Peer Pressure moved notice; see Options/Options-Peer-Pressure.lua for when to delete it.
-	if ns.BuildPeerPressureOptions then
-		AceConfig:RegisterOptionsTable(registry.PeerPressure, ns.BuildPeerPressureOptions())
-		AceConfigDialog:AddToBlizOptions(registry.PeerPressure, L["TAB_PEER_PRESSURE"], parent)
-	end
-
-	if ns.BuildBuffWindowOptions then
-		-- Builders: the class lists exist only after login.
-		AceConfig:RegisterOptionsTable(registry.BuffWindow, ns.BuildBuffWindowOptions)
-		local _, buffWindowID = AceConfigDialog:AddToBlizOptions(registry.BuffWindow, L["TAB_BUFF_WINDOW"], parent)
-
-		--[[
-		    Tracked Abilities, Self-Buffs and Weapon Buffs nest one level deeper, under Buff Duty, by the
-		    category id AddToBlizOptions just handed back: the Settings panel finds
-		    a parent at any depth and indents each level.
-		]]
-		AceConfig:RegisterOptionsTable(registry.BuffWindowBuffs, ns.BuildBuffWindowBuffsOptions)
-		AceConfigDialog:AddToBlizOptions(registry.BuffWindowBuffs, L["TRACKED_HEADER"], buffWindowID)
-		AceConfig:RegisterOptionsTable(registry.BuffWindowSelfBuffs, ns.BuildBuffWindowSelfBuffsOptions)
-		AceConfigDialog:AddToBlizOptions(registry.BuffWindowSelfBuffs, L["BUFF_WINDOW_SELF_HEADER"], buffWindowID)
-		AceConfig:RegisterOptionsTable(registry.BuffWindowWeaponBuffs, ns.BuildBuffWindowWeaponBuffsOptions)
-		AceConfigDialog:AddToBlizOptions(
-			registry.BuffWindowWeaponBuffs,
-			L["BUFF_WINDOW_WEAPON_PANEL_HEADER"],
-			buffWindowID
-		)
-	end
-
 	if ns.BuildThankYouButtonOptions then
 		AceConfig:RegisterOptionsTable(registry.ThankYouButton, ns.BuildThankYouButtonOptions())
 		AceConfigDialog:AddToBlizOptions(registry.ThankYouButton, L["TAB_THANK_YOU_BUTTON"], parent)

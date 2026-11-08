@@ -20,33 +20,15 @@ ns.Version = GetVersion()
 --------------------------------------------------------------------------------
 
 --[[
-    AceDB-3.0 owns the SavedVariables lifecycle: it applies ns.DATABASE_DEFAULTS
-    itself -- copied into the saved table, an explicit false preserved -- so there
-    is no hand-rolled merge and every setting lives under ns.db.profile.
-]]
-
---[[
-    A profile switch / copy / reset swaps every user setting at once, so re-seed
-    the watched-buff lists (a fresh profile starts empty and seeds from the
-    defaults in this client's Data folder), bring the Thank You macros in
-    line with the incoming profile, point the mini-map button at the incoming
-    profile's position, and refresh any open options panels off the
-    new values. Settings read live from the database update themselves; anything
-    applied imperatively, like a macro on the bars, has to be re-applied here.
+    A profile switch / copy / reset swaps every user setting at once, so bring
+    the Thank You macros in line with the incoming profile and refresh any open
+    options panels off the new values. Settings read live from the database update
+    themselves; anything applied imperatively, like a macro on the bars, has to
+    be re-applied here.
 ]]
 local function OnProfileChanged()
-	if ns.PopulateWatchedBuffs then
-		ns.PopulateWatchedBuffs()
-	end
-	if ns.PopulateBuffWindowAudience then
-		ns.PopulateBuffWindowAudience()
-		ns.RefreshBuffWindow()
-	end
 	if ns.ReconcileMacros then
 		ns.ReconcileMacros()
-	end
-	if ns.RefreshMinimapButton then
-		ns.RefreshMinimapButton()
 	end
 	local registry = LibStub("AceConfigRegistry-3.0")
 	for _, name in pairs(ns.OPTIONS_REGISTRY) do
@@ -54,11 +36,92 @@ local function OnProfileChanged()
 	end
 end
 
+--[[
+    Characters from another game version, dropped without a word. AceDB keys
+    a character "Name - Realm" on realm clients and "First Last" on the
+    realm-free ones (WoW Forever), so a saved key shaped the other way from
+    the one being played came from a copied WTF folder: its char section,
+    its profile choice and, unless someone still uses it, its own profile go.
+]]
+local REALM_KEY_SEPARATOR = " - "
+
+---@param characterKey any
+---@param realmClient boolean
+---@return boolean
+local function IsOtherClientKey(characterKey, realmClient)
+	if type(characterKey) ~= "string" then
+		return true
+	end
+	return (characterKey:find(REALM_KEY_SEPARATOR, 1, true) ~= nil) ~= realmClient
+end
+
+---@param sv table # the saved table, or one of its namespaces
+---@param realmClient boolean
+---@param profilesInUse table<string, boolean>
+---@return nil
+local function PruneSavedTable(sv, realmClient, profilesInUse)
+	local pruned = {}
+	for _, section in ipairs({ "char", "profileKeys" }) do
+		local characters = sv[section]
+		if type(characters) == "table" then
+			for characterKey in pairs(characters) do
+				if IsOtherClientKey(characterKey, realmClient) then
+					characters[characterKey] = nil
+					pruned[characterKey] = true
+				end
+			end
+		end
+	end
+	if type(sv.profiles) == "table" then
+		for characterKey in pairs(pruned) do
+			if not profilesInUse[characterKey] then
+				sv.profiles[characterKey] = nil
+			end
+		end
+	end
+end
+
+---@return nil
+local function PruneOtherClientCharacters()
+	local currentKey = ns.db.keys and ns.db.keys.char
+	local sv = ns.db.sv
+	if type(currentKey) ~= "string" or type(sv) ~= "table" then
+		return
+	end
+	local realmClient = currentKey:find(REALM_KEY_SEPARATOR, 1, true) ~= nil
+	local profilesInUse = { [ns.db.keys.profile or ""] = true }
+	for characterKey, profileName in pairs(sv.profileKeys or {}) do
+		if not IsOtherClientKey(characterKey, realmClient) then
+			profilesInUse[profileName] = true
+		end
+	end
+	PruneSavedTable(sv, realmClient, profilesInUse)
+	for _, namespace in pairs(sv.namespaces or {}) do
+		if type(namespace) == "table" then
+			PruneSavedTable(namespace, realmClient, profilesInUse)
+		end
+	end
+end
+
 local function InitializeDatabase()
 	ns.db = LibStub("AceDB-3.0"):New("TFTBDB", ns.DATABASE_DEFAULTS, true)
+	PruneOtherClientCharacters()
 	-- MIGRATION (remove after 2026-11-21): Peer Pressure moved to Control Freak, which imports nothing from TFTBDB.
 	for _, profile in pairs(ns.db.profiles) do
 		profile.peerPressure = nil
+	end
+	--[[
+	    MIGRATION (remove after 2026-12-07): Teammate Buffs, Send Good News,
+	    Service Alerts, Buff Duty and the mini-map button were retired, so
+	    their settings go.
+	]]
+	for _, profile in pairs(ns.db.profiles) do
+		profile.minimap = nil
+		profile.teammates = nil
+		profile.services = nil
+		profile.goodNews = nil
+		profile.buffWindow = nil
+		profile.watchedBuffs = nil
 	end
 	ns.db.RegisterCallback(ns, "OnProfileChanged", OnProfileChanged)
 	ns.db.RegisterCallback(ns, "OnProfileCopied", OnProfileChanged)
@@ -79,39 +142,26 @@ end
 ns.EVENT_NAMES = {
 	"PLAYER_LOGIN",
 	"PLAYER_ENTERING_WORLD",
-	"UNIT_SPELLCAST_SENT",
-	"UNIT_SPELLCAST_SUCCEEDED",
 	"LOADING_SCREEN_DISABLED",
-	"UNIT_AURA",
-	"GROUP_ROSTER_UPDATE",
-	"SPELLS_CHANGED",
-	"PLAYER_REGEN_DISABLED",
-	"PLAYER_REGEN_ENABLED",
-	"PLAYER_TARGET_CHANGED",
-	"UNIT_PET",
-	"SPELL_UPDATE_COOLDOWN",
-	"GET_ITEM_INFO_RECEIVED",
-	"UNIT_INVENTORY_CHANGED",
-	"BAG_UPDATE_DELAYED",
-	"REPLACE_ENCHANT",
-	"UI_ERROR_MESSAGE",
 }
 
--- Forever has no combat log, and registering COMBAT_LOG_EVENT_UNFILTERED there errors.
-if ns.FLAVOR ~= "Camelot" then
+--[[
+    Forever has no combat log, and registering COMBAT_LOG_EVENT_UNFILTERED there
+    errors, so it reads buffs on you from UNIT_AURA instead.
+]]
+if ns.FLAVOR == "Camelot" then
+	table.insert(ns.EVENT_NAMES, "UNIT_AURA")
+else
 	table.insert(ns.EVENT_NAMES, "COMBAT_LOG_EVENT_UNFILTERED")
 end
 
 --[[
     Unit events the add-on only ever needs for these units register with
     RegisterUnitEvent, so the client never wakes the dispatcher for every
-    nameplate and raid member. Every other event registers unfiltered --
-    UNIT_AURA included, since the Buff Window reads every group member and
-    RegisterUnitEvent takes two units at most.
+    nameplate and raid member. Every other event registers unfiltered.
 ]]
 ns.EVENT_UNITS = {
-	UNIT_SPELLCAST_SENT = { "player", "pet" },
-	UNIT_INVENTORY_CHANGED = { "player" },
+	UNIT_AURA = { "player" },
 }
 
 --[[
@@ -152,9 +202,8 @@ end
 --[[
     The login sequence owns ordering: the saved variables must exist before any
     feature reads them or any panel registers (the Profiles panel binds to ns.db).
-    The panels that render the display groups register as builders and draw them
-    on open, so they can register before the groups exist. Feature logic lives in
-    the feature modules; Core only calls their setup hooks in the right order.
+    Feature logic lives in the feature modules; Core only calls their setup hooks
+    in the right order.
 ]]
 local function OnPlayerLogin()
 	InitializeDatabase()
@@ -163,16 +212,8 @@ local function OnPlayerLogin()
 		ns.RegisterOptionsPanels()
 	end
 
-	if ns.RegisterMinimapButton then
-		ns.RegisterMinimapButton()
-	end
-
 	if ns.SetupBuffTracking then
 		ns.SetupBuffTracking()
-	end
-
-	if ns.SetupBuffWindow then
-		ns.SetupBuffWindow()
 	end
 
 	if ns.CreateAutoMacro then
@@ -194,10 +235,6 @@ end
 local function OnPlayerEnteringWorld()
 	if ns.db then
 		ns.PrintWelcome()
-		-- Buff Duty's In Instance: every way into or out of one is a loading screen.
-		if ns.RequestBuffWindowRefresh then
-			ns.RequestBuffWindowRefresh()
-		end
 	end
 end
 

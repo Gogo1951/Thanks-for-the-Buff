@@ -28,30 +28,13 @@ function ns.BuildGeneralOptions()
 					ns.db.profile.showWelcome = value
 				end,
 			},
-			spaceMinimap = ns.OptionsSpacer(4.5),
-			enableMinimap = {
-				type = "toggle",
-				name = L["OPTIONS_ENABLE_MINIMAP"],
-				desc = L["OPTIONS_ENABLE_MINIMAP_DESCRIPTION"],
-				width = "full",
-				order = 5,
-				get = function()
-					return not ns.db.profile.minimap.hide
-				end,
-				set = function(_, value)
-					ns.db.profile.minimap.hide = not value
-					ns.RefreshMinimapButton()
-				end,
-			},
 			-- Features
 			spaceFeatures0 = ns.OptionsSpacer(10),
 			headerFeatures = ns.OptionsHeader(L["OPTIONS_FEATURES_HEADER"], 11),
 			spaceFeatures1 = ns.OptionsSpacer(12),
 			descFeatures = ns.OptionsDesc(L["OPTIONS_FEATURES_DESCRIPTION"], 12.3),
 			spaceFeatures2 = ns.OptionsSpacer(12.6),
-			-- The feature rows fill 13 onward; the note sits below them.
-			spaceFeatures3 = ns.OptionsSpacer(50),
-			noteFeatures = ns.OptionsFeaturesNote(51),
+			-- The feature rows fill 13 onward.
 			-- /Commands
 			spaceCommands0 = ns.OptionsSpacer(60),
 			headerCommands = ns.OptionsHeader(L["OPTIONS_COMMANDS_HEADER"], 61),
@@ -60,8 +43,22 @@ function ns.BuildGeneralOptions()
 				GetColor("INFO") .. L["OPTIONS_COMMAND"] .. "|r" .. "  " .. L["OPTIONS_COMMAND_DESCRIPTION"],
 				63
 			),
+			-- Looking for Other Features?
+			spaceGoodToGo0 = ns.OptionsSpacer(70),
+			headerGoodToGo = ns.OptionsHeader(L["OPTIONS_GOOD_TO_GO_HEADER"], 71),
+			spaceGoodToGo1 = ns.OptionsSpacer(72),
+			descGoodToGo = ns.OptionsDesc(L["OPTIONS_GOOD_TO_GO_DESCRIPTION"], 73),
+			spaceGoodToGoCurseForge = ns.OptionsSpacer(74),
+			-- 75-76: CurseForge row
+			spaceGoodToGoWago = ns.OptionsSpacer(77),
+			-- 78-79: Wago row
+			spaceGoodToGoCopyLink = ns.OptionsSpacer(80),
+			copyCaptionGoodToGo = ns.OptionsDesc(GetColor("HELP") .. L["OPTIONS_COPY_LINK"] .. "|r", 81),
 		},
 	}
+
+	ns.OptionsLinkRow(options.args, "GoodToGoCurseForge", L["OPTIONS_CURSEFORGE"], ns.GOOD_TO_GO_LINKS.CURSEFORGE, 75)
+	ns.OptionsLinkRow(options.args, "GoodToGoWago", L["OPTIONS_WAGO"], ns.GOOD_TO_GO_LINKS.WAGO, 78)
 
 	-- Every feature's switch, two to a line.
 	local toggles = {}

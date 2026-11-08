@@ -7,8 +7,8 @@ end
 -- Add-on Identity
 --------------------------------------------------------------------------------
 
-L["ADDON_TITLE"] = "Thanks for the Buff (TFTB)"
-L["ADDON_SHORT"] = "TFTB"
+L["ADDON_TITLE"] = "Thanks for the Buff (TFTB)" -- Full Name
+L["ADDON_SHORT_NAME"] = "TFTB" -- Short Name
 
 --------------------------------------------------------------------------------
 -- Messages
@@ -19,14 +19,8 @@ L["CHAT_LOADED"] =
 	"버전 %s. 설정(이 메시지를 끄는 옵션 포함)은 옵션 > 애드온 > Thanks for the Buff (TFTB)에 있습니다. 이 애드온이 마음에 드시나요? 친구에게 알려 주시거나, CurseForge에서 즐겨찾기에 추가하거나, GitHub에서 Star를 눌러 주세요. (="
 L["CHAT_OPTIONS_IN_COMBAT"] = "안전을 위해 전투 중에는 설정 인터페이스를 열 수 없습니다."
 
--- Buff & gift announcements
+-- Buff print out
 L["MESSAGE_BUFFED"] = "%s님이 당신에게 %s 버프를 주었습니다!"
-L["MESSAGE_GAVE_YOU"] = "%s님이 당신에게 %s(을)를 주었습니다!"
-L["MESSAGE_GAVE_GROUP"] = "%s님이 파티에 %s(을)를 주었습니다!"
-L["MESSAGE_USED_ITEM"] = "%s님이 당신에게 %s(을)를 사용했습니다!"
-L["MESSAGE_USED_SPELL"] = "%s님이 당신에게 %s(을)를 시전했습니다!"
-L["MESSAGE_SET_OUT"] = "%s님이 %s(을)를 꺼냈습니다!"
-L["MESSAGE_OPENED"] = "%s님이 %s(을)를 열었습니다!"
 
 -- Thank-you
 L["MESSAGE_WHISPER_THANKS"] = "%s 고맙습니다"
@@ -40,39 +34,25 @@ L["MESSAGE_CANT_THANK_SELF"] = "자신에게는 감사할 수 없습니다!"
 L["UNKNOWN_SPELL"] = "알 수 없는 주문"
 
 --------------------------------------------------------------------------------
--- Mini-map Button
---------------------------------------------------------------------------------
-
-L["MINIMAP_OPTIONS"] = "Thanks for the Buff (TFTB) 옵션"
-L["LEFT_CLICK"] = "좌클릭"
-L["RIGHT_CLICK"] = "우클릭"
-L["SHIFT_LEFT_CLICK"] = "Shift + 좌클릭"
-L["SHIFT_RIGHT_CLICK"] = "Shift + 우클릭"
-L["SHIFT_MIDDLE_CLICK"] = "Shift + 휠클릭"
-L["ACTION_TOGGLE"] = "전환"
-L["ENABLED"] = "활성화"
-L["DISABLED"] = "비활성화"
-
---------------------------------------------------------------------------------
 -- Options: Main Panel
 --------------------------------------------------------------------------------
 
 L["OPTIONS_WELCOME_TOGGLE"] = "환영 메시지 활성화"
 L["OPTIONS_WELCOME_DESCRIPTION"] = "접속할 때 자신만 볼 수 있는 메시지를 출력합니다."
-L["OPTIONS_ENABLE_MINIMAP"] = "미니맵 버튼 활성화"
-L["OPTIONS_ENABLE_MINIMAP_DESCRIPTION"] =
-	"미니맵에 TFTB 버튼을 표시합니다. 클릭 한 번으로 기능을 켜고 끌 수 있습니다."
 L["OPTIONS_DESCRIPTION"] =
-	"버프를 준 모든 플레이어에게 귓속말이나 감정 표현으로 자동으로 감사를 표하고, 빠진 버프를 클릭 한 번으로 시전하는 알리미로 공격대, 나 자신, 무기의 버프를 늘 유지하세요. 잔치, 차원문, 소환, 영혼샘 알림도 받을 수 있습니다. 매너도 자동으로."
+	"버프를 준 모든 플레이어에게 귓속말이나 감정 표현으로 자동으로 감사를 표하고, 감사 매크로를 클릭해 누구에게나 직접 감사를 전하세요. 매너도 자동으로."
 L["OPTIONS_FEATURES_HEADER"] = "기능"
 L["OPTIONS_FEATURES_DESCRIPTION"] =
 	"각 기능은 여기서 또는 해당 기능의 패널에서 켜거나 끌 수 있습니다."
-L["OPTIONS_FEATURES_NOTE"] =
-	'"%s" 같은 일부 새 기능은 "Thanks for the Buff"의 기존 범위를 넘어섭니다. 필요 없는 기능은 자유롭게 꺼 두세요. 이 기능들은 다른 애드온인 "Connoisseur & Restocker"로 옮겨지거나, 모두 "Buttons, Buffs, & Bags" 같은 하나의 큰 애드온으로 합쳐질 수도 있습니다. Discord, CurseForge 또는 GitHub에서 의견을 들려 주세요. 감사합니다!'
 L["OPTIONS_COMMANDS_HEADER"] = "/Commands"
 L["OPTIONS_COMMAND"] = "/tftb"
 L["OPTIONS_COMMAND_DESCRIPTION"] = "이 애드온의 설정 인터페이스를 엽니다."
-L["OPTIONS_EXAMPLE"] = "예시: %s"
+L["SAMPLE_EXAMPLE"] = "예시: %s"
+
+-- Looking for Other Features?
+L["OPTIONS_GOOD_TO_GO_HEADER"] = "다른 기능을 찾고 계신가요?"
+L["OPTIONS_GOOD_TO_GO_DESCRIPTION"] =
+	"일부 기능이 새 애드온 Good to Go로 옮겨졌습니다. CurseForge 또는 Wago에서 찾아보세요."
 
 --------------------------------------------------------------------------------
 -- Options: Feedback & Support Panel
@@ -103,10 +83,9 @@ L["OPTIONS_COPY_LINK"] = "링크를 복사하려면 해당 칸을 클릭한 뒤 
 L["OPTIONS_VERSION"] = "버전 %s"
 
 --------------------------------------------------------------------------------
--- Options: Buff Panels
+-- Options: Stranger Buffs
 --------------------------------------------------------------------------------
 
--- Stranger Buffs
 L["TAB_STRANGERS"] = "낯선 사람의 버프"
 L["STRANGERS_ENABLE"] = "낯선 사람의 버프에 감사 표시 활성화"
 L["STRANGERS_ENABLE_DESCRIPTION"] = "파티 외부의 플레이어가 준 버프에 대한 감사 표시를 켭니다."
@@ -122,78 +101,14 @@ L["STRANGERS_MIN_DURATION"] = "최소 버프 지속시간"
 L["STRANGERS_MIN_DURATION_DESCRIPTION"] =
 	"이보다 짧은 버프는 무시합니다. 0으로 설정하면 모든 버프에 반응합니다."
 
--- Teammate Buffs
-L["TAB_TEAMMATES"] = "팀원의 버프"
-L["TEAMMATES_ENABLE"] = "팀원의 버프에 감사 표시 활성화"
-L["TEAMMATES_ENABLE_DESCRIPTION"] =
-	"파티원이나 공격대원이 당신에게 시전한 버프와 재사용 대기시간 기술에 대한 감사 표시를 켭니다."
-L["TEAMMATES_DESCRIPTION"] =
-	"파티 및 공격대원이 당신에게 시전한 버프와 재사용 대기시간 기술에 감사를 표합니다."
-
--- Service Alerts
-L["TAB_SERVICES"] = "지원 알림"
-L["SERVICES_ENABLE"] = "지원 알림 활성화"
-L["SERVICES_ENABLE_DESCRIPTION"] =
-	"잔치, 영혼샘, 차원문 등 파티를 위해 설치된 도움에 대한 알림을 켭니다."
-L["SERVICES_DESCRIPTION"] =
-	"누군가 그룹을 위해 지원을 설치하면 반응합니다. 잔치, 영혼샘, 차원문, 수리 로봇이 해당됩니다."
-
--- Send Good News
-L["TAB_GOOD_NEWS"] = "좋은 소식 보내기"
-L["GOOD_NEWS_DESCRIPTION"] =
-	"버프를 걸어 준 플레이어에게 무엇을 시전했는지, 그리고 짧은 버프라면 얼마나 지속되는지 알려 주세요."
-L["GOOD_NEWS_ENABLE"] = "좋은 소식 활성화"
-L["GOOD_NEWS_ENABLE_DESCRIPTION"] =
-	"버프를 걸어 준 플레이어에게 무엇을 시전했는지 알려 주는 귓속말을 켭니다."
-L["GOOD_NEWS_SCOPE"] = "받는 대상"
-L["GOOD_NEWS_SCOPE_ALWAYS"] = "버프한 모든 대상"
-L["GOOD_NEWS_SCOPE_GROUP"] = "파티/공격대 구성원만"
-L["GOOD_NEWS_SCOPE_DESCRIPTION"] =
-	"좋은 소식 귓속말을 받을 대상을 설정합니다. 버프한 모든 대상 또는 그룹 구성원만 선택할 수 있습니다."
-L["GOOD_NEWS_MESSAGES_HEADER"] = "좋은 소식 메시지"
-L["GOOD_NEWS_MESSAGES_DESCRIPTION"] = "버프를 받은 플레이어가 받게 되는 귓속말입니다."
---[[
-    The message box's tooltip, in three parts. LIMIT's %d is a real placeholder
-    and gets formatted; TOKENS carries a literal %a for the reader to copy and so
-    must never reach string.format. Joined into one line at the point of use.
-]]
-L["GOOD_NEWS_MESSAGE_INPUT_DESCRIPTION"] =
-	"귓속말 내용을 설정합니다. 비워 두면 기본 문구를 사용합니다."
-L["GOOD_NEWS_MESSAGE_LIMIT"] = "최대 길이는 %d입니다."
-L["GOOD_NEWS_MESSAGE_TOKENS"] =
-	"%a(은)는 기술 링크로 바뀌며, 지속시간이 1분 미만이면 지속시간도 함께 표시됩니다."
---[[
-    Appended to the ability link inside %a when the buff has a readable duration
-    under a minute. A whole clause rather than a bare number so it can be reworded
-    per language.
-]]
-L["GOOD_NEWS_DURATION_CLAUSE"] = "%s 동안"
-
--- Peer Pressure (TEMPORARY: delete on or after 2026-11-21, with Options/Options-Peer-Pressure.lua)
-L["TAB_PEER_PRESSURE"] = "또래 압박"
-L["PEER_PRESSURE_CONTROL_FREAK"] = "Control Freak"
-L["PEER_PRESSURE_MOVED"] =
-	'WoW Forever에서는 애드온이 전투 기록을 읽을 수 없어서, 모든 게임 버전에서 똑같이 작동하도록 애드온 구성을 바꾸고 있습니다. "또래 압박"은 다른 애드온인 "Control Freak"으로 옮겨졌습니다. 같은 직업 플레이어가 재사용 대기시간 기술을 쓸 때 계속 알림을 받으려면 설치하세요.'
-
--- Shared across the buff panels
-L["TRACKED_HEADER"] = "추적 중인 능력"
-L["TRACKED_GROUP_ITEMS"] = "아이템"
-L["TRACKED_ITEM_PENDING"] = "아이템 #%d"
-L["TRACKED_SPELL_PENDING"] = "주문 #%d"
-
--- Shared by Send Good News and the Thank You Button
-L["WHISPER_MESSAGE"] = "귓속말 메시지"
-L["WHISPER_MESSAGE_RESET"] = "초기화"
-L["WHISPER_MESSAGE_RESET_DESCRIPTION"] = "귓속말 메시지를 기본 문구로 되돌립니다."
-
 --------------------------------------------------------------------------------
--- Shared: Praise and Notifications
+-- Options: Praise and Notifications
 --------------------------------------------------------------------------------
 
 --[[
-    The two section headers every buff panel is built from: what the other player
-    sees, then what only you get. Key prefixes match the header the control
-    appears under.
+    The two section headers the Stranger Buffs panel is built from: what the
+    other player sees, then what only you get. Key prefixes match the header
+    the control appears under.
 ]]
 L["PRAISE_HEADER"] = "감사 귓속말 및 감정 표현"
 L["NOTIFICATIONS_HEADER"] = "알림"
@@ -221,164 +136,6 @@ L["NOTIFICATIONS_SOUND_DESCRIPTION"] =
 	"버프를 받을 때 효과음을 재생합니다. 자신에게만 들립니다."
 L["NOTIFICATIONS_SOUND_PREVIEW_DESCRIPTION"] =
 	"켜기 전에 미리 들어 볼 수 있도록 효과음을 재생합니다."
-
---------------------------------------------------------------------------------
--- Tracked Ability Groups
---------------------------------------------------------------------------------
-
---[[
-    Labels for multi-member tracked groups that no single game record names
-    (Data/{Game}/Tracked-Abilities-{Game}.lua). Single spells and items, and a
-    group named after one of its own items, take their names from the client.
-]]
-L["GROUP_PORTALS"] = "차원문"
-L["GROUP_RESISTANCE_CAULDRONS"] = "저항 가마솥"
-L["GROUP_REPAIR_BOTS"] = "수리 로봇"
-
---------------------------------------------------------------------------------
--- Options: Buff Duty
---------------------------------------------------------------------------------
-
-L["TAB_BUFF_WINDOW"] = "버프 당번"
-L["BUFF_WINDOW_DESCRIPTION"] =
-	"내 버프가 빠진 사람을 보여 줍니다. 아이콘을 클릭하면 시전합니다."
-L["BUFF_WINDOW_ENABLE"] = "버프 당번 활성화"
-L["BUFF_WINDOW_ENABLE_DESCRIPTION"] =
-	"당신이 줄 수 있는 버프가 빠진 그룹 구성원을 보여 주는 창인 버프 당번을 켭니다."
-L["BUFF_WINDOW_NO_BUFFS"] =
-	"당신의 직업에는 이 목록에 있는 버프가 없으므로 이 캐릭터에서는 창이 표시되지 않습니다."
--- When to Show: Solo and In Group, each with Always or In Instance, then the classes.
-L["BUFF_WINDOW_WHEN_HEADER"] = "표시 조건"
-L["BUFF_WINDOW_WHEN_DESCRIPTION"] = "창이 나타날 때를 선택합니다."
-L["BUFF_WINDOW_WHEN_SOLO"] = "솔로"
-L["BUFF_WINDOW_WHEN_SOLO_DESCRIPTION"] = "파티나 공격대에 속하지 않았을 때 창을 표시합니다."
-L["BUFF_WINDOW_WHEN_GROUP"] = "그룹"
-L["BUFF_WINDOW_WHEN_GROUP_DESCRIPTION"] = "파티나 공격대에 속했을 때 창을 표시합니다."
-L["BUFF_WINDOW_WHERE_DESCRIPTION"] =
-	"창을 표시할 곳을 정합니다: 어디서나, 또는 던전, 공격대, 전장, 투기장 안에서만."
-L["BUFF_WINDOW_WHERE_ALWAYS"] = "항상"
-L["BUFF_WINDOW_WHERE_INSTANCE"] = "인스턴스 안"
-L["BUFF_WINDOW_CLASSES_DESCRIPTION"] = "이 직업들로 플레이할 때 창을 표시합니다."
-L["BUFF_WINDOW_CLASS_DESCRIPTION"] = "이 직업으로 플레이할 때 창을 표시합니다."
-L["BUFF_WINDOW_HEADER"] = "창"
-L["BUFF_WINDOW_WINDOW_DESCRIPTION"] =
-	"창을 놓아 둔 자리에 두거나, 전투 중에는 방해되지 않게 치워 둡니다."
-L["BUFF_WINDOW_LOCK"] = "창 잠금"
-L["BUFF_WINDOW_LOCK_DESCRIPTION"] =
-	"창이 움직이지 않도록 고정합니다. 잠금을 해제하면 배경을 끌어서 옮길 수 있습니다."
-L["BUFF_WINDOW_HIDE_IN_COMBAT"] = "전투 중 숨기기"
-L["BUFF_WINDOW_HIDE_IN_COMBAT_DESCRIPTION"] =
-	"전투 중에는 창을 숨깁니다. 전투 중에는 목록을 갱신할 수 없으므로, 창을 표시해 두면 전투가 끝날 때까지 마지막 상태가 유지됩니다."
-L["BUFF_WINDOW_SHOW_HEADER"] = "창에 표시"
-L["BUFF_WINDOW_SHOW_DESCRIPTION"] = "자신의 버프, 버프를 준 낯선 사람, 대상을 창에 추가합니다."
-L["BUFF_WINDOW_FAVOR_ENABLE"] = "보답하기"
-L["BUFF_WINDOW_FAVOR_ENABLE_DESCRIPTION"] =
-	"최근 당신에게 버프를 준 낯선 사람과 그들에게 돌려줄 수 있는 버프를 보여 줍니다. 아이콘을 우클릭하면 해당 플레이어를 목록에서 제외합니다."
-L["BUFF_WINDOW_FAVOR_SECONDS_DESCRIPTION"] =
-	"낯선 사람이 마지막 버프 후 목록에 남아 있는 시간을 설정합니다."
-L["BUFF_WINDOW_TARGET_ENABLE"] = "내 대상"
-L["BUFF_WINDOW_TARGET_ENABLE_DESCRIPTION"] =
-	"대상이 그룹 외부의 플레이어이고 당신이 줄 수 있는 버프가 빠져 있으면 대상을 보여 줍니다."
-L["BUFF_WINDOW_REFRESH"] = "갱신 기준 시간"
-L["BUFF_WINDOW_REFRESH_DESCRIPTION"] =
-	"버프의 남은 시간이 얼마 이하가 되면 누락으로 간주할지 설정하여, 버프가 사라지기 전에 다시 걸 수 있게 합니다. 지속시간이 이 값 이하인 버프는 사라진 뒤에만 누락으로 간주합니다."
--- Count as Tanks: one dropdown per class, then Pets, each with these three choices.
-L["BUFF_WINDOW_TANKS_HEADER"] = "방어 전담으로 간주"
-L["BUFF_WINDOW_TANKS_DESCRIPTION"] =
-	"자신의 역할이 없는 대상 중 누가 방어 전담에게 제공하는 버프(예: 가시)를 받을지 정합니다."
-L["BUFF_WINDOW_TANKS_CLASS_DESCRIPTION"] =
-	"이 직업의 플레이어를 언제 방어 전담으로 간주할지 설정합니다. 플레이어에게 방어 전담이나 치유 전담 역할이 있으면 항상 그 역할이 우선합니다."
-L["BUFF_WINDOW_TANKS_PETS"] = "소환수"
-L["BUFF_WINDOW_TANKS_PETS_DESCRIPTION"] =
-	"소환수를 언제 방어 전담으로 간주할지 설정합니다. 소환수는 모두에게 제공하는 버프도 받습니다."
-L["BUFF_WINDOW_TANKS_NEVER"] = "안 함"
-L["BUFF_WINDOW_TANKS_SOLO"] = "그룹에 속하지 않을 때"
-L["BUFF_WINDOW_TANKS_ALWAYS"] = "항상"
--- Who each buff is offered to: one dropdown per buff, these four choices.
-L["BUFF_WINDOW_AUDIENCE_OFF"] = "끄기"
-L["BUFF_WINDOW_AUDIENCE_TANK"] = "방어 전담"
-L["BUFF_WINDOW_AUDIENCE_HEALER"] = "치유 전담"
-L["BUFF_WINDOW_AUDIENCE_ALL"] = "모두"
--- Each buff's dropdown tooltip; hovering the buff's name shows the spell itself.
-L["BUFF_WINDOW_AUDIENCE_DESCRIPTION"] = "%s을(를) 제공할 대상을 설정합니다."
-L["BUFF_WINDOW_BUFFS_DESCRIPTION"] =
-	"각 버프를 누구에게 제공할지 선택합니다. 방어 전담과 치유 전담은 그룹 역할을 따르며, 역할이 없으면 공격 전담으로 간주합니다. 단, 아래 방어 전담으로 간주에서 다르게 설정했다면 그 설정을 따릅니다."
-
-L["BUFF_WINDOW_SELF_DESCRIPTION"] = "자신의 버프로, 창 맨 위에 고정됩니다."
---[[
-    Muted note after a class name on the Self-Buffs panel, for a family of self
-    buffs only one of which can be up at a time. Keyed by the family.
-]]
-L["BUFF_WINDOW_SELF_NOTE_ASPECT"] = "상 중 하나면 충분"
-L["BUFF_WINDOW_SELF_NOTE_MAGE_ARMOR"] = "갑옷 중 하나면 충분"
-L["BUFF_WINDOW_SELF_NOTE_PALADIN_AURA"] = "오라 중 하나면 충분"
-L["BUFF_WINDOW_SELF_NOTE_SHAMAN_SHIELD"] = "보호막 중 하나면 충분"
-L["BUFF_WINDOW_SELF_NOTE_WARLOCK_ARMOR"] = "갑옷 중 하나면 충분"
-L["BUFF_WINDOW_SELF_NOTE_WARLOCK_DEMON"] = "두 악마 버프 중 하나면 충분"
-L["BUFF_WINDOW_SELF_REFRESH_OFF"] = "끄기"
-L["BUFF_WINDOW_SELF_REFRESH_MISSING"] = "없을 때"
--- %s is a duration from the client, like "5 Minutes".
-L["BUFF_WINDOW_SELF_REFRESH_UNDER"] = "%s 미만"
-L["BUFF_WINDOW_SELF_REFRESH_DESCRIPTION"] =
-	"%s을(를) 언제 표시할지 설정합니다. 표시 안 함, 사라졌을 때, 남은 시간이 이 값보다 적을 때 중에서 선택합니다."
--- The Weapon Buffs panel, under Buff Duty after Self-Buffs.
-L["BUFF_WINDOW_WEAPON_PANEL_HEADER"] = "무기 버프"
-L["BUFF_WINDOW_WEAPON_DESCRIPTION"] =
-	"각 무기에 무엇을 유지할지 선택하세요. 가방에 있고 무기에 맞으면, 없거나 곧 끝날 때 창에 표시됩니다."
--- The one timing for every weapon buff, at the top of the panel.
-L["BUFF_WINDOW_WEAPON_REFRESH"] = "다시 적용"
-L["BUFF_WINDOW_WEAPON_REFRESH_DESCRIPTION"] =
-	"무기 버프를 다시 제공할 때를 설정합니다. 사라졌을 때, 남은 시간이 이 값보다 적을 때 중에서 선택합니다."
--- The boxes for the weapon items any class can use, after the rogue and shaman boxes.
-L["BUFF_WINDOW_WEAPON_KIND_OIL"] = "오일"
-L["BUFF_WINDOW_WEAPON_KIND_STONE"] = "숫돌"
-L["BUFF_WINDOW_WEAPON_KIND_LURE"] = "미끼"
---[[
-    One choice's checkbox under one hand. The first %s is the poison, imbue,
-    oil, stone or lure, the second the client's "Main Hand" or "Off Hand".
-]]
-L["BUFF_WINDOW_WEAPON_PICK_DESCRIPTION"] =
-	"%s을(를) %s 무기용으로 제공합니다. 선택한 항목이 무기에 하나도 없으면, 가지고 있는 항목을 각각 제공합니다."
-L["BUFF_WINDOW_SELF_ENABLE"] = "내 자기 버프"
-L["BUFF_WINDOW_SELF_ENABLE_DESCRIPTION"] =
-	"갑옷 주문이나 내면의 열정처럼 자신에게만 걸 수 있는 버프가 없거나 곧 끝날 때 창 맨 위에 표시합니다. 어떤 버프를 표시할지는 자기 버프에서 고르세요."
-L["BUFF_WINDOW_WEAPON_ENABLE"] = "내 무기 버프"
-L["BUFF_WINDOW_WEAPON_ENABLE_DESCRIPTION"] =
-	"무기에 없거나 곧 끝나는 독, 무기 강화, 오일, 숫돌, 미끼를 창 맨 위에 자기 버프와 함께 표시합니다. 클릭하면 적용합니다. 표시할 항목은 무기 버프에서 고르세요."
-
--- The window itself
-L["BUFF_WINDOW_SELF_HEADER"] = "자기 버프"
-L["BUFF_WINDOW_FAVOR_HEADER"] = "보답하기"
-L["BUFF_WINDOW_TARGET_HEADER"] = "대상"
-L["BUFF_WINDOW_TOOLTIP_CAST"] = "클릭하면 %s에게 시전합니다."
--- %s is the client's "Main Hand" or "Off Hand".
-L["BUFF_WINDOW_TOOLTIP_WEAPON"] = "클릭하면 %s 무기에 적용합니다."
-L["BUFF_WINDOW_TOOLTIP_USE"] =
-	"파티에 영혼석을 지닌 사람이 없습니다. 클릭하면 %s에게 영혼석을 사용합니다."
-L["BUFF_WINDOW_TOOLTIP_CREATE"] =
-	"파티에 영혼석을 지닌 사람이 없습니다. 클릭하면 영혼석을 만듭니다."
-L["BUFF_WINDOW_TOOLTIP_GROUP"] = "클릭하면 %s와(과) 그 파티에게 시전합니다."
-L["BUFF_WINDOW_TOOLTIP_FAVOR"] = "클릭하면 %s을(를) 대상으로 지정하고 시전합니다."
-L["BUFF_WINDOW_TOOLTIP_DISMISS"] = "우클릭하면 목록에서 %s을(를) 제외합니다."
--- The window's close button: the class name in its color, then the options command.
-L["BUFF_WINDOW_CLOSED"] =
-	"%s 직업의 버프 당번이 꺼졌습니다. 다시 켜려면 미니맵 버튼을 Shift + 우클릭하거나 %s 명령어를 입력하세요."
-
--- The Buff Key (Key Bindings, and the Keybinds section of Buff Duty)
-L["BUFF_KEYS_HEADER"] = "단축키"
-L["BUFF_KEYS_DESCRIPTION"] =
-	"전투 중이 아닐 때 키나 매크로 하나로 목록의 다음 버프를 시전합니다. 무기 버프는 계속 창에서 클릭하여 적용합니다."
-L["BUFF_KEY"] = "버프 버튼"
-L["BUFF_KEY_DESCRIPTION"] =
-	"누를 때마다 빠진 버프를 하나씩 시전합니다: 죽은 대상 부활, 그다음 파티의 죽은 사람 부활(사제, 성기사, 주술사), 자기 버프, 보답하기, 대상, 파티 순서입니다. 사거리 안의 모두에게 하나씩 거는 것보다 마나가 적게 들면 파티 버프를 시전합니다."
-L["BUFF_KEY_SKIP_COOLDOWNS"] = "재사용 대기시간이 있는 버프 건너뛰기"
-L["BUFF_KEY_SKIP_COOLDOWNS_DESCRIPTION"] =
-	"공포의 수호물처럼 재사용 대기시간이 있는 버프는 건너뛰고 다음 버프로 넘어갑니다."
--- %s is a player's name.
-L["BUFF_KEY_WAITING"] = "%s님이 사거리 안에 들어오기를 기다리는 중입니다."
-L["BUFF_KEY_DONE"] = "더 걸 버프가 없습니다."
--- The caption beside the read-only box that holds a Buff Key's macro line.
-L["BUFF_KEY_MACRO_CAPTION"] = "매크로"
 
 --------------------------------------------------------------------------------
 -- Options: Thank You Button
@@ -409,17 +166,16 @@ L["BUTTON_MACRO_ENABLE_DESCRIPTION"] =
 L["BUTTON_WHISPER_DESCRIPTION"] =
 	"이 버튼이 대상에게 보낼 귓속말을 설정합니다. 비워 두면 귓속말을 보내지 않습니다."
 
+-- Each button's whisper box
+L["WHISPER_MESSAGE"] = "귓속말 메시지"
+L["WHISPER_MESSAGE_RESET"] = "초기화"
+L["WHISPER_MESSAGE_RESET_DESCRIPTION"] = "귓속말 메시지를 기본 문구로 되돌립니다."
+
 --------------------------------------------------------------------------------
 -- Defaults
 --------------------------------------------------------------------------------
 
 L["DEFAULT_WHISPER"] = "감사합니다, 최고예요! (="
---[[
-    The star marker (left off on WoW Forever) and " // TFTB" sign-off are added
-    by the builder, which also drops the closing punctuation; neither is part of
-    the editable text.
-]]
-L["DEFAULT_GOOD_NEWS"] = "%a 버프를 받았습니다"
 
 --------------------------------------------------------------------------------
 -- Emotes

@@ -34,14 +34,15 @@ ns.PALETTE = {
 --------------------------------------------------------------------------------
 
 --[[
-    Classes through Wrath only; DEATHKNIGHT is deliberate forward-prep for when
-    Anniversary progresses (Era/TBC clients simply never look the key up).
+    Classes through Mists, so the table is the same on every flavor: a client
+    without Death Knights or Monks simply never looks those keys up.
 ]]
 Data.CLASS_COLORS = {
 	DEATHKNIGHT = "C41E3A",
 	DRUID = "FF7C0A",
 	HUNTER = "AAD372",
 	MAGE = "3FC7EB",
+	MONK = "00FF98",
 	PALADIN = "F48CBA",
 	PRIEST = "FFFFFF",
 	ROGUE = "FFF468",
@@ -50,34 +51,21 @@ Data.CLASS_COLORS = {
 	WARRIOR = "C69B6D",
 }
 
---[[
-    Who a Buff Window buff is offered to, one choice per buff.
-    BUFF_AUDIENCE_ORDER is the dropdown's order; the labels come from the locale
-    (BUFF_WINDOW_AUDIENCE_*).
-]]
-Data.BUFF_AUDIENCE = {
-	OFF = "OFF",
-	TANK = "TANK",
-	HEALER = "HEALER",
-	ALL = "ALL",
-}
-Data.BUFF_AUDIENCE_ORDER = { "OFF", "TANK", "HEALER", "ALL" }
+--------------------------------------------------------------------------------
+-- Example Lines
+--------------------------------------------------------------------------------
 
---[[
-    Classes with nothing to gain from melee attack power, so a Buff Window row
-    marked noCasters (Blessing of Might) skips them.
-]]
-Data.CASTER_CLASSES = {
-	MAGE = true,
-	PRIEST = true,
-	WARLOCK = true,
-}
-
--- Classes with no mana, so a Buff Window row marked manaOnly skips them.
-Data.NO_MANA_CLASSES = {
-	DEATHKNIGHT = true,
-	ROGUE = true,
-	WARRIOR = true,
+-- The house roster the Example lines name, keyed by class token.
+ns.SAMPLE_NAMES = {
+	HUNTER = "Spek",
+	PRIEST = "Katz",
+	ROGUE = "Fathom",
+	DRUID = "Aero",
+	WARRIOR = "Prima",
+	WARLOCK = "Greasy",
+	PALADIN = "Aiek",
+	MAGE = "Portalrico",
+	SHAMAN = "Moondragon",
 }
 
 --------------------------------------------------------------------------------
@@ -88,18 +76,7 @@ Data.NO_MANA_CLASSES = {
 ns.OPTIONS_REGISTRY = {
 	General = ADDON_NAME .. "_General",
 	StrangerBuffs = ADDON_NAME .. "_StrangerBuffs",
-	TeammateBuffs = ADDON_NAME .. "_TeammateBuffs",
-	TeammateBuffsTracked = ADDON_NAME .. "_TeammateBuffsTracked",
-	SendGoodNews = ADDON_NAME .. "_SendGoodNews",
-	SendGoodNewsTracked = ADDON_NAME .. "_SendGoodNewsTracked",
-	ServiceAlerts = ADDON_NAME .. "_ServiceAlerts",
-	ServiceAlertsTracked = ADDON_NAME .. "_ServiceAlertsTracked",
-	PeerPressure = ADDON_NAME .. "_PeerPressure", -- TEMPORARY: see Options/Options-Peer-Pressure.lua
 	ThankYouButton = ADDON_NAME .. "_ThankYouButton",
-	BuffWindow = ADDON_NAME .. "_BuffWindow",
-	BuffWindowBuffs = ADDON_NAME .. "_BuffWindowBuffs",
-	BuffWindowSelfBuffs = ADDON_NAME .. "_BuffWindowSelfBuffs",
-	BuffWindowWeaponBuffs = ADDON_NAME .. "_BuffWindowWeaponBuffs",
 	Profiles = ADDON_NAME .. "_Profiles",
 	FeedbackSupport = ADDON_NAME .. "_FeedbackSupport",
 	Diagnostics = ADDON_NAME .. "_Diagnostics",
@@ -113,23 +90,8 @@ ns.OPTIONS_REGISTRY = {
 ns.OPTIONS_ROW_WIDTH = 3.4
 ns.OPTIONS_LABEL_WIDTH = 2.1
 ns.OPTIONS_CONTROL_WIDTH = ns.OPTIONS_ROW_WIDTH - ns.OPTIONS_LABEL_WIDTH
-
---[[
-    The same row inside an inline group (a class's box of buffs). The box insets
-    its content 10 pixels -- in width units, where AceConfigDialog makes 1 unit
-    170 pixels -- and its border takes room besides, so the label gives back 0.3
-    or the control wraps under it. A row outside a box that should line up with
-    the boxed ones below it uses the inset label width: same control, same x.
-]]
-ns.OPTIONS_INLINE_LABEL_WIDTH = ns.OPTIONS_LABEL_WIDTH - 0.3
-ns.OPTIONS_INLINE_INSET_WIDTH = 10 / 170
-ns.OPTIONS_ALIGNED_LABEL_WIDTH = ns.OPTIONS_INLINE_LABEL_WIDTH + ns.OPTIONS_INLINE_INSET_WIDTH
-
--- The item lists' remove column, sized to its icon rather than a caption.
-ns.OPTIONS_REMOVE_ICON_WIDTH = 0.25
-
--- The blank cell a sub-option row leads with.
-ns.OPTIONS_SUB_INDENT_WIDTH = 0.115
+ns.OPTIONS_REMOVE_ICON_WIDTH = 0.25 -- the item lists' remove column, sized to its icon
+ns.OPTIONS_SUB_INDENT_WIDTH = 0.115 -- the blank cell a sub-option row leads with
 
 --------------------------------------------------------------------------------
 -- Constants
@@ -177,92 +139,16 @@ Data.MAX_GLOBAL_MACROS = 120
 Data.THANK_YOU_DEFAULT_ICON = 134411
 
 --[[
-    When a class, or pets, count as tanks on the Buff Window ("Count as
-    Tanks"): NEVER, SOLO while you're not in a party or raid, or ALWAYS. Only
-    for a player with no role of their own. TANK_WHEN_ORDER is the dropdown's
-    order; the labels come from the locale (BUFF_WINDOW_TANKS_*). Pets are
-    stored under TANK_WHEN_PET beside the class tokens.
-]]
-Data.TANK_WHEN = {
-	NEVER = "NEVER",
-	SOLO = "SOLO",
-	ALWAYS = "ALWAYS",
-}
-Data.TANK_WHEN_ORDER = { "NEVER", "SOLO", "ALWAYS" }
-Data.TANK_WHEN_PET = "PET"
-
---[[
-    Where the Buff Window shows while Solo or In Group lets it show at all
-    ("When to Show"): ALWAYS, or INSTANCE for inside a dungeon, raid,
-    battleground or arena only. BUFF_WINDOW_WHERE_ORDER is the dropdown's
-    order; the labels come from the locale (BUFF_WINDOW_WHERE_*).
-]]
-Data.BUFF_WINDOW_WHERE = {
-	ALWAYS = "ALWAYS",
-	INSTANCE = "INSTANCE",
-}
-Data.BUFF_WINDOW_WHERE_ORDER = { "ALWAYS", "INSTANCE" }
-
---[[
-    When a self buff or the Soulstone shows on the Buff Window: OFF, MISSING
-    (only once it's gone), or a number of minutes left. Doubles as the
-    dropdown's order. The Weapon Buffs dropdown reuses MISSING for When
-    Missing.
-]]
-Data.SELF_REFRESH_OFF = "OFF"
-Data.SELF_REFRESH_MISSING = 0
-Data.SELF_REFRESH_CHOICES = { "OFF", 0, 10, 5, 3 }
-
---[[
-    The weapon hands a poison or imbue can go on, by the inventory slot each
-    names. Which hands a class is offered is the data folder's call
-    (BUFF_WINDOW_WEAPON_HANDS): a Classic Era shaman can't dual wield.
-]]
-Data.WEAPON_HAND_SLOTS = { MAIN = 16, OFF = 17 }
-Data.WEAPON_HAND_ORDER = { "MAIN", "OFF" }
-
---[[
-    The Weapon Buffs panel's one Reapply timing, for every poison, imbue,
-    oil, stone and lure: When Missing, or minutes left. No Off: each choice
-    has its own checkboxes for that.
-]]
-Data.WEAPON_REFRESH_CHOICES = { 0, 10, 5, 3 }
-Data.WEAPON_REFRESH_DEFAULT = 3
-
--- The Weapon Buffs panel's boxes for the items any class can use, in order (BUFF_WINDOW_WEAPON_ITEMS' kind).
-Data.WEAPON_ITEM_KINDS = { "OIL", "STONE", "LURE" }
--- A kind that only one hand can carry: a fishing pole is always two-handed, so a lure is main hand only.
-Data.WEAPON_ITEM_KIND_HANDS = { LURE = { "MAIN" } }
-
---[[
-    The Buff Window's "Refresh Under" choices, in minutes: a buff with
-    less than this left is offered again.
-]]
-Data.BUFF_WINDOW_REFRESH_CHOICES = { 3, 5, 10 }
-
---[[
-    How long a stranger who buffed you can stay on the Buff Window's Return the
-    Favor list, in seconds (the player picks one), and how many of them it
-    holds at once. Short on purpose: past a few seconds
-    they have usually walked on.
-]]
-Data.BUFF_WINDOW_FAVOR_CHOICES = { 20, 40, 60 }
-Data.BUFF_WINDOW_FAVOR_MAX = 5
-
--- The Buff Window's buff buttons, and the role icon in front of each name.
-Data.BUFF_WINDOW_ICON_SIZE = 20
-
---[[
     Praise Delay lengths, in seconds. Doubles as the dropdown's display order; the
     labels themselves come from the client's own duration strings at panel-build
-    time (see ns.DefinePraiseDelaySelect).
+    time (see DefinePraiseDelaySelect in Options/Options-Stranger-Buffs.lua).
 ]]
 Data.PRAISE_DELAY_CHOICES = { 1, 2, 3, 4 }
 
 --[[
     The seconds scale behind the cooldown and duration dropdowns.
 
-    Straight Fibonacci, and every entry is labelled in SECONDS -- 144 stays 144,
+    Straight Fibonacci, and every entry is labeled in SECONDS -- 144 stays 144,
     not "2 Minutes". Mixing units inside one list makes two adjacent options look
     like different kinds of thing, and the reader has to convert to compare them.
 
@@ -284,28 +170,11 @@ ns.LINKS = {
 	DISCORD = "https://discord.gg/eh8hKq992Q",
 	WAGO = "https://addons.wago.io/addons/thanks-for-the-buff",
 }
-ns.CONTROL_FREAK_URL = "https://www.curseforge.com/wow/addons/control-freak" -- TEMPORARY: see Options/Options-Peer-Pressure.lua
 
---------------------------------------------------------------------------------
--- Tracking Codes
---------------------------------------------------------------------------------
-
--- How the thank-you reads, and which panel the toggle lives on.
-Data.BUFF = {
-	SOLO = "SOLO", -- cast on you            -> "gave you ..."        (Teammate Buffs)
-	GROUP = "GROUP", -- party/raid-wide        -> "gave your group ..." (Teammate Buffs)
-	SERVICE = "SERVICE", -- set out for the group  -> "set out a ..."       (Service Alerts)
-}
-
--- How the combat log is matched.
-Data.DETECT = {
-	AURA = "AURA", -- SPELL_AURA_APPLIED lands on you
-	CAST = "CAST", -- SPELL_CAST_SUCCESS fires
-	--[[
-	    SPELL_RESURRECT fires. For the ones that can FAIL: a cast succeeding only
-	    means the attempt happened, so the cast event proves nothing worth saying.
-	]]
-	RESURRECT = "RESURRECT",
+-- Good to Go, the add-on several former TFTB features moved to.
+ns.GOOD_TO_GO_LINKS = {
+	CURSEFORGE = "https://www.curseforge.com/wow/addons/good-to-go",
+	WAGO = "https://addons.wago.io/addons/good-to-go",
 }
 
 --------------------------------------------------------------------------------
