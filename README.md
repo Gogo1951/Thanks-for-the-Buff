@@ -28,7 +28,7 @@ Auto thank every player who buffs you with a whisper or emote, and thank anyone 
 
 🔴 World of Warcraft // 12.1.0
 
-🔴 Mists of Pandaria Classic // 5.5.4
+🟢 Mists of Pandaria Classic // 5.5.4
 
 🟢 Burning Crusade Anniversary // 2.5.6
 
