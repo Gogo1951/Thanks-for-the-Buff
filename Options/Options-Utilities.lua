@@ -28,14 +28,42 @@ function ns.OptionsSpacer(order, hidden)
 end
 
 --[[
+    A row label that explains itself on hover. AceConfig gives a description no
+    tooltip, so a label-beside-control row read as a bare caption and only its
+    control answered the mouse. This is the stock Label with mouse scripts that
+    fire AceGUI's OnEnter and OnLeave, which AceConfigDialog already answers with
+    the option's name and desc, so the label shows the control's tooltip under
+    its own caption.
+]]
+local AceGUI = LibStub("AceGUI-3.0")
+local ROW_LABEL_WIDGET, ROW_LABEL_VERSION = "TFTB-RowLabel", 1
+
+AceGUI:RegisterWidgetType(ROW_LABEL_WIDGET, function()
+	local widget = AceGUI.WidgetRegistry["Label"]()
+	widget.type = ROW_LABEL_WIDGET
+	widget.frame:EnableMouse(true)
+	widget.frame:SetScript("OnEnter", function()
+		widget:Fire("OnEnter")
+	end)
+	widget.frame:SetScript("OnLeave", function()
+		widget:Fire("OnLeave")
+	end)
+	return widget
+end, ROW_LABEL_VERSION)
+
+--[[
     The left half of a label-beside-control row: the control that follows carries
     name = "" and ns.OPTIONS_CONTROL_WIDTH, so the two total one row and flow onto
     the same line. A row whose control needs more room passes its own width here.
+    `desc` is the control's own tooltip text: given, hovering the label shows it
+    too, titled with the label.
 ]]
-function ns.OptionsRowLabel(text, order, width, hidden)
+function ns.OptionsRowLabel(text, order, width, hidden, desc)
 	return {
 		type = "description",
 		name = text,
+		desc = desc,
+		dialogControl = desc and ROW_LABEL_WIDGET or nil,
 		fontSize = "medium",
 		width = width or ns.OPTIONS_LABEL_WIDTH,
 		order = order,
@@ -70,6 +98,69 @@ function ns.OptionsLinkRow(args, key, caption, url, order)
 end
 
 --------------------------------------------------------------------------------
+-- Example Lines
+--------------------------------------------------------------------------------
+
+--[[
+    A panel falls back to white after a link's closing |r, where a chat frame
+    falls back to the line's color, so the color is opened again after every |r.
+]]
+function ns.TintText(color, text)
+	return color .. (text:gsub("|r", "|r" .. color)) .. "|r"
+end
+
+--[[
+    A silver "Example:" line showing the exact string a feature prints or
+    sends. getText returns the finished line in its own colors; a function so
+    the line redraws as settings change. Silver opens again after the line, for
+    a locale whose label runs on past it.
+]]
+function ns.OptionsExample(getText, order, hidden)
+	return {
+		type = "description",
+		name = function()
+			return GetColor("HELP") .. L["SAMPLE_EXAMPLE"]:format(getText() .. GetColor("HELP")) .. "|r"
+		end,
+		fontSize = "medium",
+		order = order,
+		hidden = hidden,
+	}
+end
+
+local WHISPER_FALLBACK_COLOR = "FF80FF"
+
+-- The whisper color the player sees in their own chat, so a recolored channel shows as they set it.
+local function WhisperColor()
+	local info = ChatTypeInfo and ChatTypeInfo.WHISPER
+	if not info then
+		return "|cff" .. WHISPER_FALLBACK_COLOR
+	end
+	return string.format(
+		"|cff%02x%02x%02x",
+		math.floor(info.r * 255 + 0.5),
+		math.floor(info.g * 255 + 0.5),
+		math.floor(info.b * 255 + 0.5)
+	)
+end
+
+-- The character the panel is open on, in its class color, as a whisper's sender.
+local function SampleSender()
+	local name = GetUnitName("player") or ""
+	local _, class = UnitClass("player")
+	local hex = class and Data.CLASS_COLORS[class]
+	if hex then
+		name = "|cff" .. hex .. name .. "|r"
+	end
+	return "[" .. name .. "]"
+end
+
+-- A whisper as the player receiving it sees it: "[You] whispers: message", in the whisper color.
+function ns.SampleWhisper(message)
+	local prefix = (CHAT_WHISPER_GET or "%s whispers: "):format(SampleSender())
+	return ns.TintText(WhisperColor(), prefix .. message)
+end
+
+--------------------------------------------------------------------------------
 -- Feature Switches
 --------------------------------------------------------------------------------
 
@@ -85,7 +176,7 @@ ns.FEATURE_SWITCHES = {
 	    key: the profile subtable, setting: its on/off field, name/desc: locale keys,
 	    onChange: present only for a feature that must react the moment either copy flips.
 	]]
-	{ key = "strangers", setting = "enabled", name = "STRANGERS_ENABLE", desc = "STRANGERS_ENABLE_DESCRIPTION" },
+	{ key = "strangers", setting = "enabled", name = "GIVE_THANKS_ENABLE", desc = "GIVE_THANKS_ENABLE_DESCRIPTION" },
 }
 
 local function NotifyAllPanels()
@@ -118,11 +209,6 @@ function ns.GetFeatureSwitch(key)
 		end
 	end
 	return nil
-end
-
-function ns.IsFeatureOn(key)
-	local feature = ns.GetFeatureSwitch(key)
-	return ns.db.profile[key][feature.setting] and true or false
 end
 
 --[[
@@ -172,20 +258,9 @@ end
 --------------------------------------------------------------------------------
 
 --[[
-    Shared by the emote picker and the blank line above it, so both disappear
-    together when the panel's emotes are switched off.
-]]
-function ns.EmotesHidden(settings)
-	return function()
-		return not settings().emotesEnabled
-	end
-end
-
---[[
-    The emote picker: one half-width toggle per entry in Data.EMOTES, inline under
-    the panel's Enable Emotes toggle and hidden along with it. Stranger Buffs and
-    Thank You Button 1 both draw it; a button overrides `hidden`, since it has no
-    Enable Emotes toggle.
+    The emote picker: one half-width toggle per entry in Data.EMOTES, for Thank
+    You Button 1. Give Thanks uses the larger emote grid instead
+    (Options/Options-Emote-Grid.lua). The caller sets `hidden`.
 ]]
 function ns.DefineEmoteGroup(settings, order)
 	local group = {
@@ -193,7 +268,6 @@ function ns.DefineEmoteGroup(settings, order)
 		name = L["EMOTES_SELECT"],
 		order = order,
 		inline = true,
-		hidden = ns.EmotesHidden(settings),
 		args = {},
 	}
 
@@ -202,7 +276,8 @@ function ns.DefineEmoteGroup(settings, order)
 		group.args[emote] = {
 			type = "toggle",
 			name = ns.GetEmoteCommand(emote),
-			desc = emoteData.desc,
+			-- No tooltip: the command is the whole label. "inline" with no desc tells AceConfigDialog to show none.
+			descStyle = "inline",
 			order = i,
 			width = "half",
 			get = function()

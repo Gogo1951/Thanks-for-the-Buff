@@ -22,8 +22,7 @@ L["CHAT_OPTIONS_IN_COMBAT"] = "As a safety precaution, the Options Interface can
 -- Buff print out
 L["MESSAGE_BUFFED"] = "%s buffed you with %s!"
 
--- Thank-you
-L["MESSAGE_WHISPER_THANKS"] = "Thanks for the %s"
+-- Thank You Button
 L["MESSAGE_SELECT_PLAYER"] = "Target a player first."
 L["MESSAGE_CANT_THANK_SELF"] = "You can't thank yourself!"
 
@@ -32,6 +31,7 @@ L["MESSAGE_CANT_THANK_SELF"] = "You can't thank yourself!"
 --------------------------------------------------------------------------------
 
 L["UNKNOWN_SPELL"] = "Unknown Spell"
+L["SAMPLE_EXAMPLE"] = "Example: %s"
 
 --------------------------------------------------------------------------------
 -- Options: Main Panel
@@ -40,13 +40,12 @@ L["UNKNOWN_SPELL"] = "Unknown Spell"
 L["OPTIONS_WELCOME_TOGGLE"] = "Enable Welcome Message"
 L["OPTIONS_WELCOME_DESCRIPTION"] = "Prints a message only you can see when you log in."
 L["OPTIONS_DESCRIPTION"] =
-	"Auto thank every player who buffs you with a whisper or emote, and thank anyone by hand with a click of your Thank You macros. Manners, automated."
+	"Auto thank players who buff you with an emote or whisper. Strangers who drop Fortitude, Arcane Intellect, or Mark of the Wild on you get thanked on the spot, and one click of your Thank You macros thanks anyone you target."
 L["OPTIONS_FEATURES_HEADER"] = "Features"
 L["OPTIONS_FEATURES_DESCRIPTION"] = "Turn each feature on or off here, or on its own panel."
 L["OPTIONS_COMMANDS_HEADER"] = "/Commands"
 L["OPTIONS_COMMAND"] = "/tftb"
 L["OPTIONS_COMMAND_DESCRIPTION"] = "Opens the Options Interface for this add-on."
-L["SAMPLE_EXAMPLE"] = "Example: %s"
 
 -- Looking for Other Features?
 L["OPTIONS_GOOD_TO_GO_HEADER"] = "Looking for Other Features?"
@@ -81,54 +80,81 @@ L["OPTIONS_COPY_LINK"] = "To copy a link, click its box, then press Ctrl+A and C
 L["OPTIONS_VERSION"] = "Version %s"
 
 --------------------------------------------------------------------------------
--- Options: Stranger Buffs
+-- Options: Give Thanks
 --------------------------------------------------------------------------------
 
-L["TAB_STRANGERS"] = "Stranger Buffs"
-L["STRANGERS_ENABLE"] = "Enable Thanks for Stranger Buffs"
-L["STRANGERS_ENABLE_DESCRIPTION"] = "Turns on thanks for buffs from players outside your group."
-L["STRANGERS_DESCRIPTION"] = "Thank players outside your group when they buff you out in the open world."
+L["TAB_GIVE_THANKS"] = "Give Thanks"
+L["GIVE_THANKS_ENABLE"] = "Enable Give Thanks"
+L["GIVE_THANKS_ENABLE_DESCRIPTION"] = "Turns on thanks for buffs from players outside your group."
+L["GIVE_THANKS_DESCRIPTION"] = "Thank players outside your group when they buff you out in the open world."
+
+-- Praise Limits
+L["PRAISE_HEADER"] = "Praise Limits"
+L["PRAISE_DESCRIPTION"] = "These hold back both the emote and the whisper, so a wave of buffs never turns into spam."
 -- The dropdown values carry the unit, so these labels do not repeat it.
-L["STRANGERS_OVERALL_COOLDOWN"] = "Praise Cooldown"
-L["STRANGERS_OVERALL_COOLDOWN_DESCRIPTION"] =
+L["GIVE_THANKS_OVERALL_COOLDOWN"] = "Praise Cooldown"
+L["GIVE_THANKS_OVERALL_COOLDOWN_DESCRIPTION"] =
 	"Sets the delay between one round of praise and the next, no matter who buffed you. Set to zero to praise every buff."
-L["STRANGERS_SOURCE_COOLDOWN"] = "Same-Player Praise Cooldown"
-L["STRANGERS_SOURCE_COOLDOWN_DESCRIPTION"] =
+L["GIVE_THANKS_SOURCE_COOLDOWN"] = "Same-Player Praise Cooldown"
+L["GIVE_THANKS_SOURCE_COOLDOWN_DESCRIPTION"] =
 	"Sets the delay between praise aimed at the same player. Set to zero to praise every buff."
-L["STRANGERS_MIN_DURATION"] = "Minimum Buff Duration"
-L["STRANGERS_MIN_DURATION_DESCRIPTION"] = "Ignores buffs shorter than this. Set to zero to react to every buff."
-
---------------------------------------------------------------------------------
--- Options: Praise and Notifications
---------------------------------------------------------------------------------
-
---[[
-    The two section headers the Stranger Buffs panel is built from: what the
-    other player sees, then what only you get. Key prefixes match the header
-    the control appears under.
-]]
-L["PRAISE_HEADER"] = "Praise Whispers & Emotes"
-L["NOTIFICATIONS_HEADER"] = "Notifications"
-L["PRAISE_DESCRIPTION"] = "What the other player sees: a thank-you whisper, an emote, or both."
-L["NOTIFICATIONS_DESCRIPTION"] = "What only you get: a print out, a sound, or both."
-
--- Also titles the Thank You Button's emote grid, so it carries no PRAISE_ prefix.
-L["EMOTES_SELECT"] = "Select Emotes"
-
-L["PRAISE_WHISPER_ENABLE"] = "Enable Thank-You Whispers"
-L["PRAISE_WHISPER_DESCRIPTION"] = "Whispers a thank-you to the player who buffed you."
-L["PRAISE_EMOTES_ENABLE"] = "Enable Emotes"
-L["PRAISE_EMOTES_DESCRIPTION"] = "Shows your appreciation with an emote. Emotes are held back while you are in combat."
+L["GIVE_THANKS_MIN_DURATION"] = "Minimum Buff Duration"
+L["GIVE_THANKS_MIN_DURATION_DESCRIPTION"] = "Ignores buffs shorter than this. Set to zero to react to every buff."
 L["PRAISE_DELAY_ENABLE"] = "Enable Praise Delay"
 L["PRAISE_DELAY_DESCRIPTION"] =
 	"Waits a moment before the whisper and the emote, so your thanks don't land in the same instant as the buff. Notifications are unaffected."
 L["PRAISE_DELAY_LENGTH_DESCRIPTION"] = "Sets how long to wait before the whisper and the emote go out."
 
+-- Thank-You Whispers
+L["WHISPERS_HEADER"] = "Thank-You Whispers"
+L["PRAISE_WHISPER_ENABLE"] = "Enable Thank-You Whispers"
+L["PRAISE_WHISPER_DESCRIPTION"] = "Whispers a thank-you to the player who buffed you."
+L["PRAISE_WHISPER_MESSAGE_DESCRIPTION"] =
+	"Sets what TFTB whispers to the player who buffed you. {spell} becomes the buff. Leave it empty to send no whisper."
+
+-- Notifications
+L["NOTIFICATIONS_HEADER"] = "Notifications"
+L["NOTIFICATIONS_DESCRIPTION"] = "What only you get: a print out, a sound, or both."
 L["NOTIFICATIONS_PRINT_ENABLE"] = "Enable Print Outs"
 L["NOTIFICATIONS_PRINT_DESCRIPTION"] = "Prints a message only you can see when you receive a buff."
 L["NOTIFICATIONS_SOUND_ENABLE"] = "Enable Sound Effects"
 L["NOTIFICATIONS_SOUND_DESCRIPTION"] = "Plays a sound when you receive a buff. Only you hear it."
 L["NOTIFICATIONS_SOUND_PREVIEW_DESCRIPTION"] = "Plays the sound so you can hear it before turning it on."
+
+-- Emotes: the grid's group keys are EMOTE_GROUP_ plus each Data.EMOTE_GROUPS entry, upper-cased.
+L["TAB_EMOTES_LIST"] = "Emotes List"
+L["EMOTES_GRID_DESCRIPTION"] =
+	"Check the emotes Give Thanks can pick from when a player outside your group buffs you; it uses one at random. Emotes are held back while you are in combat."
+L["EMOTE_GROUP_COUNT"] = "%s (%d of %d Checked)"
+L["EMOTE_GROUP_TEXT"] = "Text"
+L["EMOTE_GROUP_TEXT_DESCRIPTION"] = "Shows the emote line only."
+L["EMOTE_GROUP_VOICE"] = "Voice"
+L["EMOTE_GROUP_VOICE_DESCRIPTION"] = "Plays a voice line."
+L["EMOTE_GROUP_GESTURE"] = "Gesture"
+L["EMOTE_GROUP_GESTURE_DESCRIPTION"] = "Plays a short animation."
+L["EMOTE_GROUP_POSE"] = "Pose"
+L["EMOTE_GROUP_POSE_DESCRIPTION"] = "Holds until you move."
+L["EMOTES_RESET"] = "Reset Emotes"
+L["EMOTES_RESET_DESCRIPTION"] = "Puts the checklist back to the default praise emotes."
+L["EMOTES_RESET_CONFIRM"] = "Reset the emote checklist to the defaults?"
+
+--------------------------------------------------------------------------------
+-- Options: Ignored Buffs
+--------------------------------------------------------------------------------
+
+L["TAB_IGNORED_BUFFS"] = "Ignored Buffs"
+L["IGNORED_BUFFS_DESCRIPTION"] =
+	"Buffs on this list never get a thank-you, whoever casts them. You still get your print out and sound."
+L["IGNORED_BUFFS_ADD_CURRENT"] = "Ignore Current Buff"
+L["IGNORED_BUFFS_ADD_CURRENT_DESCRIPTION"] = "Adds one of the buffs on you right now."
+L["IGNORED_BUFFS_ADD"] = "Add Buff"
+L["IGNORED_BUFFS_ADD_DESCRIPTION"] = "Type a spell ID, or Shift-click a buff's link into the box, then press Enter."
+L["IGNORED_BUFFS_EMPTY"] = "No buffs ignored yet. Add one above."
+L["IGNORED_BUFFS_REMOVE"] = "Removes this buff from the list."
+L["IGNORED_BUFFS_NOT_FOUND"] = "No buff found for %s."
+L["IGNORED_BUFFS_ALL_CHARACTERS"] = "All Characters"
+L["IGNORED_BUFFS_PROMOTE_DESCRIPTION"] =
+	"Moves this buff to the All Characters list, so it's never thanked on any character."
 
 --------------------------------------------------------------------------------
 -- Options: Thank You Button
@@ -141,6 +167,8 @@ L["BUTTON_SECTION"] = "Thank You Button %d"
 L["BUTTON_EMOTE"] = "Emote"
 L["BUTTON_EMOTE_DESCRIPTION"] = "Sets the emote this button performs at your target, or None for no emote."
 L["BUTTON_EMOTE_NONE"] = "None"
+-- Titles Thank You Button 1's emote checklist.
+L["EMOTES_SELECT"] = "Select Emotes"
 L["BUTTON_ICON"] = "Icon"
 L["BUTTON_ICON_DESCRIPTION"] = "Sets the icon this button's macro shows in your macro list and on your action bars."
 -- The Icon dropdown's first choice, the macros' own icon; every other choice is a picture alone.
@@ -154,7 +182,11 @@ L["BUTTON_MACRO_ENABLE"] = 'Enable Macro "%s"'
 L["BUTTON_MACRO_ENABLE_DESCRIPTION"] = "Creates a macro named %s and deletes it again when you turn this off."
 L["BUTTON_WHISPER_DESCRIPTION"] = "Sets what this button whispers to your target. Leave it empty to send no whisper."
 
--- Each button's whisper box
+--------------------------------------------------------------------------------
+-- Options: Whisper Message Row
+--------------------------------------------------------------------------------
+
+-- The caption and Reset button beside every whisper box, on Give Thanks and each Thank You Button.
 L["WHISPER_MESSAGE"] = "Whisper Message"
 L["WHISPER_MESSAGE_RESET"] = "Reset"
 L["WHISPER_MESSAGE_RESET_DESCRIPTION"] = "Resets the whisper message to the default text."
@@ -164,20 +196,5 @@ L["WHISPER_MESSAGE_RESET_DESCRIPTION"] = "Resets the whisper message to the defa
 --------------------------------------------------------------------------------
 
 L["DEFAULT_WHISPER"] = "Thanks, you're the best! (="
-
---------------------------------------------------------------------------------
--- Emotes
---------------------------------------------------------------------------------
-
-L["EMOTE_CHEER_DESCRIPTION"] = "You cheer at <Target>."
-L["EMOTE_DRINK_DESCRIPTION"] = "You raise a drink to <Target>."
-L["EMOTE_FLEX_DESCRIPTION"] = "You flex at <Target>."
-L["EMOTE_GRIN_DESCRIPTION"] = "You grin wickedly at <Target>."
-L["EMOTE_HIGHFIVE_DESCRIPTION"] = "You high-five <Target>."
-L["EMOTE_PRAISE_DESCRIPTION"] = "You praise <Target>."
-L["EMOTE_SALUTE_DESCRIPTION"] = "You salute <Target> with respect."
-L["EMOTE_SMILE_DESCRIPTION"] = "You smile at <Target>."
-L["EMOTE_THANK_DESCRIPTION"] = "You thank <Target>."
-L["EMOTE_WHOA_DESCRIPTION"] = "You exclaim 'Whoa!' at <Target>."
-L["EMOTE_WINK_DESCRIPTION"] = "You wink at <Target>."
-L["EMOTE_YES_DESCRIPTION"] = "You nod at <Target>."
+-- TRANSLATORS: keep {spell} exactly as written; TFTB swaps in the buff's link.
+L["DEFAULT_GIVE_THANKS_WHISPER"] = "Thanks for the {spell}"

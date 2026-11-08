@@ -5,9 +5,10 @@ local L = ns.L
 local GetColor = ns.GetColor
 
 --[[
-    "Stranger Buffs" panel -- a helpful buff on you from a player outside
-    your group. Two sections: Praise (what the buffer sees you send back, and the
-    limits on it) and Notifications (the chat line and sound only you get).
+    "Give Thanks" panel -- a helpful buff on you from a player outside
+    your group. Sections in order: the Praise Limits, the thank-you whisper, the
+    Notifications only you get. The emote checklist is a child panel of its own,
+    Emotes List (Options-Emotes-List.lua), since it is by far the longest.
 ]]
 
 --------------------------------------------------------------------------------
@@ -79,32 +80,6 @@ end
 -- Example Lines
 --------------------------------------------------------------------------------
 
---[[
-    A panel falls back to white after a link's closing |r, where a chat frame
-    falls back to the line's color, so the color is opened again after every |r.
-]]
-local function Tint(color, text)
-	return color .. (text:gsub("|r", "|r" .. color)) .. "|r"
-end
-
---[[
-    A silver "Example:" line showing the exact string a feature prints or
-    sends. getText returns the finished line in its own colors; a function so
-    the line redraws as settings change. Silver opens again after the line, for
-    a locale whose label runs on past it.
-]]
-local function OptionsExample(getText, order, hidden)
-	return {
-		type = "description",
-		name = function()
-			return GetColor("HELP") .. L["SAMPLE_EXAMPLE"]:format(getText() .. GetColor("HELP")) .. "|r"
-		end,
-		fontSize = "medium",
-		order = order,
-		hidden = hidden,
-	}
-end
-
 -- Chat draws the {rt1} marker as the Star icon; panel text needs the texture itself.
 local function MarkerAsTexture(message)
 	return (message:gsub(ns.TARGET_MARKER, "|TInterface\\TargetingFrame\\UI-RaidTargetingIcon_1:14|t", 1))
@@ -113,45 +88,18 @@ end
 -- The class whose spell the sample names (Arcane Intellect), so the buffer's name and color agree with it.
 local SAMPLE_CLASS = "MAGE"
 
-local WHISPER_FALLBACK_COLOR = "FF80FF"
-
---[[
-    The whisper color the player sees in their own chat, so a recolored
-    channel shows as they set it.
-]]
-local function WhisperColor()
-	local info = ChatTypeInfo and ChatTypeInfo.WHISPER
-	if not info then
-		return "|cff" .. WHISPER_FALLBACK_COLOR
-	end
-	return string.format(
-		"|cff%02x%02x%02x",
-		math.floor(info.r * 255 + 0.5),
-		math.floor(info.g * 255 + 0.5),
-		math.floor(info.b * 255 + 0.5)
-	)
-end
-
--- The character the panel is open on, in its class color, as a whisper's sender.
-local function SampleSender()
-	local name = GetUnitName("player") or ""
-	local _, class = UnitClass("player")
-	local hex = class and Data.CLASS_COLORS[class]
-	if hex then
-		name = "|cff" .. hex .. name .. "|r"
-	end
-	return "[" .. name .. "]"
-end
-
 --[[
     The Example line under the print toggle, hidden with it. build
     gets the sample player's class and name and returns the message body, made
     by the same builder the real print uses.
 ]]
 local function DefinePrintExample(settings, order, build)
-	return OptionsExample(
+	return ns.OptionsExample(
 		function()
-			return Tint(GetColor("TEXT"), ns.GetPrintPrefix() .. build(SAMPLE_CLASS, ns.SAMPLE_NAMES[SAMPLE_CLASS]))
+			return ns.TintText(
+				GetColor("TEXT"),
+				ns.GetPrintPrefix() .. build(SAMPLE_CLASS, ns.SAMPLE_NAMES[SAMPLE_CLASS])
+			)
 		end,
 		order,
 		function()
@@ -165,18 +113,63 @@ end
     the buffer receives it, "[You] whispers: ...", in the whisper color.
 ]]
 local function DefineWhisperExample(settings, order, spellId)
-	return OptionsExample(
+	return ns.OptionsExample(
 		function()
 			local link = ns.GetSpellLink(spellId) or ""
-			local message = MarkerAsTexture(ns:BuildAnnounceMessage("MESSAGE_WHISPER_THANKS", link))
-			local prefix = (CHAT_WHISPER_GET or "%s whispers: "):format(SampleSender())
-			return Tint(WhisperColor(), prefix .. message)
+			return ns.SampleWhisper(MarkerAsTexture(ns:BuildThanksWhisper(settings().whisperMessage, link) or ""))
 		end,
 		order,
 		function()
-			return not settings().whisperEnabled
+			return not settings().whisperEnabled or (settings().whisperMessage or "") == ""
 		end
 	)
+end
+
+--[[
+    The whisper's own words: a caption, the message box and a Reset button on one
+    row, the same row the Thank You Button whispers use. Shown with the whisper
+    toggle. The box keeps whatever is typed; ns:BuildThanksWhisper falls back to
+    the default text if the finished whisper would run past the chat ceiling.
+]]
+local WHISPER_LABEL_WIDTH = 0.9
+local WHISPER_RESET_WIDTH = 0.5
+
+local function DefineWhisperMessageRow(args, settings, order)
+	local function hidden()
+		return not settings().whisperEnabled
+	end
+	args.whisperMessageLabel = ns.OptionsRowLabel(
+		L["WHISPER_MESSAGE"],
+		order,
+		WHISPER_LABEL_WIDTH,
+		hidden,
+		L["PRAISE_WHISPER_MESSAGE_DESCRIPTION"]
+	)
+	args.whisperMessage = {
+		type = "input",
+		name = "",
+		desc = L["PRAISE_WHISPER_MESSAGE_DESCRIPTION"],
+		width = ns.OPTIONS_ROW_WIDTH - WHISPER_LABEL_WIDTH - WHISPER_RESET_WIDTH,
+		order = order + 0.01,
+		hidden = hidden,
+		get = function()
+			return settings().whisperMessage
+		end,
+		set = function(_, value)
+			settings().whisperMessage = (value or ""):match("^%s*(.-)%s*$")
+		end,
+	}
+	args.whisperMessageReset = {
+		type = "execute",
+		name = L["WHISPER_MESSAGE_RESET"],
+		desc = L["WHISPER_MESSAGE_RESET_DESCRIPTION"],
+		width = WHISPER_RESET_WIDTH,
+		order = order + 0.02,
+		hidden = hidden,
+		func = function()
+			settings().whisperMessage = L["DEFAULT_GIVE_THANKS_WHISPER"]
+		end,
+	}
 end
 
 -- The blank line above an Example, hidden whenever the Example is.
@@ -191,28 +184,11 @@ end
 --------------------------------------------------------------------------------
 
 --[[
-    The reaction toggles, one factory each. They are separate rather than one
-    block because the panel files them under different headers: the whisper and
-    the emote are praise the other player sees, the print and the sound are
-    notifications only you get. Every factory takes a `settings` accessor
-    returning ns.db.profile.strangers.
+    The reaction toggles, one factory each: the whisper, praise the other player
+    sees, and the print and the sound only you get. The emotes are a checklist
+    of their own (Options/Options-Emote-Grid.lua). Every factory takes a
+    `settings` accessor returning ns.db.profile.strangers.
 ]]
-local function DefinePrintToggle(settings, order)
-	return {
-		type = "toggle",
-		name = L["NOTIFICATIONS_PRINT_ENABLE"],
-		desc = L["NOTIFICATIONS_PRINT_DESCRIPTION"],
-		width = "full",
-		order = order,
-		get = function()
-			return settings().printEnabled
-		end,
-		set = function(_, value)
-			settings().printEnabled = value
-		end,
-	}
-end
-
 local function DefineWhisperToggle(settings, order)
 	return {
 		type = "toggle",
@@ -229,18 +205,18 @@ local function DefineWhisperToggle(settings, order)
 	}
 end
 
-local function DefineEmotesToggle(settings, order)
+local function DefinePrintToggle(settings, order)
 	return {
 		type = "toggle",
-		name = L["PRAISE_EMOTES_ENABLE"],
-		desc = L["PRAISE_EMOTES_DESCRIPTION"],
+		name = L["NOTIFICATIONS_PRINT_ENABLE"],
+		desc = L["NOTIFICATIONS_PRINT_DESCRIPTION"],
 		width = "full",
 		order = order,
 		get = function()
-			return settings().emotesEnabled
+			return settings().printEnabled
 		end,
 		set = function(_, value)
-			settings().emotesEnabled = value
+			settings().printEnabled = value
 		end,
 	}
 end
@@ -278,8 +254,8 @@ local function DefineSoundPreview(playSound, order)
 		name = "",
 		desc = L["NOTIFICATIONS_SOUND_PREVIEW_DESCRIPTION"],
 		image = "Interface\\Common\\VoiceChat-Speaker",
-		imageWidth = 18,
-		imageHeight = 18,
+		imageWidth = 16,
+		imageHeight = 16,
 		width = 0.15,
 		order = order,
 		func = playSound,
@@ -355,7 +331,7 @@ end
     instead of depending on someone remembering to pass a flag down.
 
     Existing `hidden` values are COMPOSED, not replaced. Several controls already
-    hide for their own reasons (the emote grid follows its own toggle), and
+    hide for their own reasons (the whisper Example follows its toggle), and
     overwriting that would leave the grid showing whenever the master was on.
 ]]
 local function HideAllExcept(args, isHidden, keep)
@@ -383,16 +359,16 @@ end
 -- Options Table
 --------------------------------------------------------------------------------
 
-function ns.BuildStrangersOptions()
+function ns.BuildGiveThanksOptions()
 	local function settings()
 		return ns.db.profile.strangers
 	end
 
 	local options = {
-		name = L["TAB_STRANGERS"],
+		name = L["TAB_GIVE_THANKS"],
 		type = "group",
 		args = {
-			descIntro = ns.OptionsDesc(L["STRANGERS_DESCRIPTION"], 1),
+			descIntro = ns.OptionsDesc(L["GIVE_THANKS_DESCRIPTION"], 1),
 			space0 = ns.OptionsSpacer(2),
 
 			--[[
@@ -408,37 +384,48 @@ function ns.BuildStrangersOptions()
 			space1 = ns.OptionsSpacer(4),
 			descPraise = ns.OptionsDesc(L["PRAISE_DESCRIPTION"], 4.3),
 			spacePraise = ns.OptionsSpacer(4.6),
-			emotesStrangers = DefineEmotesToggle(settings, 5),
-			emoteSpacer = ns.OptionsSpacer(6, ns.EmotesHidden(settings)),
-			strangersEmoteGroup = ns.DefineEmoteGroup(settings, 7),
-			space2 = ns.OptionsSpacer(8),
-			whisperStrangers = DefineWhisperToggle(settings, 9),
-			whisperExampleSpacer = DefineExampleSpacer(settings, "whisperEnabled", 9.3),
-			whisperExample = DefineWhisperExample(settings, 9.6, ns.GAME_IDS.SAMPLE_BUFF_SPELL_ID),
-			space3 = ns.OptionsSpacer(10),
+			-- The limits come first: they hold back the emote and the whisper alike.
 			-- Dropdowns over Data.SECONDS_CHOICES, the scale that explains its own steps.
-			praiseCooldownStrangersLabel = ns.OptionsRowLabel(L["STRANGERS_OVERALL_COOLDOWN"], 11),
+			praiseCooldownStrangersLabel = ns.OptionsRowLabel(
+				L["GIVE_THANKS_OVERALL_COOLDOWN"],
+				11,
+				nil,
+				nil,
+				L["GIVE_THANKS_OVERALL_COOLDOWN_DESCRIPTION"]
+			),
 			praiseCooldownStrangers = DefineSecondsSelect(
 				settings,
 				"praiseCooldown",
 				11.1,
-				L["STRANGERS_OVERALL_COOLDOWN_DESCRIPTION"]
+				L["GIVE_THANKS_OVERALL_COOLDOWN_DESCRIPTION"]
 			),
 			space4 = ns.OptionsSpacer(12),
-			cooldownStrangersLabel = ns.OptionsRowLabel(L["STRANGERS_SOURCE_COOLDOWN"], 13),
+			cooldownStrangersLabel = ns.OptionsRowLabel(
+				L["GIVE_THANKS_SOURCE_COOLDOWN"],
+				13,
+				nil,
+				nil,
+				L["GIVE_THANKS_SOURCE_COOLDOWN_DESCRIPTION"]
+			),
 			cooldownStrangers = DefineSecondsSelect(
 				settings,
 				"cooldown",
 				13.1,
-				L["STRANGERS_SOURCE_COOLDOWN_DESCRIPTION"]
+				L["GIVE_THANKS_SOURCE_COOLDOWN_DESCRIPTION"]
 			),
 			space5 = ns.OptionsSpacer(14),
-			minDurationStrangersLabel = ns.OptionsRowLabel(L["STRANGERS_MIN_DURATION"], 15),
+			minDurationStrangersLabel = ns.OptionsRowLabel(
+				L["GIVE_THANKS_MIN_DURATION"],
+				15,
+				nil,
+				nil,
+				L["GIVE_THANKS_MIN_DURATION_DESCRIPTION"]
+			),
 			minDurationStrangers = DefineSecondsSelect(
 				settings,
 				"minBuffDuration",
 				15.1,
-				L["STRANGERS_MIN_DURATION_DESCRIPTION"]
+				L["GIVE_THANKS_MIN_DURATION_DESCRIPTION"]
 			),
 			space6 = ns.OptionsSpacer(16),
 			-- Praise Delay closes the section.
@@ -446,20 +433,33 @@ function ns.BuildStrangersOptions()
 			praiseDelayLengthStrangers = DefinePraiseDelaySelect(settings, 18),
 			space7 = ns.OptionsSpacer(19),
 
-			headerNotifications = ns.OptionsHeader(L["NOTIFICATIONS_HEADER"], 20),
-			space8 = ns.OptionsSpacer(21),
-			descNotifications = ns.OptionsDesc(L["NOTIFICATIONS_DESCRIPTION"], 21.3),
-			spaceNotifications = ns.OptionsSpacer(21.6),
-			printStrangers = DefinePrintToggle(settings, 22),
-			printExampleSpacer = DefineExampleSpacer(settings, "printEnabled", 22.3),
-			printExample = DefinePrintExample(settings, 22.6, function(class, name)
+			-- The emote checklist has its own child panel, Emotes List.
+			headerWhispers = ns.OptionsHeader(L["WHISPERS_HEADER"], 40),
+			spaceWhispers = ns.OptionsSpacer(40.5),
+			whisperStrangers = DefineWhisperToggle(settings, 41),
+			-- 41.1 through 41.12 belong to the whisper message row, added below.
+			whisperMessageSpacer = DefineExampleSpacer(settings, "whisperEnabled", 41.05),
+			whisperExampleSpacer = DefineExampleSpacer(settings, "whisperEnabled", 41.3),
+			whisperExample = DefineWhisperExample(settings, 41.6, ns.GAME_IDS.SAMPLE_BUFF_SPELL_ID),
+			spaceAfterWhispers = ns.OptionsSpacer(42),
+
+			headerNotifications = ns.OptionsHeader(L["NOTIFICATIONS_HEADER"], 50),
+			space8 = ns.OptionsSpacer(51),
+			descNotifications = ns.OptionsDesc(L["NOTIFICATIONS_DESCRIPTION"], 51.3),
+			spaceNotifications = ns.OptionsSpacer(51.6),
+			printStrangers = DefinePrintToggle(settings, 52),
+			printExampleSpacer = DefineExampleSpacer(settings, "printEnabled", 52.3),
+			printExample = DefinePrintExample(settings, 52.6, function(class, name)
 				return ns:BuildStrangerMessage(class, name, ns.GetSpellLink(ns.GAME_IDS.SAMPLE_BUFF_SPELL_ID) or "")
 			end),
-			space9 = ns.OptionsSpacer(23),
-			soundStrangers = DefineSoundToggle(settings, 24),
-			soundPreviewStrangers = DefineSoundPreview(ns.PlayBuffSound, 25),
+			space9 = ns.OptionsSpacer(53),
+			soundStrangers = DefineSoundToggle(settings, 54),
+			soundPreviewStrangers = DefineSoundPreview(ns.PlayBuffSound, 55),
+			spaceAfterNotifications = ns.OptionsSpacer(56),
 		},
 	}
+
+	DefineWhisperMessageRow(options.args, settings, 41.1)
 
 	-- Intro text and the switch itself stay; everything else follows the switch.
 	HideAllExcept(options.args, function()

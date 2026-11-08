@@ -22,9 +22,32 @@ function ns.RegisterOptionsPanels()
 	local mainPanel, mainCategoryID = AceConfigDialog:AddToBlizOptions(registry.General, parent)
 	ns.optionsFrames = { main = mainPanel, categoryID = mainCategoryID }
 
-	if ns.BuildStrangersOptions then
-		AceConfig:RegisterOptionsTable(registry.StrangerBuffs, ns.BuildStrangersOptions())
-		AceConfigDialog:AddToBlizOptions(registry.StrangerBuffs, L["TAB_STRANGERS"], parent)
+	if ns.BuildGiveThanksOptions then
+		AceConfig:RegisterOptionsTable(registry.GiveThanks, ns.BuildGiveThanksOptions())
+		local _, strangersID = AceConfigDialog:AddToBlizOptions(registry.GiveThanks, L["TAB_GIVE_THANKS"], parent)
+		ns.optionsFrames.strangersID = strangersID
+	end
+
+	--[[
+	    Emotes List and Ignored Buffs are child panels of Give Thanks, in that
+	    order. A panel nested one level further down passes its parent's captured
+	    category ID, not its title: AddToBlizOptions resolves a parent by name
+	    only among top-level panels. Ignored Buffs registers as the builder, so
+	    every repaint lists the current buffs.
+	]]
+	if ns.BuildEmotesListOptions then
+		AceConfig:RegisterOptionsTable(registry.EmotesList, ns.BuildEmotesListOptions())
+		AceConfigDialog:AddToBlizOptions(registry.EmotesList, L["TAB_EMOTES_LIST"], ns.optionsFrames.strangersID)
+	end
+
+	if ns.BuildIgnoredBuffsOptions then
+		AceConfig:RegisterOptionsTable(registry.IgnoredBuffs, ns.BuildIgnoredBuffsOptions)
+		local ignoredPanel = AceConfigDialog:AddToBlizOptions(
+			registry.IgnoredBuffs,
+			L["TAB_IGNORED_BUFFS"],
+			ns.optionsFrames.strangersID
+		)
+		ns.PrepareIgnoredBuffsTree(ignoredPanel)
 	end
 
 	if ns.BuildThankYouButtonOptions then

@@ -1,23 +1,24 @@
 # Thanks for the Buff // Test Plan
 
-Thanks for the Buff thanks the players who buff you and gives you Thank You macros to thank anyone by hand. This release takes it back to its roots (Teammate Buffs, Send Good News, Service Alerts, Buff Duty, Peer Pressure and the mini-map button are gone) and adds Mists of Pandaria Classic, so we most want you to check that nothing old is left behind and that the thank-yous still work everywhere.
+Thanks for the Buff thanks players outside your group who buff you, and gives you Thank You macros to thank anyone by hand. This time we most want you to try the new Give Thanks settings: your own whisper, your own emote list, and buffs you never want to thank.
 
 **Play on Classic Era, Season of Discovery, WoW Forever, TBC Anniversary and Mists of Pandaria Classic.** If something looks wrong, tell us the check number and what you saw on [Discord](https://discord.gg/eh8hKq992Q).
 
 ## What's New
 
-1. Log in on a character that used the last version, with Buff Duty and the other old features set up; no error should appear, and your Stranger Buffs and Thank You Button settings should be as you left them.
-2. Type `/tftb`; under **Thanks for the Buff (TFTB)** the list should show only Stranger Buffs, Thank You Button, Profiles, Feedback & Support and Diagnostic Tools.
-3. On the main **Thanks for the Buff (TFTB)** page, check **Features** holds only **Enable Thanks for Stranger Buffs** and **Looking for Other Features?** has Good to Go links you can copy.
-4. Check there's no TFTB button on the mini-map, no Buff Duty window when you join a group, and no Thanks for the Buff section in the game's Key Bindings.
-5. Run the checks below on Mists of Pandaria Classic too; it's new there.
+1. Log in on a character that used the last version; no error should appear, and if you had emotes turned off, every emote on **Give Thanks** is now unchecked.
+2. Type `/tftb` and check **Stranger Buffs** is now called **Give Thanks**, with **Ignored Buffs** under it.
+3. On **Give Thanks**, write your own **Whisper Message** with `{spell}` in it, turn on **Enable Thank-You Whispers** and get buffed by a stranger; the whisper names the buff, with a star in front (now on WoW Forever too).
+4. Under **Emotes**, check only a couple of emotes (try one from **Voice** or **Pose**) and get buffed by a stranger; you use one of those.
+5. On **Ignored Buffs**, add a buff with **Add From Your Buffs** or **Add Buff**, then get it from a stranger; no thank-you goes out, but your print out and sound still do.
+6. Let a groupmate's pet buff you (a warlock's Imp works); nothing should happen.
+7. On **Thank You Button**, type a whisper for a button and check the **Example** line under it shows the whisper as your target will get it.
 
 ## Everything Else
 
-6. Stand in a capital city and let a stranger buff you; you emote at them.
-7. On **Stranger Buffs**, turn on **Enable Thank-You Whispers** and **Enable Print Outs**, then get buffed by a stranger; they get a whisper, and you see a line in chat.
-8. Have a groupmate buff you; nothing should happen, since they aren't a stranger.
-9. On WoW Forever, get buffed by a stranger **in combat**; no error should appear.
-10. On **Thank You Button**, tick **Enable Macro "- Thank"** and press the macro on a target (on WoW Forever, **in combat** too).
-11. Tick **Enable Macro "- TFTB 2"**, pick an emote and an icon, and press the "- TFTB 2" macro on a target.
-12. Type `/tftb` and check the options open inside the game's Options, especially on TBC Anniversary; in combat, it should refuse.
+8. Turn on **Enable Print Outs** and **Enable Sound Effects**, then let a stranger buff you in a capital city; you emote at them, see a line in chat and hear a sound.
+9. Have a groupmate buff you; nothing should happen, since they aren't a stranger.
+10. On WoW Forever, get buffed by a stranger **in combat**; no error should appear.
+11. On **Thank You Button**, tick **Enable Macro "- Thank"** and press the macro on a target (on WoW Forever, **in combat** too).
+12. Tick **Enable Macro "- TFTB 2"**, pick an emote and an icon, and press the "- TFTB 2" macro on a target.
+13. Type `/tftb` and check the options open inside the game's Options, especially on TBC Anniversary; in combat, it should refuse.

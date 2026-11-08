@@ -3,7 +3,6 @@ ns.L = LibStub("AceLocale-3.0"):GetLocale(ADDON_NAME)
 ns.Data = {}
 
 local Data = ns.Data
-local L = ns.L
 
 -- The SavedVariables global the TOC declares; Diagnostics dumps it by this name.
 ns.SAVED_VARIABLES_NAME = "TFTBDB"
@@ -28,6 +27,13 @@ ns.PALETTE = {
 	SEPARATOR = "AAAAAA", -- Gray: Separators, Dividers
 	MUTED = "808080", -- Dark Gray: Meta-data, Version Numbers
 }
+
+--[[
+    The client's own spell-link blue, verbatim. Not a palette role, so it is kept
+    separate; the exact literal is preserved because ns.GetSpellLink hands it to
+    SendChatMessage's hyperlink validator.
+]]
+ns.SPELL_LINK_COLOR = "71d5ff"
 
 --------------------------------------------------------------------------------
 -- Class Colors
@@ -75,7 +81,9 @@ ns.SAMPLE_NAMES = {
 -- Keys match each panel's file suffix.
 ns.OPTIONS_REGISTRY = {
 	General = ADDON_NAME .. "_General",
-	StrangerBuffs = ADDON_NAME .. "_StrangerBuffs",
+	GiveThanks = ADDON_NAME .. "_GiveThanks",
+	EmotesList = ADDON_NAME .. "_EmotesList",
+	IgnoredBuffs = ADDON_NAME .. "_IgnoredBuffs",
 	ThankYouButton = ADDON_NAME .. "_ThankYouButton",
 	Profiles = ADDON_NAME .. "_Profiles",
 	FeedbackSupport = ADDON_NAME .. "_FeedbackSupport",
@@ -92,6 +100,26 @@ ns.OPTIONS_LABEL_WIDTH = 2.1
 ns.OPTIONS_CONTROL_WIDTH = ns.OPTIONS_ROW_WIDTH - ns.OPTIONS_LABEL_WIDTH
 ns.OPTIONS_REMOVE_ICON_WIDTH = 0.25 -- the item lists' remove column, sized to its icon
 ns.OPTIONS_SUB_INDENT_WIDTH = 0.115 -- the blank cell a sub-option row leads with
+
+-- The Ignored Buffs rows' promote column, sized to hold "All Characters" without truncating.
+ns.OPTIONS_PROMOTE_WIDTH = 0.9
+
+--[[
+    A tree panel's sidebar eats into the pane its rows are laid out in, so rows
+    inside one spend a shorter budget than ns.OPTIONS_ROW_WIDTH. AceGUI's tree
+    defaults to 175px; this is a hair wider, enough for a long realm name. The
+    tree stays drag-resizable, and a drag wins over this seed.
+]]
+ns.OPTIONS_TREE_WIDTH = 180
+ns.OPTIONS_TREE_ROW_WIDTH = 2.5
+
+--[[
+    The Ignored Buffs panel names one scope per list. Every scope but one is an
+    AceDB char key ("Name - Realm", never localized), so the account-wide list
+    needs a key no character can collide with -- hence the asterisks, which no
+    character or realm name can contain.
+]]
+ns.LIST_SCOPE_GLOBAL = "**global**"
 
 --------------------------------------------------------------------------------
 -- Constants
@@ -141,7 +169,7 @@ Data.THANK_YOU_DEFAULT_ICON = 134411
 --[[
     Praise Delay lengths, in seconds. Doubles as the dropdown's display order; the
     labels themselves come from the client's own duration strings at panel-build
-    time (see DefinePraiseDelaySelect in Options/Options-Stranger-Buffs.lua).
+    time (see DefinePraiseDelaySelect in Options/Options-Give-Thanks.lua).
 ]]
 Data.PRAISE_DELAY_CHOICES = { 1, 2, 3, 4 }
 
@@ -181,18 +209,30 @@ ns.GOOD_TO_GO_LINKS = {
 -- Emotes
 --------------------------------------------------------------------------------
 
+--[[
+    The emote groups, in the order the Give Thanks panel lists them. Each
+    flavor's Data/<Flavor>/Emote-Groups-<Flavor>.lua sorts its tokens into them.
+]]
+Data.EMOTE_GROUPS = { "Text", "Gesture", "Voice", "Pose" }
+
+--[[
+    The curated praise emotes: the ones Give Thanks starts with checked, and
+    the whole list Thank You Button 1 offers. Only tokens: the client performs
+    each emote and writes its line in the player's own language, so TFTB never
+    carries a copy of that text.
+]]
 Data.EMOTES = {
-	{ token = "CHEER", desc = L["EMOTE_CHEER_DESCRIPTION"] },
-	{ token = "DRINK", desc = L["EMOTE_DRINK_DESCRIPTION"] },
-	{ token = "FLEX", desc = L["EMOTE_FLEX_DESCRIPTION"] },
-	{ token = "GRIN", desc = L["EMOTE_GRIN_DESCRIPTION"] },
-	{ token = "HIGHFIVE", desc = L["EMOTE_HIGHFIVE_DESCRIPTION"] },
-	{ token = "PRAISE", desc = L["EMOTE_PRAISE_DESCRIPTION"] },
-	{ token = "SALUTE", desc = L["EMOTE_SALUTE_DESCRIPTION"] },
-	{ token = "SMILE", desc = L["EMOTE_SMILE_DESCRIPTION"] },
-	{ token = "THANK", desc = L["EMOTE_THANK_DESCRIPTION"] },
-	{ token = "WHOA", desc = L["EMOTE_WHOA_DESCRIPTION"] },
-	{ token = "WINK", desc = L["EMOTE_WINK_DESCRIPTION"] },
+	{ token = "CHEER" },
+	{ token = "DRINK" },
+	{ token = "FLEX" },
+	{ token = "GRIN" },
+	{ token = "HIGHFIVE" },
+	{ token = "PRAISE" },
+	{ token = "SALUTE" },
+	{ token = "SMILE" },
+	{ token = "THANK" },
+	{ token = "WHOA" },
+	{ token = "WINK" },
 	-- Token is NOD: /yes is one of its command aliases, and no client has a YES token.
-	{ token = "NOD", desc = L["EMOTE_YES_DESCRIPTION"] },
+	{ token = "NOD" },
 }

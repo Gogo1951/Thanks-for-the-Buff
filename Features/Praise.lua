@@ -2,7 +2,7 @@ local _, ns = ...
 
 --[[
     Reacting to a stranger's buff: the praise cooldowns, the emote target, and
-    the print, sound, whisper and emote the Stranger Buffs panel offers.
+    the print, sound, whisper and emote the Give Thanks panel offers.
     Buff-Tracking classifies the event and calls ns.HandleStrangersBuff.
 ]]
 
@@ -61,7 +61,7 @@ local function TryWhisperCooldown(guid)
 end
 
 --[[
-    The Strangers panel's overall praise limit: one key for the whole feature,
+    The Give Thanks panel's overall praise limit: one key for the whole feature,
     since it asks "how recently did I praise ANYONE", not "how recently did I
     praise this player" (that is the per-source "praise:<guid>" key).
 ]]
@@ -155,8 +155,8 @@ end
     the delay window.
 
     Two things are deliberately decided late instead, when the emote actually
-    fires. Combat, because the promise on that toggle is that an emote never
-    plays while you are fighting. And the emote target: ResolveEmoteTarget hands
+    fires. Combat, because the promise is that an emote never plays while you
+    are fighting. And the emote target: ResolveEmoteTarget hands
     back a live unit token, and "target", "focus", and "mouseover" all name
     whoever you are pointing at in that instant -- resolve it early and a delayed
     emote thanks whoever you moved on to. A buffer with no unit token degrades
@@ -167,7 +167,7 @@ end
 local function DeliverPraise(db, guid, name, link, whisperAllowed, emoteAllowed)
 	local function Praise()
 		if whisperAllowed then
-			ns:WhisperThanks(name, link)
+			ns:WhisperThanks(name, link, db.whisperMessage)
 		end
 		if emoteAllowed and not InCombatLockdown() then
 			ns:DoRandomEmote(db.emotes, ResolveEmoteTarget(guid, name))
@@ -213,12 +213,17 @@ local function HandleStrangersBuff(sourceGUID, sourceName, spellID)
 		ns.PlayBuffSound()
 	end
 
+	-- An ignored buff still notifies you; it just never thanks anyone.
+	if ns.IsBuffIgnored(spellID) then
+		return
+	end
+
 	--[[
         Two praise cooldowns, both user settings: the overall one keeps a
         mass-buff moment from turning into a chain of thank-yous, the per-source
         one keeps a single player from being praised over and over. Neither is
         spent unless praise is cleared to go out, so a buff that arrives while you
-        are in combat with emotes as your only enabled praise costs nothing. The
+        are in combat with emotes as your only praise costs nothing. The
         per-recipient whisper throttle sits on top as a floor no setting can
         lower, so a short cooldown can't whisper someone into the server's chat
         squelch.
@@ -228,8 +233,11 @@ local function HandleStrangersBuff(sourceGUID, sourceName, spellID)
 		return
 	end
 
-	local whisperAllowed = db.whisperEnabled and TryWhisperCooldown(sourceGUID)
-	local emoteAllowed = db.emotesEnabled and not InCombatLockdown()
+	local whisperAllowed = db.whisperEnabled
+		and db.whisperMessage
+		and db.whisperMessage ~= ""
+		and TryWhisperCooldown(sourceGUID)
+	local emoteAllowed = #ns.GetPickableEmotes(db.emotes) > 0 and not InCombatLockdown()
 	if not whisperAllowed and not emoteAllowed then
 		return
 	end

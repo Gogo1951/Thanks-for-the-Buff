@@ -133,9 +133,8 @@ function ns.RunThankYou(button)
 	end
 
 	--[[
-	    A single-emote button stores one token chosen from everything the client
-	    offers, so it cannot go through DoRandomEmote -- that one is bounded by
-	    Data.EMOTES, the curated twelve Stranger Buffs and Thank You Button 1 use.
+	    A single-emote button stores one token, not a checklist, so there is
+	    nothing for DoRandomEmote to choose between.
 	]]
 	if button and button.singleEmote then
 		ns:DoEmoteToken(db.emote, "target")

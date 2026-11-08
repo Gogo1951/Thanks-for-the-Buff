@@ -56,6 +56,7 @@ read_globals = {
 	"issecretvalue",
 	"LibStub",
 	"MAXEMOTEINDEX",
+	"PlaySound",
 	"PlaySoundFile",
 	"SetCVar",
 	"Settings",

@@ -33,3 +33,21 @@
 - **Departs from:** MESSAGES → Target Marker, "so two add-ons never collide."
 - **Instead:** Sent messages carry the Star marker (`{rt1}`), which Good to Go also uses.
 - **Why:** Good to Go carries on features that moved out of Thanks for the Buff, so the two sister add-ons share one marker.
+
+### Thank You Button whispers go out unbranded
+
+- **Departs from:** MESSAGES, "every sent message trails with the Short Name".
+- **Instead:** A Thank You Button whisper sends the player's own text exactly as typed, with no target marker and no Short Name.
+- **Why:** The player writes it and sends it with their own key press, so it speaks in their voice, not the add-on's.
+
+### Give Thanks has a Reset Emotes button
+
+- **Departs from:** SAVED VARIABLES → Reset, "no control resets settings Reset Profile can reach".
+- **Instead:** A confirmed Reset Emotes button on Give Thanks puts the emote checklist back to the default praise emotes.
+- **Why:** The checklist holds every emote the client has, so rebuilding the defaults by hand takes real effort, as with an item list's Restore Defaults.
+
+### Ignored Buffs match one spell ID
+
+- **Departs from:** COMPATIBILITY → Game Mechanics, "a check for a buff matches every rank's ID".
+- **Instead:** Each Ignored Buffs entry ignores only the exact spell ID added, from the player's own buffs or typed in.
+- **Why:** Rank names differ within some locales, so no name match covers every rank, and a player can add each rank's ID by hand.
