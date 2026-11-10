@@ -55,6 +55,12 @@ function ns.RegisterOptionsPanels()
 		AceConfigDialog:AddToBlizOptions(registry.ThankYouButton, L["TAB_THANK_YOU_BUTTON"], parent)
 	end
 
+	-- Registered as the builder, so every repaint lists the current guilds and names.
+	if ns.BuildWaveToFriendsOptions then
+		AceConfig:RegisterOptionsTable(registry.WaveToFriends, ns.BuildWaveToFriendsOptions)
+		AceConfigDialog:AddToBlizOptions(registry.WaveToFriends, L["TAB_WAVE_TO_FRIENDS"], parent)
+	end
+
 	--[[
 	    Profiles registers after the feature panels, directly above Feedback &
 	    Support. Its display name comes already localized from AceDBOptions-3.0.

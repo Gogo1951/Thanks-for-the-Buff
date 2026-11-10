@@ -177,6 +177,7 @@ ns.FEATURE_SWITCHES = {
 	    onChange: present only for a feature that must react the moment either copy flips.
 	]]
 	{ key = "strangers", setting = "enabled", name = "GIVE_THANKS_ENABLE", desc = "GIVE_THANKS_ENABLE_DESCRIPTION" },
+	{ key = "wave", setting = "enabled", name = "WAVE_ENABLE", desc = "WAVE_ENABLE_DESCRIPTION" },
 }
 
 local function NotifyAllPanels()
@@ -254,6 +255,41 @@ function ns.OptionsTogglePairs(args, keyPrefix, startOrder, toggles)
 end
 
 --------------------------------------------------------------------------------
+-- Master Switch
+--------------------------------------------------------------------------------
+
+--[[
+    Hides every arg not named in `keep` while isHidden() is true.
+
+    Applied to the finished args table rather than threaded through every
+    Define* builder, so a control added later is covered automatically.
+
+    An arg's own `hidden` is COMPOSED, not replaced, so a control that hides for
+    its own reason (the whisper Example follows its toggle) still does while
+    the switch is on.
+]]
+function ns.HideAllExcept(args, isHidden, keep)
+	for key, option in pairs(args) do
+		if not keep[key] then
+			local own = option.hidden
+			if own == nil then
+				option.hidden = isHidden
+			else
+				option.hidden = function(info)
+					if isHidden(info) then
+						return true
+					end
+					if type(own) == "function" then
+						return own(info)
+					end
+					return own
+				end
+			end
+		end
+	end
+end
+
+--------------------------------------------------------------------------------
 -- Emote Picker
 --------------------------------------------------------------------------------
 
@@ -290,4 +326,27 @@ function ns.DefineEmoteGroup(settings, order)
 	end
 
 	return group
+end
+
+--[[
+    The single-emote dropdown's contents, for Thank You Buttons 2 to 5 and Wave
+    to Friends' Custom List rows: every emote the client has, plus an explicit
+    None, ordered by slash command. Built from ns.GetEmoteCatalog rather than
+    Data.EMOTES, since these are a free choice from the whole client set.
+
+    Cached: the catalog cannot change during a session, and the panels rebuild
+    on every open otherwise.
+]]
+local emoteValues, emoteSorting
+
+function ns.GetEmoteSelectChoices()
+	if not emoteValues then
+		emoteValues = { [""] = L["BUTTON_EMOTE_NONE"] }
+		emoteSorting = { "" }
+		for _, emote in ipairs(ns.GetEmoteCatalog()) do
+			emoteValues[emote.token] = emote.command
+			emoteSorting[#emoteSorting + 1] = emote.token
+		end
+	end
+	return emoteValues, emoteSorting
 end

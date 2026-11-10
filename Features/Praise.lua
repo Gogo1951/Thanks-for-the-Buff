@@ -34,7 +34,7 @@ local function SetCooldown(guid, duration)
 			sessionCooldowns[key] = nil
 		end
 	end
-	sessionCooldowns[guid] = now + (duration or 10)
+	sessionCooldowns[guid] = now + duration
 end
 
 --[[

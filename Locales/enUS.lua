@@ -40,7 +40,7 @@ L["SAMPLE_EXAMPLE"] = "Example: %s"
 L["OPTIONS_WELCOME_TOGGLE"] = "Enable Welcome Message"
 L["OPTIONS_WELCOME_DESCRIPTION"] = "Prints a message only you can see when you log in."
 L["OPTIONS_DESCRIPTION"] =
-	"Auto thank players who buff you with an emote or whisper. Strangers who drop Fortitude, Arcane Intellect, or Mark of the Wild on you get thanked on the spot, and one click of your Thank You macros thanks anyone you target."
+	"Auto thank players who buff you with an emote or whisper, greet friends and guildmates with a wave as you pass them, and thank anyone you target with one click of your Thank You macros."
 L["OPTIONS_FEATURES_HEADER"] = "Features"
 L["OPTIONS_FEATURES_DESCRIPTION"] = "Turn each feature on or off here, or on its own panel."
 L["OPTIONS_COMMANDS_HEADER"] = "/Commands"
@@ -109,6 +109,7 @@ L["PRAISE_DELAY_LENGTH_DESCRIPTION"] = "Sets how long to wait before the whisper
 L["WHISPERS_HEADER"] = "Thank-You Whispers"
 L["PRAISE_WHISPER_ENABLE"] = "Enable Thank-You Whispers"
 L["PRAISE_WHISPER_DESCRIPTION"] = "Whispers a thank-you to the player who buffed you."
+-- TRANSLATORS: keep {spell} exactly as written; it is the token players type into the whisper.
 L["PRAISE_WHISPER_MESSAGE_DESCRIPTION"] =
 	"Sets what TFTB whispers to the player who buffed you. {spell} becomes the buff. Leave it empty to send no whisper."
 
@@ -121,10 +122,19 @@ L["NOTIFICATIONS_SOUND_ENABLE"] = "Enable Sound Effects"
 L["NOTIFICATIONS_SOUND_DESCRIPTION"] = "Plays a sound when you receive a buff. Only you hear it."
 L["NOTIFICATIONS_SOUND_PREVIEW_DESCRIPTION"] = "Plays the sound so you can hear it before turning it on."
 
--- Emotes: the grid's group keys are EMOTE_GROUP_ plus each Data.EMOTE_GROUPS entry, upper-cased.
+--------------------------------------------------------------------------------
+-- Options: Emotes List
+--------------------------------------------------------------------------------
+
 L["TAB_EMOTES_LIST"] = "Emotes List"
 L["EMOTES_GRID_DESCRIPTION"] =
 	"Check the emotes Give Thanks can pick from when a player outside your group buffs you; it uses one at random. Emotes are held back while you are in combat."
+
+--[[
+    The emote checklist, shared by this panel and Wave to Friends' Friends and
+    Guilds tabs. Its group keys are EMOTE_GROUP_ plus each Data.EMOTE_GROUPS
+    entry, upper-cased.
+]]
 L["EMOTE_GROUP_COUNT"] = "%s (%d of %d Checked)"
 L["EMOTE_GROUP_TEXT"] = "Text"
 L["EMOTE_GROUP_TEXT_DESCRIPTION"] = "Shows the emote line only."
@@ -181,6 +191,60 @@ L["BUTTON_ICON_DEFAULT"] = "Default"
 L["BUTTON_MACRO_ENABLE"] = 'Enable Macro "%s"'
 L["BUTTON_MACRO_ENABLE_DESCRIPTION"] = "Creates a macro named %s and deletes it again when you turn this off."
 L["BUTTON_WHISPER_DESCRIPTION"] = "Sets what this button whispers to your target. Leave it empty to send no whisper."
+
+--------------------------------------------------------------------------------
+-- Options: Wave to Friends
+--------------------------------------------------------------------------------
+
+L["TAB_WAVE_TO_FRIENDS"] = "Wave to Friends"
+L["WAVE_ENABLE"] = "Enable Wave to Friends"
+L["WAVE_ENABLE_DESCRIPTION"] = "Turns on an emote for friends and guildmates when you mouse over them."
+L["WAVE_DESCRIPTION"] = "Greet friends and guildmates with an emote when you mouse over them out in the world."
+L["WAVE_RULES"] = "Never your party or raid, and never in combat."
+L["WAVE_RESTING_ENABLE"] = "Only While Resting"
+L["WAVE_RESTING_ENABLE_DESCRIPTION"] = "Waves only while you are resting, in a town or an inn."
+L["WAVE_COOLDOWN"] = "Same-Player Cooldown"
+L["WAVE_COOLDOWN_DESCRIPTION"] = "Sets how long before the same player can be greeted again."
+L["WAVE_COOLDOWN_ONCE_PER_SESSION"] = "Once per Session"
+-- %s is the default emotes' slash commands, as the client names them.
+L["WAVE_EMOTES_RESET_DEFAULTS_DESCRIPTION"] = "Puts the checklist back to %s only."
+
+-- Custom List
+L["WAVE_TAB_CUSTOM"] = "Custom List"
+L["WAVE_CUSTOM_DESCRIPTION"] =
+	"Players who always get their own emote, even over Friends and Guilds. Pick None to never emote at someone."
+-- One of these two follows WAVE_CUSTOM_DESCRIPTION: realm clients, then WoW Forever, which has no realms.
+L["WAVE_CUSTOM_NAMES_REALM"] = "Name-Realm matches that realm only; a bare name matches any realm."
+L["WAVE_CUSTOM_NAMES_FOREVER"] = "A full name matches one character; a first name alone matches everyone with it."
+L["WAVE_CUSTOM_ENABLE"] = "Enable Custom List"
+L["WAVE_CUSTOM_ENABLE_DESCRIPTION"] = "Uses the names below before Friends and Guilds."
+L["WAVE_CUSTOM_OFF_WARNING"] = "The Custom List is off, so nobody below gets their emote."
+L["WAVE_CUSTOM_ADD"] = "Add Player"
+L["WAVE_CUSTOM_ADD_DESCRIPTION"] = "Type a name or Name-Realm, then press Enter. Separate several names with commas."
+L["WAVE_CUSTOM_ADD_DESCRIPTION_FOREVER"] =
+	"Type a full name or a first name, then press Enter. Separate several names with commas."
+L["WAVE_CUSTOM_EMPTY"] = "No players yet. Add one above."
+L["WAVE_CUSTOM_EMOTE_DESCRIPTION"] = "Sets the emote for this player, or None to never emote at them."
+L["WAVE_CUSTOM_REMOVE"] = "Removes this player from the list."
+
+-- Friends
+L["WAVE_TAB_FRIENDS"] = "Friends"
+L["WAVE_FRIENDS_ENABLE"] = "Wave at Friends"
+L["WAVE_FRIENDS_ENABLE_DESCRIPTION"] = "Greets characters on your friends list."
+L["WAVE_BNET_ENABLE"] = "Include Battle.net Friends"
+L["WAVE_BNET_ENABLE_DESCRIPTION"] = "Also greets the characters your Battle.net friends are playing."
+L["WAVE_FRIENDS_EMOTES_DESCRIPTION"] = "Check the emotes to pick from for friends; one is used at random."
+
+-- Guilds
+L["WAVE_TAB_GUILDS"] = "Guilds"
+L["WAVE_MY_GUILD_ENABLE"] = "Wave at My Guild"
+L["WAVE_MY_GUILD_ENABLE_DESCRIPTION"] = "Greets members of the guild you are in."
+L["WAVE_GUILD_ADD"] = "Add Guild"
+L["WAVE_GUILD_ADD_DESCRIPTION"] =
+	"Type a guild's name, then press Enter. Separate several guilds with commas. Capitals don't matter."
+L["WAVE_GUILDS_EMPTY"] = "No other guilds yet. Add one above."
+L["WAVE_GUILD_REMOVE"] = "Removes this guild from the list."
+L["WAVE_GUILDS_EMOTES_DESCRIPTION"] = "Check the emotes to pick from for guild members; one is used at random."
 
 --------------------------------------------------------------------------------
 -- Options: Whisper Message Row

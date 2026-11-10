@@ -82,7 +82,7 @@ end
 
 -- Chat draws the {rt1} marker as the Star icon; panel text needs the texture itself.
 local function MarkerAsTexture(message)
-	return (message:gsub(ns.TARGET_MARKER, "|TInterface\\TargetingFrame\\UI-RaidTargetingIcon_1:14|t", 1))
+	return (message:gsub(ns.TARGET_MARKER, "|TInterface\\TargetingFrame\\UI-RaidTargetingIcon_1:16|t", 1))
 end
 
 -- The class whose spell the sample names (Arcane Intellect), so the buffer's name and color agree with it.
@@ -319,43 +319,6 @@ local function DefinePraiseDelaySelect(settings, order)
 end
 
 --------------------------------------------------------------------------------
--- Master Switch
---------------------------------------------------------------------------------
-
---[[
-    Hide every control on the panel behind its master switch.
-
-    Applied to the finished args table rather than threaded through every
-    Define* builder. The rule is positional -- everything except the intro text
-    and the switch itself -- so a control added later is covered automatically
-    instead of depending on someone remembering to pass a flag down.
-
-    Existing `hidden` values are COMPOSED, not replaced. Several controls already
-    hide for their own reasons (the whisper Example follows its toggle), and
-    overwriting that would leave the grid showing whenever the master was on.
-]]
-local function HideAllExcept(args, isHidden, keep)
-	for key, option in pairs(args) do
-		if not keep[key] then
-			local own = option.hidden
-			if own == nil then
-				option.hidden = isHidden
-			else
-				option.hidden = function(info)
-					if isHidden(info) then
-						return true
-					end
-					if type(own) == "function" then
-						return own(info)
-					end
-					return own
-				end
-			end
-		end
-	end
-end
-
---------------------------------------------------------------------------------
 -- Options Table
 --------------------------------------------------------------------------------
 
@@ -462,7 +425,7 @@ function ns.BuildGiveThanksOptions()
 	DefineWhisperMessageRow(options.args, settings, 41.1)
 
 	-- Intro text and the switch itself stay; everything else follows the switch.
-	HideAllExcept(options.args, function()
+	ns.HideAllExcept(options.args, function()
 		return not settings().enabled
 	end, { descIntro = true, space0 = true, enable = true })
 

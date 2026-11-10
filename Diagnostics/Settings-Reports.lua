@@ -3,26 +3,6 @@ local _, ns = ...
 local GetClientHeader = ns.GetDiagnosticClientHeader
 
 --------------------------------------------------------------------------------
--- Display Context
---------------------------------------------------------------------------------
-
---[[
-    Answers "a window is too big / off-screen" reports: screen size and UI
-    scale. Read-only.
-]]
-function ns:BuildDisplayContextReport()
-	local lines = { GetClientHeader(), "" }
-
-	local width, height = _G.GetPhysicalScreenSize()
-	lines[#lines + 1] = string.format("Physical screen size: %s x %s", tostring(width), tostring(height))
-	lines[#lines + 1] = string.format("UIParent scale: %s", tostring(UIParent and UIParent:GetScale()))
-	lines[#lines + 1] = string.format("uiScale CVar: %s", tostring(GetCVar("uiScale")))
-	lines[#lines + 1] = string.format("useUiScale CVar: %s", tostring(GetCVar("useUiScale")))
-
-	return table.concat(lines, "\n")
-end
-
---------------------------------------------------------------------------------
 -- Other Add-ons
 --------------------------------------------------------------------------------
 
@@ -66,11 +46,13 @@ local function DumpTable(value, indent, depth, lines)
 end
 
 --[[
-    Dumps the single AceDB-managed table (profiles, profileKeys) so a player
-    can paste their exact configuration: every setting each profile has saved
-    (AceDB fills the rest in from the defaults, which the context report
-    prints as read), every Give Thanks switch, throttle, emote pick and
-    ignored buff, and every Thank You button's text, icon and emotes.
+    Dumps the single AceDB-managed table (profiles, profileKeys, char, global)
+    so a player can paste their exact configuration: every setting each
+    profile has saved (AceDB fills the rest in from the defaults, which the
+    context reports print as read), every Give Thanks switch, throttle and
+    emote pick, every Thank You button's text, icon and emotes, every Wave to
+    Friends switch, guild, name and emote, and every Ignored Buffs row in both
+    scopes.
 ]]
 function ns:BuildSavedVariablesReport()
 	local lines = { GetClientHeader(), "", ns.SAVED_VARIABLES_NAME .. " = {" }

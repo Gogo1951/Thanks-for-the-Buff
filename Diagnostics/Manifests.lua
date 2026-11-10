@@ -12,9 +12,10 @@ local GetClientHeader = ns.GetDiagnosticClientHeader
     nothing incidental, and nothing the add-on does not use.
 
     Every modern/legacy pair the add-on still picks between is listed as both
-    halves: Validate Data's tooltip-text read (C_TooltipInfo.GetItemByID and
+    halves: Wave to Friends' mouse-focus read (GetMouseFoci, or GetMouseFocus)
+    and Validate Data's tooltip-text read (C_TooltipInfo.GetItemByID and
     GetSpellByID, or the hidden scan tooltip). Rows for one flavor's buff
-    detection are added only on that flavor, below.
+    detection and name reads are added only on that flavor, below.
     The hidden tooltip is probed through the GameTooltip methods it inherits,
     so the check creates nothing. A FAIL on one half is the report working
     rather than a defect: the pair tells a bug report which branch that client
@@ -62,8 +63,8 @@ ns.DIAGNOSTIC_API_CHECKS = {
 	{ "C_Spell.RequestLoadSpellData", HasFunction("C_Spell", "RequestLoadSpellData") },
 	{ "C_Spell.IsSpellDataCached", HasFunction("C_Spell", "IsSpellDataCached") },
 	{ "C_Spell.GetSpellLink", HasFunction("C_Spell", "GetSpellLink") },
-	-- Ignored Buffs' row icons; a client without it lists each buff by name alone.
-	{ "C_Spell.GetSpellTexture (guarded)", HasFunction("C_Spell", "GetSpellTexture") },
+	-- Ignored Buffs' row icons.
+	{ "C_Spell.GetSpellTexture", HasFunction("C_Spell", "GetSpellTexture") },
 	{ "C_UnitAuras.GetBuffDataByIndex", HasFunction("C_UnitAuras", "GetBuffDataByIndex") },
 	{ "issecretvalue", HasGlobalFunction("issecretvalue") },
 	{ "GetPlayerInfoByGUID", HasGlobalFunction("GetPlayerInfoByGUID") },
@@ -92,6 +93,14 @@ ns.DIAGNOSTIC_API_CHECKS = {
 	{ "GetNumMacros", HasGlobalFunction("GetNumMacros") },
 	{ "GetMacroInfo", HasGlobalFunction("GetMacroInfo") },
 	{ "PlaySoundFile", HasGlobalFunction("PlaySoundFile") },
+	-- Wave to Friends: who counts, and the resting rule.
+	{ "C_FriendList.IsFriend", HasFunction("C_FriendList", "IsFriend") },
+	{ "C_BattleNet.GetAccountInfoByGUID", HasFunction("C_BattleNet", "GetAccountInfoByGUID") },
+	{ "GetGuildInfo", HasGlobalFunction("GetGuildInfo") },
+	{ "IsResting", HasGlobalFunction("IsResting") },
+	-- Wave to Friends' mouse-focus read: GetMouseFoci where the client ships it, else GetMouseFocus.
+	{ "GetMouseFoci", HasGlobalFunction("GetMouseFoci") },
+	{ "GetMouseFocus (legacy)", HasGlobalFunction("GetMouseFocus") },
 	-- Validate Data's spell tooltip read: C_TooltipInfo where the client ships both getters, else the scan tooltip.
 	{ "C_TooltipInfo.GetItemByID", HasFunction("C_TooltipInfo", "GetItemByID") },
 	{ "C_TooltipInfo.GetSpellByID", HasFunction("C_TooltipInfo", "GetSpellByID") },
@@ -106,8 +115,7 @@ ns.DIAGNOSTIC_API_CHECKS = {
 	},
 	{ "C_XMLUtil.GetTemplateInfo", HasFunction("C_XMLUtil", "GetTemplateInfo") },
 	{ "GameTooltipTemplate", HasTemplate("GameTooltipTemplate") },
-	-- Display Context's screen read, and the taintLog button.
-	{ "GetPhysicalScreenSize", HasGlobalFunction("GetPhysicalScreenSize") },
+	-- The context report's sound reads, and the taintLog button.
 	{ "GetCVar", HasGlobalFunction("GetCVar") },
 	{ "SetCVar", HasGlobalFunction("SetCVar") },
 }
@@ -115,7 +123,10 @@ ns.DIAGNOSTIC_API_CHECKS = {
 --[[
     Each flavor's buff detection, probed only where it runs: WoW Forever reads
     UNIT_AURA and names a caster out of nameplate range from its GUID, and asks
-    C_Secrets before every read; every other flavor reads the combat log.
+    C_Secrets before every read; every other flavor reads the combat log. Wave
+    to Friends' Custom List reads a WoW Forever name's surname through
+    UnitNameUnmodified, and a realm client's home realm through
+    GetNormalizedRealmName; both skip the read where the client lacks it.
 ]]
 if ns.FLAVOR == "Camelot" then
 	local checks = ns.DIAGNOSTIC_API_CHECKS
@@ -124,8 +135,10 @@ if ns.FLAVOR == "Camelot" then
 	checks[#checks + 1] =
 		{ "C_Secrets.ShouldUnitIdentityBeSecret", HasFunction("C_Secrets", "ShouldUnitIdentityBeSecret") }
 	checks[#checks + 1] = { "C_Secrets.ShouldAurasBeSecret", HasFunction("C_Secrets", "ShouldAurasBeSecret") }
+	checks[#checks + 1] = { "UnitNameUnmodified (guarded)", HasGlobalFunction("UnitNameUnmodified") }
 else
 	local checks = ns.DIAGNOSTIC_API_CHECKS
+	checks[#checks + 1] = { "GetNormalizedRealmName (guarded)", HasGlobalFunction("GetNormalizedRealmName") }
 	checks[#checks + 1] = { "CombatLogGetCurrentEventInfo", HasGlobalFunction("CombatLogGetCurrentEventInfo") }
 	checks[#checks + 1] = {
 		"COMBATLOG_OBJECT_* affiliation / reaction / type flags",
@@ -159,7 +172,7 @@ end
 
 -- The add-on's own example reports, appended to the shared Event Log intro.
 ns.DiagnosticsStrings.EVENT_LOG_EXAMPLES =
-	"Best for 'nobody got thanked' reports. It records each buff that lands on you, decoded: the spell, who cast it, how long it lasts, and, off WoW Forever, whether the combat log calls them a friendly player outside your group. On WoW Forever it records each buff added to you with the gate, if any, that kept TFTB from reading it."
+	"Best for 'nobody got thanked' reports. It records each buff that lands on you, decoded: the spell, who cast it, how long it lasts, and, off WoW Forever, whether the combat log calls them a friendly player outside your group. On WoW Forever it records each buff added to you with the gate, if any, that kept TFTB from reading it. For 'nobody got waved at' reports, each time you mouse over someone records UPDATE_MOUSEOVER_UNIT; with none, the game never told TFTB."
 
 --[[
     How many emotes a list has picked, out of how many this client offers, and
@@ -452,6 +465,254 @@ function ns:BuildContextReport()
 end
 
 --------------------------------------------------------------------------------
+-- Wave to Friends Context
+--------------------------------------------------------------------------------
+
+local function SortedKeys(set)
+	local keys = {}
+	for key in pairs(set) do
+		keys[#keys + 1] = key
+	end
+	table.sort(keys)
+	return keys
+end
+
+-- A value that may be secret on WoW Forever, as true or false, never tested while secret.
+local function PlainFlag(value)
+	if not ns.IsPlain(value) then
+		return "<secret>"
+	end
+	return tostring(value and true or false)
+end
+
+-- The mouse-focus read ns.IsMouseOverWorld chose at load, found the way Features/Utilities.lua finds it.
+local function MouseFocusRead()
+	if GetMouseFoci then
+		return "GetMouseFoci"
+	elseif GetMouseFocus then
+		return "GetMouseFocus"
+	end
+	return "none (every mouseover counts as the world)"
+end
+
+local function WaveCooldownText(seconds)
+	if seconds == 0 then
+		return "once per session"
+	end
+	return tostring(seconds) .. " seconds"
+end
+
+-- A Custom List entry's emote: None waves at nobody, and a token this client lacks plays nothing.
+local function CustomEmoteText(token)
+	if token == nil or token == "" then
+		return "None (never waved at)"
+	end
+	return string.format("%s valid=%s", tostring(token), tostring(ns.IsClientEmote(token)))
+end
+
+--[[
+    The Custom List keys a unit's name reads as, short then full, built through
+    ns.NormalizeWaveName from the name calls Wave to Friends makes: Name and
+    Name-Realm on a realm client, First and First Last on WoW Forever, whose
+    surname comes from UnitNameUnmodified, else UnitName. nil when the name
+    can't be read.
+]]
+local function WaveNameKeys(unit)
+	if ns.FLAVOR == "Camelot" then
+		local name, surname
+		for _, getName in ipairs(UnitNameUnmodified and { UnitNameUnmodified, UnitName } or { UnitName }) do
+			local first, second = getName(unit)
+			if ns.IsPlain(first) and ns.IsPlain(second) and first then
+				name = name or first
+				if not surname and second and second ~= "" then
+					surname = second
+				end
+			end
+		end
+		if not name then
+			return nil
+		end
+		local full =
+			ns.NormalizeWaveName((surname and not name:find(" ", 1, true)) and (name .. " " .. surname) or name)
+		return full and full:match("^(%S+)"), full
+	end
+	local name, realm = UnitName(unit)
+	if not (ns.IsPlain(name) and ns.IsPlain(realm) and name) then
+		return nil
+	end
+	if not realm or realm == "" then
+		realm = GetNormalizedRealmName and GetNormalizedRealmName()
+	end
+	return ns.NormalizeWaveName(name), realm and ns.NormalizeWaveName(name .. "-" .. realm)
+end
+
+--[[
+    How Wave to Friends reads the current target, as it reads a mouseover:
+    whether it is a player outside your group, then each list in the order
+    the feature checks them (Custom List, Friends, Guilds), and which one would
+    greet them. The per-player wave cooldown lives in the feature's memory and
+    isn't shown; a /reload clears it.
+]]
+local function WaveTargetLines(lines, settings)
+	local unit = "target"
+	if not UnitExists(unit) then
+		lines[#lines + 1] = "Current target: none (target someone who wasn't waved at, then run this again)"
+		return
+	end
+	if ns.IsUnitIdentitySecret(unit) then
+		lines[#lines + 1] = "Current target: identity secret (Wave to Friends skips them)"
+		return
+	end
+	local inParty, inRaid = UnitInParty(unit), UnitInRaid(unit)
+	local inGroup = "<secret>"
+	if ns.IsPlain(inParty) and ns.IsPlain(inRaid) then
+		inGroup = tostring((inParty or inRaid) and true or false)
+	end
+	lines[#lines + 1] = string.format(
+		"Current target: player=%s self=%s inGroup=%s (only players outside your party or raid are waved at)",
+		PlainFlag(UnitIsPlayer(unit)),
+		PlainFlag(UnitIsUnit(unit, "player")),
+		inGroup
+	)
+
+	local short, full = WaveNameKeys(unit)
+	local entry = (full and (settings.players or {})[full]) or (short and (settings.players or {})[short])
+	local customText = "no entry"
+	if not short and not full then
+		customText = "name unreadable"
+	elseif type(entry) == "table" then
+		customText = "entry, emote=" .. CustomEmoteText(entry.emote)
+	end
+	lines[#lines + 1] =
+		string.format("  Custom List: %s (read as %s / %s)", customText, tostring(short), tostring(full))
+
+	local guid = UnitGUID(unit)
+	local isFriend, isBnetFriend = false, false
+	local friendText, bnetText = "<no GUID>", "<no GUID>"
+	if guid and ns.IsPlain(guid) then
+		local friend = C_FriendList.IsFriend(guid)
+		friendText = PlainFlag(friend)
+		isFriend = ns.IsPlain(friend) and friend and true or false
+		local info = C_BattleNet.GetAccountInfoByGUID(guid)
+		local bnet = type(info) == "table" and info.isFriend
+		bnetText = PlainFlag(bnet)
+		isBnetFriend = ns.IsPlain(bnet) and bnet and true or false
+	end
+	lines[#lines + 1] = string.format("  Friends: friend=%s battleNetFriend=%s", friendText, bnetText)
+
+	local guildName = GetGuildInfo(unit)
+	local guildListed, sameGuild = false, false
+	local guildText = "none"
+	if not ns.IsPlain(guildName) then
+		guildText = "<secret>"
+	elseif guildName and guildName ~= "" then
+		local key = ns.NormalizeGuildName(guildName)
+		guildListed = key ~= nil and settings.guilds ~= nil and settings.guilds[key] ~= nil
+		local myGuild = GetGuildInfo("player")
+		sameGuild = ns.IsPlain(myGuild) and myGuild ~= nil and myGuild == guildName
+		guildText = string.format("<%s> listed=%s yourGuild=%s", guildName, tostring(guildListed), tostring(sameGuild))
+	end
+	lines[#lines + 1] = "  Guild: " .. guildText
+
+	-- First match wins, as in the feature: a Custom List entry set to None stops the lists below it.
+	local greeting = "nobody"
+	if settings.customEnabled and type(entry) == "table" then
+		greeting = (entry.emote and entry.emote ~= "") and ("Custom List (" .. tostring(entry.emote) .. ")")
+			or "Custom List, set to None: never waved at"
+	elseif settings.friendsEnabled and (isFriend or (settings.bnetFriends and isBnetFriend)) then
+		greeting = "Friends"
+		if #ns.GetPickableEmotes(settings.friendEmotes) == 0 then
+			greeting = greeting .. " (NO EMOTE this client can play is picked)"
+		end
+	elseif guildListed or (settings.myGuildEnabled and sameGuild) then
+		greeting = "Guilds"
+		if #ns.GetPickableEmotes(settings.guildEmotes) == 0 then
+			greeting = greeting .. " (NO EMOTE this client can play is picked)"
+		end
+	end
+	lines[#lines + 1] = "  Would greet them through: " .. greeting
+end
+
+--[[
+    The state behind a "my friend walked past and nothing happened" report:
+    every gate the mouseover handler checks before it looks at who you moused
+    over (the switch, the resting rule, combat, the mouse-focus read), the
+    cooldown, each list with its switch, entries and picked emotes, and how
+    the current target reads to the feature.
+]]
+function ns:BuildWaveContextReport()
+	local lines = { GetClientHeader(), "" }
+	local settings = ns.db and ns.db.profile.wave
+	if not settings then
+		lines[#lines + 1] = "Saved variables not initialized."
+		return table.concat(lines, "\n")
+	end
+
+	lines[#lines + 1] = string.format(
+		"Wave to Friends: enabled=%s restingOnly=%s resting=%s InCombat=%s cooldown=%s",
+		tostring(settings.enabled),
+		tostring(settings.restingOnly),
+		tostring(IsResting() and true or false),
+		tostring(InCombatLockdown() and true or false),
+		WaveCooldownText(settings.cooldown)
+	)
+	lines[#lines + 1] = string.format(
+		"Mouse focus read: %s (a wave fires only with the mouse on the 3D world, never on a unit frame or nameplate)",
+		MouseFocusRead()
+	)
+	if ns.FLAVOR == "Camelot" then
+		lines[#lines + 1] = "Names read as: First Last (WoW Forever has no realms)"
+	else
+		lines[#lines + 1] = string.format(
+			"Names read as: Name-Realm, your realm %s",
+			tostring(GetNormalizedRealmName and GetNormalizedRealmName())
+		)
+	end
+
+	lines[#lines + 1] = ""
+	local players = type(settings.players) == "table" and settings.players or {}
+	local playerKeys = SortedKeys(players)
+	lines[#lines + 1] = string.format(
+		"Custom List: enabled=%s entries=%d (checked first)",
+		tostring(settings.customEnabled),
+		#playerKeys
+	)
+	for _, key in ipairs(playerKeys) do
+		local entry = players[key]
+		lines[#lines + 1] = string.format(
+			"  %s (key %s): emote=%s",
+			tostring(type(entry) == "table" and entry.name or "?"),
+			key,
+			CustomEmoteText(type(entry) == "table" and entry.emote or nil)
+		)
+	end
+	lines[#lines + 1] = string.format(
+		"Friends: enabled=%s battleNet=%s emotesPicked=%s",
+		tostring(settings.friendsEnabled),
+		tostring(settings.bnetFriends),
+		EmotesPicked(settings.friendEmotes)
+	)
+	local guilds = type(settings.guilds) == "table" and settings.guilds or {}
+	local guildKeys = SortedKeys(guilds)
+	local myGuild = GetGuildInfo("player")
+	lines[#lines + 1] = string.format(
+		"Guilds: myGuild=%s yourGuild=%s listed=%d emotesPicked=%s",
+		tostring(settings.myGuildEnabled),
+		(ns.IsPlain(myGuild) and myGuild) and ("<" .. myGuild .. ">") or "none",
+		#guildKeys,
+		EmotesPicked(settings.guildEmotes)
+	)
+	for _, key in ipairs(guildKeys) do
+		lines[#lines + 1] = string.format("  <%s> (key %s)", tostring(guilds[key]), key)
+	end
+
+	lines[#lines + 1] = ""
+	WaveTargetLines(lines, settings)
+
+	return table.concat(lines, "\n")
+end
+
+--------------------------------------------------------------------------------
 -- Emote Extract
 --------------------------------------------------------------------------------
 
@@ -559,15 +820,6 @@ end
 -- Name Lookups
 --------------------------------------------------------------------------------
 
-local function SortedKeys(set)
-	local keys = {}
-	for key in pairs(set) do
-		keys[#keys + 1] = key
-	end
-	table.sort(keys)
-	return keys
-end
-
 --[[
     The command this client gives an emote token, through ns.GetEmoteCommand as
     the panels name it; nil when the client has no such emote, where the
@@ -587,10 +839,13 @@ end
       loads late;
     - the client's seconds string, through ns.FormatDuration as the options
       panels' cooldown, duration and Praise Delay dropdowns label their
-      choices, with the sample count in the ID cell;
+      choices, and its minutes and hours strings, as Wave to Friends' cooldown
+      dropdown labels its choices, with the sample count in the ID cell (1, 2
+      and 5, one count per plural form a Slavic locale has);
     - every curated emote token the Give Thanks and Thank You panels pick
-      from, named by the command this client gives it (NIL means the client has
-      no such emote, so a pick of it never plays).
+      from, then the ones Wave to Friends starts its lists on, each named by
+      the command this client gives it (NIL means the client has no such
+      emote, so a pick of it never plays).
 
     TFTB names no item by constant.
 ]]
@@ -614,19 +869,46 @@ do
 		}
 	end
 
-	for _, seconds in ipairs({ 1, 15 }) do
-		rows[#rows + 1] = {
-			constant = "D_SECONDS",
-			kind = "globalString",
-			id = seconds,
-			lookup = function()
-				return ns.FormatDuration(seconds, true)
-			end,
-		}
+	-- { constant, seconds per count, counts }; minutes and hours word the cooldown without forceSeconds.
+	for _, unit in ipairs({
+		{ "D_SECONDS", 1, { 1, 2, 5 } },
+		{ "D_MINUTES", 60, { 1, 2, 5 } },
+		{ "D_HOURS", 3600, { 1 } },
+	}) do
+		local constant, size = unit[1], unit[2]
+		for _, count in ipairs(unit[3]) do
+			rows[#rows + 1] = {
+				constant = constant,
+				kind = "globalString",
+				id = count,
+				lookup = function()
+					return ns.FormatDuration(count * size, size == 1)
+				end,
+			}
+		end
 	end
 
+	local tokens, seen = {}, {}
+	local function AddToken(token)
+		if not seen[token] then
+			seen[token] = true
+			tokens[#tokens + 1] = token
+		end
+	end
 	for _, emote in ipairs(ns.Data.EMOTES) do
-		local token = emote.token
+		AddToken(emote.token)
+	end
+	local wave = ns.DATABASE_DEFAULTS.profile.wave
+	for _, set in ipairs({ wave.friendEmotes, wave.guildEmotes }) do
+		for _, token in ipairs(SortedKeys(set)) do
+			AddToken(token)
+		end
+	end
+	for _, token in ipairs(ns.Data.WAVE_CUSTOM_DEFAULT_EMOTES) do
+		AddToken(token)
+	end
+
+	for _, token in ipairs(tokens) do
 		rows[#rows + 1] = {
 			constant = token,
 			kind = "emote",

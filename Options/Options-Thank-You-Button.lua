@@ -49,28 +49,6 @@ end
 --------------------------------------------------------------------------------
 
 --[[
-    The dropdown's contents: every emote the client has, plus an explicit "none",
-    ordered by slash command. Built from ns.GetEmoteCatalog rather than
-    Data.EMOTES -- these buttons are a free choice from the whole client set, not
-    from the twelve Data.EMOTES curates for Give Thanks and Thank You Button 1.
-
-    Cached: the catalog cannot change during a session, and this table is rebuilt
-    on every panel open otherwise.
-]]
-local emoteValues, emoteSorting
-local function EmoteChoices()
-	if not emoteValues then
-		emoteValues = { [""] = L["BUTTON_EMOTE_NONE"] }
-		emoteSorting = { "" }
-		for _, emote in ipairs(ns.GetEmoteCatalog()) do
-			emoteValues[emote.token] = emote.command
-			emoteSorting[#emoteSorting + 1] = emote.token
-		end
-	end
-	return emoteValues, emoteSorting
-end
-
---[[
     The Icon dropdown: the macros' own icon as Default first, then this
     client's ns.THANK_YOU_MACRO_ICONS in list order, each its picture alone, since
     the client gives an icon no name. Values are texture file IDs, the same number
@@ -242,7 +220,7 @@ local function AddButtonSection(args, button, index)
 	    control for the choice being made.
 	]]
 	if button.singleEmote then
-		local values, sorting = EmoteChoices()
+		local values, sorting = ns.GetEmoteSelectChoices()
 		args["emoteLabel" .. index] = ns.OptionsRowLabel(
 			L["BUTTON_EMOTE"],
 			base + 9,

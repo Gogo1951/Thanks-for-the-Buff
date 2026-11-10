@@ -40,7 +40,7 @@ L["SAMPLE_EXAMPLE"] = "Ejemplo: %s"
 L["OPTIONS_WELCOME_TOGGLE"] = "Habilitar mensaje de bienvenida"
 L["OPTIONS_WELCOME_DESCRIPTION"] = "Muestra un mensaje que solo tú puedes ver al iniciar sesión."
 L["OPTIONS_DESCRIPTION"] =
-	"Agradece automáticamente con una emoción o un susurro a los jugadores que te den un beneficio. Los desconocidos que te lancen Entereza, Intelecto Arcano o Marca de lo salvaje reciben tu agradecimiento al momento, y un clic en tus macros de agradecimiento da las gracias a quien tengas como objetivo."
+	"Agradece automáticamente con una emoción o un susurro a los jugadores que te den un beneficio, saluda con la mano a tus amigos y compañeros de hermandad al pasar a su lado y da las gracias a quien tengas como objetivo con un clic en tus macros de agradecimiento."
 L["OPTIONS_FEATURES_HEADER"] = "Funciones"
 L["OPTIONS_FEATURES_DESCRIPTION"] = "Activa o desactiva cada función aquí o en su propio panel."
 L["OPTIONS_COMMANDS_HEADER"] = "/Commands"
@@ -111,6 +111,7 @@ L["PRAISE_DELAY_LENGTH_DESCRIPTION"] = "Establece cuánto se espera antes de env
 L["WHISPERS_HEADER"] = "Susurros de agradecimiento"
 L["PRAISE_WHISPER_ENABLE"] = "Habilitar susurros de agradecimiento"
 L["PRAISE_WHISPER_DESCRIPTION"] = "Susurra un agradecimiento al jugador que te ha dado el beneficio."
+-- TRANSLATORS: keep {spell} exactly as written; it is the token players type into the whisper.
 L["PRAISE_WHISPER_MESSAGE_DESCRIPTION"] =
 	"Establece lo que TFTB susurra al jugador que te ha dado el beneficio. {spell} se sustituye por el beneficio. Déjalo vacío para no enviar ningún susurro."
 
@@ -123,10 +124,19 @@ L["NOTIFICATIONS_SOUND_ENABLE"] = "Habilitar efectos de sonido"
 L["NOTIFICATIONS_SOUND_DESCRIPTION"] = "Reproduce un sonido cuando recibes un beneficio. Solo tú lo oyes."
 L["NOTIFICATIONS_SOUND_PREVIEW_DESCRIPTION"] = "Reproduce el sonido para que puedas oírlo antes de activarlo."
 
--- Emotes: the grid's group keys are EMOTE_GROUP_ plus each Data.EMOTE_GROUPS entry, upper-cased.
+--------------------------------------------------------------------------------
+-- Options: Emotes List
+--------------------------------------------------------------------------------
+
 L["TAB_EMOTES_LIST"] = "Lista de emociones"
 L["EMOTES_GRID_DESCRIPTION"] =
 	"Marca las emociones entre las que puede elegir la función Agradecimientos cuando un jugador de fuera de tu grupo te da un beneficio; usa una al azar. Las emociones se retienen mientras estás en combate."
+
+--[[
+    The emote checklist, shared by this panel and Wave to Friends' Friends and
+    Guilds tabs. Its group keys are EMOTE_GROUP_ plus each Data.EMOTE_GROUPS
+    entry, upper-cased.
+]]
 L["EMOTE_GROUP_COUNT"] = "%s (%d de %d marcadas)"
 L["EMOTE_GROUP_TEXT"] = "Texto"
 L["EMOTE_GROUP_TEXT_DESCRIPTION"] = "Solo muestra la línea de la emoción."
@@ -187,6 +197,68 @@ L["BUTTON_MACRO_ENABLE"] = 'Habilitar macro "%s"'
 L["BUTTON_MACRO_ENABLE_DESCRIPTION"] = "Crea una macro llamada %s y la elimina al desactivar esta opción."
 L["BUTTON_WHISPER_DESCRIPTION"] =
 	"Establece lo que este botón susurra a tu objetivo. Déjalo vacío para no enviar ningún susurro."
+
+--------------------------------------------------------------------------------
+-- Options: Wave to Friends
+--------------------------------------------------------------------------------
+
+L["TAB_WAVE_TO_FRIENDS"] = "Saludo a amigos"
+L["WAVE_ENABLE"] = "Habilitar saludo a amigos"
+L["WAVE_ENABLE_DESCRIPTION"] =
+	"Activa una emoción para amigos y compañeros de hermandad cuando pasas el ratón por encima de ellos."
+L["WAVE_DESCRIPTION"] =
+	"Saluda con una emoción a tus amigos y compañeros de hermandad cuando pasas el ratón por encima de ellos por el mundo."
+L["WAVE_RULES"] = "Nunca a tu grupo o banda, y nunca en combate."
+L["WAVE_RESTING_ENABLE"] = "Solo mientras descansas"
+L["WAVE_RESTING_ENABLE_DESCRIPTION"] = "Saluda solo mientras descansas, en una ciudad o una posada."
+L["WAVE_COOLDOWN"] = "Reutilización para el mismo jugador"
+L["WAVE_COOLDOWN_DESCRIPTION"] =
+	"Establece cuánto tiempo pasa antes de que se pueda volver a saludar al mismo jugador."
+L["WAVE_COOLDOWN_ONCE_PER_SESSION"] = "Una vez por sesión"
+-- %s is the default emotes' slash commands, as the client names them.
+L["WAVE_EMOTES_RESET_DEFAULTS_DESCRIPTION"] = "Devuelve la lista a solo %s."
+
+-- Custom List
+L["WAVE_TAB_CUSTOM"] = "Lista personalizada"
+L["WAVE_CUSTOM_DESCRIPTION"] =
+	"Jugadores que siempre reciben su propia emoción, incluso por encima de Amigos y Hermandades. Elige Ninguna para no dedicarle nunca una emoción a alguien."
+-- One of these two follows WAVE_CUSTOM_DESCRIPTION: realm clients, then WoW Forever, which has no realms.
+L["WAVE_CUSTOM_NAMES_REALM"] =
+	"Nombre-Reino solo coincide con ese reino; un nombre sin reino coincide con cualquier reino."
+L["WAVE_CUSTOM_NAMES_FOREVER"] =
+	"Un nombre completo coincide con un solo personaje; solo el nombre de pila coincide con todos los que lo llevan."
+L["WAVE_CUSTOM_ENABLE"] = "Habilitar lista personalizada"
+L["WAVE_CUSTOM_ENABLE_DESCRIPTION"] = "Usa los nombres de abajo antes que Amigos y Hermandades."
+L["WAVE_CUSTOM_OFF_WARNING"] = "La lista personalizada está desactivada, así que nadie de abajo recibe su emoción."
+L["WAVE_CUSTOM_ADD"] = "Añadir jugador"
+L["WAVE_CUSTOM_ADD_DESCRIPTION"] =
+	"Escribe un nombre o Nombre-Reino y luego pulsa Intro. Separa varios nombres con comas."
+L["WAVE_CUSTOM_ADD_DESCRIPTION_FOREVER"] =
+	"Escribe un nombre completo o un nombre de pila y luego pulsa Intro. Separa varios nombres con comas."
+L["WAVE_CUSTOM_EMPTY"] = "Todavía no hay jugadores. Añade uno arriba."
+L["WAVE_CUSTOM_EMOTE_DESCRIPTION"] =
+	"Establece la emoción para este jugador, o Ninguna para no dedicarle nunca una emoción."
+L["WAVE_CUSTOM_REMOVE"] = "Quita a este jugador de la lista."
+
+-- Friends
+L["WAVE_TAB_FRIENDS"] = "Amigos"
+L["WAVE_FRIENDS_ENABLE"] = "Saludar a amigos"
+L["WAVE_FRIENDS_ENABLE_DESCRIPTION"] = "Saluda a los personajes de tu lista de amigos."
+L["WAVE_BNET_ENABLE"] = "Incluir amigos de Battle.net"
+L["WAVE_BNET_ENABLE_DESCRIPTION"] = "Saluda también a los personajes con los que juegan tus amigos de Battle.net."
+L["WAVE_FRIENDS_EMOTES_DESCRIPTION"] = "Marca las emociones entre las que elegir para los amigos; se usa una al azar."
+
+-- Guilds
+L["WAVE_TAB_GUILDS"] = "Hermandades"
+L["WAVE_MY_GUILD_ENABLE"] = "Saludar a mi hermandad"
+L["WAVE_MY_GUILD_ENABLE_DESCRIPTION"] = "Saluda a los miembros de la hermandad a la que perteneces."
+L["WAVE_GUILD_ADD"] = "Añadir hermandad"
+L["WAVE_GUILD_ADD_DESCRIPTION"] =
+	"Escribe el nombre de una hermandad y luego pulsa Intro. Separa varias hermandades con comas. No importan las mayúsculas."
+L["WAVE_GUILDS_EMPTY"] = "Todavía no hay otras hermandades. Añade una arriba."
+L["WAVE_GUILD_REMOVE"] = "Quita esta hermandad de la lista."
+L["WAVE_GUILDS_EMOTES_DESCRIPTION"] =
+	"Marca las emociones entre las que elegir para los miembros de la hermandad; se usa una al azar."
 
 --------------------------------------------------------------------------------
 -- Options: Whisper Message Row

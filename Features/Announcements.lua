@@ -36,12 +36,12 @@ end
 --------------------------------------------------------------------------------
 
 --[[
-    Branded sent messages for the automated buff thank-yous:
-    {rt1} Message // TFTB. BuildAnnounceMessage assembles the decorated string and
-    Announce sends it. The body carries a spell link and the leading raid-
-    target marker; the chat system renders both on send (the marker becomes the
-    Star icon), so the pipes and braces pass through unchanged. Every flavor
-    carries the marker, WoW Forever included.
+    SignOff gives every branded sent message its "{rt1} Message // TFTB" shape:
+    the Give Thanks whisper through ns:BuildThanksWhisper, and any locale-key
+    message through BuildAnnounceMessage / Announce. The body can carry a spell
+    link beside the leading raid-target marker; the chat system renders both on
+    send (the marker becomes the Star icon), so the pipes and braces pass
+    through unchanged. Every flavor carries the marker, WoW Forever included.
 ]]
 local function MarkerPrefix()
 	return ns.TARGET_MARKER .. " "
@@ -321,9 +321,8 @@ end
     keeps the seconds wording whatever the size: the rounding is right for a
     duration read as a length ("1 Minute" for 89s) but wrong for a fixed menu
     choice, where 89 would print as "1 Minute" directly beneath "55 Seconds".
-    The minute and hour rungs stay because this formats whatever duration it is
-    handed, and a later caller re-deriving the ladder would walk back into the
-    plural-escape trap that ResolvePlurals exists to solve.
+    The minute and hour rungs word Wave to Friends' cooldown dropdown, which
+    runs in minutes.
 ]]
 local function FormatDuration(seconds, forceSeconds)
 	seconds = math.floor((seconds or 0) + 0.5)
