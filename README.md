@@ -13,6 +13,10 @@ Auto thank players who buff you with an emote or whisper, greet friends and guil
 * **Never Spammy** // A wave of world buffs or a generous repeat buffer never turns your gratitude into spam.
 * **Know Who Buffed You** // Turn on a chat note or a sound to see who buffed you and with what.
 
+> **Stranger Buffs You, Self:** TFTB // Katz buffed you with [Power Word: Fortitude]!
+
+> **Stranger Buffs You, Message To Katz:** {rt1} Thanks for the [Power Word: Fortitude] // TFTB
+
 ### Wave to Friends
 
 * **Say Hi Without Stopping** // Mouse over a friend or guildmate out in the world and they get a wave, no typing required.
@@ -25,12 +29,6 @@ Auto thank players who buff you with an emote or whisper, greet friends and guil
 
 * **Thank Anyone** // A healer in your group, a mage who handed you water? Target them, and one click emotes and whispers your thanks.
 * **Five Buttons, Your Way** // Each has its own emote, whisper, and icon: thank a fly-by buffer, ask a mage for water, or heckle a guildie.
-
-### Example Messages
-
-> **Stranger Buffs You, Self:** TFTB // Katz buffed you with [Power Word: Fortitude]!
-
-> **Stranger Buffs You, Message To Katz:** {rt1} Thanks for the [Power Word: Fortitude] // TFTB
 
 > **Thank You Button, Message To Portalrico:** Thanks, you're the best! (=
 
