@@ -40,7 +40,7 @@ L["SAMPLE_EXAMPLE"] = "示例：%s"
 L["OPTIONS_WELCOME_TOGGLE"] = "启用欢迎信息"
 L["OPTIONS_WELCOME_DESCRIPTION"] = "登录时显示一条只有你能看到的信息。"
 L["OPTIONS_DESCRIPTION"] =
-	"自动用表情或密语感谢为你施加增益的玩家。陌生人为你施放真言术：韧、奥术智慧或野性印记时会当场收到感谢，点一下感谢宏，就能感谢你选中的任何人。"
+	"自动用表情或密语感谢为你施加增益的玩家，路过好友和公会成员时向他们挥手问候，点一下感谢宏就能感谢你选中的任何人。"
 L["OPTIONS_FEATURES_HEADER"] = "功能"
 L["OPTIONS_FEATURES_DESCRIPTION"] = "在此处或各功能自己的面板中开启或关闭每项功能。"
 L["OPTIONS_COMMANDS_HEADER"] = "/Commands"
@@ -110,6 +110,7 @@ L["PRAISE_DELAY_LENGTH_DESCRIPTION"] = "设置发送密语和表情前的等待�
 L["WHISPERS_HEADER"] = "感谢密语"
 L["PRAISE_WHISPER_ENABLE"] = "启用感谢密语"
 L["PRAISE_WHISPER_DESCRIPTION"] = "向为你施加增益的玩家密语致谢。"
+-- TRANSLATORS: keep {spell} exactly as written; it is the token players type into the whisper.
 L["PRAISE_WHISPER_MESSAGE_DESCRIPTION"] =
 	"设置 TFTB 向为你施加增益的玩家发送的密语。{spell} 会替换为该增益。留空则不发送密语。"
 
@@ -122,10 +123,19 @@ L["NOTIFICATIONS_SOUND_ENABLE"] = "启用音效"
 L["NOTIFICATIONS_SOUND_DESCRIPTION"] = "获得增益时播放音效。只有你能听到。"
 L["NOTIFICATIONS_SOUND_PREVIEW_DESCRIPTION"] = "播放该音效，让你在开启前先试听。"
 
--- Emotes: the grid's group keys are EMOTE_GROUP_ plus each Data.EMOTE_GROUPS entry, upper-cased.
+--------------------------------------------------------------------------------
+-- Options: Emotes List
+--------------------------------------------------------------------------------
+
 L["TAB_EMOTES_LIST"] = "表情列表"
 L["EMOTES_GRID_DESCRIPTION"] =
 	"勾选队伍外玩家为你施加增益时致谢功能可以使用的表情，它会随机选用一个。战斗中会暂缓发送表情。"
+
+--[[
+    The emote checklist, shared by this panel and Wave to Friends' Friends and
+    Guilds tabs. Its group keys are EMOTE_GROUP_ plus each Data.EMOTE_GROUPS
+    entry, upper-cased.
+]]
 L["EMOTE_GROUP_COUNT"] = "%s（已勾选 %d/%d）"
 L["EMOTE_GROUP_TEXT"] = "文字"
 L["EMOTE_GROUP_TEXT_DESCRIPTION"] = "只显示表情文字。"
@@ -156,7 +166,7 @@ L["IGNORED_BUFFS_REMOVE"] = "从列表中移除此增益。"
 L["IGNORED_BUFFS_NOT_FOUND"] = "未找到与 %s 对应的增益。"
 L["IGNORED_BUFFS_ALL_CHARACTERS"] = "所有角色"
 L["IGNORED_BUFFS_PROMOTE_DESCRIPTION"] =
-	"将此增益移到“所有角色”列表，这样任何角色都不会为它发送感谢。"
+	"将此增益移到'所有角色'列表，这样任何角色都不会为它发送感谢。"
 
 --------------------------------------------------------------------------------
 -- Options: Thank You Button
@@ -183,6 +193,62 @@ L["BUTTON_ICON_DEFAULT"] = "默认"
 L["BUTTON_MACRO_ENABLE"] = '启用宏 "%s"'
 L["BUTTON_MACRO_ENABLE_DESCRIPTION"] = "创建一个名为 %s 的宏，关闭此项时会将其删除。"
 L["BUTTON_WHISPER_DESCRIPTION"] = "设置此按钮向你的目标发送的密语。留空则不发送密语。"
+
+--------------------------------------------------------------------------------
+-- Options: Wave to Friends
+--------------------------------------------------------------------------------
+
+L["TAB_WAVE_TO_FRIENDS"] = "好友问候"
+L["WAVE_ENABLE"] = "启用好友问候"
+L["WAVE_ENABLE_DESCRIPTION"] = "鼠标指向好友和公会成员时，对其使用表情。"
+L["WAVE_DESCRIPTION"] = "在野外鼠标指向好友和公会成员时，用表情向他们问候。"
+L["WAVE_RULES"] = "不会对你的小队或团队成员使用，战斗中也不会使用。"
+L["WAVE_RESTING_ENABLE"] = "仅在休息时"
+L["WAVE_RESTING_ENABLE_DESCRIPTION"] = "仅在你于城镇或旅店中休息时挥手。"
+L["WAVE_COOLDOWN"] = "同一玩家冷却时间"
+L["WAVE_COOLDOWN_DESCRIPTION"] = "设置同一名玩家要隔多久才能再次被问候。"
+L["WAVE_COOLDOWN_ONCE_PER_SESSION"] = "每次登录一次"
+-- %s is the default emotes' slash commands, as the client names them.
+L["WAVE_EMOTES_RESET_DEFAULTS_DESCRIPTION"] = "将列表恢复为只勾选 %s。"
+
+-- Custom List
+L["WAVE_TAB_CUSTOM"] = "自定义列表"
+L["WAVE_CUSTOM_DESCRIPTION"] =
+	"这些玩家总是获得专属表情，优先于好友和公会。选择'无'则永远不对此人使用表情。"
+-- One of these two follows WAVE_CUSTOM_DESCRIPTION: realm clients, then WoW Forever, which has no realms.
+L["WAVE_CUSTOM_NAMES_REALM"] = "角色名-服务器只匹配该服务器；只写角色名则匹配所有服务器。"
+L["WAVE_CUSTOM_NAMES_FOREVER"] =
+	"完整姓名只匹配一个角色；只写名而不写姓，则匹配所有同名角色。"
+L["WAVE_CUSTOM_ENABLE"] = "启用自定义列表"
+L["WAVE_CUSTOM_ENABLE_DESCRIPTION"] = "优先于好友和公会使用下方的名字。"
+L["WAVE_CUSTOM_OFF_WARNING"] = "自定义列表已关闭，因此下方的任何人都不会获得其表情。"
+L["WAVE_CUSTOM_ADD"] = "添加玩家"
+L["WAVE_CUSTOM_ADD_DESCRIPTION"] =
+	"输入角色名或角色名-服务器，然后按回车键。多个名字用逗号分隔。"
+L["WAVE_CUSTOM_ADD_DESCRIPTION_FOREVER"] =
+	"输入完整姓名或只输入名，然后按回车键。多个名字用逗号分隔。"
+L["WAVE_CUSTOM_EMPTY"] = "尚无玩家。请在上方添加。"
+L["WAVE_CUSTOM_EMOTE_DESCRIPTION"] = "设置对此玩家使用的表情，选择'无'则永远不对其使用表情。"
+L["WAVE_CUSTOM_REMOVE"] = "从列表中移除此玩家。"
+
+-- Friends
+L["WAVE_TAB_FRIENDS"] = "好友"
+L["WAVE_FRIENDS_ENABLE"] = "向好友挥手"
+L["WAVE_FRIENDS_ENABLE_DESCRIPTION"] = "问候你好友列表中的角色。"
+L["WAVE_BNET_ENABLE"] = "包括战网好友"
+L["WAVE_BNET_ENABLE_DESCRIPTION"] = "也问候你的战网好友正在玩的角色。"
+L["WAVE_FRIENDS_EMOTES_DESCRIPTION"] = "勾选对好友可用的表情，每次随机选用一个。"
+
+-- Guilds
+L["WAVE_TAB_GUILDS"] = "公会"
+L["WAVE_MY_GUILD_ENABLE"] = "向我的公会挥手"
+L["WAVE_MY_GUILD_ENABLE_DESCRIPTION"] = "问候你所在公会的成员。"
+L["WAVE_GUILD_ADD"] = "添加公会"
+L["WAVE_GUILD_ADD_DESCRIPTION"] =
+	"输入公会名称，然后按回车键。多个公会用逗号分隔。不区分大小写。"
+L["WAVE_GUILDS_EMPTY"] = "尚无其他公会。请在上方添加。"
+L["WAVE_GUILD_REMOVE"] = "从列表中移除此公会。"
+L["WAVE_GUILDS_EMOTES_DESCRIPTION"] = "勾选对公会成员可用的表情，每次随机选用一个。"
 
 --------------------------------------------------------------------------------
 -- Options: Whisper Message Row

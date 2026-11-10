@@ -40,7 +40,7 @@ L["SAMPLE_EXAMPLE"] = "예시: %s"
 L["OPTIONS_WELCOME_TOGGLE"] = "환영 메시지 활성화"
 L["OPTIONS_WELCOME_DESCRIPTION"] = "접속할 때 자신만 볼 수 있는 메시지를 출력합니다."
 L["OPTIONS_DESCRIPTION"] =
-	"버프를 준 플레이어에게 감정 표현이나 귓속말로 자동으로 감사를 표하세요. 인내, 신비한 지능, 야생의 징표를 걸어 준 낯선 사람에게는 그 자리에서 감사를 전하고, 감사 매크로를 한 번 클릭하면 대상으로 잡은 누구에게나 감사할 수 있습니다."
+	"버프를 준 플레이어에게 감정 표현이나 귓속말로 자동으로 감사를 표하고, 지나치는 친구와 길드원에게 손을 흔들어 인사하며, 감사 매크로를 한 번 클릭해 대상으로 잡은 누구에게나 감사하세요."
 L["OPTIONS_FEATURES_HEADER"] = "기능"
 L["OPTIONS_FEATURES_DESCRIPTION"] =
 	"각 기능은 여기서 또는 해당 기능의 패널에서 켜거나 끌 수 있습니다."
@@ -115,6 +115,7 @@ L["PRAISE_DELAY_LENGTH_DESCRIPTION"] =
 L["WHISPERS_HEADER"] = "감사 귓속말"
 L["PRAISE_WHISPER_ENABLE"] = "감사 귓속말 활성화"
 L["PRAISE_WHISPER_DESCRIPTION"] = "버프를 준 플레이어에게 감사의 귓속말을 보냅니다."
+-- TRANSLATORS: keep {spell} exactly as written; it is the token players type into the whisper.
 L["PRAISE_WHISPER_MESSAGE_DESCRIPTION"] =
 	"버프를 준 플레이어에게 TFTB가 보낼 귓속말을 설정합니다. {spell}은 해당 버프로 바뀝니다. 비워 두면 귓속말을 보내지 않습니다."
 
@@ -129,10 +130,19 @@ L["NOTIFICATIONS_SOUND_DESCRIPTION"] =
 L["NOTIFICATIONS_SOUND_PREVIEW_DESCRIPTION"] =
 	"켜기 전에 미리 들어 볼 수 있도록 효과음을 재생합니다."
 
--- Emotes: the grid's group keys are EMOTE_GROUP_ plus each Data.EMOTE_GROUPS entry, upper-cased.
+--------------------------------------------------------------------------------
+-- Options: Emotes List
+--------------------------------------------------------------------------------
+
 L["TAB_EMOTES_LIST"] = "감정 표현 목록"
 L["EMOTES_GRID_DESCRIPTION"] =
 	"파티 외부의 플레이어가 버프를 줄 때 감사하기 기능이 고를 수 있는 감정 표현을 선택하세요. 그중 하나를 무작위로 사용합니다. 전투 중에는 감정 표현이 보류됩니다."
+
+--[[
+    The emote checklist, shared by this panel and Wave to Friends' Friends and
+    Guilds tabs. Its group keys are EMOTE_GROUP_ plus each Data.EMOTE_GROUPS
+    entry, upper-cased.
+]]
 L["EMOTE_GROUP_COUNT"] = "%s (%d/%d 선택)"
 L["EMOTE_GROUP_TEXT"] = "텍스트"
 L["EMOTE_GROUP_TEXT_DESCRIPTION"] = "감정 표현 문구만 표시합니다."
@@ -195,6 +205,68 @@ L["BUTTON_MACRO_ENABLE_DESCRIPTION"] =
 	"%s(이)라는 이름의 매크로를 만들고, 이 설정을 끄면 다시 삭제합니다."
 L["BUTTON_WHISPER_DESCRIPTION"] =
 	"이 버튼이 대상에게 보낼 귓속말을 설정합니다. 비워 두면 귓속말을 보내지 않습니다."
+
+--------------------------------------------------------------------------------
+-- Options: Wave to Friends
+--------------------------------------------------------------------------------
+
+L["TAB_WAVE_TO_FRIENDS"] = "친구 인사"
+L["WAVE_ENABLE"] = "친구 인사 활성화"
+L["WAVE_ENABLE_DESCRIPTION"] = "친구와 길드원에게 마우스를 올리면 감정 표현을 하도록 켭니다."
+L["WAVE_DESCRIPTION"] =
+	"야외에서 친구와 길드원에게 마우스를 올리면 감정 표현으로 인사합니다."
+L["WAVE_RULES"] = "파티원이나 공격대원에게는 하지 않으며, 전투 중에도 하지 않습니다."
+L["WAVE_RESTING_ENABLE"] = "휴식 중에만"
+L["WAVE_RESTING_ENABLE_DESCRIPTION"] = "도시나 여관에서 휴식 중일 때만 인사합니다."
+L["WAVE_COOLDOWN"] = "같은 플레이어 대기시간"
+L["WAVE_COOLDOWN_DESCRIPTION"] = "같은 플레이어에게 다시 인사하기까지의 시간을 설정합니다."
+L["WAVE_COOLDOWN_ONCE_PER_SESSION"] = "접속당 한 번"
+-- %s is the default emotes' slash commands, as the client names them.
+L["WAVE_EMOTES_RESET_DEFAULTS_DESCRIPTION"] = "목록을 %s만 선택된 상태로 되돌립니다."
+
+-- Custom List
+L["WAVE_TAB_CUSTOM"] = "사용자 목록"
+L["WAVE_CUSTOM_DESCRIPTION"] =
+	"친구와 길드보다 우선해 항상 자신만의 감정 표현을 받는 플레이어입니다. 없음을 선택하면 그 사람에게는 감정 표현을 하지 않습니다."
+-- One of these two follows WAVE_CUSTOM_DESCRIPTION: realm clients, then WoW Forever, which has no realms.
+L["WAVE_CUSTOM_NAMES_REALM"] =
+	"이름-서버는 그 서버에서만 일치하고, 서버 없이 이름만 쓰면 모든 서버에서 일치합니다."
+L["WAVE_CUSTOM_NAMES_FOREVER"] =
+	"전체 이름은 캐릭터 하나와 일치하고, 앞 이름만 쓰면 그 이름을 가진 모든 캐릭터와 일치합니다."
+L["WAVE_CUSTOM_ENABLE"] = "사용자 목록 활성화"
+L["WAVE_CUSTOM_ENABLE_DESCRIPTION"] = "친구와 길드보다 먼저 아래 이름을 사용합니다."
+L["WAVE_CUSTOM_OFF_WARNING"] =
+	"사용자 목록이 꺼져 있어 아래의 누구도 감정 표현을 받지 않습니다."
+L["WAVE_CUSTOM_ADD"] = "플레이어 추가"
+L["WAVE_CUSTOM_ADD_DESCRIPTION"] =
+	"이름 또는 이름-서버를 입력한 다음 Enter 키를 누르세요. 여러 이름은 쉼표로 구분하세요."
+L["WAVE_CUSTOM_ADD_DESCRIPTION_FOREVER"] =
+	"전체 이름이나 앞 이름을 입력한 다음 Enter 키를 누르세요. 여러 이름은 쉼표로 구분하세요."
+L["WAVE_CUSTOM_EMPTY"] = "아직 플레이어가 없습니다. 위에서 추가하세요."
+L["WAVE_CUSTOM_EMOTE_DESCRIPTION"] =
+	"이 플레이어에게 할 감정 표현을 설정합니다. 없음을 선택하면 감정 표현을 하지 않습니다."
+L["WAVE_CUSTOM_REMOVE"] = "이 플레이어를 목록에서 제거합니다."
+
+-- Friends
+L["WAVE_TAB_FRIENDS"] = "친구"
+L["WAVE_FRIENDS_ENABLE"] = "친구에게 손 흔들기"
+L["WAVE_FRIENDS_ENABLE_DESCRIPTION"] = "친구 목록에 있는 캐릭터에게 인사합니다."
+L["WAVE_BNET_ENABLE"] = "Battle.net 친구 포함"
+L["WAVE_BNET_ENABLE_DESCRIPTION"] = "Battle.net 친구가 플레이 중인 캐릭터에게도 인사합니다."
+L["WAVE_FRIENDS_EMOTES_DESCRIPTION"] =
+	"친구에게 쓸 감정 표현을 선택하세요. 그중 하나를 무작위로 사용합니다."
+
+-- Guilds
+L["WAVE_TAB_GUILDS"] = "길드"
+L["WAVE_MY_GUILD_ENABLE"] = "내 길드에 손 흔들기"
+L["WAVE_MY_GUILD_ENABLE_DESCRIPTION"] = "내가 속한 길드의 길드원에게 인사합니다."
+L["WAVE_GUILD_ADD"] = "길드 추가"
+L["WAVE_GUILD_ADD_DESCRIPTION"] =
+	"길드 이름을 입력한 다음 Enter 키를 누르세요. 여러 길드는 쉼표로 구분하세요. 대소문자는 구분하지 않습니다."
+L["WAVE_GUILDS_EMPTY"] = "아직 다른 길드가 없습니다. 위에서 추가하세요."
+L["WAVE_GUILD_REMOVE"] = "이 길드를 목록에서 제거합니다."
+L["WAVE_GUILDS_EMOTES_DESCRIPTION"] =
+	"길드원에게 쓸 감정 표현을 선택하세요. 그중 하나를 무작위로 사용합니다."
 
 --------------------------------------------------------------------------------
 -- Options: Whisper Message Row

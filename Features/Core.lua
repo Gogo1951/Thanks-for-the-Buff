@@ -26,7 +26,7 @@ ns.Version = GetVersion()
     themselves; anything applied imperatively, like a macro on the bars, has to
     be re-applied here.
 ]]
-local function OnProfileChanged()
+function ns:ApplyProfile()
 	if ns.ReconcileMacros then
 		ns.ReconcileMacros()
 	end
@@ -103,26 +103,17 @@ local function PruneOtherClientCharacters()
 	end
 end
 
---[[
-    Bumped when a release starts every player over from the defaults. A saved
-    table stamped with any other value is thrown away whole before AceDB reads
-    it, without a word in chat. AceDB leaves a top-level key it doesn't manage
-    alone, so the stamp survives every logout.
-]]
-local SETTINGS_RESET = 2
-
 local function InitializeDatabase()
-	if type(TFTBDB) ~= "table" or TFTBDB.settingsReset ~= SETTINGS_RESET then
-		TFTBDB = { settingsReset = SETTINGS_RESET }
-	end
 	ns.db = LibStub("AceDB-3.0"):New("TFTBDB", ns.DATABASE_DEFAULTS, true)
 	PruneOtherClientCharacters()
+	-- MIGRATION (remove after 2026-12-09): drops the retired settingsReset stamp.
+	ns.db.sv.settingsReset = nil
 	-- Saved every login so the Ignored Buffs tree can color any character by class.
 	local _, classToken = UnitClass("player")
 	ns.db.char.classToken = classToken or false
-	ns.db.RegisterCallback(ns, "OnProfileChanged", OnProfileChanged)
-	ns.db.RegisterCallback(ns, "OnProfileCopied", OnProfileChanged)
-	ns.db.RegisterCallback(ns, "OnProfileReset", OnProfileChanged)
+	for _, msg in ipairs({ "OnProfileChanged", "OnProfileReset", "OnProfileCopied" }) do
+		ns.db.RegisterCallback(ns, msg, "ApplyProfile")
+	end
 end
 
 --------------------------------------------------------------------------------
@@ -140,6 +131,8 @@ ns.EVENT_NAMES = {
 	"PLAYER_LOGIN",
 	"PLAYER_ENTERING_WORLD",
 	"LOADING_SCREEN_DISABLED",
+	-- Wave to Friends: mousing over a character.
+	"UPDATE_MOUSEOVER_UNIT",
 }
 
 --[[

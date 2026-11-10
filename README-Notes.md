@@ -51,3 +51,9 @@
 - **Departs from:** COMPATIBILITY → Game Mechanics, "a check for a buff matches every rank's ID".
 - **Instead:** Each Ignored Buffs entry ignores only the exact spell ID added, from the player's own buffs or typed in.
 - **Why:** Rank names differ within some locales, so no name match covers every rank, and a player can add each rank's ID by hand.
+
+### Per-character Ignored Buffs on a shared profile
+
+- **Departs from:** SAVED VARIABLES → The Two Models, "an add-on uses Per-Character if and only if it stores something that genuinely differs from character to character".
+- **Instead:** Every setting rides the one shared profile, and only each character's own Ignored Buffs list is kept per character.
+- **Why:** A player who wants different settings switches profiles, while a buff worth ignoring belongs to the character who keeps receiving it.

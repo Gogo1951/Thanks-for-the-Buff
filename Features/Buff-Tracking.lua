@@ -19,6 +19,22 @@ local isReady = false
 local playerGUID -- cached at login; a character's GUID never changes within a session
 
 --------------------------------------------------------------------------------
+-- GUID Helpers
+--------------------------------------------------------------------------------
+
+--[[
+    Is this GUID a player character? The client stamps every GUID with its own
+    type -- "Player-<realm>-<hex>" for characters, "Pet-...", "Creature-...",
+    "Vehicle-..." for everything else -- which makes this the authoritative test,
+    independent of the combat log's TYPE_PLAYER flag. It guards the whisper
+    paths: a whisper addressed to a pet bounces back as "No player named 'X' is
+    currently playing", so a pet name must never reach SendChatMessage.
+]]
+local function IsPlayerGUID(guid)
+	return type(guid) == "string" and guid:sub(1, 7) == "Player-"
+end
+
+--------------------------------------------------------------------------------
 -- Safety Timer
 --------------------------------------------------------------------------------
 
@@ -181,7 +197,7 @@ local function OnCombatLogEventUnfiltered()
 	    A pet that buffs you is never credited: its name is not a player's, so
 	    the whisper would bounce.
 	]]
-	if not ns.IsPlayerGUID(sourceGUID) or not sourceName then
+	if not IsPlayerGUID(sourceGUID) or not sourceName then
 		return
 	end
 	if bit.band(sourceFlags or 0, COMBATLOG_OBJECT_REACTION_FRIENDLY) == 0 then
@@ -223,7 +239,7 @@ local function ResolveAuraCaster(aura)
 			return nil
 		end
 		casterGUID = sourceGUID
-		creditUnit = ns.IsPlayerGUID(sourceGUID) and sourceUnit or GetPetOwnerUnit(sourceGUID)
+		creditUnit = IsPlayerGUID(sourceGUID) and sourceUnit or GetPetOwnerUnit(sourceGUID)
 	else
 		local instanceID = aura.auraInstanceID
 		if not instanceID or not ns.IsPlain(instanceID) then
@@ -234,7 +250,7 @@ local function ResolveAuraCaster(aura)
 		if not ok or not casterGUID or not ns.IsPlain(casterGUID) then
 			return nil
 		end
-		local isPlayer = ns.IsPlayerGUID(casterGUID)
+		local isPlayer = IsPlayerGUID(casterGUID)
 		creditUnit = isPlayer and ns.GetUnitByGUID(casterGUID) or GetPetOwnerUnit(casterGUID)
 		if not creditUnit then
 			if not isPlayer then
@@ -293,7 +309,7 @@ local function HandleAddedAura(aura)
 	if IsGroupMemberOrPet(creditGUID, creditName) or IsGroupMemberOrPet(casterGUID) then
 		return
 	end
-	if ns.IsPlayerGUID(creditGUID) then
+	if IsPlayerGUID(creditGUID) then
 		--[[
 		    Only a unit can be asked whether it's friendly. A player we know by GUID
 		    alone just put a helpful buff on you, which the other faction can't do.

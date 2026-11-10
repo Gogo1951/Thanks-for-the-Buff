@@ -23,8 +23,9 @@ end
 --------------------------------------------------------------------------------
 
 --[[
-    The AceDB-3.0 defaults table. Every user setting lives under `profile` -- the
-    shared Default profile holds the whole database. AceDB applies these itself,
+    The AceDB-3.0 defaults table. Every setting lives on the shared Default
+    profile; the Ignored Buffs lists and classToken sit outside it, in `char`
+    and `global` (below). AceDB applies these itself,
     copying them into the saved table and preserving an explicit false, so there is
     no hand-rolled merge.
 ]]
@@ -66,6 +67,26 @@ ns.DATABASE_DEFAULTS = {
 			    as false, so AceDB does not fill it back in.
 			]]
 			emotes = GetDefaultEmoteSettings(true),
+		},
+		--[[
+		    Wave to Friends. Off by default: it emotes at people on its own, so a
+		    player opts in. Friends and Guilds each pick at random from their own
+		    token set; a Custom List entry is { name = as typed, emote = one token,
+		    "" for None }, keyed by ns.NormalizeWaveName. `guilds` is keyed by
+		    ns.NormalizeGuildName and holds the name as typed.
+		]]
+		wave = {
+			enabled = false,
+			restingOnly = true,
+			cooldown = 300,
+			friendsEnabled = true,
+			bnetFriends = true,
+			friendEmotes = { WAVE = true },
+			myGuildEnabled = true,
+			guilds = {},
+			guildEmotes = { WAVE = true },
+			customEnabled = true,
+			players = {},
 		},
 		slash = {
 			createMacro = true,

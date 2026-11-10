@@ -1,8 +1,8 @@
 # Thanks for the Buff (TFTB)
 
-Auto thank players who buff you with an emote or whisper. Strangers who drop Fortitude, Arcane Intellect, or Mark of the Wild on you get thanked on the spot, and one click of your Thank You macros thanks anyone you target.
+Auto thank players who buff you with an emote or whisper, greet friends and guildmates with a wave as you pass them, and thank anyone you target with one click of your Thank You macros.
 
-**TL;DR:** Be the friendly face in Azeroth without breaking stride. Every kindness gets noticed, and nobody has to wonder whether you saw their buff.
+**TL;DR:** Be the friendly face in Azeroth without breaking stride. Every buff gets noticed, and every friend gets a hello.
 
 ### Give Thanks
 
@@ -12,6 +12,12 @@ Auto thank players who buff you with an emote or whisper. Strangers who drop For
 * **Your Emotes, Your Style** // Pick from every emote in the game, from a polite bow to a big cheer, and a random one goes out each time.
 * **Never Spammy** // A wave of world buffs or a generous repeat buffer never turns your gratitude into spam.
 * **Know Who Buffed You** // Turn on a chat note or a sound to see who buffed you and with what.
+
+### Wave to Friends
+
+* **Say Hi Without Stopping** // Mouse over a friend or guildmate out in the world and they get a wave, no typing required.
+* **You Pick Who Counts** // Your friends list, your Battle.net friends' characters, your own guild, and any other guilds you name.
+* **A Custom List for Your Regulars** // Give a favorite player their own emote, shoo away your rival, or skip someone entirely.
 
 ### Thank You Button
 
@@ -33,8 +39,9 @@ Auto thank players who buff you with an emote or whisper. Strangers who drop For
 1. Install the add-on, ideally using [CurseForge](https://www.curseforge.com/wow/addons/thanks-for-the-buff-revisited) or [Wago](https://addons.wago.io/addons/thanks-for-the-buff).
 2. Type `/tftb` to open the Options Interface.
 3. Under Give Thanks > Emotes List, pick the emotes you like.
-4. Open your Macros window and drag `- Thank` onto your action bar.
-5. _"Manners maketh the raid."_
+4. Turn on Wave to Friends to greet the people you know.
+5. Open your Macros window and drag `- Thank` onto your action bar.
+6. _"Manners maketh the raid."_
 
 ## Tips & Tricks
 

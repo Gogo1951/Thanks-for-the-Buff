@@ -10,7 +10,7 @@ local GetColor = ns.GetColor
     then the characters) and the selected scope's buffs on the right. Each scope
     group closes over its own scope key, so the add controls and the row buttons
     in a pane always act on the list the player is looking at, including another
-    character's. The lists themselves live in Features/Utilities.lua.
+    character's. The lists themselves live in Features/Ignored-Buffs.lua.
 
     A buff is a spell, not an item, so each pane keeps this panel's own shape:
     an add-from-what-you-have select first, since a player rarely knows a spell
@@ -31,7 +31,7 @@ local function SpellLabel(spellId)
 	if not name then
 		return nil
 	end
-	local icon = C_Spell.GetSpellTexture and C_Spell.GetSpellTexture(spellId)
+	local icon = C_Spell.GetSpellTexture(spellId)
 	local picture = icon and ("|T" .. icon .. ":16|t ") or ""
 	return picture .. "|cff" .. ns.SPELL_LINK_COLOR .. name .. "|r", name
 end

@@ -1,5 +1,5 @@
 ## Title: Thanks for the Buff (TFTB)
-## Notes: Auto thank players who buff you with an emote or whisper. Strangers who drop Fortitude, Arcane Intellect, or Mark of the Wild on you get thanked on the spot, and one click of your Thank You macros thanks anyone you target.
+## Notes: Auto thank players who buff you with an emote or whisper, greet friends and guildmates with a wave as you pass them, and thank anyone you target with one click of your Thank You macros.
 ## Author: Gogo1951
 
 ## IconTexture: Interface/AddOns/TFTB/Includes/Images/Thanks-for-the-Buff.tga
@@ -61,9 +61,11 @@ Data/Default-Settings.lua
 Features/Core.lua
 Features/Utilities.lua
 Features/Announcements.lua
+Features/Ignored-Buffs.lua
 Features/Praise.lua
 Features/Buff-Tracking.lua
 Features/Thank-You-Button.lua
+Features/Wave-To-Friends.lua
 
 # Diagnostics
 Diagnostics/Diagnostics-Core.lua
@@ -83,6 +85,7 @@ Options/Options-Give-Thanks.lua
 Options/Options-Emotes-List.lua
 Options/Options-Ignored-Buffs.lua
 Options/Options-Thank-You-Button.lua
+Options/Options-Wave-To-Friends.lua
 Options/Options-Profiles.lua
 Options/Options-Feedback-Support.lua
 Diagnostics/Options-Diagnostics.lua

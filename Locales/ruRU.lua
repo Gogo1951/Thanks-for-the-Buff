@@ -42,7 +42,7 @@ L["OPTIONS_WELCOME_TOGGLE"] = "Включить приветственное с�
 L["OPTIONS_WELCOME_DESCRIPTION"] =
 	"Выводит сообщение, которое видите только вы, при входе в игру."
 L["OPTIONS_DESCRIPTION"] =
-	"Автоматически благодарите эмоцией или шепотом игроков, которые накладывают на вас баффы. Незнакомцы, наложившие на вас Стойкость, Чародейский интеллект или Знак дикой природы, получат благодарность сразу, а один щелчок по макросам благодарности поблагодарит любого, кто у вас в цели."
+	"Автоматически благодарите эмоцией или шепотом игроков, которые накладывают на вас баффы, приветствуйте друзей и согильдийцев взмахом руки, проходя мимо, и благодарите любого, кто у вас в цели, одним щелчком по макросам благодарности."
 L["OPTIONS_FEATURES_HEADER"] = "Функции"
 L["OPTIONS_FEATURES_DESCRIPTION"] =
 	"Включайте и отключайте каждую функцию здесь или на ее собственной панели."
@@ -120,6 +120,7 @@ L["WHISPERS_HEADER"] = "Благодарственный шепот"
 L["PRAISE_WHISPER_ENABLE"] = "Включить благодарственный шепот"
 L["PRAISE_WHISPER_DESCRIPTION"] =
 	"Шепчет благодарность игроку, который дал вам бафф."
+-- TRANSLATORS: keep {spell} exactly as written; it is the token players type into the whisper.
 L["PRAISE_WHISPER_MESSAGE_DESCRIPTION"] =
 	"Задает, что TFTB шепчет игроку, который дал вам бафф. {spell} заменяется на бафф. Оставьте поле пустым, чтобы ничего не шептать."
 
@@ -136,10 +137,19 @@ L["NOTIFICATIONS_SOUND_DESCRIPTION"] =
 L["NOTIFICATIONS_SOUND_PREVIEW_DESCRIPTION"] =
 	"Воспроизводит звук, чтобы вы могли услышать его до включения."
 
--- Emotes: the grid's group keys are EMOTE_GROUP_ plus each Data.EMOTE_GROUPS entry, upper-cased.
+--------------------------------------------------------------------------------
+-- Options: Emotes List
+--------------------------------------------------------------------------------
+
 L["TAB_EMOTES_LIST"] = "Список эмоций"
 L["EMOTES_GRID_DESCRIPTION"] =
 	"Отметьте эмоции, из которых функция Благодарности может выбирать, когда игрок вне вашей группы дает вам бафф; она использует одну наугад. Во время боя эмоции откладываются."
+
+--[[
+    The emote checklist, shared by this panel and Wave to Friends' Friends and
+    Guilds tabs. Its group keys are EMOTE_GROUP_ plus each Data.EMOTE_GROUPS
+    entry, upper-cased.
+]]
 L["EMOTE_GROUP_COUNT"] = "%s (отмечено %d из %d)"
 L["EMOTE_GROUP_TEXT"] = "Текст"
 L["EMOTE_GROUP_TEXT_DESCRIPTION"] = "Показывает только строку эмоции."
@@ -172,7 +182,7 @@ L["IGNORED_BUFFS_REMOVE"] = "Удаляет этот бафф из списка.
 L["IGNORED_BUFFS_NOT_FOUND"] = "Бафф для %s не найден."
 L["IGNORED_BUFFS_ALL_CHARACTERS"] = "Все персонажи"
 L["IGNORED_BUFFS_PROMOTE_DESCRIPTION"] =
-	"Переносит этот бафф в список «Все персонажи», чтобы за него не благодарили ни на одном персонаже."
+	'Переносит этот бафф в список "Все персонажи", чтобы за него не благодарили ни на одном персонаже.'
 
 --------------------------------------------------------------------------------
 -- Options: Thank You Button
@@ -204,6 +214,76 @@ L["BUTTON_MACRO_ENABLE_DESCRIPTION"] =
 	"Создает макрос с именем %s и снова удаляет его, когда вы отключаете этот параметр."
 L["BUTTON_WHISPER_DESCRIPTION"] =
 	"Задает, что эта кнопка шепчет вашей цели. Оставьте поле пустым, чтобы ничего не шептать."
+
+--------------------------------------------------------------------------------
+-- Options: Wave to Friends
+--------------------------------------------------------------------------------
+
+L["TAB_WAVE_TO_FRIENDS"] = "Приветствие друзей"
+L["WAVE_ENABLE"] = "Включить приветствие друзей"
+L["WAVE_ENABLE_DESCRIPTION"] =
+	"Включает эмоцию для друзей и согильдийцев, когда вы наводите на них курсор."
+L["WAVE_DESCRIPTION"] =
+	"Приветствуйте друзей и согильдийцев эмоцией, когда наводите на них курсор в открытом мире."
+L["WAVE_RULES"] = "Никогда для вашей группы или рейда и никогда в бою."
+L["WAVE_RESTING_ENABLE"] = "Только во время отдыха"
+L["WAVE_RESTING_ENABLE_DESCRIPTION"] =
+	"Приветствует только во время отдыха, в городе или таверне."
+L["WAVE_COOLDOWN"] = "Задержка для того же игрока"
+L["WAVE_COOLDOWN_DESCRIPTION"] =
+	"Задает, через какое время того же игрока можно поприветствовать снова."
+L["WAVE_COOLDOWN_ONCE_PER_SESSION"] = "Раз за сеанс"
+-- %s is the default emotes' slash commands, as the client names them.
+L["WAVE_EMOTES_RESET_DEFAULTS_DESCRIPTION"] =
+	"Оставляет в списке отмеченными только %s."
+
+-- Custom List
+L["WAVE_TAB_CUSTOM"] = "Свой список"
+L["WAVE_CUSTOM_DESCRIPTION"] =
+	"Игроки, которые всегда получают свою эмоцию, даже раньше вкладок Друзья и Гильдии. Выберите Нет, чтобы никогда не адресовать кому-то эмоцию."
+-- One of these two follows WAVE_CUSTOM_DESCRIPTION: realm clients, then WoW Forever, which has no realms.
+L["WAVE_CUSTOM_NAMES_REALM"] =
+	"Имя-Сервер подходит только для этого сервера; имя без сервера подходит для любого сервера."
+L["WAVE_CUSTOM_NAMES_FOREVER"] =
+	"Полное имя подходит одному персонажу; одно имя без фамилии подходит всем, у кого оно такое же."
+L["WAVE_CUSTOM_ENABLE"] = "Включить свой список"
+L["WAVE_CUSTOM_ENABLE_DESCRIPTION"] =
+	"Использует имена ниже раньше вкладок Друзья и Гильдии."
+L["WAVE_CUSTOM_OFF_WARNING"] =
+	"Свой список выключен, поэтому никто ниже не получит свою эмоцию."
+L["WAVE_CUSTOM_ADD"] = "Добавить игрока"
+L["WAVE_CUSTOM_ADD_DESCRIPTION"] =
+	"Введите имя или Имя-Сервер, затем нажмите Enter. Несколько имен разделяйте запятыми."
+L["WAVE_CUSTOM_ADD_DESCRIPTION_FOREVER"] =
+	"Введите полное имя или только имя без фамилии, затем нажмите Enter. Несколько имен разделяйте запятыми."
+L["WAVE_CUSTOM_EMPTY"] = "Игроков пока нет. Добавьте игрока выше."
+L["WAVE_CUSTOM_EMOTE_DESCRIPTION"] =
+	"Задает эмоцию для этого игрока. Вариант Нет отключает для него эмоции."
+L["WAVE_CUSTOM_REMOVE"] = "Удаляет этого игрока из списка."
+
+-- Friends
+L["WAVE_TAB_FRIENDS"] = "Друзья"
+L["WAVE_FRIENDS_ENABLE"] = "Махать друзьям"
+L["WAVE_FRIENDS_ENABLE_DESCRIPTION"] =
+	"Приветствует персонажей из вашего списка друзей."
+L["WAVE_BNET_ENABLE"] = "Включая друзей Battle.net"
+L["WAVE_BNET_ENABLE_DESCRIPTION"] =
+	"Также приветствует персонажей, за которых играют ваши друзья Battle.net."
+L["WAVE_FRIENDS_EMOTES_DESCRIPTION"] =
+	"Отметьте эмоции для друзей; используется одна наугад."
+
+-- Guilds
+L["WAVE_TAB_GUILDS"] = "Гильдии"
+L["WAVE_MY_GUILD_ENABLE"] = "Махать своей гильдии"
+L["WAVE_MY_GUILD_ENABLE_DESCRIPTION"] =
+	"Приветствует членов гильдии, в которой вы состоите."
+L["WAVE_GUILD_ADD"] = "Добавить гильдию"
+L["WAVE_GUILD_ADD_DESCRIPTION"] =
+	"Введите название гильдии, затем нажмите Enter. Несколько гильдий разделяйте запятыми. Регистр букв не важен."
+L["WAVE_GUILDS_EMPTY"] = "Других гильдий пока нет. Добавьте гильдию выше."
+L["WAVE_GUILD_REMOVE"] = "Удаляет эту гильдию из списка."
+L["WAVE_GUILDS_EMOTES_DESCRIPTION"] =
+	"Отметьте эмоции для согильдийцев; используется одна наугад."
 
 --------------------------------------------------------------------------------
 -- Options: Whisper Message Row

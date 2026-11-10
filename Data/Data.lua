@@ -85,6 +85,7 @@ ns.OPTIONS_REGISTRY = {
 	EmotesList = ADDON_NAME .. "_EmotesList",
 	IgnoredBuffs = ADDON_NAME .. "_IgnoredBuffs",
 	ThankYouButton = ADDON_NAME .. "_ThankYouButton",
+	WaveToFriends = ADDON_NAME .. "_WaveToFriends",
 	Profiles = ADDON_NAME .. "_Profiles",
 	FeedbackSupport = ADDON_NAME .. "_FeedbackSupport",
 	Diagnostics = ADDON_NAME .. "_Diagnostics",
@@ -115,7 +116,8 @@ ns.OPTIONS_TREE_ROW_WIDTH = 2.5
 
 --[[
     The Ignored Buffs panel names one scope per list. Every scope but one is an
-    AceDB char key ("Name - Realm", never localized), so the account-wide list
+    AceDB char key ("Name - Realm", or "First Last" on WoW Forever, never
+    localized), so the account-wide list
     needs a key no character can collide with -- hence the asterisks, which no
     character or realm name can contain.
 ]]
@@ -187,6 +189,17 @@ Data.PRAISE_DELAY_CHOICES = { 1, 2, 3, 4 }
 Data.SECONDS_CHOICES = { 0, 1, 2, 3, 5, 8, 13, 21, 34, 55, 89, 144 }
 
 --[[
+    Wave to Friends' per-player cooldown, in seconds. Waves are social, not
+    reactive, so this scale runs in minutes and the dropdown words it that way
+    (ns.FormatDuration without forceSeconds). The trailing 0 is Once per
+    Session: greet each player once until the next /reload or login.
+]]
+Data.WAVE_COOLDOWN_CHOICES = { 60, 120, 300, 600, 900, 1800, 3600, 0 }
+
+-- The emote a new Custom List name starts on: the first of these this client has, else None.
+Data.WAVE_CUSTOM_DEFAULT_EMOTES = { "SHOO", "WAVE" }
+
+--[[
     {rt1} Star, {rt2} Circle, {rt3} Diamond, {rt4} Triangle,
     {rt5} Moon, {rt6} Square, {rt7} Cross, {rt8} Skull
 ]]
@@ -210,7 +223,8 @@ ns.GOOD_TO_GO_LINKS = {
 --------------------------------------------------------------------------------
 
 --[[
-    The emote groups, in the order the Give Thanks panel lists them. Each
+    The emote groups, in the order every emote checklist lists them (Emotes
+    List and Wave to Friends' tabs). Each
     flavor's Data/<Flavor>/Emote-Groups-<Flavor>.lua sorts its tokens into them.
 ]]
 Data.EMOTE_GROUPS = { "Text", "Gesture", "Voice", "Pose" }
