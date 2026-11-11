@@ -141,10 +141,10 @@ L["EMOTES_GRID_DESCRIPTION"] =
 L["EMOTE_GROUP_COUNT"] = "%s (%d de %d marcadas)"
 L["EMOTE_GROUP_TEXT"] = "Texto"
 L["EMOTE_GROUP_TEXT_DESCRIPTION"] = "Mostra só a linha da expressão."
-L["EMOTE_GROUP_VOICE"] = "Voz"
-L["EMOTE_GROUP_VOICE_DESCRIPTION"] = "Toca uma fala."
 L["EMOTE_GROUP_GESTURE"] = "Gesto"
 L["EMOTE_GROUP_GESTURE_DESCRIPTION"] = "Toca uma animação curta."
+L["EMOTE_GROUP_VOICE"] = "Voz"
+L["EMOTE_GROUP_VOICE_DESCRIPTION"] = "Toca uma fala."
 L["EMOTE_GROUP_POSE"] = "Postura"
 L["EMOTE_GROUP_POSE_DESCRIPTION"] = "Dura até você se mover."
 L["EMOTES_RESET"] = "Redefinir expressões"
@@ -230,7 +230,8 @@ L["WAVE_CUSTOM_NAMES_FOREVER"] =
 	"Um nome completo corresponde a um só personagem; só o primeiro nome corresponde a todos que o têm."
 L["WAVE_CUSTOM_ENABLE"] = "Habilitar lista personalizada"
 L["WAVE_CUSTOM_ENABLE_DESCRIPTION"] = "Usa os nomes abaixo antes de Amigos e Guildas."
-L["WAVE_CUSTOM_OFF_WARNING"] = "A lista personalizada está desligada, então ninguém abaixo recebe a sua expressão."
+L["WAVE_CUSTOM_OFF_WARNING"] =
+	"A lista personalizada está desligada, então ninguém abaixo recebe a própria expressão."
 L["WAVE_CUSTOM_ADD"] = "Adicionar jogador"
 L["WAVE_CUSTOM_ADD_DESCRIPTION"] =
 	"Digite um nome ou Nome-Reino e depois pressione Enter. Separe vários nomes com vírgulas."
@@ -274,14 +275,12 @@ L["WHISPER_MESSAGE_RESET_DESCRIPTION"] = "Redefine a mensagem de sussurro para o
 -- The whisper composer around the Give Thanks message box.
 L["SEND_MESSAGES_IN"] = "Enviar mensagens em"
 L["SEND_MESSAGES_IN_DESCRIPTION"] =
-	"Define o idioma em que o TFTB escreve para outros jogadores. Escolher outro idioma usa a mensagem padrão dele, a menos que você tenha escrito a sua."
-L["WHISPER_SIGN_OFF_DESCRIPTION"] = "Adicionado a toda mensagem que o TFTB envia, para que outros jogadores saibam que veio de um add-on."
+	"Define o idioma em que o TFTB escreve para outros jogadores. Escolher outro idioma usa o texto padrão dele, a menos que você tenha escrito o seu."
+L["WHISPER_SIGN_OFF_DESCRIPTION"] =
+	"Adicionado a toda mensagem que o TFTB envia, para que outros jogadores saibam que veio de um add-on."
 -- TRANSLATORS: each %s is a token, {spell} then {name}, drawn in blue.
 L["WHISPER_TOKENS"] = "Marcadores: %s o buff, %s quem lançou"
-L["WHISPER_ROOM_LEFT"] = "Espaço restante: %d"
-L["WHISPER_ROOM_LEFT_DESCRIPTION"] =
-	"Quanto ainda cabe no sussurro, medido com o buff de exemplo. Alguns caracteres contam como mais de um, e um buff com nome mais longo deixa menos espaço."
-L["WHISPER_TOO_LONG"] = "Longa demais. O TFTB vai enviar a mensagem padrão no lugar."
+L["WHISPER_TOO_LONG"] = "Longa demais, então o texto padrão será enviado no lugar."
 L["WHISPER_TEST"] = "Enviar teste para mim"
 L["WHISPER_TEST_DESCRIPTION"] = "Sussurra o exemplo para você, para ver exatamente como outros jogadores vão ver."
 
@@ -289,4 +288,5 @@ L["WHISPER_TEST_DESCRIPTION"] = "Sussurra o exemplo para você, para ver exatame
 -- Defaults
 --------------------------------------------------------------------------------
 
+-- The Thank You Button whisper's default, in the client's own language; Give Thanks' defaults live in Data/Message-Languages.lua.
 L["DEFAULT_WHISPER"] = "Valeu, você é demais! (="

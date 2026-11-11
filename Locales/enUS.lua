@@ -138,10 +138,10 @@ L["EMOTES_GRID_DESCRIPTION"] =
 L["EMOTE_GROUP_COUNT"] = "%s (%d of %d Checked)"
 L["EMOTE_GROUP_TEXT"] = "Text"
 L["EMOTE_GROUP_TEXT_DESCRIPTION"] = "Shows the emote line only."
-L["EMOTE_GROUP_VOICE"] = "Voice"
-L["EMOTE_GROUP_VOICE_DESCRIPTION"] = "Plays a voice line."
 L["EMOTE_GROUP_GESTURE"] = "Gesture"
 L["EMOTE_GROUP_GESTURE_DESCRIPTION"] = "Plays a short animation."
+L["EMOTE_GROUP_VOICE"] = "Voice"
+L["EMOTE_GROUP_VOICE_DESCRIPTION"] = "Plays a voice line."
 L["EMOTE_GROUP_POSE"] = "Pose"
 L["EMOTE_GROUP_POSE_DESCRIPTION"] = "Holds until you move."
 L["EMOTES_RESET"] = "Reset Emotes"
@@ -258,14 +258,12 @@ L["WHISPER_MESSAGE_RESET_DESCRIPTION"] = "Resets the whisper message to the defa
 -- The whisper composer around the Give Thanks message box.
 L["SEND_MESSAGES_IN"] = "Send Messages In"
 L["SEND_MESSAGES_IN_DESCRIPTION"] =
-	"Sets the language TFTB writes in when it messages other players. Picking another language swaps in its default message, unless you've written your own."
-L["WHISPER_SIGN_OFF_DESCRIPTION"] = "Added to every message TFTB sends, so other players can tell it came from an add-on."
+	"Sets the language TFTB writes in when it messages other players. Picking another language swaps in its default text, unless you've written your own."
+L["WHISPER_SIGN_OFF_DESCRIPTION"] =
+	"Added to every message TFTB sends, so other players can tell it came from an add-on."
 -- TRANSLATORS: each %s is a token, {spell} then {name}, drawn in blue.
 L["WHISPER_TOKENS"] = "Tokens: %s the buff, %s who cast it"
-L["WHISPER_ROOM_LEFT"] = "Room left: %d"
-L["WHISPER_ROOM_LEFT_DESCRIPTION"] =
-	"How much more fits in the whisper, measured with the example buff. Some letters count as more than one, and a buff with a longer name leaves less room."
-L["WHISPER_TOO_LONG"] = "Too long. TFTB will send the default message instead."
+L["WHISPER_TOO_LONG"] = "Too long, so the default text goes out instead."
 L["WHISPER_TEST"] = "Send Test to Me"
 L["WHISPER_TEST_DESCRIPTION"] = "Whispers the example to you, so you see it exactly as other players will."
 
@@ -273,4 +271,5 @@ L["WHISPER_TEST_DESCRIPTION"] = "Whispers the example to you, so you see it exac
 -- Defaults
 --------------------------------------------------------------------------------
 
+-- The Thank You Button whisper's default, in the client's own language; Give Thanks' defaults live in Data/Message-Languages.lua.
 L["DEFAULT_WHISPER"] = "Thanks, you're the best! (="

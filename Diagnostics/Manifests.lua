@@ -172,7 +172,7 @@ end
 
 -- The add-on's own example reports, appended to the shared Event Log intro.
 ns.DiagnosticsStrings.EVENT_LOG_EXAMPLES =
-	"Best for 'nobody got thanked' reports. It records each buff that lands on you, decoded: the spell, who cast it, how long it lasts, and, off WoW Forever, whether the combat log calls them a friendly player outside your group. On WoW Forever it records each buff added to you with the gate, if any, that kept TFTB from reading it. For 'nobody got waved at' reports, each time you mouse over someone records UPDATE_MOUSEOVER_UNIT; with none, the game never told TFTB."
+	"Best for 'nobody got thanked' reports. It records each buff that lands on you, decoded: the spell, who cast it, how long it lasts, and, off WoW Forever, whether the combat log calls them a friendly player outside your group. On WoW Forever it records each buff added to you with the gate, if any, that kept TFTB from reading it, and who cast each one it read. For 'nobody got waved at' reports, each time you mouse over someone records UPDATE_MOUSEOVER_UNIT; with none, the game never told TFTB."
 
 --[[
     How many emotes a list has picked, out of how many this client offers, and
@@ -785,6 +785,55 @@ function ns:LogAuraApplied(spellID, sourceName, sourceFlags)
 end
 
 --[[
+    Who cast an aura on you, read the way Buff-Tracking.lua finds its caster:
+    the aura's sourceUnit, or with none (a stranger out of nameplate range) the
+    caster's GUID from C_UnitAuras.GetAuraCasterGUID. Reports the GUID's type
+    (Player, Pet, Creature, ...), self when it is you, and, where the aura names
+    a unit, whether that unit is in your group and friendly. Give Thanks credits
+    only a friendly Player outside your group, so a read aura that went
+    unthanked with anything else here stopped at that check. unresolved means
+    no caster could be read, which Give Thanks skips too. A secret value is
+    never tested.
+]]
+local function AuraCasterText(aura)
+	local unit = aura.sourceUnit
+	if not ns.IsPlain(unit) then
+		return "caster=<secret>"
+	end
+	local guid
+	if unit then
+		guid = UnitGUID(unit)
+	else
+		local instanceID = aura.auraInstanceID
+		if ns.IsPlain(instanceID) and instanceID then
+			local ok, casterGUID = pcall(C_UnitAuras.GetAuraCasterGUID, "player", instanceID)
+			if ok then
+				guid = casterGUID
+			end
+		end
+	end
+	if not ns.IsPlain(guid) then
+		return "caster=<secret>"
+	end
+	if not guid then
+		return "caster=unresolved"
+	end
+	local text = "caster=" .. tostring(guid:match("^(%a+)%-") or "?")
+	if guid == UnitGUID("player") then
+		text = text .. " self"
+	end
+	if unit then
+		local inParty, inRaid = UnitInParty(unit), UnitInRaid(unit)
+		local inGroup = "<secret>"
+		if ns.IsPlain(inParty) and ns.IsPlain(inRaid) then
+			inGroup = tostring((inParty or inRaid) and true or false)
+		end
+		text = text .. string.format(" inGroup=%s friend=%s", inGroup, PlainFlag(UnitIsFriend("player", unit)))
+	end
+	return text
+end
+
+--[[
     Forever's version of the case above: UNIT_AURA is excluded from the log
     because its update table can't be written as text, so the buff engine calls
     this for each helpful aura added to you (or one whose helpfulness is
@@ -792,10 +841,10 @@ end
     first gate that stops the update -- not ready, no db, in combat, auras
     secret, full update -- or read when the aura goes on to be classified.
     verdict read means the buff reached the add-on and the issue is
-    downstream, so a read aura also carries its duration as Give Thanks
-    reads it (nil when it isn't found on you). A secret value is never tested
-    here: ns:LogEventNow writes it as <secret>, and the name and duration
-    reads are skipped.
+    downstream, so a read aura also carries who cast it (AuraCasterText) and
+    its duration as Give Thanks reads it (nil when it isn't found on you). A
+    secret value is never tested here: ns:LogEventNow writes it as <secret>,
+    and the name, caster and duration reads are skipped.
 ]]
 function ns:LogAuraUpdate(verdict, aura)
 	if not ns.IsPlain(aura) then
@@ -807,14 +856,17 @@ function ns:LogAuraUpdate(verdict, aura)
 		return
 	end
 	local spellID = aura.spellId
-	local name, duration
+	local name, caster, duration
+	if verdict == "read" then
+		caster = AuraCasterText(aura)
+	end
 	if ns.IsPlain(spellID) and spellID then
 		name = C_Spell.GetSpellName(spellID)
 		if verdict == "read" then
 			duration = "duration=" .. tostring(ns.GetBuffDuration("player", spellID))
 		end
 	end
-	ns:LogEventNow("UNIT_AURA", "ADDED", verdict, spellID, name or "?", aura.sourceUnit, duration)
+	ns:LogEventNow("UNIT_AURA", "ADDED", verdict, spellID, name or "?", aura.sourceUnit, caster, duration)
 end
 
 --------------------------------------------------------------------------------

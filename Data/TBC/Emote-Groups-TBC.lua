@@ -1,9 +1,6 @@
 local _, ns = ...
 
---[[
-    [emote token] = group. An emote this client offers that is not listed is a
-    Text emote: it prints its line and does nothing else.
-]]
+-- [emote token] = group
 ns.EMOTE_GROUP_BY_TOKEN = {
 	-- Voice
 	ATTACKMYTARGET = "Voice",
@@ -115,10 +112,8 @@ How We Got the Data
 Last Validated
 	2026-11-08, TBC Anniversary 2.5.6.70577
 
-Source
-	wago.tools DB2 exports for build 2.5.6.70577: EmotesText, Emotes and EmotesTextSound.
-
 Notes
+	- Sorts every emote that does more than print a line into the group the Give Thanks emote grid shows it under (ns.GetEmoteGroup in Features/Utilities.lua). An emote this client offers that isn't listed is a Text emote: it prints its line and does nothing else.
 	- Each EmotesText row (the token) links to an Emotes row (its animation).
 	- Pose: the animation loops until you move (Emotes.EmoteSpecProc 1 or 2).
 	- Voice: the token has EmotesTextSound rows, or its animation carries an EventSoundID.
@@ -126,4 +121,18 @@ Notes
 	- Text: everything else. Checked first to last in that order, so no token sits in two groups.
 	- Counts: Text 157, Voice 27, Gesture 66, Pose 6.
 	- Which emotes exist still comes from the running client (ns.GetEmoteCatalog); this file only sorts them.
+
+SQL (CMaNGOS)
+	TODO: Add SQL Query
+
+Wowhead
+	None.
+
+wago.tools
+	https://wago.tools/db2/EmotesText?build=2.5.6.70577
+	https://wago.tools/db2/Emotes?build=2.5.6.70577
+	https://wago.tools/db2/EmotesTextSound?build=2.5.6.70577
+
+QuestieDB
+	None.
 ]]

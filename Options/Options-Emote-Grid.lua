@@ -1,13 +1,14 @@
-local _, ns = ...
+local ADDON_NAME, ns = ...
 local Data = ns.Data
 local L = ns.L
 
 local GetColor = ns.GetColor
 
 --[[
-    The Give Thanks emote checklist: every emote this client offers, grouped
-    by kind (Text, Voice, Gesture, Pose), four checkboxes to a line under a
-    yellow header per group.
+    The emote checklist shared by Give Thanks' Emotes List and Wave to
+    Friends' Friends and Guilds tabs: every emote this client offers, grouped
+    in Data.EMOTE_GROUPS order (Text, Gesture, Voice, Pose), four checkboxes
+    to a line under a yellow header per group.
 
     Each group is ONE custom AceGUI widget, not one AceConfig toggle per emote.
     AceConfig rebuilds every widget on the page after each click, and ~255
@@ -52,7 +53,7 @@ end
 --------------------------------------------------------------------------------
 
 local AceGUI = LibStub("AceGUI-3.0")
-local WIDGET_TYPE, WIDGET_VERSION = "TFTB-EmoteChecklist", 2
+local WIDGET_TYPE, WIDGET_VERSION = ADDON_NAME .. "_EmoteChecklist", 2
 
 local function HeaderText(model, group)
 	local key = "EMOTE_GROUP_" .. group:upper()

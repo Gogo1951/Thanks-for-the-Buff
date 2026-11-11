@@ -16,7 +16,7 @@ L["ADDON_SHORT_NAME"] = "TFTB" -- Short Name
 
 -- System
 L["CHAT_LOADED"] =
-	"버전 %s. 설정(이 메시지를 끄는 옵션 포함)은 옵션 > 애드온 > Thanks for the Buff (TFTB)에 있습니다. 이 애드온이 마음에 드시나요? 친구에게 알려 주시거나, CurseForge에서 즐겨찾기에 추가하거나, GitHub에서 Star를 눌러 주세요. (="
+	"버전 %s. 설정(이 메시지를 끄는 옵션 포함)은 설정 > 애드온 > Thanks for the Buff (TFTB)에 있습니다. 이 애드온이 마음에 드시나요? 친구에게 알려 주시거나, CurseForge에서 즐겨찾기에 추가하거나, GitHub에서 Star를 눌러 주세요. (="
 L["CHAT_OPTIONS_IN_COMBAT"] = "안전을 위해 전투 중에는 설정 인터페이스를 열 수 없습니다."
 
 -- Buff print out
@@ -146,10 +146,10 @@ L["EMOTES_GRID_DESCRIPTION"] =
 L["EMOTE_GROUP_COUNT"] = "%s (%d/%d 선택)"
 L["EMOTE_GROUP_TEXT"] = "텍스트"
 L["EMOTE_GROUP_TEXT_DESCRIPTION"] = "감정 표현 문구만 표시합니다."
-L["EMOTE_GROUP_VOICE"] = "음성"
-L["EMOTE_GROUP_VOICE_DESCRIPTION"] = "음성 대사를 재생합니다."
 L["EMOTE_GROUP_GESTURE"] = "동작"
 L["EMOTE_GROUP_GESTURE_DESCRIPTION"] = "짧은 동작을 재생합니다."
+L["EMOTE_GROUP_VOICE"] = "음성"
+L["EMOTE_GROUP_VOICE_DESCRIPTION"] = "음성 대사를 재생합니다."
 L["EMOTE_GROUP_POSE"] = "자세"
 L["EMOTE_GROUP_POSE_DESCRIPTION"] = "움직일 때까지 유지됩니다."
 L["EMOTES_RESET"] = "감정 표현 초기화"
@@ -280,19 +280,19 @@ L["WHISPER_MESSAGE_RESET_DESCRIPTION"] = "귓속말 메시지를 기본 문구�
 -- The whisper composer around the Give Thanks message box.
 L["SEND_MESSAGES_IN"] = "메시지 언어"
 L["SEND_MESSAGES_IN_DESCRIPTION"] =
-	"TFTB가 다른 플레이어에게 보내는 메시지의 언어를 설정합니다. 다른 언어를 고르면, 직접 쓴 메시지가 아닌 경우 그 언어의 기본 메시지로 바뀝니다."
-L["WHISPER_SIGN_OFF_DESCRIPTION"] = "TFTB가 보내는 모든 메시지에 붙어, 다른 플레이어가 애드온이 보낸 메시지임을 알 수 있게 합니다."
+	"TFTB가 다른 플레이어에게 보내는 메시지의 언어를 설정합니다. 다른 언어를 고르면, 직접 쓴 문구가 아닌 경우 그 언어의 기본 문구로 바뀝니다."
+L["WHISPER_SIGN_OFF_DESCRIPTION"] =
+	"TFTB가 보내는 모든 메시지에 붙어, 다른 플레이어가 애드온이 보낸 메시지임을 알 수 있게 합니다."
 -- TRANSLATORS: each %s is a token, {spell} then {name}, drawn in blue.
 L["WHISPER_TOKENS"] = "토큰: %s 버프, %s 시전자"
-L["WHISPER_ROOM_LEFT"] = "남은 공간: %d"
-L["WHISPER_ROOM_LEFT_DESCRIPTION"] =
-	"예시 버프를 기준으로 귓속말에 더 넣을 수 있는 양입니다. 일부 글자는 한 칸보다 많이 차지하며, 이름이 긴 버프는 공간을 더 씁니다."
-L["WHISPER_TOO_LONG"] = "너무 깁니다. 대신 기본 메시지를 보냅니다."
+L["WHISPER_TOO_LONG"] = "너무 길어서 대신 기본 문구를 보냅니다."
 L["WHISPER_TEST"] = "나에게 테스트 보내기"
-L["WHISPER_TEST_DESCRIPTION"] = "예시를 나에게 귓속말로 보내, 다른 플레이어가 보는 그대로 확인할 수 있습니다."
+L["WHISPER_TEST_DESCRIPTION"] =
+	"예시를 나에게 귓속말로 보내, 다른 플레이어가 보는 그대로 확인할 수 있습니다."
 
 --------------------------------------------------------------------------------
 -- Defaults
 --------------------------------------------------------------------------------
 
+-- The Thank You Button whisper's default, in the client's own language; Give Thanks' defaults live in Data/Message-Languages.lua.
 L["DEFAULT_WHISPER"] = "감사합니다, 최고예요! (="

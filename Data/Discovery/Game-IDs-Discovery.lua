@@ -37,7 +37,7 @@ ns.THANK_YOU_MACRO_ICONS = {
 How We Got the Data
 
 Last Validated
-	2026-11-07, Season of Discovery 1.15.9.70576
+	2026-11-11, Season of Discovery 1.15.9.70576
 
 Notes
 	- Spell IDs that feature code needs by name rather than from a list: the sample spells the options panels use for their preview messages.

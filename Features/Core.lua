@@ -136,9 +136,9 @@ end
 local function InitializeDatabase()
 	MigrateMessageLanguage()
 	ns.db = LibStub("AceDB-3.0"):New("TFTBDB", ns.DATABASE_DEFAULTS, true)
-	-- A fresh install has nothing to migrate, so it is stamped on its first login too.
-	ns.db.sv.messageLanguageMigrated = true
 	PruneOtherClientCharacters()
+	-- MIGRATION (remove after 2027-02-11): stamps the account so MigrateMessageLanguage runs once, fresh installs included.
+	ns.db.sv.messageLanguageMigrated = true
 	-- MIGRATION (remove after 2026-12-09): drops the retired settingsReset stamp.
 	ns.db.sv.settingsReset = nil
 	-- Saved every login so the Ignored Buffs tree can color any character by class.
@@ -169,8 +169,9 @@ ns.EVENT_NAMES = {
 }
 
 --[[
-    Forever has no combat log, and registering COMBAT_LOG_EVENT_UNFILTERED there
-    errors, so it reads buffs on you from UNIT_AURA instead.
+    Add-ons can't register WoW Forever's combat log: COMBAT_LOG_EVENT_UNFILTERED
+    there raises ADDON_ACTION_FORBIDDEN, which pcall can't catch, so Forever
+    reads buffs on you from UNIT_AURA instead.
 ]]
 if ns.FLAVOR == "Camelot" then
 	table.insert(ns.EVENT_NAMES, "UNIT_AURA")

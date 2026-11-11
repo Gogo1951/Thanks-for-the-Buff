@@ -139,10 +139,10 @@ L["EMOTES_GRID_DESCRIPTION"] =
 L["EMOTE_GROUP_COUNT"] = "%s（已勾選 %d/%d）"
 L["EMOTE_GROUP_TEXT"] = "文字"
 L["EMOTE_GROUP_TEXT_DESCRIPTION"] = "只顯示表情文字。"
-L["EMOTE_GROUP_VOICE"] = "語音"
-L["EMOTE_GROUP_VOICE_DESCRIPTION"] = "播放一句語音。"
 L["EMOTE_GROUP_GESTURE"] = "動作"
 L["EMOTE_GROUP_GESTURE_DESCRIPTION"] = "播放一個簡短動作。"
+L["EMOTE_GROUP_VOICE"] = "語音"
+L["EMOTE_GROUP_VOICE_DESCRIPTION"] = "播放一句語音。"
 L["EMOTE_GROUP_POSE"] = "姿態"
 L["EMOTE_GROUP_POSE_DESCRIPTION"] = "持續到你移動為止。"
 L["EMOTES_RESET"] = "重設表情"
@@ -263,14 +263,12 @@ L["WHISPER_MESSAGE_RESET_DESCRIPTION"] = "將密語訊息恢復為預設文字�
 -- The whisper composer around the Give Thanks message box.
 L["SEND_MESSAGES_IN"] = "訊息語言"
 L["SEND_MESSAGES_IN_DESCRIPTION"] =
-	"設定 TFTB 向其他玩家發送訊息時使用的語言。切換語言時，若你沒有自己寫過訊息，會換成該語言的預設訊息。"
-L["WHISPER_SIGN_OFF_DESCRIPTION"] = "TFTB 發送的每則訊息都會帶上它，讓其他玩家知道這是插件發送的。"
+	"設定 TFTB 向其他玩家發送訊息時使用的語言。切換語言時，若你沒有自己寫過，會換成該語言的預設文字。"
+L["WHISPER_SIGN_OFF_DESCRIPTION"] =
+	"TFTB 發送的每則訊息都會帶上它，讓其他玩家知道這是插件發送的。"
 -- TRANSLATORS: each %s is a token, {spell} then {name}, drawn in blue.
 L["WHISPER_TOKENS"] = "預留位置：%s 增益，%s 施法者"
-L["WHISPER_ROOM_LEFT"] = "剩餘空間：%d"
-L["WHISPER_ROOM_LEFT_DESCRIPTION"] =
-	"按範例增益計算，密語還能容納多少內容。部分字元佔用不只一個單位，名稱較長的增益會佔用更多空間。"
-L["WHISPER_TOO_LONG"] = "太長了。TFTB 將改為發送預設訊息。"
+L["WHISPER_TOO_LONG"] = "太長了，因此會改為發送預設文字。"
 L["WHISPER_TEST"] = "發送測試給我"
 L["WHISPER_TEST_DESCRIPTION"] = "把範例密語發給你自己，讓你看到和其他玩家完全一樣的效果。"
 
@@ -278,4 +276,5 @@ L["WHISPER_TEST_DESCRIPTION"] = "把範例密語發給你自己，讓你看到�
 -- Defaults
 --------------------------------------------------------------------------------
 
+-- The Thank You Button whisper's default, in the client's own language; Give Thanks' defaults live in Data/Message-Languages.lua.
 L["DEFAULT_WHISPER"] = "謝謝，你最棒了！(="

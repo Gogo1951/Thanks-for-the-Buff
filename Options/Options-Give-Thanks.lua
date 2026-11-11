@@ -112,8 +112,8 @@ end
 
 --[[
     The whisper section's sample: the buff the panels always show (Arcane
-    Intellect) and the Mage who cast it, so the Example line, the Room Left
-    meter and Send Test to Me all measure and send the same message.
+    Intellect) and the Mage who cast it, so the Example line, the Too Long
+    check and Send Test to Me all measure and send the same message.
 ]]
 local function SampleLink()
 	return ns.GetSpellLink(ns.GAME_IDS.SAMPLE_BUFF_SPELL_ID) or ""
@@ -145,12 +145,11 @@ end
       Reset. The marker and sign-off are captions, not part of the box: SignOff
       adds them to whatever is typed, so they can't be deleted, and showing them
       either side makes that plain before anything is sent.
-    - Room Left under the caption, tokens under the box: how many bytes are
-      left once the marker, sign-off and the sample buff's link are in, and
-      what the box understands. Bytes, not letters, because that is what the
-      chat ceiling counts, and Cyrillic, Korean and Chinese spend two or three
-      per letter. Past the ceiling a line
-      says the default will go instead (ns:BuildThanksWhisper).
+    - The tokens under the box: what the box understands. Once the message,
+      marker, sign-off and the sample buff's link pass the chat ceiling (in
+      bytes, so Cyrillic, Korean and Chinese get there sooner), a line says
+      the default will go instead (ns:BuildThanksWhisper). There is no live
+      count: the panel only redraws on save, so one would lag the typing.
     - The Example line and Send Test to Me, built by the same code that sends.
 
     Everything follows the whisper toggle. The box keeps whatever is typed.
@@ -189,19 +188,14 @@ local function DefineWhisperComposer(args, settings, order)
 	local function messageHidden()
 		return hidden() or (settings().whisperMessage or "") == ""
 	end
-	local function RoomLeft()
+	local function Fits()
 		local message = ns.FillThanksWhisper(settings().whisperMessage or "", SampleLink(), SampleBuffer())
-		return ns.CHAT_MESSAGE_MAX_LENGTH - #message
+		return #message <= ns.CHAT_MESSAGE_MAX_LENGTH
 	end
 
 	-- Send Messages In
-	args.messageLanguageLabel = ns.OptionsRowLabel(
-		L["SEND_MESSAGES_IN"],
-		order,
-		WHISPER_LABEL_WIDTH,
-		hidden,
-		L["SEND_MESSAGES_IN_DESCRIPTION"]
-	)
+	args.messageLanguageLabel =
+		ns.OptionsRowLabel(L["SEND_MESSAGES_IN"], order, WHISPER_LABEL_WIDTH, hidden, L["SEND_MESSAGES_IN_DESCRIPTION"])
 	args.messageLanguage = {
 		type = "select",
 		name = "",
@@ -273,25 +267,8 @@ local function DefineWhisperComposer(args, settings, order)
 		end,
 	}
 
-	--[[
-	    Room Left in the label column, under the caption, and the tokens line
-	    beside it, under the box: the tokens get the full width in every locale.
-	    With the box empty there is nothing to measure, so the cell goes blank
-	    rather than hiding, which would pull the tokens line left.
-	]]
-	args.whisperRoomLeft = ns.OptionsRowLabel(
-		function()
-			if (settings().whisperMessage or "") == "" then
-				return " "
-			end
-			local left = RoomLeft()
-			return GetColor(left < 0 and "OFF" or "HELP") .. L["WHISPER_ROOM_LEFT"]:format(left) .. "|r"
-		end,
-		order + 0.2,
-		WHISPER_HINT_INDENT,
-		hidden,
-		L["WHISPER_ROOM_LEFT_DESCRIPTION"]
-	)
+	-- The tokens line under the box, a blank cell holding it clear of the label column.
+	args.whisperTokensIndent = ns.OptionsRowLabel(" ", order + 0.2, WHISPER_HINT_INDENT, hidden)
 	args.whisperTokens = {
 		type = "description",
 		name = function()
@@ -311,7 +288,7 @@ local function DefineWhisperComposer(args, settings, order)
 
 	-- Past the ceiling: say what will happen instead.
 	local function fitsHidden()
-		return messageHidden() or RoomLeft() >= 0
+		return messageHidden() or Fits()
 	end
 	args.whisperTooLongIndent = ns.OptionsRowLabel(" ", order + 0.25, WHISPER_HINT_INDENT, fitsHidden)
 	args.whisperTooLong = {
@@ -515,8 +492,7 @@ function ns.BuildGiveThanksOptions()
 			space1 = ns.OptionsSpacer(4),
 			descPraise = ns.OptionsDesc(L["PRAISE_DESCRIPTION"], 4.3),
 			spacePraise = ns.OptionsSpacer(4.6),
-			-- The limits come first: they hold back the emote and the whisper alike.
-			-- Dropdowns over Data.SECONDS_CHOICES, the scale that explains its own steps.
+			-- The limits come first, as dropdowns over Data.SECONDS_CHOICES: they hold back the emote and the whisper alike.
 			praiseCooldownStrangersLabel = ns.OptionsRowLabel(
 				L["GIVE_THANKS_OVERALL_COOLDOWN"],
 				11,

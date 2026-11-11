@@ -278,10 +278,12 @@ local function ResolveAuraCaster(aura)
 end
 
 --[[
-    Forever has no combat log, so buffs on you are read from UNIT_AURA instead.
-    Nothing is read while C_Secrets reports auras secret or while you are in
-    combat, so a buff that lands then is skipped, never queued. Only newly added auras count; a recast of a buff you already have is
-    not seen.
+    Add-ons can't register WoW Forever's combat log: COMBAT_LOG_EVENT_UNFILTERED
+    there raises ADDON_ACTION_FORBIDDEN, which pcall can't catch, so buffs on
+    you are read from UNIT_AURA instead. Nothing is read while C_Secrets reports
+    auras secret or while you are in combat, so a buff that lands then is
+    skipped, never queued. Only newly added auras count; a recast of a buff you
+    already have is not seen.
 ]]
 local function HandleAddedAura(aura)
 	local spellID = aura.spellId

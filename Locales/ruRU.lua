@@ -16,7 +16,7 @@ L["ADDON_SHORT_NAME"] = "TFTB" -- Short Name
 
 -- System
 L["CHAT_LOADED"] =
-	"Версия %s. Настройки (включая возможность отключить это сообщение) находятся в меню Настройки > Модификации > Thanks for the Buff (TFTB). Нравится этот аддон? Расскажите о нем другу, добавьте его в избранное на CurseForge или поставьте Star на GitHub. (="
+	"Версия %s. Настройки (включая возможность отключить это сообщение) находятся в меню Настройки > Модификации > Thanks for the Buff (TFTB). Нравится этот аддон? Расскажите о нем другу, добавьте его в избранное на CurseForge или поставьте звезду на GitHub. (="
 L["CHAT_OPTIONS_IN_COMBAT"] =
 	"В целях безопасности окно настроек нельзя открыть во время боя."
 
@@ -71,7 +71,7 @@ L["OPTIONS_LEVEL_UP_FRIEND"] =
 L["OPTIONS_LEVEL_UP_CURSEFORGE"] =
 	"• Добавьте в избранное на CurseForge: откройте ссылку на CurseForge ниже, войдите в аккаунт и нажмите на звездочку под кнопкой Download. Избранное помогает большему числу игроков находить аддон."
 L["OPTIONS_LEVEL_UP_GITHUB"] =
-	"• Поставьте Star на GitHub: откройте ссылку на GitHub ниже, войдите в аккаунт и нажмите Star в правом верхнем углу. Звезды помогают проекту получить доступ к большему числу бесплатных инструментов для разработчиков."
+	"• Поставьте звезду на GitHub: откройте ссылку на GitHub ниже, войдите в аккаунт и нажмите Star в правом верхнем углу. Звезды помогают проекту получить доступ к большему числу бесплатных инструментов для разработчиков."
 L["OPTIONS_LEVEL_UP_THANKS"] = "Спасибо, что выбрали Thanks for the Buff (TFTB)!"
 
 L["OPTIONS_FEEDBACK"] = "Отзывы и поддержка"
@@ -122,7 +122,7 @@ L["PRAISE_WHISPER_DESCRIPTION"] =
 	"Шепчет благодарность игроку, который дал вам бафф."
 -- TRANSLATORS: keep {spell} and {name} exactly as written; they are the tokens players type into the whisper.
 L["PRAISE_WHISPER_MESSAGE_DESCRIPTION"] =
-	"Задает, что TFTB шепчет игроку, который дал вам бафф. {spell} заменяется на бафф, {name} — на имя игрока. Оставьте поле пустым, чтобы ничего не шептать."
+	"Задает, что TFTB шепчет игроку, который дал вам бафф. {spell} заменяется на бафф, а {name} на имя игрока. Оставьте поле пустым, чтобы ничего не шептать."
 
 -- Notifications
 L["NOTIFICATIONS_HEADER"] = "Уведомления"
@@ -153,10 +153,10 @@ L["EMOTES_GRID_DESCRIPTION"] =
 L["EMOTE_GROUP_COUNT"] = "%s (отмечено %d из %d)"
 L["EMOTE_GROUP_TEXT"] = "Текст"
 L["EMOTE_GROUP_TEXT_DESCRIPTION"] = "Показывает только строку эмоции."
-L["EMOTE_GROUP_VOICE"] = "Голос"
-L["EMOTE_GROUP_VOICE_DESCRIPTION"] = "Проигрывает голосовую реплику."
 L["EMOTE_GROUP_GESTURE"] = "Жест"
 L["EMOTE_GROUP_GESTURE_DESCRIPTION"] = "Проигрывает короткую анимацию."
+L["EMOTE_GROUP_VOICE"] = "Голос"
+L["EMOTE_GROUP_VOICE_DESCRIPTION"] = "Проигрывает голосовую реплику."
 L["EMOTE_GROUP_POSE"] = "Поза"
 L["EMOTE_GROUP_POSE_DESCRIPTION"] = "Держится, пока вы не двинетесь."
 L["EMOTES_RESET"] = "Сбросить эмоции"
@@ -297,19 +297,20 @@ L["WHISPER_MESSAGE_RESET_DESCRIPTION"] = "Возвращает текст шеп
 -- The whisper composer around the Give Thanks message box.
 L["SEND_MESSAGES_IN"] = "Язык сообщений"
 L["SEND_MESSAGES_IN_DESCRIPTION"] =
-	"Задает язык, на котором TFTB пишет другим игрокам. При выборе другого языка подставляется его стандартное сообщение, если вы не написали свое."
-L["WHISPER_SIGN_OFF_DESCRIPTION"] = "Добавляется к каждому сообщению TFTB, чтобы другие игроки видели, что его отправил аддон."
+	"Задает язык, на котором TFTB пишет другим игрокам. При выборе другого языка подставляется его стандартный текст, если вы не написали свой."
+L["WHISPER_SIGN_OFF_DESCRIPTION"] =
+	"Добавляется к каждому сообщению TFTB, чтобы другие игроки видели, что его отправил аддон."
 -- TRANSLATORS: each %s is a token, {spell} then {name}, drawn in blue.
 L["WHISPER_TOKENS"] = "Подстановки: %s бафф, %s кто его дал"
-L["WHISPER_ROOM_LEFT"] = "Осталось места: %d"
-L["WHISPER_ROOM_LEFT_DESCRIPTION"] =
-	"Сколько еще поместится в шепот, если считать по примерному баффу. Некоторые буквы занимают больше одного места, а бафф с длинным названием оставляет меньше места."
-L["WHISPER_TOO_LONG"] = "Слишком длинно. Вместо этого TFTB отправит стандартное сообщение."
+L["WHISPER_TOO_LONG"] =
+	"Слишком длинно, поэтому будет отправлен стандартный текст."
 L["WHISPER_TEST"] = "Отправить тест себе"
-L["WHISPER_TEST_DESCRIPTION"] = "Шепчет пример вам, чтобы вы увидели его так же, как другие игроки."
+L["WHISPER_TEST_DESCRIPTION"] =
+	"Шепчет пример вам, чтобы вы увидели его так же, как другие игроки."
 
 --------------------------------------------------------------------------------
 -- Defaults
 --------------------------------------------------------------------------------
 
+-- The Thank You Button whisper's default, in the client's own language; Give Thanks' defaults live in Data/Message-Languages.lua.
 L["DEFAULT_WHISPER"] = "Спасибо, ты супер! (="

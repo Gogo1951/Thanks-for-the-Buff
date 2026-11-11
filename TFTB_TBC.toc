@@ -53,9 +53,9 @@ Locales/zhTW.lua
 # Data
 Data/Flavor.lua
 Data/Data.lua
-Data/Message-Languages.lua
 Data/TBC/Game-IDs-TBC.lua
 Data/TBC/Emote-Groups-TBC.lua
+Data/Message-Languages.lua
 Data/Default-Settings.lua
 
 # Thanks for the Buff

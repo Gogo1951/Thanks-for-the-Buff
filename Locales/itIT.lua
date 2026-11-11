@@ -142,10 +142,10 @@ L["EMOTES_GRID_DESCRIPTION"] =
 L["EMOTE_GROUP_COUNT"] = "%s (%d di %d selezionate)"
 L["EMOTE_GROUP_TEXT"] = "Testo"
 L["EMOTE_GROUP_TEXT_DESCRIPTION"] = "Mostra solo la riga dell'emote."
-L["EMOTE_GROUP_VOICE"] = "Voce"
-L["EMOTE_GROUP_VOICE_DESCRIPTION"] = "Riproduce una battuta parlata."
 L["EMOTE_GROUP_GESTURE"] = "Gesto"
 L["EMOTE_GROUP_GESTURE_DESCRIPTION"] = "Riproduce una breve animazione."
+L["EMOTE_GROUP_VOICE"] = "Voce"
+L["EMOTE_GROUP_VOICE_DESCRIPTION"] = "Riproduce una battuta parlata."
 L["EMOTE_GROUP_POSE"] = "Posa"
 L["EMOTE_GROUP_POSE_DESCRIPTION"] = "Dura finché non ti muovi."
 L["EMOTES_RESET"] = "Ripristina le emote"
@@ -274,14 +274,12 @@ L["WHISPER_MESSAGE_RESET_DESCRIPTION"] = "Ripristina il testo predefinito del me
 -- The whisper composer around the Give Thanks message box.
 L["SEND_MESSAGES_IN"] = "Invia messaggi in"
 L["SEND_MESSAGES_IN_DESCRIPTION"] =
-	"Imposta la lingua in cui TFTB scrive agli altri giocatori. Scegliendo un'altra lingua viene usato il suo messaggio predefinito, a meno che tu non abbia scritto il tuo."
-L["WHISPER_SIGN_OFF_DESCRIPTION"] = "Aggiunto a ogni messaggio inviato da TFTB, così gli altri giocatori capiscono che viene da un add-on."
+	"Imposta la lingua in cui TFTB scrive agli altri giocatori. Scegliendo un'altra lingua viene usato il suo testo predefinito, a meno che tu non abbia scritto il tuo."
+L["WHISPER_SIGN_OFF_DESCRIPTION"] =
+	"Aggiunto a ogni messaggio inviato da TFTB, così gli altri giocatori capiscono che viene da un add-on."
 -- TRANSLATORS: each %s is a token, {spell} then {name}, drawn in blue.
 L["WHISPER_TOKENS"] = "Segnaposto: %s il potenziamento, %s chi l'ha lanciato"
-L["WHISPER_ROOM_LEFT"] = "Spazio rimasto: %d"
-L["WHISPER_ROOM_LEFT_DESCRIPTION"] =
-	"Quanto entra ancora nel sussurro, misurato con il potenziamento di esempio. Alcuni caratteri contano più di uno, e un potenziamento con un nome più lungo lascia meno spazio."
-L["WHISPER_TOO_LONG"] = "Troppo lungo. TFTB invierà invece il messaggio predefinito."
+L["WHISPER_TOO_LONG"] = "Troppo lungo, quindi verrà inviato il testo predefinito."
 L["WHISPER_TEST"] = "Invia una prova a me"
 L["WHISPER_TEST_DESCRIPTION"] = "Ti sussurra l'esempio, così lo vedi esattamente come lo vedranno gli altri giocatori."
 
@@ -289,4 +287,5 @@ L["WHISPER_TEST_DESCRIPTION"] = "Ti sussurra l'esempio, così lo vedi esattament
 -- Defaults
 --------------------------------------------------------------------------------
 
+-- The Thank You Button whisper's default, in the client's own language; Give Thanks' defaults live in Data/Message-Languages.lua.
 L["DEFAULT_WHISPER"] = "Grazie, sei un mito! (="
