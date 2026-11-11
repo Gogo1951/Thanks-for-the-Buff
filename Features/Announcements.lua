@@ -226,32 +226,61 @@ end
 
 --[[
     The Give Thanks whisper: the player's own message with "{spell}" swapped for
-    the buff's link, signed off like every sent message. nil for an empty
-    message, which sends no whisper. A message that runs past the chat ceiling
-    once the link is in falls back to the default text rather than being
-    rejected. Unlike the print, the other player sees it, and the Praise Delay
-    can hold it back.
+    the buff's link and "{name}" for the buffer's short name, signed off like
+    every sent message. Unlike the print, the other player sees it, and the
+    Praise Delay can hold it back.
+
+    FillThanksWhisper builds it as typed, however long, so the options panel
+    can measure how much room is left. BuildThanksWhisper is what gets sent:
+    nil for an empty message, which sends no whisper, and the default text of
+    the language messages go out in (ns.GetDefaultThanksWhisper) when the
+    player's own runs past the chat ceiling, rather than being rejected.
 ]]
-function ns:BuildThanksWhisper(template, link)
+local function ShortName(name)
+	if not name or name == "" then
+		return ""
+	end
+	return Ambiguate(name, "short")
+end
+
+function ns.FillThanksWhisper(template, link, name)
+	local body = template:gsub("{spell}", function()
+		return link or ""
+	end)
+	body = body:gsub("{name}", function()
+		return ShortName(name)
+	end)
+	return SignOff(body)
+end
+
+function ns:BuildThanksWhisper(template, link, name)
 	if not template or template == "" then
 		return nil
 	end
-	local function Fill(text)
-		return SignOff((text:gsub("{spell}", function()
-			return link
-		end)))
-	end
-	local message = Fill(template)
+	local message = ns.FillThanksWhisper(template, link, name)
 	if #message > ns.CHAT_MESSAGE_MAX_LENGTH then
-		message = Fill(L["DEFAULT_GIVE_THANKS_WHISPER"])
+		message = ns.FillThanksWhisper(ns.GetDefaultThanksWhisper(), link, name)
 	end
 	return message
 end
 
 function ns:WhisperThanks(target, link, template)
-	local message = ns:BuildThanksWhisper(template, link)
+	local message = ns:BuildThanksWhisper(template, link, target)
 	if message then
 		C_ChatInfo.SendChatMessage(message, "WHISPER", nil, target)
+	end
+end
+
+--[[
+    The options panel's Send Test to Me: the whisper exactly as a buffer would
+    get it, sent to the player's own character, so they see the marker and the
+    link drawn by real chat rather than by the panel.
+]]
+function ns:WhisperThanksTest(template, link, name)
+	local message = ns:BuildThanksWhisper(template, link, name)
+	local me = GetUnitName("player", true)
+	if message and me then
+		C_ChatInfo.SendChatMessage(message, "WHISPER", nil, me)
 	end
 end
 

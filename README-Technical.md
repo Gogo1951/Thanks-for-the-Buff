@@ -4,7 +4,7 @@
 
 ## File Map
 
-The packager installs the repo as `Interface/AddOns/TFTB/` (`package-as` in `.pkgmeta`), so `ADDON_NAME` is `TFTB` everywhere: the AceLocale name, every `ns.OPTIONS_REGISTRY` key, the sound path.
+The packager installs the repo as `Interface/AddOns/TFTB/` (`package-as` in `.pkgmeta`), so `ADDON_NAME` is `TFTB` everywhere: the AceLocale name, every `ns.OPTIONS_REGISTRY` key, the sound path, the prefix of both custom AceGUI widget types.
 
 ```text
 Thanks-for-the-Buff/
@@ -28,6 +28,7 @@ Thanks-for-the-Buff/
 ├── Data/
 │   ├── Flavor.lua                    ns.FLAVOR from the TOC's X-Flavor, ns.IS_DISCOVERY, ns.DATA_FOLDER
 │   ├── Data.lua                      Locale init, palette, registry, layout widths, constants, Thank You rows, curated emotes, links
+│   ├── Message-Languages.lua         Send Messages In: each language's name and default whisper, loaded in every client
 │   ├── Default-Settings.lua          AceDB defaults; generates Thank You buttons 2 and up
 │   ├── Vanilla/                      Classic Era; each file returns early on Season of Discovery
 │   │   ├── Emote-Groups-Vanilla.lua  Emote token to Voice, Gesture or Pose
@@ -161,7 +162,7 @@ An emote that reaches nobody reads as a bug: emote at the buffer or not at all.
 - **`ns.GetPickableEmotes`** (Announcements) drops saved tokens this client can't perform (another flavor's emote, a retired key), since `PerformEmote` with a bad token is a silent no-op.
 - **`Data.EMOTES`**: the curated praise tokens. Give Thanks' defaults and Thank You Button 1's whole checklist (`ns.DefineEmoteGroup`, Options-Utilities). Tokens only; the client writes each line in the player's language.
 - **`ns.EMOTE_GROUP_BY_TOKEN`** (`Data/{Game}/Emote-Groups-{Game}.lua`) sorts tokens into `Data.EMOTE_GROUPS`; unlisted is Text (`ns.GetEmoteGroup`).
-- **`ns.DefineEmoteGrid`** (`Options/Options-Emote-Grid.lua`) draws the whole catalog, grouped, as one custom AceGUI widget (`TFTB-EmoteChecklist`) per group, not one AceConfig toggle per emote: a toggle per emote froze the screen on every click because AceConfig rebuilds every widget after each change. The widget keeps its checkboxes; a redraw re-reads checked states; a click writes straight to the profile.
+- **`ns.DefineEmoteGrid`** (`Options/Options-Emote-Grid.lua`) draws the whole catalog, grouped, in `Data.EMOTE_GROUPS` order, as one custom AceGUI widget (`WIDGET_TYPE`, `<ADDON_NAME>_EmoteChecklist`) per group, not one AceConfig toggle per emote: a toggle per emote froze the screen on every click because AceConfig rebuilds every widget after each change. The widget keeps its checkboxes; a redraw re-reads checked states; a click writes straight to the profile.
 - **Grid IDs**: each grid registers a model in `models[gridId]`, and each widget's option name is `"<gridId>:<group>"`, so a recycled widget finds the right model. Three grids today: `strangers` (Emotes List, the default), `waveFriends`, `waveGuilds`. Each takes its own `key`, `defaults`, `registry` and `width` through `opts`.
 - **Session caches**: `ns.GetEmoteSelectChoices` (single-emote dropdowns: Thank You Buttons 2 and up, Custom List rows) and `IconChoices` (Options-Thank-You-Button) build once, since neither list can change in a session.
 
@@ -170,13 +171,14 @@ An emote that reaches nobody reads as a bug: emote at the buffer or not at all.
 All in `Features/Announcements.lua`.
 
 - **Prints** open with `ns.GetPrintPrefix()` (`TFTB //`, a `README-Notes.md` exception). `ns:PrintMessage` wraps the body in the TEXT color only when it holds no `|c`, so an outer `|r` never cuts off an embedded link or class color. The stranger print is `MESSAGE_BUFFED` with the name class-colored from `GetPlayerInfoByGUID`.
-- **Give Thanks whisper**: `ns:BuildThanksWhisper` swaps `{spell}` in `whisperMessage` for the link, then `SignOff` gives it the marker-and-brand shape:
+- **Give Thanks whisper**: `ns.FillThanksWhisper` swaps `{spell}` in `whisperMessage` for the link and `{name}` for the buffer's short name (`Ambiguate`), then `SignOff` gives it the marker-and-brand shape:
 
   ```text
   {rt1} Thanks for the [Arcane Intellect] // TFTB
   ```
 
-  `TrimSentBody` strips trailing `CLOSING_MARKS` and a leading `OPENING_MARKS` entry, matched as whole UTF-8 sequences. Past `ns.CHAT_MESSAGE_MAX_LENGTH` with the link in, it sends the default text instead of being rejected.
+  `TrimSentBody` strips trailing `CLOSING_MARKS` and a leading `OPENING_MARKS` entry, matched as whole UTF-8 sequences. `ns:BuildThanksWhisper` is what sends: past `ns.CHAT_MESSAGE_MAX_LENGTH` with the link in, it sends `ns.GetDefaultThanksWhisper()` instead of being rejected.
+- **Send Messages In** (`profile.messageLanguage`, read through `ns.GetMessageLanguage`) is the language other players read, separate from the UI's locale. AceLocale loads only the client's own Locales file, so every language's default whisper lives in `Data.MESSAGE_LANGUAGES` (`Data/Message-Languages.lua`), which loads everywhere. English (`Data.DEFAULT_MESSAGE_LANGUAGE`) whatever the client; a saved code no longer listed reads as English. Spell links still carry the sender's client's spell name.
 - **Thank You whispers** go out unbranded through `ns:Whisper`, exactly as typed (a `README-Notes.md` exception), only to a same-faction target. `TrimToBytes` (Options-Thank-You-Button) caps the input on save without splitting a UTF-8 character.
 - **Spell links** are hand-built in `ns.GetSpellLink` as `|Hspell:<id>:0|h` in `ns.SPELL_LINK_COLOR`. Classic's native link lacks `:0`, and `SendChatMessage`'s validator strips such a link to the bare name. Native is the fallback only for a spell with no name.
 - **Durations** (`ns.FormatDuration`) use the client's `D_SECONDS` / `D_MINUTES` / `D_HOURS`. `ResolvePlurals` expands their `|4singular:plural;` escape, which `SendChatMessage` rejects; handles three-form Slavic plurals. `forceSeconds` keeps a fixed seconds menu in one unit; Wave's cooldown dropdown omits it and reads in minutes.
@@ -218,6 +220,7 @@ All in `Features/Announcements.lua`.
 - **`ns.HideAllExcept`** hides every arg not in `keep` while the switch is off. Runs over the finished args table, so later controls are covered; composes with an existing `hidden`. Wave's tabs are the exception: left out of the table while off (see Pitfalls).
 - **Seconds dropdowns** (Give Thanks) offer `Data.SECONDS_CHOICES`, worded in seconds. `NearestChoice` shows the closest listed value without rewriting the saved one. Wave's cooldown `get` does the same but never snaps to or from 0.
 - **Example lines** go through the real builders: print through `ns.GetPrintPrefix` + `ns:BuildStrangerMessage` with `ns.SAMPLE_NAMES.MAGE` (matching the Arcane Intellect sample); whispers through `ns.SampleWhisper` (`CHAT_WHISPER_GET`, the player's `ChatTypeInfo.WHISPER` color), with `{rt1}` swapped for its texture.
+- **Whisper composer** (`DefineWhisperComposer`, Options-Give-Thanks), the house pattern for a message the player words and TFTB sends: Send Messages In, then label, Star caption, box, `// TFTB` caption and Reset on one row; under it the tokens, a red Too Long line once the message passes the chat ceiling in bytes (`ns.FillThanksWhisper` with the sample buff and `ns.SAMPLE_NAMES.MAGE`; no live count, since AceConfig redraws only on save), the Example line and Send Test to Me (`ns:WhisperThanksTest`, a real whisper to yourself). The marker and sign-off are captions, not text in the box, because `SignOff` adds them. Changing the language swaps the text only while it is still the old language's default.
 - **Reset Emotes** on each grid is a confirmed `execute` writing back that grid's `defaults` (Give Thanks' is a `README-Notes.md` exception). General ends with Good to Go's links (`ns.GOOD_TO_GO_LINKS`), another exception.
 
 ### Diagnostics
@@ -226,7 +229,7 @@ All in `Features/Announcements.lua`.
 
 - **Settings tab**: Buff Reactions Context (`ns:BuildContextReport`), Wave to Friends Context (`ns:BuildWaveContextReport`), Emote Extract (`ns:BuildEmoteReport`). Probes read feature state through accessors (`ns.IsBuffTrackingReady`, `ns.IsBuffTrackingSetUp`, `ns.GetPraiseCooldownState`, `ns.GetEmoteCatalog`, `ns.GetPickableEmotes`) so they show what the features act on.
 - **Framework files carry TFTB edits**: `Report-Runner.lua` (`ns.DIAGNOSTIC_REPORTS` / `ns.DIAGNOSTIC_SECTIONS`: the `wave` report added, Display Context removed), `Diagnostics-Core.lua` (`WAVE_TITLE` / `WAVE_DESCRIPTION`), `Settings-Reports.lua` (Display Context removed).
-- **Aura log lines**: `ns.DIAGNOSTIC_EVENT_EXCLUDE` drops both detection events (firehose; `UNIT_AURA`'s table can't print). Instead `ns:LogAuraApplied` logs every aura landing on you before any filter, with decoded flags and duration; `ns:LogAuraUpdate` (WoW Forever) logs each added helpful aura with the first gate that stopped it, or `read`.
+- **Aura log lines**: `ns.DIAGNOSTIC_EVENT_EXCLUDE` drops both detection events (firehose; `UNIT_AURA`'s table can't print). Instead `ns:LogAuraApplied` logs every aura landing on you before any filter, with decoded flags and duration; `ns:LogAuraUpdate` (WoW Forever) logs each added helpful aura with the first gate that stopped it, or `read`; a `read` aura also carries its caster (`AuraCasterText`: GUID type, `self`, and group and friend flags where the aura names a unit, read the same way `ResolveAuraCaster` finds it) and its duration as Give Thanks reads it.
 - **API rows** are flavor-split: WoW Forever adds the aura-caster, secret and `UnitNameUnmodified` rows; the rest add the combat-log and `GetNormalizedRealmName` rows.
 - **Game Names** (`ns.DIAGNOSTIC_NAME_LOOKUPS`): `ns.GAME_IDS` spells, the duration strings, `Data.EMOTES` plus Wave's default tokens.
 - **Message Length** (`ns.DIAGNOSTIC_MESSAGES`): the Give Thanks whisper with the sample spell, plus how long a buff link it can take; each set Thank You whisper; each macro body.
@@ -244,7 +247,8 @@ All in `Features/Announcements.lua`.
 - **New Wave greeting tier or list**: `PickGreeting` in `Features/Wave-To-Friends.lua`; `ns.DATABASE_DEFAULTS.profile.wave`; a tab in `Options/Options-Wave-To-Friends.lua`; `WaveTargetLines` and `ns:BuildWaveContextReport` in Manifests.
 - **New feature file**: all four TOCs, in load order. Files that cache an `ns` function into a local at load (`local GetColor = ns.GetColor`; `Buff-Tracking.lua`'s `ns.HandleStrangersBuff`) must load after the file that defines it.
 - **New global API call**: `.luacheckrc` `read_globals`; a row in `ns.DIAGNOSTIC_API_CHECKS` (flavor-split block when only one flavor has it).
-- **New data table**: all seven `Data/{Game}/` folders (empty table where a flavor has no rows; Discovery guard pair in `Vanilla/` and `Discovery/`; a How We Got the Data block); each TOC's Data block between `Data/Data.lua` and `Data/Default-Settings.lua`; a `ns.DIAGNOSTIC_DATA_SOURCES` row.
+- **New data table**: all seven `Data/{Game}/` folders (empty table where a flavor has no rows; Discovery guard pair in `Vanilla/` and `Discovery/`; a How We Got the Data block); each TOC's Data block with the other flavor files, after `Data/Data.lua` and ahead of `Data/Message-Languages.lua` and `Data/Default-Settings.lua`; a `ns.DIAGNOSTIC_DATA_SOURCES` row.
+- **New sent-message language**: a `Data.MESSAGE_LANGUAGES` row (locale code, the language's own name, a default for every sent message). The dropdown, Reset and the fallback pick it up.
 - **New context report**: builder in `Manifests.lua`; entry in `ns.DIAGNOSTIC_REPORTS` and its section in `ns.DIAGNOSTIC_SECTIONS` (`Report-Runner.lua`); title and description in `ns.DiagnosticsStrings` (`Diagnostics-Core.lua`).
 
 ## Saved Variables
@@ -252,12 +256,13 @@ All in `Features/Announcements.lua`.
 - `TFTBDB`: the one SavedVariables table (`ns.SAVED_VARIABLES_NAME`), AceDB-3.0.
 - **Simple model** (`AceDB:New("TFTBDB", ns.DATABASE_DEFAULTS, true)`): one shared `Default` profile holds every setting, Wave to Friends' Custom List and guilds included. **Reset Profile** puts all of that back to install defaults, so it empties the Custom List and guild list too.
 - **Outside the profile**: `global.ignoredBuffs` (All Characters) and `char.ignoredBuffs` (per character, a `README-Notes.md` exception to the model rule), plus `char.classToken`. Reset Profile and profile switches never touch them.
-- **Init order** (`InitializeDatabase`): `AceDB:New`, `PruneOtherClientCharacters`, the migration, `classToken`, then the `ApplyProfile` callbacks.
+- **Init order** (`InitializeDatabase`): `MigrateMessageLanguage`, `AceDB:New`, `PruneOtherClientCharacters`, the `messageLanguageMigrated` stamp, the settingsReset migration, `classToken`, then the `ApplyProfile` callbacks.
 - **Default seeding**: `GetDefaultEmoteSettings(enabled)` builds `strangers.emotes` and `slash.emotes` with every `Data.EMOTES` token true; buttons 2 and up are generated off. Wave's `friendEmotes` / `guildEmotes` default to their own sets. All are settings maps, no seeded flag: a new default token appears ticked wherever the key was never saved. An unticked default is stored `false` (`model.SetChecked`), never nil.
 
 ### Migration Chain
 
 1. `MIGRATION (remove after 2026-12-09)`, `InitializeDatabase`: nils the retired `ns.db.sv.settingsReset` stamp.
+2. `MIGRATION (remove after 2027-02-11)`, `MigrateMessageLanguage` (Core): before `AceDB:New`, on the raw `TFTBDB`, every profile with whispers on and no `messageLanguage` gets the client's locale (when TFTB lists it and it isn't English), and the default text in it where none was saved. Stamped `sv.messageLanguageMigrated` once per account, fresh installs included, so a later pick of English sticks.
 
 ## Pitfalls & Why
 
@@ -270,7 +275,8 @@ All in `Features/Announcements.lua`.
 - **Client duration strings in chat**: the `|4` escape gets the line rejected. Go through `ns.FormatDuration`.
 - **Testing a buff duration for truthiness**: a live buff with no timer reports 0. `ns.GetBuffDuration` returns nil only when absent.
 - **Leaving an unticked default emote nil**: AceDB refills it next login. Store `false`.
-- **One AceConfig toggle per emote**: froze the panel on every click. Keep `TFTB-EmoteChecklist`.
+- **One AceConfig toggle per emote**: froze the panel on every click. Keep the emote checklist widget.
+- **A bare custom widget type name**: AceGUI's widget registry is shared by every add-on, and `RegisterWidgetType` ignores a same-named type unless its version is higher, so another add-on's widget could draw TFTB's controls. Both TFTB types (`Options-Emote-Grid.lua`, `Options-Utilities.lua`) are built from `ADDON_NAME`; a new one follows suit.
 - **Two emote grids in one args table**: `ns.DefineEmoteGrid` writes fixed arg keys (`emoteGridDesc`, `emoteGrid_<group>`, `emoteGridReset`), so the second overwrites the first. Wave puts each grid in its own tab.
 - **Reusing a grid ID**: `models[gridId]` is overwritten and the first grid's widgets draw the second's settings.
 - **Hiding Wave's tabs instead of omitting them**: AceConfigDialog still draws the empty bordered tab frame, because it reads a child group's `hidden` against the parent's path. `ns.BuildWaveToFriendsOptions` leaves them out while off and is registered as a builder so they return on the switch.
@@ -287,4 +293,5 @@ All in `Features/Announcements.lua`.
 - **Stale safety timers**: an earlier timer could end a newer pause. `safetyToken` prevents it.
 - **Hoisting the macro count**: enabling several buttons on a nearly full list would overshoot. `ReconcileMacros` re-reads `GetNumMacros()` per macro.
 - **Refreshing `Diagnostics/` from the framework source**: overwrites TFTB's edits to `Report-Runner.lua`, `Diagnostics-Core.lua` and `Settings-Reports.lua`, dropping Wave to Friends Context and restoring Display Context. Re-apply them.
-- **`{spell}` in `DEFAULT_GIVE_THANKS_WHISPER`**: a gsub token, not a format code; translations must keep it verbatim. The whisper ceiling is bytes, so test overflow in ruRU.
+- **`{spell}` and `{name}` in `Data.MESSAGE_LANGUAGES`**: gsub tokens, not format codes; translations must keep them verbatim. The whisper ceiling is bytes, so test overflow in ruRU.
+- **Default whisper text in a Locales file**: only the client's own file loads, so an English client sending German would have no German text. Defaults for sent messages go in `Data.MESSAGE_LANGUAGES`.

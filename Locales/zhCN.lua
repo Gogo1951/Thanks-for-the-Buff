@@ -37,8 +37,8 @@ L["SAMPLE_EXAMPLE"] = "示例：%s"
 -- Options: Main Panel
 --------------------------------------------------------------------------------
 
-L["OPTIONS_WELCOME_TOGGLE"] = "启用欢迎信息"
-L["OPTIONS_WELCOME_DESCRIPTION"] = "登录时显示一条只有你能看到的信息。"
+L["OPTIONS_WELCOME_TOGGLE"] = "启用欢迎消息"
+L["OPTIONS_WELCOME_DESCRIPTION"] = "登录时显示一条只有你能看到的消息。"
 L["OPTIONS_DESCRIPTION"] =
 	"自动用表情或密语感谢为你施加增益的玩家，路过好友和公会成员时向他们挥手问候，点一下感谢宏就能感谢你选中的任何人。"
 L["OPTIONS_FEATURES_HEADER"] = "功能"
@@ -110,15 +110,15 @@ L["PRAISE_DELAY_LENGTH_DESCRIPTION"] = "设置发送密语和表情前的等待�
 L["WHISPERS_HEADER"] = "感谢密语"
 L["PRAISE_WHISPER_ENABLE"] = "启用感谢密语"
 L["PRAISE_WHISPER_DESCRIPTION"] = "向为你施加增益的玩家密语致谢。"
--- TRANSLATORS: keep {spell} exactly as written; it is the token players type into the whisper.
+-- TRANSLATORS: keep {spell} and {name} exactly as written; they are the tokens players type into the whisper.
 L["PRAISE_WHISPER_MESSAGE_DESCRIPTION"] =
-	"设置 TFTB 向为你施加增益的玩家发送的密语。{spell} 会替换为该增益。留空则不发送密语。"
+	"设置 TFTB 向为你施加增益的玩家发送的密语。{spell} 会替换为该增益，{name} 会替换为该玩家的名字。留空则不发送密语。"
 
 -- Notifications
 L["NOTIFICATIONS_HEADER"] = "通知"
 L["NOTIFICATIONS_DESCRIPTION"] = "只有你会收到的内容：一条文字提示、一段音效，或两者兼有。"
 L["NOTIFICATIONS_PRINT_ENABLE"] = "启用文字提示"
-L["NOTIFICATIONS_PRINT_DESCRIPTION"] = "获得增益时，显示一条只有你能看到的信息。"
+L["NOTIFICATIONS_PRINT_DESCRIPTION"] = "获得增益时，显示一条只有你能看到的消息。"
 L["NOTIFICATIONS_SOUND_ENABLE"] = "启用音效"
 L["NOTIFICATIONS_SOUND_DESCRIPTION"] = "获得增益时播放音效。只有你能听到。"
 L["NOTIFICATIONS_SOUND_PREVIEW_DESCRIPTION"] = "播放该音效，让你在开启前先试听。"
@@ -139,10 +139,10 @@ L["EMOTES_GRID_DESCRIPTION"] =
 L["EMOTE_GROUP_COUNT"] = "%s（已勾选 %d/%d）"
 L["EMOTE_GROUP_TEXT"] = "文字"
 L["EMOTE_GROUP_TEXT_DESCRIPTION"] = "只显示表情文字。"
-L["EMOTE_GROUP_VOICE"] = "语音"
-L["EMOTE_GROUP_VOICE_DESCRIPTION"] = "播放一句语音。"
 L["EMOTE_GROUP_GESTURE"] = "动作"
 L["EMOTE_GROUP_GESTURE_DESCRIPTION"] = "播放一个简短动作。"
+L["EMOTE_GROUP_VOICE"] = "语音"
+L["EMOTE_GROUP_VOICE_DESCRIPTION"] = "播放一句语音。"
 L["EMOTE_GROUP_POSE"] = "姿态"
 L["EMOTE_GROUP_POSE_DESCRIPTION"] = "持续到你移动为止。"
 L["EMOTES_RESET"] = "重置表情"
@@ -255,14 +255,25 @@ L["WAVE_GUILDS_EMOTES_DESCRIPTION"] = "勾选对公会成员可用的表情，�
 --------------------------------------------------------------------------------
 
 -- The caption and Reset button beside every whisper box, on Give Thanks and each Thank You Button.
-L["WHISPER_MESSAGE"] = "密语信息"
+L["WHISPER_MESSAGE"] = "密语消息"
 L["WHISPER_MESSAGE_RESET"] = "重置"
-L["WHISPER_MESSAGE_RESET_DESCRIPTION"] = "将密语信息恢复为默认文本。"
+L["WHISPER_MESSAGE_RESET_DESCRIPTION"] = "将密语消息恢复为默认文本。"
+
+-- The whisper composer around the Give Thanks message box.
+L["SEND_MESSAGES_IN"] = "消息语言"
+L["SEND_MESSAGES_IN_DESCRIPTION"] =
+	"设置 TFTB 向其他玩家发送消息时使用的语言。切换语言时，如果你没有自己写过，会换成该语言的默认文本。"
+L["WHISPER_SIGN_OFF_DESCRIPTION"] =
+	"TFTB 发送的每条消息都会带上它，让其他玩家知道这是插件发送的。"
+-- TRANSLATORS: each %s is a token, {spell} then {name}, drawn in blue.
+L["WHISPER_TOKENS"] = "占位符：%s 增益，%s 施法者"
+L["WHISPER_TOO_LONG"] = "太长了，因此会改为发送默认文本。"
+L["WHISPER_TEST"] = "发送测试给我"
+L["WHISPER_TEST_DESCRIPTION"] = "把示例密语发给你自己，让你看到和其他玩家完全一样的效果。"
 
 --------------------------------------------------------------------------------
 -- Defaults
 --------------------------------------------------------------------------------
 
+-- The Thank You Button whisper's default, in the client's own language; Give Thanks' defaults live in Data/Message-Languages.lua.
 L["DEFAULT_WHISPER"] = "谢谢，你最棒了！(="
--- TRANSLATORS: keep {spell} exactly as written; TFTB swaps in the buff's link.
-L["DEFAULT_GIVE_THANKS_WHISPER"] = "感谢你的 {spell}"

@@ -55,6 +55,7 @@ Data/Flavor.lua
 Data/Data.lua
 Data/Mists/Game-IDs-Mists.lua
 Data/Mists/Emote-Groups-Mists.lua
+Data/Message-Languages.lua
 Data/Default-Settings.lua
 
 # Thanks for the Buff

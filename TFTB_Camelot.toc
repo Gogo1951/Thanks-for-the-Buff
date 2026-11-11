@@ -55,6 +55,7 @@ Data/Flavor.lua
 Data/Data.lua
 Data/Camelot/Game-IDs-Camelot.lua
 Data/Camelot/Emote-Groups-Camelot.lua
+Data/Message-Languages.lua
 Data/Default-Settings.lua
 
 # Thanks for the Buff

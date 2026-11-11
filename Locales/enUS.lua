@@ -109,9 +109,9 @@ L["PRAISE_DELAY_LENGTH_DESCRIPTION"] = "Sets how long to wait before the whisper
 L["WHISPERS_HEADER"] = "Thank-You Whispers"
 L["PRAISE_WHISPER_ENABLE"] = "Enable Thank-You Whispers"
 L["PRAISE_WHISPER_DESCRIPTION"] = "Whispers a thank-you to the player who buffed you."
--- TRANSLATORS: keep {spell} exactly as written; it is the token players type into the whisper.
+-- TRANSLATORS: keep {spell} and {name} exactly as written; they are the tokens players type into the whisper.
 L["PRAISE_WHISPER_MESSAGE_DESCRIPTION"] =
-	"Sets what TFTB whispers to the player who buffed you. {spell} becomes the buff. Leave it empty to send no whisper."
+	"Sets what TFTB whispers to the player who buffed you. {spell} becomes the buff and {name} their name. Leave it empty to send no whisper."
 
 -- Notifications
 L["NOTIFICATIONS_HEADER"] = "Notifications"
@@ -138,10 +138,10 @@ L["EMOTES_GRID_DESCRIPTION"] =
 L["EMOTE_GROUP_COUNT"] = "%s (%d of %d Checked)"
 L["EMOTE_GROUP_TEXT"] = "Text"
 L["EMOTE_GROUP_TEXT_DESCRIPTION"] = "Shows the emote line only."
-L["EMOTE_GROUP_VOICE"] = "Voice"
-L["EMOTE_GROUP_VOICE_DESCRIPTION"] = "Plays a voice line."
 L["EMOTE_GROUP_GESTURE"] = "Gesture"
 L["EMOTE_GROUP_GESTURE_DESCRIPTION"] = "Plays a short animation."
+L["EMOTE_GROUP_VOICE"] = "Voice"
+L["EMOTE_GROUP_VOICE_DESCRIPTION"] = "Plays a voice line."
 L["EMOTE_GROUP_POSE"] = "Pose"
 L["EMOTE_GROUP_POSE_DESCRIPTION"] = "Holds until you move."
 L["EMOTES_RESET"] = "Reset Emotes"
@@ -255,10 +255,21 @@ L["WHISPER_MESSAGE"] = "Whisper Message"
 L["WHISPER_MESSAGE_RESET"] = "Reset"
 L["WHISPER_MESSAGE_RESET_DESCRIPTION"] = "Resets the whisper message to the default text."
 
+-- The whisper composer around the Give Thanks message box.
+L["SEND_MESSAGES_IN"] = "Send Messages In"
+L["SEND_MESSAGES_IN_DESCRIPTION"] =
+	"Sets the language TFTB writes in when it messages other players. Picking another language swaps in its default text, unless you've written your own."
+L["WHISPER_SIGN_OFF_DESCRIPTION"] =
+	"Added to every message TFTB sends, so other players can tell it came from an add-on."
+-- TRANSLATORS: each %s is a token, {spell} then {name}, drawn in blue.
+L["WHISPER_TOKENS"] = "Tokens: %s the buff, %s who cast it"
+L["WHISPER_TOO_LONG"] = "Too long, so the default text goes out instead."
+L["WHISPER_TEST"] = "Send Test to Me"
+L["WHISPER_TEST_DESCRIPTION"] = "Whispers the example to you, so you see it exactly as other players will."
+
 --------------------------------------------------------------------------------
 -- Defaults
 --------------------------------------------------------------------------------
 
+-- The Thank You Button whisper's default, in the client's own language; Give Thanks' defaults live in Data/Message-Languages.lua.
 L["DEFAULT_WHISPER"] = "Thanks, you're the best! (="
--- TRANSLATORS: keep {spell} exactly as written; TFTB swaps in the buff's link.
-L["DEFAULT_GIVE_THANKS_WHISPER"] = "Thanks for the {spell}"

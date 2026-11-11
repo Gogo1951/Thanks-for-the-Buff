@@ -1,4 +1,4 @@
-local _, ns = ...
+local ADDON_NAME, ns = ...
 local Data = ns.Data
 local L = ns.L
 
@@ -36,7 +36,7 @@ end
     its own caption.
 ]]
 local AceGUI = LibStub("AceGUI-3.0")
-local ROW_LABEL_WIDGET, ROW_LABEL_VERSION = "TFTB-RowLabel", 1
+local ROW_LABEL_WIDGET, ROW_LABEL_VERSION = ADDON_NAME .. "_RowLabel", 1
 
 AceGUI:RegisterWidgetType(ROW_LABEL_WIDGET, function()
 	local widget = AceGUI.WidgetRegistry["Label"]()

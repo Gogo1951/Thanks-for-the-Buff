@@ -103,9 +103,42 @@ local function PruneOtherClientCharacters()
 	end
 end
 
+--[[
+    MIGRATION (remove after 2027-02-11): before Send Messages In, the thank-you
+    whisper always went out in the client's language. A profile that had
+    whispers switched on keeps on whispering in that language: it gets the
+    client's locale as its message language and, where it still used the
+    default text, that language's default. Read from the raw saved table before
+    AceDB fills in defaults, since a value left at its old default is simply
+    absent there. Runs once per account, stamped so a player who later picks
+    English is never switched back.
+]]
+local function MigrateMessageLanguage()
+	local sv = TFTBDB
+	if type(sv) ~= "table" or sv.messageLanguageMigrated then
+		return
+	end
+	local locale = GetLocale()
+	if locale == ns.Data.DEFAULT_MESSAGE_LANGUAGE or not ns.GetMessageLanguageInfo(locale) then
+		return
+	end
+	for _, profile in pairs(type(sv.profiles) == "table" and sv.profiles or {}) do
+		local strangers = type(profile) == "table" and profile.strangers
+		if type(strangers) == "table" and strangers.whisperEnabled == true and profile.messageLanguage == nil then
+			profile.messageLanguage = locale
+			if strangers.whisperMessage == nil then
+				strangers.whisperMessage = ns.GetDefaultThanksWhisper(locale)
+			end
+		end
+	end
+end
+
 local function InitializeDatabase()
+	MigrateMessageLanguage()
 	ns.db = LibStub("AceDB-3.0"):New("TFTBDB", ns.DATABASE_DEFAULTS, true)
 	PruneOtherClientCharacters()
+	-- MIGRATION (remove after 2027-02-11): stamps the account so MigrateMessageLanguage runs once, fresh installs included.
+	ns.db.sv.messageLanguageMigrated = true
 	-- MIGRATION (remove after 2026-12-09): drops the retired settingsReset stamp.
 	ns.db.sv.settingsReset = nil
 	-- Saved every login so the Ignored Buffs tree can color any character by class.
@@ -136,8 +169,9 @@ ns.EVENT_NAMES = {
 }
 
 --[[
-    Forever has no combat log, and registering COMBAT_LOG_EVENT_UNFILTERED there
-    errors, so it reads buffs on you from UNIT_AURA instead.
+    Add-ons can't register WoW Forever's combat log: COMBAT_LOG_EVENT_UNFILTERED
+    there raises ADDON_ACTION_FORBIDDEN, which pcall can't catch, so Forever
+    reads buffs on you from UNIT_AURA instead.
 ]]
 if ns.FLAVOR == "Camelot" then
 	table.insert(ns.EVENT_NAMES, "UNIT_AURA")

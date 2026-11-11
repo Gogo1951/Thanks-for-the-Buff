@@ -40,6 +40,12 @@
 - **Instead:** A Thank You Button whisper sends the player's own text exactly as typed, with no target marker and no Short Name.
 - **Why:** The player writes it and sends it with their own key press, so it speaks in their voice, not the add-on's.
 
+### Thank You Button whispers skip the composer
+
+- **Departs from:** MESSAGES → Editable Messages, "Send Messages In" and "On the panel, the composer".
+- **Instead:** A Thank You Button whisper keeps a plain box with Reset and an Example line, and its default text comes from the client's own locale.
+- **Why:** The player types it and sends it with their own key press, so it is written in whatever language they choose, not one the add-on picks.
+
 ### Give Thanks has a Reset Emotes button
 
 - **Departs from:** SAVED VARIABLES → Reset, "no control resets settings Reset Profile can reach".

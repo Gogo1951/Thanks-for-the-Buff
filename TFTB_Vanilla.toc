@@ -57,6 +57,7 @@ Data/Vanilla/Game-IDs-Vanilla.lua
 Data/Vanilla/Emote-Groups-Vanilla.lua
 Data/Discovery/Game-IDs-Discovery.lua
 Data/Discovery/Emote-Groups-Discovery.lua
+Data/Message-Languages.lua
 Data/Default-Settings.lua
 
 # Thanks for the Buff

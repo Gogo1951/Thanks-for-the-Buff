@@ -370,7 +370,7 @@ local function DefineCooldownSelect(order)
 		end,
 		get = function()
 			local stored = Settings().cooldown
-			-- 0 is Once per Session, never the nearest neighbour of a short timer.
+			-- 0 is Once per Session, never the nearest neighbor of a short timer.
 			if stored == 0 then
 				return 0
 			end
