@@ -33,6 +33,12 @@ ns.DATABASE_DEFAULTS = {
 	profile = {
 		showWelcome = true,
 		--[[
+		    The language every branded message TFTB sends is written in, a locale
+		    code from Data.MESSAGE_LANGUAGES. Profile-wide rather than per feature:
+		    the players you talk to read one language, whichever feature is talking.
+		]]
+		messageLanguage = Data.DEFAULT_MESSAGE_LANGUAGE,
+		--[[
             Praise (the outgoing whisper and emote) carries its own throttles here:
             `praiseCooldown` is the gap between any two praises whoever buffed you,
             `cooldown` the gap between two praises of the SAME player. The overall
@@ -48,8 +54,13 @@ ns.DATABASE_DEFAULTS = {
 			enabled = true,
 			printEnabled = false,
 			whisperEnabled = false,
-			-- What the thank-you whisper says; "{spell}" becomes the buff's link.
-			whisperMessage = ns.L["DEFAULT_GIVE_THANKS_WHISPER"],
+			--[[
+			    What the thank-you whisper says; "{spell}" becomes the buff's link and
+			    "{name}" the buffer's name. The default is in the default language
+			    (Data.DEFAULT_MESSAGE_LANGUAGE), not the client's, so it matches the
+			    Send Messages In setting a new profile starts on.
+			]]
+			whisperMessage = ns.GetDefaultThanksWhisper(Data.DEFAULT_MESSAGE_LANGUAGE),
 			praiseDelayEnabled = false,
 			praiseDelay = 2,
 			praiseCooldown = 0,

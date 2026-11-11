@@ -109,9 +109,9 @@ L["PRAISE_DELAY_LENGTH_DESCRIPTION"] = "Sets how long to wait before the whisper
 L["WHISPERS_HEADER"] = "Thank-You Whispers"
 L["PRAISE_WHISPER_ENABLE"] = "Enable Thank-You Whispers"
 L["PRAISE_WHISPER_DESCRIPTION"] = "Whispers a thank-you to the player who buffed you."
--- TRANSLATORS: keep {spell} exactly as written; it is the token players type into the whisper.
+-- TRANSLATORS: keep {spell} and {name} exactly as written; they are the tokens players type into the whisper.
 L["PRAISE_WHISPER_MESSAGE_DESCRIPTION"] =
-	"Sets what TFTB whispers to the player who buffed you. {spell} becomes the buff. Leave it empty to send no whisper."
+	"Sets what TFTB whispers to the player who buffed you. {spell} becomes the buff and {name} their name. Leave it empty to send no whisper."
 
 -- Notifications
 L["NOTIFICATIONS_HEADER"] = "Notifications"
@@ -255,10 +255,22 @@ L["WHISPER_MESSAGE"] = "Whisper Message"
 L["WHISPER_MESSAGE_RESET"] = "Reset"
 L["WHISPER_MESSAGE_RESET_DESCRIPTION"] = "Resets the whisper message to the default text."
 
+-- The whisper composer around the Give Thanks message box.
+L["SEND_MESSAGES_IN"] = "Send Messages In"
+L["SEND_MESSAGES_IN_DESCRIPTION"] =
+	"Sets the language TFTB writes in when it messages other players. Picking another language swaps in its default message, unless you've written your own."
+L["WHISPER_SIGN_OFF_DESCRIPTION"] = "Added to every message TFTB sends, so other players can tell it came from an add-on."
+-- TRANSLATORS: each %s is a token, {spell} then {name}, drawn in blue.
+L["WHISPER_TOKENS"] = "Tokens: %s the buff, %s who cast it"
+L["WHISPER_ROOM_LEFT"] = "Room left: %d"
+L["WHISPER_ROOM_LEFT_DESCRIPTION"] =
+	"How much more fits in the whisper, measured with the example buff. Some letters count as more than one, and a buff with a longer name leaves less room."
+L["WHISPER_TOO_LONG"] = "Too long. TFTB will send the default message instead."
+L["WHISPER_TEST"] = "Send Test to Me"
+L["WHISPER_TEST_DESCRIPTION"] = "Whispers the example to you, so you see it exactly as other players will."
+
 --------------------------------------------------------------------------------
 -- Defaults
 --------------------------------------------------------------------------------
 
 L["DEFAULT_WHISPER"] = "Thanks, you're the best! (="
--- TRANSLATORS: keep {spell} exactly as written; TFTB swaps in the buff's link.
-L["DEFAULT_GIVE_THANKS_WHISPER"] = "Thanks for the {spell}"

@@ -110,9 +110,9 @@ L["PRAISE_DELAY_LENGTH_DESCRIPTION"] = "设置发送密语和表情前的等待�
 L["WHISPERS_HEADER"] = "感谢密语"
 L["PRAISE_WHISPER_ENABLE"] = "启用感谢密语"
 L["PRAISE_WHISPER_DESCRIPTION"] = "向为你施加增益的玩家密语致谢。"
--- TRANSLATORS: keep {spell} exactly as written; it is the token players type into the whisper.
+-- TRANSLATORS: keep {spell} and {name} exactly as written; they are the tokens players type into the whisper.
 L["PRAISE_WHISPER_MESSAGE_DESCRIPTION"] =
-	"设置 TFTB 向为你施加增益的玩家发送的密语。{spell} 会替换为该增益。留空则不发送密语。"
+	"设置 TFTB 向为你施加增益的玩家发送的密语。{spell} 会替换为该增益，{name} 会替换为该玩家的名字。留空则不发送密语。"
 
 -- Notifications
 L["NOTIFICATIONS_HEADER"] = "通知"
@@ -259,10 +259,22 @@ L["WHISPER_MESSAGE"] = "密语信息"
 L["WHISPER_MESSAGE_RESET"] = "重置"
 L["WHISPER_MESSAGE_RESET_DESCRIPTION"] = "将密语信息恢复为默认文本。"
 
+-- The whisper composer around the Give Thanks message box.
+L["SEND_MESSAGES_IN"] = "消息语言"
+L["SEND_MESSAGES_IN_DESCRIPTION"] =
+	"设置 TFTB 向其他玩家发送消息时使用的语言。切换语言时，如果你没有自己写过消息，会换成该语言的默认消息。"
+L["WHISPER_SIGN_OFF_DESCRIPTION"] = "TFTB 发送的每条消息都会带上它，让其他玩家知道这是插件发送的。"
+-- TRANSLATORS: each %s is a token, {spell} then {name}, drawn in blue.
+L["WHISPER_TOKENS"] = "占位符：%s 增益，%s 施法者"
+L["WHISPER_ROOM_LEFT"] = "剩余空间：%d"
+L["WHISPER_ROOM_LEFT_DESCRIPTION"] =
+	"按示例增益计算，密语还能容纳多少内容。部分字符占用不止一个单位，名字较长的增益会占用更多空间。"
+L["WHISPER_TOO_LONG"] = "太长了。TFTB 将改为发送默认消息。"
+L["WHISPER_TEST"] = "发送测试给我"
+L["WHISPER_TEST_DESCRIPTION"] = "把示例密语发给你自己，让你看到和其他玩家完全一样的效果。"
+
 --------------------------------------------------------------------------------
 -- Defaults
 --------------------------------------------------------------------------------
 
 L["DEFAULT_WHISPER"] = "谢谢，你最棒了！(="
--- TRANSLATORS: keep {spell} exactly as written; TFTB swaps in the buff's link.
-L["DEFAULT_GIVE_THANKS_WHISPER"] = "感谢你的 {spell}"

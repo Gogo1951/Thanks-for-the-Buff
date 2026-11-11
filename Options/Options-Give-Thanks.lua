@@ -81,8 +81,10 @@ end
 --------------------------------------------------------------------------------
 
 -- Chat draws the {rt1} marker as the Star icon; panel text needs the texture itself.
+local MARKER_TEXTURE = "|TInterface\\TargetingFrame\\UI-RaidTargetingIcon_1:16|t"
+
 local function MarkerAsTexture(message)
-	return (message:gsub(ns.TARGET_MARKER, "|TInterface\\TargetingFrame\\UI-RaidTargetingIcon_1:16|t", 1))
+	return (message:gsub(ns.TARGET_MARKER, MARKER_TEXTURE, 1))
 end
 
 -- The class whose spell the sample names (Arcane Intellect), so the buffer's name and color agree with it.
@@ -109,48 +111,141 @@ local function DefinePrintExample(settings, order, build)
 end
 
 --[[
-    The Example line under the whisper toggle, hidden with it: the whisper as
-    the buffer receives it, "[You] whispers: ...", in the whisper color.
+    The whisper section's sample: the buff the panels always show (Arcane
+    Intellect) and the Mage who cast it, so the Example line, the Room Left
+    meter and Send Test to Me all measure and send the same message.
 ]]
-local function DefineWhisperExample(settings, order, spellId)
-	return ns.OptionsExample(
-		function()
-			local link = ns.GetSpellLink(spellId) or ""
-			return ns.SampleWhisper(MarkerAsTexture(ns:BuildThanksWhisper(settings().whisperMessage, link) or ""))
-		end,
-		order,
-		function()
-			return not settings().whisperEnabled or (settings().whisperMessage or "") == ""
-		end
-	)
+local function SampleLink()
+	return ns.GetSpellLink(ns.GAME_IDS.SAMPLE_BUFF_SPELL_ID) or ""
+end
+
+local function SampleBuffer()
+	return ns.SAMPLE_NAMES[SAMPLE_CLASS]
 end
 
 --[[
-    The whisper's own words: a caption, the message box and a Reset button on one
-    row, the same row the Thank You Button whispers use. Shown with the whisper
-    toggle. The box keeps whatever is typed; ns:BuildThanksWhisper falls back to
-    the default text if the finished whisper would run past the chat ceiling.
+    The Example line under the whisper rows, hidden with them: the whisper as
+    the buffer receives it, "[You] whispers: ...", in the whisper color.
+]]
+local function DefineWhisperExample(settings, order, hidden)
+	return ns.OptionsExample(function()
+		local message = ns:BuildThanksWhisper(settings().whisperMessage, SampleLink(), SampleBuffer())
+		return ns.SampleWhisper(MarkerAsTexture(message or ""))
+	end, order, hidden)
+end
+
+--[[
+    The whisper composer, the house pattern for any message a player can word
+    themselves and TFTB sends for them. In order:
+
+    - Send Messages In: the language the message goes out in. Picking another
+      swaps in that language's default text, but only while the box still holds
+      the old language's default, so nobody's own words are ever replaced.
+    - The message row: the Star marker, the box, the "// TFTB" sign-off and
+      Reset. The marker and sign-off are captions, not part of the box: SignOff
+      adds them to whatever is typed, so they can't be deleted, and showing them
+      either side makes that plain before anything is sent.
+    - Room Left under the caption, tokens under the box: how many bytes are
+      left once the marker, sign-off and the sample buff's link are in, and
+      what the box understands. Bytes, not letters, because that is what the
+      chat ceiling counts, and Cyrillic, Korean and Chinese spend two or three
+      per letter. Past the ceiling a line
+      says the default will go instead (ns:BuildThanksWhisper).
+    - The Example line and Send Test to Me, built by the same code that sends.
+
+    Everything follows the whisper toggle. The box keeps whatever is typed.
 ]]
 local WHISPER_LABEL_WIDTH = 0.9
+local WHISPER_MARKER_WIDTH = 0.15
+local WHISPER_SIGN_OFF_WIDTH = 0.35
 local WHISPER_RESET_WIDTH = 0.5
+local WHISPER_INPUT_WIDTH = ns.OPTIONS_ROW_WIDTH
+	- WHISPER_LABEL_WIDTH
+	- WHISPER_MARKER_WIDTH
+	- WHISPER_SIGN_OFF_WIDTH
+	- WHISPER_RESET_WIDTH
+-- The hint row's first cell spans the label and the marker, so its second starts under the box.
+local WHISPER_HINT_INDENT = WHISPER_LABEL_WIDTH + WHISPER_MARKER_WIDTH
+local WHISPER_LANGUAGE_WIDTH = 1.2
+local WHISPER_TEST_WIDTH = 1.0
 
-local function DefineWhisperMessageRow(args, settings, order)
+local languageValues, languageSorting
+
+local function LanguageChoices()
+	if not languageValues then
+		languageValues, languageSorting = {}, {}
+		for _, language in ipairs(Data.MESSAGE_LANGUAGES) do
+			languageValues[language.locale] = language.name
+			languageSorting[#languageSorting + 1] = language.locale
+		end
+	end
+	return languageValues, languageSorting
+end
+
+local function DefineWhisperComposer(args, settings, order)
 	local function hidden()
 		return not settings().whisperEnabled
 	end
-	args.whisperMessageLabel = ns.OptionsRowLabel(
-		L["WHISPER_MESSAGE"],
+	local function messageHidden()
+		return hidden() or (settings().whisperMessage or "") == ""
+	end
+	local function RoomLeft()
+		local message = ns.FillThanksWhisper(settings().whisperMessage or "", SampleLink(), SampleBuffer())
+		return ns.CHAT_MESSAGE_MAX_LENGTH - #message
+	end
+
+	-- Send Messages In
+	args.messageLanguageLabel = ns.OptionsRowLabel(
+		L["SEND_MESSAGES_IN"],
 		order,
 		WHISPER_LABEL_WIDTH,
 		hidden,
+		L["SEND_MESSAGES_IN_DESCRIPTION"]
+	)
+	args.messageLanguage = {
+		type = "select",
+		name = "",
+		desc = L["SEND_MESSAGES_IN_DESCRIPTION"],
+		width = WHISPER_LANGUAGE_WIDTH,
+		order = order + 0.01,
+		hidden = hidden,
+		values = function()
+			return (LanguageChoices())
+		end,
+		sorting = select(2, LanguageChoices()),
+		get = function()
+			return ns.GetMessageLanguage()
+		end,
+		set = function(_, value)
+			if settings().whisperMessage == ns.GetDefaultThanksWhisper(ns.GetMessageLanguage()) then
+				settings().whisperMessage = ns.GetDefaultThanksWhisper(value)
+			end
+			ns.db.profile.messageLanguage = value
+		end,
+	}
+	args.messageLanguageSpacer = ns.OptionsSpacer(order + 0.05, hidden)
+
+	-- The message row: label, marker, box, sign-off, Reset.
+	args.whisperMessageLabel = ns.OptionsRowLabel(
+		L["WHISPER_MESSAGE"],
+		order + 0.1,
+		WHISPER_LABEL_WIDTH,
+		hidden,
 		L["PRAISE_WHISPER_MESSAGE_DESCRIPTION"]
+	)
+	args.whisperMarker = ns.OptionsRowLabel(
+		MARKER_TEXTURE,
+		order + 0.11,
+		WHISPER_MARKER_WIDTH,
+		hidden,
+		L["WHISPER_SIGN_OFF_DESCRIPTION"]
 	)
 	args.whisperMessage = {
 		type = "input",
 		name = "",
 		desc = L["PRAISE_WHISPER_MESSAGE_DESCRIPTION"],
-		width = ns.OPTIONS_ROW_WIDTH - WHISPER_LABEL_WIDTH - WHISPER_RESET_WIDTH,
-		order = order + 0.01,
+		width = WHISPER_INPUT_WIDTH,
+		order = order + 0.12,
 		hidden = hidden,
 		get = function()
 			return settings().whisperMessage
@@ -159,15 +254,88 @@ local function DefineWhisperMessageRow(args, settings, order)
 			settings().whisperMessage = (value or ""):match("^%s*(.-)%s*$")
 		end,
 	}
+	args.whisperSignOff = ns.OptionsRowLabel(
+		GetColor("SEPARATOR") .. "// " .. L["ADDON_SHORT_NAME"] .. "|r",
+		order + 0.13,
+		WHISPER_SIGN_OFF_WIDTH,
+		hidden,
+		L["WHISPER_SIGN_OFF_DESCRIPTION"]
+	)
 	args.whisperMessageReset = {
 		type = "execute",
 		name = L["WHISPER_MESSAGE_RESET"],
 		desc = L["WHISPER_MESSAGE_RESET_DESCRIPTION"],
 		width = WHISPER_RESET_WIDTH,
-		order = order + 0.02,
+		order = order + 0.14,
 		hidden = hidden,
 		func = function()
-			settings().whisperMessage = L["DEFAULT_GIVE_THANKS_WHISPER"]
+			settings().whisperMessage = ns.GetDefaultThanksWhisper()
+		end,
+	}
+
+	--[[
+	    Room Left in the label column, under the caption, and the tokens line
+	    beside it, under the box: the tokens get the full width in every locale.
+	    With the box empty there is nothing to measure, so the cell goes blank
+	    rather than hiding, which would pull the tokens line left.
+	]]
+	args.whisperRoomLeft = ns.OptionsRowLabel(
+		function()
+			if (settings().whisperMessage or "") == "" then
+				return " "
+			end
+			local left = RoomLeft()
+			return GetColor(left < 0 and "OFF" or "HELP") .. L["WHISPER_ROOM_LEFT"]:format(left) .. "|r"
+		end,
+		order + 0.2,
+		WHISPER_HINT_INDENT,
+		hidden,
+		L["WHISPER_ROOM_LEFT_DESCRIPTION"]
+	)
+	args.whisperTokens = {
+		type = "description",
+		name = function()
+			local info = GetColor("INFO")
+			return GetColor("HELP")
+				.. L["WHISPER_TOKENS"]:format(
+					info .. "{spell}" .. GetColor("HELP"),
+					info .. "{name}" .. GetColor("HELP")
+				)
+				.. "|r"
+		end,
+		width = ns.OPTIONS_ROW_WIDTH - WHISPER_HINT_INDENT,
+		fontSize = "medium",
+		order = order + 0.21,
+		hidden = hidden,
+	}
+
+	-- Past the ceiling: say what will happen instead.
+	local function fitsHidden()
+		return messageHidden() or RoomLeft() >= 0
+	end
+	args.whisperTooLongIndent = ns.OptionsRowLabel(" ", order + 0.25, WHISPER_HINT_INDENT, fitsHidden)
+	args.whisperTooLong = {
+		type = "description",
+		name = GetColor("OFF") .. L["WHISPER_TOO_LONG"] .. "|r",
+		width = ns.OPTIONS_ROW_WIDTH - WHISPER_HINT_INDENT,
+		fontSize = "medium",
+		order = order + 0.26,
+		hidden = fitsHidden,
+	}
+
+	-- The Example line, then Send Test to Me.
+	args.whisperExampleSpacer = ns.OptionsSpacer(order + 0.3, messageHidden)
+	args.whisperExample = DefineWhisperExample(settings, order + 0.31, messageHidden)
+	args.whisperTestSpacer = ns.OptionsSpacer(order + 0.35, messageHidden)
+	args.whisperTest = {
+		type = "execute",
+		name = L["WHISPER_TEST"],
+		desc = L["WHISPER_TEST_DESCRIPTION"],
+		width = WHISPER_TEST_WIDTH,
+		order = order + 0.36,
+		hidden = messageHidden,
+		func = function()
+			ns:WhisperThanksTest(settings().whisperMessage, SampleLink(), SampleBuffer())
 		end,
 	}
 end
@@ -400,10 +568,8 @@ function ns.BuildGiveThanksOptions()
 			headerWhispers = ns.OptionsHeader(L["WHISPERS_HEADER"], 40),
 			spaceWhispers = ns.OptionsSpacer(40.5),
 			whisperStrangers = DefineWhisperToggle(settings, 41),
-			-- 41.1 through 41.12 belong to the whisper message row, added below.
-			whisperMessageSpacer = DefineExampleSpacer(settings, "whisperEnabled", 41.05),
-			whisperExampleSpacer = DefineExampleSpacer(settings, "whisperEnabled", 41.3),
-			whisperExample = DefineWhisperExample(settings, 41.6, ns.GAME_IDS.SAMPLE_BUFF_SPELL_ID),
+			-- 41.1 through 41.5 belong to the whisper composer, added below.
+			whisperComposerSpacer = DefineExampleSpacer(settings, "whisperEnabled", 41.05),
 			spaceAfterWhispers = ns.OptionsSpacer(42),
 
 			headerNotifications = ns.OptionsHeader(L["NOTIFICATIONS_HEADER"], 50),
@@ -422,7 +588,7 @@ function ns.BuildGiveThanksOptions()
 		},
 	}
 
-	DefineWhisperMessageRow(options.args, settings, 41.1)
+	DefineWhisperComposer(options.args, settings, 41.1)
 
 	-- Intro text and the switch itself stay; everything else follows the switch.
 	ns.HideAllExcept(options.args, function()

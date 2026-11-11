@@ -53,6 +53,7 @@ Locales/zhTW.lua
 # Data
 Data/Flavor.lua
 Data/Data.lua
+Data/Message-Languages.lua
 Data/Camelot/Game-IDs-Camelot.lua
 Data/Camelot/Emote-Groups-Camelot.lua
 Data/Default-Settings.lua

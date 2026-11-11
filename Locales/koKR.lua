@@ -115,9 +115,9 @@ L["PRAISE_DELAY_LENGTH_DESCRIPTION"] =
 L["WHISPERS_HEADER"] = "감사 귓속말"
 L["PRAISE_WHISPER_ENABLE"] = "감사 귓속말 활성화"
 L["PRAISE_WHISPER_DESCRIPTION"] = "버프를 준 플레이어에게 감사의 귓속말을 보냅니다."
--- TRANSLATORS: keep {spell} exactly as written; it is the token players type into the whisper.
+-- TRANSLATORS: keep {spell} and {name} exactly as written; they are the tokens players type into the whisper.
 L["PRAISE_WHISPER_MESSAGE_DESCRIPTION"] =
-	"버프를 준 플레이어에게 TFTB가 보낼 귓속말을 설정합니다. {spell}은 해당 버프로 바뀝니다. 비워 두면 귓속말을 보내지 않습니다."
+	"버프를 준 플레이어에게 TFTB가 보낼 귓속말을 설정합니다. {spell}은 해당 버프로, {name}은 그 플레이어의 이름으로 바뀝니다. 비워 두면 귓속말을 보내지 않습니다."
 
 -- Notifications
 L["NOTIFICATIONS_HEADER"] = "알림"
@@ -277,10 +277,22 @@ L["WHISPER_MESSAGE"] = "귓속말 메시지"
 L["WHISPER_MESSAGE_RESET"] = "초기화"
 L["WHISPER_MESSAGE_RESET_DESCRIPTION"] = "귓속말 메시지를 기본 문구로 되돌립니다."
 
+-- The whisper composer around the Give Thanks message box.
+L["SEND_MESSAGES_IN"] = "메시지 언어"
+L["SEND_MESSAGES_IN_DESCRIPTION"] =
+	"TFTB가 다른 플레이어에게 보내는 메시지의 언어를 설정합니다. 다른 언어를 고르면, 직접 쓴 메시지가 아닌 경우 그 언어의 기본 메시지로 바뀝니다."
+L["WHISPER_SIGN_OFF_DESCRIPTION"] = "TFTB가 보내는 모든 메시지에 붙어, 다른 플레이어가 애드온이 보낸 메시지임을 알 수 있게 합니다."
+-- TRANSLATORS: each %s is a token, {spell} then {name}, drawn in blue.
+L["WHISPER_TOKENS"] = "토큰: %s 버프, %s 시전자"
+L["WHISPER_ROOM_LEFT"] = "남은 공간: %d"
+L["WHISPER_ROOM_LEFT_DESCRIPTION"] =
+	"예시 버프를 기준으로 귓속말에 더 넣을 수 있는 양입니다. 일부 글자는 한 칸보다 많이 차지하며, 이름이 긴 버프는 공간을 더 씁니다."
+L["WHISPER_TOO_LONG"] = "너무 깁니다. 대신 기본 메시지를 보냅니다."
+L["WHISPER_TEST"] = "나에게 테스트 보내기"
+L["WHISPER_TEST_DESCRIPTION"] = "예시를 나에게 귓속말로 보내, 다른 플레이어가 보는 그대로 확인할 수 있습니다."
+
 --------------------------------------------------------------------------------
 -- Defaults
 --------------------------------------------------------------------------------
 
 L["DEFAULT_WHISPER"] = "감사합니다, 최고예요! (="
--- TRANSLATORS: keep {spell} exactly as written; TFTB swaps in the buff's link.
-L["DEFAULT_GIVE_THANKS_WHISPER"] = "{spell} 고맙습니다"

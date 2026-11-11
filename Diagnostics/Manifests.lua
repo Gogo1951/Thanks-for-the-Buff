@@ -379,11 +379,12 @@ function ns:BuildContextReport()
 	if db then
 		local strangers = db.strangers or {}
 		lines[#lines + 1] = string.format(
-			"Give Thanks: enabled=%s print=%s whisper=%s whisperText=%s emotesPicked=%s sound=%s  praiseDelay=%s/%s praiseCooldown=%s minDuration=%s cooldown=%s",
+			"Give Thanks: enabled=%s print=%s whisper=%s whisperText=%s messageLanguage=%s emotesPicked=%s sound=%s  praiseDelay=%s/%s praiseCooldown=%s minDuration=%s cooldown=%s",
 			tostring(strangers.enabled),
 			tostring(strangers.printEnabled),
 			tostring(strangers.whisperEnabled),
 			WhisperLength(strangers.whisperMessage),
+			ns.GetMessageLanguage(),
 			EmotesPicked(strangers.emotes),
 			tostring(strangers.soundEnabled),
 			tostring(strangers.praiseDelayEnabled),
@@ -949,9 +950,10 @@ ns.DIAGNOSTIC_MESSAGES = function()
 	local sampleID = ns.GAME_IDS and ns.GAME_IDS.SAMPLE_BUFF_SPELL_ID
 	local sampleLink = sampleID and ns.GetBuffLink(sampleID) or ""
 	local strangers = ns.db and ns.db.profile.strangers
-	local defaultTemplate = ns.L["DEFAULT_GIVE_THANKS_WHISPER"]
+	local defaultTemplate = ns.GetDefaultThanksWhisper()
 	local template = strangers and strangers.whisperMessage or defaultTemplate
-	local whisper = ns:BuildThanksWhisper(template, sampleLink) or ""
+	local sampleName = ns.SAMPLE_NAMES.MAGE
+	local whisper = ns:BuildThanksWhisper(template, sampleLink, sampleName) or ""
 	rows[#rows + 1] = {
 		label = "Thank-you whisper",
 		ceiling = ns.CHAT_MESSAGE_MAX_LENGTH,
@@ -965,7 +967,7 @@ ns.DIAGNOSTIC_MESSAGES = function()
 	if
 		template ~= defaultTemplate
 		and whisper ~= ""
-		and whisper == (ns:BuildThanksWhisper(defaultTemplate, sampleLink) or "")
+		and whisper == (ns:BuildThanksWhisper(defaultTemplate, sampleLink, sampleName) or "")
 	then
 		notes[#notes + 1] =
 			"Your own whisper text runs past the limit with this buff, so the default text is shown and sent instead; a buff with a shorter link may still send yours."

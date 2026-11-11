@@ -120,9 +120,9 @@ L["WHISPERS_HEADER"] = "Благодарственный шепот"
 L["PRAISE_WHISPER_ENABLE"] = "Включить благодарственный шепот"
 L["PRAISE_WHISPER_DESCRIPTION"] =
 	"Шепчет благодарность игроку, который дал вам бафф."
--- TRANSLATORS: keep {spell} exactly as written; it is the token players type into the whisper.
+-- TRANSLATORS: keep {spell} and {name} exactly as written; they are the tokens players type into the whisper.
 L["PRAISE_WHISPER_MESSAGE_DESCRIPTION"] =
-	"Задает, что TFTB шепчет игроку, который дал вам бафф. {spell} заменяется на бафф. Оставьте поле пустым, чтобы ничего не шептать."
+	"Задает, что TFTB шепчет игроку, который дал вам бафф. {spell} заменяется на бафф, {name} — на имя игрока. Оставьте поле пустым, чтобы ничего не шептать."
 
 -- Notifications
 L["NOTIFICATIONS_HEADER"] = "Уведомления"
@@ -294,10 +294,22 @@ L["WHISPER_MESSAGE"] = "Текст шепота"
 L["WHISPER_MESSAGE_RESET"] = "Сбросить"
 L["WHISPER_MESSAGE_RESET_DESCRIPTION"] = "Возвращает текст шепота к стандартному."
 
+-- The whisper composer around the Give Thanks message box.
+L["SEND_MESSAGES_IN"] = "Язык сообщений"
+L["SEND_MESSAGES_IN_DESCRIPTION"] =
+	"Задает язык, на котором TFTB пишет другим игрокам. При выборе другого языка подставляется его стандартное сообщение, если вы не написали свое."
+L["WHISPER_SIGN_OFF_DESCRIPTION"] = "Добавляется к каждому сообщению TFTB, чтобы другие игроки видели, что его отправил аддон."
+-- TRANSLATORS: each %s is a token, {spell} then {name}, drawn in blue.
+L["WHISPER_TOKENS"] = "Подстановки: %s бафф, %s кто его дал"
+L["WHISPER_ROOM_LEFT"] = "Осталось места: %d"
+L["WHISPER_ROOM_LEFT_DESCRIPTION"] =
+	"Сколько еще поместится в шепот, если считать по примерному баффу. Некоторые буквы занимают больше одного места, а бафф с длинным названием оставляет меньше места."
+L["WHISPER_TOO_LONG"] = "Слишком длинно. Вместо этого TFTB отправит стандартное сообщение."
+L["WHISPER_TEST"] = "Отправить тест себе"
+L["WHISPER_TEST_DESCRIPTION"] = "Шепчет пример вам, чтобы вы увидели его так же, как другие игроки."
+
 --------------------------------------------------------------------------------
 -- Defaults
 --------------------------------------------------------------------------------
 
 L["DEFAULT_WHISPER"] = "Спасибо, ты супер! (="
--- TRANSLATORS: keep {spell} exactly as written; TFTB swaps in the buff's link.
-L["DEFAULT_GIVE_THANKS_WHISPER"] = "Спасибо за {spell}"

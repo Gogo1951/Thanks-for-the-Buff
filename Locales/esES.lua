@@ -111,9 +111,9 @@ L["PRAISE_DELAY_LENGTH_DESCRIPTION"] = "Establece cuánto se espera antes de env
 L["WHISPERS_HEADER"] = "Susurros de agradecimiento"
 L["PRAISE_WHISPER_ENABLE"] = "Habilitar susurros de agradecimiento"
 L["PRAISE_WHISPER_DESCRIPTION"] = "Susurra un agradecimiento al jugador que te ha dado el beneficio."
--- TRANSLATORS: keep {spell} exactly as written; it is the token players type into the whisper.
+-- TRANSLATORS: keep {spell} and {name} exactly as written; they are the tokens players type into the whisper.
 L["PRAISE_WHISPER_MESSAGE_DESCRIPTION"] =
-	"Establece lo que TFTB susurra al jugador que te ha dado el beneficio. {spell} se sustituye por el beneficio. Déjalo vacío para no enviar ningún susurro."
+	"Establece lo que TFTB susurra al jugador que te ha dado el beneficio. {spell} se sustituye por el beneficio y {name} por su nombre. Déjalo vacío para no enviar ningún susurro."
 
 -- Notifications
 L["NOTIFICATIONS_HEADER"] = "Notificaciones"
@@ -269,10 +269,22 @@ L["WHISPER_MESSAGE"] = "Mensaje de susurro"
 L["WHISPER_MESSAGE_RESET"] = "Restablecer"
 L["WHISPER_MESSAGE_RESET_DESCRIPTION"] = "Restablece el mensaje de susurro al texto predeterminado."
 
+-- The whisper composer around the Give Thanks message box.
+L["SEND_MESSAGES_IN"] = "Enviar mensajes en"
+L["SEND_MESSAGES_IN_DESCRIPTION"] =
+	"Establece el idioma en el que TFTB escribe a otros jugadores. Al elegir otro idioma se usa su mensaje predeterminado, salvo que hayas escrito el tuyo."
+L["WHISPER_SIGN_OFF_DESCRIPTION"] = "Se añade a cada mensaje que envía TFTB, para que otros jugadores sepan que viene de un accesorio."
+-- TRANSLATORS: each %s is a token, {spell} then {name}, drawn in blue.
+L["WHISPER_TOKENS"] = "Comodines: %s el beneficio, %s quién lo lanzó"
+L["WHISPER_ROOM_LEFT"] = "Espacio libre: %d"
+L["WHISPER_ROOM_LEFT_DESCRIPTION"] =
+	"Cuánto cabe aún en el susurro, medido con el beneficio de ejemplo. Algunas letras cuentan por más de una, y un beneficio con un nombre más largo deja menos espacio."
+L["WHISPER_TOO_LONG"] = "Demasiado largo. TFTB enviará el mensaje predeterminado en su lugar."
+L["WHISPER_TEST"] = "Enviarme una prueba"
+L["WHISPER_TEST_DESCRIPTION"] = "Te susurra el ejemplo para que lo veas tal como lo verán otros jugadores."
+
 --------------------------------------------------------------------------------
 -- Defaults
 --------------------------------------------------------------------------------
 
 L["DEFAULT_WHISPER"] = "¡Gracias, eres lo máximo! (="
--- TRANSLATORS: keep {spell} exactly as written; TFTB swaps in the buff's link.
-L["DEFAULT_GIVE_THANKS_WHISPER"] = "Gracias por {spell}"
