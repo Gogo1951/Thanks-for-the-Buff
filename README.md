@@ -22,6 +22,8 @@ Auto thank players who buff you with an emote or whisper, greet friends and guil
 
 ### Wave to Friends
 
+<img width="800" alt="README-Infographic-Wave-to-Friends" src="https://github.com/user-attachments/assets/991761d6-51b3-41cb-9d00-e7355ad17dc1" />
+
 * **Say Hi Without Stopping** // Mouse over a friend or guildmate out in the world and they get a wave, no typing required.
 * **You Pick Who Counts** // Your friends list, your Battle.net friends' characters, your own guild, and any other guilds you name.
 * **A Custom List for Your Regulars** // Give a favorite player their own emote, shoo away your rival, or skip someone entirely.
