@@ -84,6 +84,11 @@ ns.DIAGNOSTIC_API_CHECKS = {
 			return type(TextEmoteSpeechList) == "table"
 		end,
 	},
+	-- Emote blockers: a cast in progress, a fishing pole in hand.
+	{ "UnitCastingInfo", HasGlobalFunction("UnitCastingInfo") },
+	{ "UnitChannelInfo", HasGlobalFunction("UnitChannelInfo") },
+	{ "GetInventoryItemID", HasGlobalFunction("GetInventoryItemID") },
+	{ "C_Item.GetItemInfoInstant", HasFunction("C_Item", "GetItemInfoInstant") },
 	{ "UnitIsVisible", HasGlobalFunction("UnitIsVisible") },
 	{ "UnitInRange", HasGlobalFunction("UnitInRange") },
 	{ "CreateMacro", HasGlobalFunction("CreateMacro") },
@@ -371,6 +376,10 @@ function ns:BuildContextReport()
 	end
 	lines[#lines + 1] = string.format("Auras secret now: %s", tostring(ns.AreAurasSecret()))
 	lines[#lines + 1] = string.format(
+		"Emotes held back now: %s (combat, casting or a fishing pole in hand)",
+		tostring(ns.GetEmoteBlocker() or "no")
+	)
+	lines[#lines + 1] = string.format(
 		"Sound: Sound_EnableAllSound=%s Sound_MasterVolume=%s",
 		tostring(GetCVar("Sound_EnableAllSound")),
 		tostring(GetCVar("Sound_MasterVolume"))
@@ -637,7 +646,7 @@ end
 --[[
     The state behind a "my friend walked past and nothing happened" report:
     every gate the mouseover handler checks before it looks at who you moused
-    over (the switch, the resting rule, combat, the mouse-focus read), the
+    over (the switch, the resting rule, the emote blockers, the mouse-focus read), the
     cooldown, each list with its switch, entries and picked emotes, and how
     the current target reads to the feature.
 ]]
@@ -650,11 +659,11 @@ function ns:BuildWaveContextReport()
 	end
 
 	lines[#lines + 1] = string.format(
-		"Wave to Friends: enabled=%s restingOnly=%s resting=%s InCombat=%s cooldown=%s",
+		"Wave to Friends: enabled=%s restingOnly=%s resting=%s emotesHeldBack=%s cooldown=%s",
 		tostring(settings.enabled),
 		tostring(settings.restingOnly),
 		tostring(IsResting() and true or false),
-		tostring(InCombatLockdown() and true or false),
+		tostring(ns.GetEmoteBlocker() or "no"),
 		WaveCooldownText(settings.cooldown)
 	)
 	lines[#lines + 1] = string.format(
