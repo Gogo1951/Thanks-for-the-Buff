@@ -10,7 +10,8 @@ local _, ns = ...
 
     Fires only on UPDATE_MOUSEOVER_UNIT with the mouse over the 3D world (a
     character, never a unit frame), never at someone in your party or raid, never
-    in combat, only while resting unless you turn that off, and at most once per
+    in combat, casting or with a fishing pole in hand, only while resting
+    unless you turn that off, and at most once per
     player per cooldown.
 ]]
 
@@ -229,7 +230,8 @@ local function OnUpdateMouseoverUnit()
 	if settings.restingOnly and not IsResting() then
 		return
 	end
-	if InCombatLockdown() or not ns.IsMouseOverWorld() then
+	-- Combat, a cast in progress, a fishing pole in hand (ns.GetEmoteBlocker).
+	if ns.GetEmoteBlocker() or not ns.IsMouseOverWorld() then
 		return
 	end
 

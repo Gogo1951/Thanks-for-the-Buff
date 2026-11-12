@@ -150,6 +150,62 @@ function ns.AreAurasSecret()
 end
 
 --------------------------------------------------------------------------------
+-- Emote Blockers
+--------------------------------------------------------------------------------
+
+--[[
+    Why an emote TFTB would play on its own should be held back right now, or
+    nil when nothing stops it. Every automatic emote (Give Thanks, Wave to
+    Friends) asks this; the Thank You buttons do not, since pressing one is the
+    player choosing to emote.
+
+    - Combat: the promise is that an emote never plays while you are fighting.
+    - Casting or channeling: an animated emote cancels a cast in progress, so a
+      thank-you would cost you the hearth, the craft or the cast you were on.
+    - A fishing pole in hand: fishing is a channel the emote would break, and
+      between casts you are about to cast again. Read by item class rather than
+      name, so it holds in every client language.
+
+    A secret cast return (WoW Forever) counts as casting: something is there,
+    and guessing "nothing" is the guess that breaks the cast.
+]]
+local MAIN_HAND_SLOT = INVSLOT_MAINHAND or 16
+local WEAPON_CLASS = (Enum and Enum.ItemClass and Enum.ItemClass.Weapon) or 2
+local FISHING_POLE_SUBCLASS = (Enum and Enum.ItemWeaponSubclass and Enum.ItemWeaponSubclass.Fishingpole) or 20
+
+local function IsBusyCasting()
+	for _, read in ipairs({ UnitCastingInfo, UnitChannelInfo }) do
+		local spell = read and read("player")
+		if not ns.IsPlain(spell) or spell ~= nil then
+			return true
+		end
+	end
+	return false
+end
+
+function ns.IsFishingPoleEquipped()
+	local itemID = GetInventoryItemID("player", MAIN_HAND_SLOT)
+	if not itemID or not ns.IsPlain(itemID) then
+		return false
+	end
+	local _, _, _, _, _, classID, subclassID = C_Item.GetItemInfoInstant(itemID)
+	return classID == WEAPON_CLASS and subclassID == FISHING_POLE_SUBCLASS
+end
+
+function ns.GetEmoteBlocker()
+	if InCombatLockdown() then
+		return "combat"
+	end
+	if IsBusyCasting() then
+		return "casting"
+	end
+	if ns.IsFishingPoleEquipped() then
+		return "fishing pole"
+	end
+	return nil
+end
+
+--------------------------------------------------------------------------------
 -- Mouse Focus
 --------------------------------------------------------------------------------
 

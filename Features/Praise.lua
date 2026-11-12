@@ -155,8 +155,9 @@ end
     the delay window.
 
     Two things are deliberately decided late instead, when the emote actually
-    fires. Combat, because the promise is that an emote never plays while you
-    are fighting. And the emote target: ResolveEmoteTarget hands
+    fires. The emote blockers (ns.GetEmoteBlocker: combat, a cast in progress,
+    a fishing pole in hand), because the Praise Delay is long enough to start a
+    fight or a cast. And the emote target: ResolveEmoteTarget hands
     back a live unit token, and "target", "focus", and "mouseover" all name
     whoever you are pointing at in that instant -- resolve it early and a delayed
     emote thanks whoever you moved on to. A buffer with no unit token degrades
@@ -169,7 +170,7 @@ local function DeliverPraise(db, guid, name, link, whisperAllowed, emoteAllowed)
 		if whisperAllowed then
 			ns:WhisperThanks(name, link, db.whisperMessage)
 		end
-		if emoteAllowed and not InCombatLockdown() then
+		if emoteAllowed and not ns.GetEmoteBlocker() then
 			ns:DoRandomEmote(db.emotes, ResolveEmoteTarget(guid, name))
 		end
 	end
@@ -223,7 +224,8 @@ local function HandleStrangersBuff(sourceGUID, sourceName, spellID)
         mass-buff moment from turning into a chain of thank-yous, the per-source
         one keeps a single player from being praised over and over. Neither is
         spent unless praise is cleared to go out, so a buff that arrives while you
-        are in combat with emotes as your only praise costs nothing. The
+        are in combat, casting or fishing with emotes as your only praise costs
+        nothing. The
         per-recipient whisper throttle sits on top as a floor no setting can
         lower, so a short cooldown can't whisper someone into the server's chat
         squelch.
@@ -237,7 +239,7 @@ local function HandleStrangersBuff(sourceGUID, sourceName, spellID)
 		and db.whisperMessage
 		and db.whisperMessage ~= ""
 		and TryWhisperCooldown(sourceGUID)
-	local emoteAllowed = #ns.GetPickableEmotes(db.emotes) > 0 and not InCombatLockdown()
+	local emoteAllowed = #ns.GetPickableEmotes(db.emotes) > 0 and not ns.GetEmoteBlocker()
 	if not whisperAllowed and not emoteAllowed then
 		return
 	end

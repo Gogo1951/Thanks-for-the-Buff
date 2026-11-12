@@ -13,13 +13,15 @@ Thanks for the Buff thanks strangers who buff you, waves at friends and guildmat
 5. Type a very long message (Russian fills it fastest); a red Too Long line appears and the Example shows the default text.
 6. If you play the game in another language and had whispers on before this update, check **Send Messages In** shows your language and your message hasn't changed.
 7. Open **Emotes List**; the groups run Text, Gesture, Voice, Pose.
+8. Equip a fishing pole and have a stranger buff you; you don't emote at them (a whisper still goes if whispers are on). Take the pole off and get buffed again; you emote.
+9. Start a long cast (a hearthstone, or fishing) and have a stranger buff you mid-cast; the cast isn't interrupted.
 
 ## Everything Else
 
-8. Turn on **Enable Print Outs** and **Enable Sound Effects**, then let a stranger buff you; you emote at them, see a line in chat and hear a sound.
-9. Have a groupmate buff you; nothing happens, since they aren't a stranger.
-10. On WoW Forever, get buffed by a stranger **in combat**; no error appears.
-11. On **Ignored Buffs**, add a buff with **Ignore Current Buff** or **Add Buff**, then get it from a stranger; you get your print out and sound, but no thank-you.
-12. On **Thank You Button**, tick **Enable Macro "- Thank"**, drag it to your bar and press it on a target (on WoW Forever, **in combat** too).
-13. On **Wave to Friends**, turn on **Enable Wave to Friends** and mouse over a friend or guildmate in town; you wave at them.
-14. Type `/tftb`; the options open inside the game's Options (watch TBC Anniversary), and in combat they refuse with a message.
+10. Turn on **Enable Print Outs** and **Enable Sound Effects**, then let a stranger buff you; you emote at them, see a line in chat and hear a sound.
+11. Have a groupmate buff you; nothing happens, since they aren't a stranger.
+12. On WoW Forever, get buffed by a stranger **in combat**; no error appears.
+13. On **Ignored Buffs**, add a buff with **Ignore Current Buff** or **Add Buff**, then get it from a stranger; you get your print out and sound, but no thank-you.
+14. On **Thank You Button**, tick **Enable Macro "- Thank"**, drag it to your bar and press it on a target (on WoW Forever, **in combat** too).
+15. On **Wave to Friends**, turn on **Enable Wave to Friends** and mouse over a friend or guildmate in town; you wave at them.
+16. Type `/tftb`; the options open inside the game's Options (watch TBC Anniversary), and in combat they refuse with a message.

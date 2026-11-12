@@ -103,10 +103,18 @@ Nothing queues for after combat. Each action refuses, or goes ahead without the 
 
 - **Options opener**: `ns:OpenOptionsPanel` refuses first thing (Style Guide → Combat Guard).
 - **Macros**: `ns.ReconcileMacros` and `ns:DeleteAutoMacro` return in combat. A macro toggle flipped mid-fight changes the setting; the macro catches up at the next login, profile change, toggle or icon pick.
-- **Praise emotes**: `HandleStrangersBuff` counts the emote unavailable in combat, and `DeliverPraise` checks again at fire time, since the Praise Delay can carry it into a fight. Whispers still go out.
+- **Praise emotes**: `HandleStrangersBuff` counts the emote unavailable while `ns.GetEmoteBlocker()` names a reason, and `DeliverPraise` checks again at fire time, since the Praise Delay can carry it into a fight or a cast. Whispers still go out.
 - **Notifications**: the print and sound fire in or out of combat.
 - **WoW Forever detection**: `OnUnitAura` skips every update in combat or while `ns.AreAurasSecret()`. A buff that lands then is never seen.
-- **Wave to Friends**: `OnUpdateMouseoverUnit` returns in combat.
+- **Wave to Friends**: `OnUpdateMouseoverUnit` returns while `ns.GetEmoteBlocker()` names a reason.
+
+### Emote Blockers
+
+`ns.GetEmoteBlocker()` (`Features/Utilities.lua`) returns why an automatic emote must wait, or nil. Give Thanks and Wave to Friends ask it; the Thank You buttons don't, since a press is the player choosing to emote. No setting.
+
+- `"combat"`: `InCombatLockdown()`.
+- `"casting"`: `UnitCastingInfo` or `UnitChannelInfo` on `player` returns anything (a secret return counts). An animated emote cancels the cast.
+- `"fishing pole"`: `ns.IsFishingPoleEquipped()`, the main-hand item's `C_Item.GetItemInfoInstant` class and subclass (Weapon, Fishing Pole), so it reads the same in every language. Covers the gap between casts as well as the Fishing channel itself.
 
 ### Give Thanks: Detect → Classify → Praise
 
@@ -129,7 +137,7 @@ Nothing queues for after combat. Each action refuses, or goes ahead without the 
 4. Print (`printEnabled`) and sound (`soundEnabled`). Never answer to cooldowns.
 5. Stop if `ns.IsBuffIgnored(spellID)`.
 6. Stop if `praise:all` or `praise:<guid>` is running.
-7. Clear the whisper (toggle, non-empty `whisperMessage`, `TryWhisperCooldown`) and the emote (any `ns.GetPickableEmotes`, out of combat). Stop if neither clears.
+7. Clear the whisper (toggle, non-empty `whisperMessage`, `TryWhisperCooldown`) and the emote (any `ns.GetPickableEmotes`, no `ns.GetEmoteBlocker()`). Stop if neither clears.
 8. Stamp the cooldowns, hand off to `DeliverPraise` (waits `praiseDelay` when `praiseDelayEnabled`).
 
 - Every gate settles before the delay timer, so a burst of buffs can't slip past a cooldown inside the delay window.
@@ -195,7 +203,7 @@ All in `Features/Announcements.lua`.
 
 `Features/Wave-To-Friends.lua`, settings in `ns.db.profile.wave`.
 
-- **Gates, in `OnUpdateMouseoverUnit` order**: `wave.enabled`; `restingOnly` vs `IsResting()`; not in combat; `ns.IsMouseOverWorld()` (cursor on `WorldFrame`, never a unit frame or nameplate; `GetMouseFoci` or `GetMouseFocus` picked once at load); identity not secret; a player, not you; not in your party or raid; a plain GUID not on cooldown.
+- **Gates, in `OnUpdateMouseoverUnit` order**: `wave.enabled`; `restingOnly` vs `IsResting()`; no `ns.GetEmoteBlocker()` (combat, casting, fishing pole); `ns.IsMouseOverWorld()` (cursor on `WorldFrame`, never a unit frame or nameplate; `GetMouseFoci` or `GetMouseFocus` picked once at load); identity not secret; a player, not you; not in your party or raid; a plain GUID not on cooldown.
 - **`PickGreeting`, first match wins**: Custom List (`customEnabled`, `players[full]` then `players[bare]`) → Friends (`friendsEnabled`, `C_FriendList.IsFriend`, plus `C_BattleNet.GetAccountInfoByGUID` when `bnetFriends`) → Guilds (`guilds[normalized]`, or your own guild when `myGuildEnabled`). Custom List returns one token (`ns:DoEmoteToken`); Friends and Guilds return a token set (`ns:DoRandomEmote`).
 - **A Custom List entry set to None** returns `""`: still a match, so it blocks Friends and Guilds and spends the cooldown, and `DoEmoteToken` plays nothing. That is how a name is kept from ever being waved at.
 - **Cooldown**: `waveCooldowns[guid]`, in memory, swept on write. `cooldown` comes from `Data.WAVE_COOLDOWN_CHOICES`; 0 is Once per Session, stored in the table as `math.huge` so the sweep never drops it and only a `/reload` ends it.
