@@ -1,8 +1,8 @@
 # Thanks for the Buff (TFTB)
 
-Auto thank players who buff you with an emote or whisper, greet friends and guildmates with a wave as you pass them, and thank anyone you target with one click of your Thank You macros.
+Auto thank players who buff you with an emote or whisper, tell players what you just cast on them, greet friends and guildmates with a wave as you pass them, and thank anyone you target with one click of your Thank You macros.
 
-**TL;DR:** Be the friendly face in Azeroth without breaking stride. Every buff gets noticed, and every friend gets a hello.
+**TL;DR:** Be the friendly face in Azeroth without breaking stride. Every buff gets noticed, every big cooldown gets used, and every friend gets a hello.
 
 ### Give Thanks
 
@@ -14,11 +14,18 @@ Auto thank players who buff you with an emote or whisper, greet friends and guil
 * **Never Spammy** // A wave of world buffs or a generous repeat buffer never turns your gratitude into spam.
 * **Know Who Buffed You** // Turn on a chat note or a sound to see who buffed you and with what.
 
-#### Example Messages
+> Sample Messages
 
 > **Stranger Buffs You, Self:** TFTB // Katz buffed you with [Power Word: Fortitude]!
 
 > **Stranger Buffs You, Message To Katz:** Thanks for the [Power Word: Fortitude] // TFTB
+
+### Good News
+
+* **No Big Buff Goes to Waste** // Cast Power Infusion, Innervate, or Blessing of Protection on someone, and they get a whisper saying so, with the time left on short buffs.
+* **Covers the Big Ones** // Soulstones, Fear Ward, Rebirth, Lay on Hands, scrolls, and more.
+* **Your Rules** // Choose which abilities send a whisper, who gets one, and what it says.
+* **Off Until You Want It** // Starts off. Turn it on in the options whenever you're ready.
 
 ### Wave to Friends
 
@@ -27,6 +34,7 @@ Auto thank players who buff you with an emote or whisper, greet friends and guil
 * **Say Hi Without Stopping** // Mouse over a friend or guildmate out in the world and they get a wave, no typing required.
 * **You Pick Who Counts** // Your friends list, your Battle.net friends' characters, your own guild, and any other guilds you name.
 * **A Custom List for Your Regulars** // Give a favorite player their own emote, shoo away your rival, or skip someone entirely.
+* **Off Until You Want It** // Starts off. Turn it on in the options whenever you're ready.
 
 ### Thank You Button
 
@@ -35,7 +43,7 @@ Auto thank players who buff you with an emote or whisper, greet friends and guil
 * **Thank Anyone** // A healer in your group, a mage who handed you water? Target them, and one click emotes and whispers your thanks.
 * **Five Buttons, Your Way** // Each has its own emote, whisper, and icon: thank a fly-by buffer, ask a mage for water, or heckle a guildie.
 
-#### Example Messages
+> Sample Messages
 
 > **Thank You Button, Message To Portalrico:** Thanks, you're the best! (=
 
@@ -43,8 +51,8 @@ Auto thank players who buff you with an emote or whisper, greet friends and guil
 
 1. Install the add-on, ideally using [CurseForge](https://www.curseforge.com/wow/addons/thanks-for-the-buff-revisited) or [Wago](https://addons.wago.io/addons/thanks-for-the-buff).
 2. Type `/tftb` to open the Options Interface.
-3. Under Give Thanks, pick your emotes from the Emotes List, and turn on Thank-You Whispers if you'd like to whisper too.
-4. Turn on Wave to Friends to greet the people you know.
+3. Under Give Thanks, pick your emotes from the Emotes List, and turn on the Give Thanks Whisper if you'd like to whisper too.
+4. Turn on Good News and Wave to Friends if you'd like them.
 5. Open your Macros window and drag `- Thank` onto your action bar.
 6. _"Manners maketh the raid."_
 
@@ -89,7 +97,6 @@ Auto thank players who buff you with an emote or whisper, greet friends and guil
 
 ### 🟢 Pairs With
 
-* fpsacha's [Manners](https://www.curseforge.com/wow/addons/manners)
 * Gogo1951's [Play It Forward](https://www.curseforge.com/wow/addons/play-it-forward)
 * Gogo1951's [Water Dispenser](https://www.curseforge.com/wow/addons/water-dispenser-revisited)
 
@@ -97,4 +104,5 @@ Auto thank players who buff you with an emote or whisper, greet friends and guil
 
 * Gogo1951's [Good to Go](https://www.curseforge.com/wow/addons/good-to-go)
 * g00v3R's [GuildGreet Extended](https://www.curseforge.com/wow/addons/guild-greet-extended)
+* fpsacha's [Manners](https://www.curseforge.com/wow/addons/manners)
 * stryker2k2's [Stryk's Emote Wheel](https://www.curseforge.com/wow/addons/stryks-emote-wheel)

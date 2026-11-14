@@ -41,7 +41,7 @@ L["SAMPLE_EXAMPLE"] = "Beispiel: %s"
 L["OPTIONS_WELCOME_TOGGLE"] = "Willkommensnachricht aktivieren"
 L["OPTIONS_WELCOME_DESCRIPTION"] = "Gibt beim Einloggen eine Nachricht aus, die nur Ihr seht."
 L["OPTIONS_DESCRIPTION"] =
-	"Bedankt Euch automatisch per Emote oder Flüstern bei Spielern, die Euch buffen, grüßt Freunde und Gildenmitglieder im Vorbeigehen mit einem Winken und dankt mit einem Klick auf Eure Dankeschön-Makros jedem, den Ihr anvisiert."
+	"Bedankt Euch automatisch per Emote oder Flüstern bei Spielern, die Euch buffen, sagt Spielern, was Ihr gerade auf sie gewirkt habt, grüßt Freunde und Gildenmitglieder im Vorbeigehen mit einem Winken und dankt mit einem Klick auf Eure Dankeschön-Makros jedem, den Ihr anvisiert."
 L["OPTIONS_FEATURES_HEADER"] = "Funktionen"
 L["OPTIONS_FEATURES_DESCRIPTION"] = "Schaltet jede Funktion hier oder auf ihrer eigenen Seite ein oder aus."
 L["OPTIONS_COMMANDS_HEADER"] = "/Commands"
@@ -108,9 +108,9 @@ L["PRAISE_DELAY_DESCRIPTION"] =
 	"Wartet einen Moment vor dem Flüstern und dem Emote, damit Euer Dank nicht im selben Augenblick wie der Buff eintrifft. Benachrichtigungen bleiben unberührt."
 L["PRAISE_DELAY_LENGTH_DESCRIPTION"] = "Legt fest, wie lange gewartet wird, bevor Flüstern und Emote gesendet werden."
 
--- Thank-You Whispers
-L["WHISPERS_HEADER"] = "Dankesflüstern"
-L["PRAISE_WHISPER_ENABLE"] = "Dankesflüstern aktivieren"
+-- Give Thanks Whisper
+L["GIVE_THANKS_WHISPER_HEADER"] = "Danksagungs-Flüstern"
+L["GIVE_THANKS_WHISPER_ENABLE"] = "Danksagungs-Flüstern aktivieren"
 L["PRAISE_WHISPER_DESCRIPTION"] = "Flüstert dem Spieler, der Euch gebufft hat, ein Dankeschön zu."
 -- TRANSLATORS: keep {spell} and {name} exactly as written; they are the tokens players type into the whisper.
 L["PRAISE_WHISPER_MESSAGE_DESCRIPTION"] =
@@ -127,12 +127,42 @@ L["NOTIFICATIONS_SOUND_PREVIEW_DESCRIPTION"] =
 	"Spielt den Ton ab, damit Ihr ihn hören könnt, bevor Ihr ihn aktiviert."
 
 --------------------------------------------------------------------------------
+-- Options: Good News
+--------------------------------------------------------------------------------
+
+L["TAB_GOOD_NEWS"] = "Gute Neuigkeiten"
+L["GOOD_NEWS_ENABLE"] = "Gute Neuigkeiten aktivieren"
+L["GOOD_NEWS_ENABLE_DESCRIPTION"] = "Aktiviert ein Flüstern, das Spielern sagt, was Ihr gerade auf sie gewirkt habt."
+L["GOOD_NEWS_DESCRIPTION"] =
+	"Lasst Spieler wissen, was Ihr gerade auf sie gewirkt habt und bei kurzen Buffs, wie lange es anhält, damit sie das Beste daraus machen können."
+L["GOOD_NEWS_SCOPE"] = "Wer es bekommt"
+L["GOOD_NEWS_SCOPE_DESCRIPTION"] =
+	"Legt fest, wer ein Flüstern von Gute Neuigkeiten bekommt: jeder, auf den Ihr eine verfolgte Fähigkeit wirkt, oder nur Eure Gruppe oder Euer Schlachtzug."
+L["GOOD_NEWS_SCOPE_ALWAYS"] = "Jeder"
+L["GOOD_NEWS_SCOPE_GROUP"] = "Nur Gruppenmitglieder"
+L["GOOD_NEWS_WHISPER_HEADER"] = "Flüstern für Gute Neuigkeiten"
+L["GOOD_NEWS_WHISPER_DESCRIPTION"] =
+	"Was der Spieler erhält, auf den Ihr wirkt. Nur die unter Verfolgte Fähigkeiten angehakten Fähigkeiten senden eines."
+-- TRANSLATORS: keep {spell} and {name} exactly as written; they are the tokens players type into the whisper.
+L["GOOD_NEWS_MESSAGE_DESCRIPTION"] =
+	"Legt fest, was TFTB dem Spieler zuflüstert, auf den Ihr wirkt. {spell} wird durch das Gewirkte ersetzt, samt Dauer, wenn sie unter einer Minute liegt, {name} durch seinen Namen. Bleibt das Feld leer, wird nichts geflüstert."
+-- TRANSLATORS: each %s is a token, {spell} then {name}, drawn in blue.
+L["GOOD_NEWS_TOKENS"] = "Platzhalter: %s was Ihr wirkt, %s wer es bekommen hat"
+
+-- Tracked Abilities
+L["TAB_GOOD_NEWS_ABILITIES"] = "Verfolgte Fähigkeiten"
+L["GOOD_NEWS_ABILITIES_DESCRIPTION"] =
+	"Gute Neuigkeiten flüstert über die hier angehakten Fähigkeiten, wenn Ihr sie auf einen anderen Spieler wirkt."
+-- The heading over the rows no class owns: scrolls, and abilities cast by a trinket's pet.
+L["GOOD_NEWS_ITEMS"] = "Gegenstände"
+
+--------------------------------------------------------------------------------
 -- Options: Emotes List
 --------------------------------------------------------------------------------
 
 L["TAB_EMOTES_LIST"] = "Emote-Liste"
 L["EMOTES_GRID_DESCRIPTION"] =
-	"Hakt die Emotes an, aus denen die Danksagung wählen darf, wenn Euch ein Spieler außerhalb Eurer Gruppe bufft; sie nimmt jeweils eines zufällig. Emotes werden zurückgehalten, solange Ihr im Kampf seid."
+	"Hakt die Emotes an, aus denen die Danksagung wählen darf, wenn Euch ein Spieler außerhalb Eurer Gruppe bufft; sie nimmt jeweils eines zufällig. Emotes werden zurückgehalten, solange Ihr im Kampf seid, zaubert oder angelt."
 
 --[[
     The emote checklist, shared by this panel and Wave to Friends' Friends and
@@ -159,8 +189,11 @@ L["EMOTES_RESET_CONFIRM"] = "Die Emote-Liste auf die Standardwerte zurücksetzen
 L["TAB_IGNORED_BUFFS"] = "Ignorierte Buffs"
 L["IGNORED_BUFFS_DESCRIPTION"] =
 	"Für Buffs auf dieser Liste gibt es nie ein Dankeschön, ganz gleich, wer sie wirkt. Eure Textmeldung und Euren Ton bekommt Ihr trotzdem."
-L["IGNORED_BUFFS_ADD_CURRENT"] = "Aktuellen Buff ignorieren"
-L["IGNORED_BUFFS_ADD_CURRENT_DESCRIPTION"] = "Fügt einen der Buffs hinzu, die gerade auf Euch wirken."
+L["IGNORED_BUFFS_ADD_RECENT"] = "Kürzlichen Buff ignorieren"
+L["IGNORED_BUFFS_ADD_RECENT_DESCRIPTION"] =
+	"Fügt einen Buff hinzu, der gerade auf Euch wirkt oder den Euch seit dem Einloggen ein anderer Spieler gegeben hat."
+-- The first %s is the buff's icon and name, the second the player who cast it.
+L["IGNORED_BUFFS_RECENT_FROM"] = "%s, von %s"
 L["IGNORED_BUFFS_ADD"] = "Buff hinzufügen"
 L["IGNORED_BUFFS_ADD_DESCRIPTION"] =
 	"Gebt eine Zauber-ID ein oder fügt den Link eines Buffs per Shift-Klick in das Feld ein und drückt dann die Eingabetaste."
@@ -212,7 +245,7 @@ L["WAVE_ENABLE_DESCRIPTION"] =
 	"Aktiviert ein Emote für Freunde und Gildenmitglieder, wenn Ihr mit der Maus über sie fahrt."
 L["WAVE_DESCRIPTION"] =
 	"Grüßt Freunde und Gildenmitglieder draußen in der Welt mit einem Emote, wenn Ihr mit der Maus über sie fahrt."
-L["WAVE_RULES"] = "Nie Eure Gruppe oder Euren Schlachtzug, und nie im Kampf."
+L["WAVE_RULES"] = "Nie Eure Gruppe oder Euren Schlachtzug, und nie, solange Ihr im Kampf seid, zaubert oder angelt."
 L["WAVE_RESTING_ENABLE"] = "Nur beim Ausruhen"
 L["WAVE_RESTING_ENABLE_DESCRIPTION"] = "Winkt nur, während Ihr Euch ausruht, in einer Stadt oder einem Gasthaus."
 L["WAVE_COOLDOWN"] = "Abklingzeit für denselben Spieler"
@@ -267,12 +300,12 @@ L["WAVE_GUILDS_EMOTES_DESCRIPTION"] =
 -- Options: Whisper Message Row
 --------------------------------------------------------------------------------
 
--- The caption and Reset button beside every whisper box, on Give Thanks and each Thank You Button.
+-- The caption and Reset button beside every whisper box, on Give Thanks, Good News and each Thank You Button.
 L["WHISPER_MESSAGE"] = "Flüsternachricht"
 L["WHISPER_MESSAGE_RESET"] = "Zurücksetzen"
 L["WHISPER_MESSAGE_RESET_DESCRIPTION"] = "Setzt die Flüsternachricht auf den Standardtext zurück."
 
--- The whisper composer around the Give Thanks message box.
+-- The whisper composer around every editable whisper's box, on Give Thanks and Good News.
 L["SEND_MESSAGES_IN"] = "Nachrichten senden auf"
 L["SEND_MESSAGES_IN_DESCRIPTION"] =
 	"Legt fest, in welcher Sprache TFTB anderen Spielern schreibt. Bei einer anderen Sprache wird deren Standardtext eingesetzt, außer Ihr habt einen eigenen geschrieben."
@@ -288,5 +321,5 @@ L["WHISPER_TEST_DESCRIPTION"] = "Flüstert Euch das Beispiel zu, damit Ihr es ge
 -- Defaults
 --------------------------------------------------------------------------------
 
--- The Thank You Button whisper's default, in the client's own language; Give Thanks' defaults live in Data/Message-Languages.lua.
+-- The Thank You Button whisper's default, in the client's own language; Give Thanks' and Good News' defaults live in Data/Message-Languages.lua.
 L["DEFAULT_WHISPER"] = "Danke, du bist spitze! (="

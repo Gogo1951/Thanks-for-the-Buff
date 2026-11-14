@@ -50,9 +50,9 @@ end
     so a player can paste their exact configuration: every setting each
     profile has saved (AceDB fills the rest in from the defaults, which the
     context reports print as read), every Give Thanks switch, throttle and
-    emote pick, every Thank You button's text, icon and emotes, every Wave to
-    Friends switch, guild, name and emote, and every Ignored Buffs row in both
-    scopes.
+    emote pick, every Thank You button's text, icon and emotes, every Good
+    News switch, its text and each ability unticked, every Wave to Friends
+    switch, guild, name and emote, and every Ignored Buffs row in both scopes.
 ]]
 function ns:BuildSavedVariablesReport()
 	local lines = { GetClientHeader(), "", ns.SAVED_VARIABLES_NAME .. " = {" }

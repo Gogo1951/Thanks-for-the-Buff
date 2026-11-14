@@ -84,6 +84,8 @@ ns.OPTIONS_REGISTRY = {
 	GiveThanks = ADDON_NAME .. "_GiveThanks",
 	EmotesList = ADDON_NAME .. "_EmotesList",
 	IgnoredBuffs = ADDON_NAME .. "_IgnoredBuffs",
+	GoodNews = ADDON_NAME .. "_GoodNews",
+	GoodNewsAbilities = ADDON_NAME .. "_GoodNewsAbilities",
 	ThankYouButton = ADDON_NAME .. "_ThankYouButton",
 	WaveToFriends = ADDON_NAME .. "_WaveToFriends",
 	Profiles = ADDON_NAME .. "_Profiles",
@@ -111,7 +113,7 @@ ns.OPTIONS_PROMOTE_WIDTH = 0.9
     defaults to 175px; this is a hair wider, enough for a long realm name. The
     tree stays drag-resizable, and a drag wins over this seed.
 ]]
-ns.OPTIONS_TREE_WIDTH = 180
+ns.OPTIONS_TREE_WIDTH = 176
 ns.OPTIONS_TREE_ROW_WIDTH = 2.5
 
 --[[
@@ -134,6 +136,25 @@ Data.SAFETY_PAUSE = 3
     non-Latin locale spends 2-3 of them per character.
 ]]
 ns.CHAT_MESSAGE_MAX_LENGTH = 255
+
+--[[
+    How Good News confirms a cast of yours went where you aimed it, one per
+    row of Data/<Flavor>/Good-News-Abilities-<Flavor>.lua:
+
+    - AURA: a buff; the whisper can say how long it lasts, read off the player
+      you cast it on.
+    - CAST: a one-shot with no buff to time (Rebirth, Lay on Hands).
+    - RESURRECT: a cast that can fail (Jumper Cables). The whisper waits for the
+      combat log to report the revive, so WoW Forever, whose combat log add-ons
+      can't read, lists no such row.
+]]
+Data.GOOD_NEWS_DETECT = { AURA = "AURA", CAST = "CAST", RESURRECT = "RESURRECT" }
+
+--[[
+    Who Good News whispers: ALWAYS, anyone you cast a tracked ability on, or
+    GROUP, only your party or raid. Doubles as the dropdown's display order.
+]]
+Data.GOOD_NEWS_SCOPES = { "ALWAYS", "GROUP" }
 --[[
     The Thank You buttons. One row each: the settings key it stores under, the
     macro it offers to create, and the slash command that macro runs.

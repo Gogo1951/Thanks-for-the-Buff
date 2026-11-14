@@ -40,7 +40,7 @@ L["SAMPLE_EXAMPLE"] = "예시: %s"
 L["OPTIONS_WELCOME_TOGGLE"] = "환영 메시지 활성화"
 L["OPTIONS_WELCOME_DESCRIPTION"] = "접속할 때 자신만 볼 수 있는 메시지를 출력합니다."
 L["OPTIONS_DESCRIPTION"] =
-	"버프를 준 플레이어에게 감정 표현이나 귓속말로 자동으로 감사를 표하고, 지나치는 친구와 길드원에게 손을 흔들어 인사하며, 감사 매크로를 한 번 클릭해 대상으로 잡은 누구에게나 감사하세요."
+	"버프를 준 플레이어에게 감정 표현이나 귓속말로 자동으로 감사를 표하고, 방금 시전한 것을 플레이어에게 알려 주며, 지나치는 친구와 길드원에게 손을 흔들어 인사하고, 감사 매크로를 한 번 클릭해 대상으로 잡은 누구에게나 감사하세요."
 L["OPTIONS_FEATURES_HEADER"] = "기능"
 L["OPTIONS_FEATURES_DESCRIPTION"] =
 	"각 기능은 여기서 또는 해당 기능의 패널에서 켜거나 끌 수 있습니다."
@@ -111,9 +111,9 @@ L["PRAISE_DELAY_DESCRIPTION"] =
 L["PRAISE_DELAY_LENGTH_DESCRIPTION"] =
 	"귓속말과 감정 표현을 보내기 전에 기다릴 시간을 설정합니다."
 
--- Thank-You Whispers
-L["WHISPERS_HEADER"] = "감사 귓속말"
-L["PRAISE_WHISPER_ENABLE"] = "감사 귓속말 활성화"
+-- Give Thanks Whisper
+L["GIVE_THANKS_WHISPER_HEADER"] = "감사하기 귓속말"
+L["GIVE_THANKS_WHISPER_ENABLE"] = "감사하기 귓속말 활성화"
 L["PRAISE_WHISPER_DESCRIPTION"] = "버프를 준 플레이어에게 감사의 귓속말을 보냅니다."
 -- TRANSLATORS: keep {spell} and {name} exactly as written; they are the tokens players type into the whisper.
 L["PRAISE_WHISPER_MESSAGE_DESCRIPTION"] =
@@ -131,12 +131,42 @@ L["NOTIFICATIONS_SOUND_PREVIEW_DESCRIPTION"] =
 	"켜기 전에 미리 들어 볼 수 있도록 효과음을 재생합니다."
 
 --------------------------------------------------------------------------------
+-- Options: Good News
+--------------------------------------------------------------------------------
+
+L["TAB_GOOD_NEWS"] = "좋은 소식"
+L["GOOD_NEWS_ENABLE"] = "좋은 소식 활성화"
+L["GOOD_NEWS_ENABLE_DESCRIPTION"] = "방금 시전한 것을 플레이어에게 알려 주는 귓속말을 켭니다."
+L["GOOD_NEWS_DESCRIPTION"] =
+	"방금 시전한 것과, 짧은 버프라면 얼마나 지속되는지를 플레이어에게 알려 주어 최대한 활용할 수 있게 하세요."
+L["GOOD_NEWS_SCOPE"] = "받는 대상"
+L["GOOD_NEWS_SCOPE_DESCRIPTION"] =
+	"좋은 소식 귓속말을 받을 대상을 설정합니다: 추적 중인 능력을 시전한 누구에게나, 또는 파티원이나 공격대원에게만."
+L["GOOD_NEWS_SCOPE_ALWAYS"] = "누구에게나"
+L["GOOD_NEWS_SCOPE_GROUP"] = "파티/공격대원만"
+L["GOOD_NEWS_WHISPER_HEADER"] = "좋은 소식 귓속말"
+L["GOOD_NEWS_WHISPER_DESCRIPTION"] =
+	"시전 대상 플레이어가 받는 내용입니다. 추적 중인 능력에서 선택한 능력만 귓속말을 보냅니다."
+-- TRANSLATORS: keep {spell} and {name} exactly as written; they are the tokens players type into the whisper.
+L["GOOD_NEWS_MESSAGE_DESCRIPTION"] =
+	"시전 대상 플레이어에게 TFTB가 보낼 귓속말을 설정합니다. {spell}은 시전한 것으로 바뀌며 지속 시간이 1분 미만이면 지속 시간도 붙고, {name}은 그 플레이어의 이름으로 바뀝니다. 비워 두면 귓속말을 보내지 않습니다."
+-- TRANSLATORS: each %s is a token, {spell} then {name}, drawn in blue.
+L["GOOD_NEWS_TOKENS"] = "토큰: %s 시전한 것, %s 받은 대상"
+
+-- Tracked Abilities
+L["TAB_GOOD_NEWS_ABILITIES"] = "추적 중인 능력"
+L["GOOD_NEWS_ABILITIES_DESCRIPTION"] =
+	"여기서 선택한 능력을 다른 플레이어에게 시전하면 좋은 소식이 귓속말로 알려 줍니다."
+-- The heading over the rows no class owns: scrolls, and abilities cast by a trinket's pet.
+L["GOOD_NEWS_ITEMS"] = "아이템"
+
+--------------------------------------------------------------------------------
 -- Options: Emotes List
 --------------------------------------------------------------------------------
 
 L["TAB_EMOTES_LIST"] = "감정 표현 목록"
 L["EMOTES_GRID_DESCRIPTION"] =
-	"파티 외부의 플레이어가 버프를 줄 때 감사하기 기능이 고를 수 있는 감정 표현을 선택하세요. 그중 하나를 무작위로 사용합니다. 전투 중에는 감정 표현이 보류됩니다."
+	"파티 외부의 플레이어가 버프를 줄 때 감사하기 기능이 고를 수 있는 감정 표현을 선택하세요. 그중 하나를 무작위로 사용합니다. 전투 중이거나 시전 또는 낚시 중에는 감정 표현이 보류됩니다."
 
 --[[
     The emote checklist, shared by this panel and Wave to Friends' Friends and
@@ -163,8 +193,11 @@ L["EMOTES_RESET_CONFIRM"] = "감정 표현 목록을 기본값으로 초기화�
 L["TAB_IGNORED_BUFFS"] = "무시할 버프"
 L["IGNORED_BUFFS_DESCRIPTION"] =
 	"이 목록의 버프에는 누가 걸어 주든 감사 인사를 보내지 않습니다. 텍스트 알림과 효과음은 그대로 받습니다."
-L["IGNORED_BUFFS_ADD_CURRENT"] = "현재 버프 무시"
-L["IGNORED_BUFFS_ADD_CURRENT_DESCRIPTION"] = "지금 자신에게 걸린 버프 중 하나를 추가합니다."
+L["IGNORED_BUFFS_ADD_RECENT"] = "최근 버프 무시"
+L["IGNORED_BUFFS_ADD_RECENT_DESCRIPTION"] =
+	"지금 자신에게 걸린 버프나, 접속한 뒤 다른 플레이어가 준 버프를 추가합니다."
+-- The first %s is the buff's icon and name, the second the player who cast it.
+L["IGNORED_BUFFS_RECENT_FROM"] = "%s, 시전자: %s"
 L["IGNORED_BUFFS_ADD"] = "버프 추가"
 L["IGNORED_BUFFS_ADD_DESCRIPTION"] =
 	"주문 ID를 입력하거나 버프 링크를 Shift-클릭하여 칸에 넣은 다음 Enter 키를 누르세요."
@@ -215,7 +248,8 @@ L["WAVE_ENABLE"] = "친구 인사 활성화"
 L["WAVE_ENABLE_DESCRIPTION"] = "친구와 길드원에게 마우스를 올리면 감정 표현을 하도록 켭니다."
 L["WAVE_DESCRIPTION"] =
 	"야외에서 친구와 길드원에게 마우스를 올리면 감정 표현으로 인사합니다."
-L["WAVE_RULES"] = "파티원이나 공격대원에게는 하지 않으며, 전투 중에도 하지 않습니다."
+L["WAVE_RULES"] =
+	"파티원이나 공격대원에게는 하지 않으며, 전투 중이거나 시전 또는 낚시 중에도 하지 않습니다."
 L["WAVE_RESTING_ENABLE"] = "휴식 중에만"
 L["WAVE_RESTING_ENABLE_DESCRIPTION"] = "도시나 여관에서 휴식 중일 때만 인사합니다."
 L["WAVE_COOLDOWN"] = "같은 플레이어 대기시간"
@@ -272,12 +306,12 @@ L["WAVE_GUILDS_EMOTES_DESCRIPTION"] =
 -- Options: Whisper Message Row
 --------------------------------------------------------------------------------
 
--- The caption and Reset button beside every whisper box, on Give Thanks and each Thank You Button.
+-- The caption and Reset button beside every whisper box, on Give Thanks, Good News and each Thank You Button.
 L["WHISPER_MESSAGE"] = "귓속말 메시지"
 L["WHISPER_MESSAGE_RESET"] = "초기화"
 L["WHISPER_MESSAGE_RESET_DESCRIPTION"] = "귓속말 메시지를 기본 문구로 되돌립니다."
 
--- The whisper composer around the Give Thanks message box.
+-- The whisper composer around every editable whisper's box, on Give Thanks and Good News.
 L["SEND_MESSAGES_IN"] = "메시지 언어"
 L["SEND_MESSAGES_IN_DESCRIPTION"] =
 	"TFTB가 다른 플레이어에게 보내는 메시지의 언어를 설정합니다. 다른 언어를 고르면, 직접 쓴 문구가 아닌 경우 그 언어의 기본 문구로 바뀝니다."
@@ -294,5 +328,5 @@ L["WHISPER_TEST_DESCRIPTION"] =
 -- Defaults
 --------------------------------------------------------------------------------
 
--- The Thank You Button whisper's default, in the client's own language; Give Thanks' defaults live in Data/Message-Languages.lua.
+-- The Thank You Button whisper's default, in the client's own language; Give Thanks' and Good News' defaults live in Data/Message-Languages.lua.
 L["DEFAULT_WHISPER"] = "감사합니다, 최고예요! (="

@@ -106,6 +106,26 @@ ns.DIAGNOSTIC_API_CHECKS = {
 	-- Wave to Friends' mouse-focus read: GetMouseFoci where the client ships it, else GetMouseFocus.
 	{ "GetMouseFoci", HasGlobalFunction("GetMouseFoci") },
 	{ "GetMouseFocus (legacy)", HasGlobalFunction("GetMouseFocus") },
+	-- Good News: which abilities this client has, who you cast at, and the item rows' links and labels.
+	{ "C_Spell.DoesSpellExist", HasFunction("C_Spell", "DoesSpellExist") },
+	-- Good News Context's known= read, which prints unreadable without it.
+	{ "IsPlayerSpell", HasGlobalFunction("IsPlayerSpell") },
+	{ "UnitInParty", HasGlobalFunction("UnitInParty") },
+	{ "UnitInRaid", HasGlobalFunction("UnitInRaid") },
+	{ "C_Item.GetItemInfo", HasFunction("C_Item", "GetItemInfo") },
+	{ "C_Item.GetItemNameByID", HasFunction("C_Item", "GetItemNameByID") },
+	{ "C_Item.GetItemIconByID", HasFunction("C_Item", "GetItemIconByID") },
+	-- Asked at login for every item a row names, so the panel and the whisper have its name.
+	{ "C_Item.RequestLoadItemDataByID", HasFunction("C_Item", "RequestLoadItemDataByID") },
+	-- Tracked Abilities' class headings, which fall back to the class token without it.
+	{
+		"LOCALIZED_CLASS_NAMES_MALE (guarded)",
+		function()
+			return type(LOCALIZED_CLASS_NAMES_MALE) == "table"
+		end,
+	},
+	-- Good News holds a whisper back while the game locks add-on chat, on a client that has the call.
+	{ "C_ChatInfo.InChatMessagingLockdown (guarded)", HasFunction("C_ChatInfo", "InChatMessagingLockdown") },
 	-- Validate Data's spell tooltip read: C_TooltipInfo where the client ships both getters, else the scan tooltip.
 	{ "C_TooltipInfo.GetItemByID", HasFunction("C_TooltipInfo", "GetItemByID") },
 	{ "C_TooltipInfo.GetSpellByID", HasFunction("C_TooltipInfo", "GetSpellByID") },
@@ -177,7 +197,7 @@ end
 
 -- The add-on's own example reports, appended to the shared Event Log intro.
 ns.DiagnosticsStrings.EVENT_LOG_EXAMPLES =
-	"Best for 'nobody got thanked' reports. It records each buff that lands on you, decoded: the spell, who cast it, how long it lasts, and, off WoW Forever, whether the combat log calls them a friendly player outside your group. On WoW Forever it records each buff added to you with the gate, if any, that kept TFTB from reading it, and who cast each one it read. For 'nobody got waved at' reports, each time you mouse over someone records UPDATE_MOUSEOVER_UNIT; with none, the game never told TFTB."
+	"Best for 'nobody got thanked' reports. It records each buff that lands on you, decoded: the spell, who cast it, how long it lasts, and, off WoW Forever, whether the combat log calls them a friendly player outside your group. On WoW Forever it records each buff added to you with the gate, if any, that kept TFTB from reading it, and who cast each one it read. For 'nobody got waved at' reports, each time you mouse over someone records UPDATE_MOUSEOVER_UNIT; with none, the game never told TFTB. For 'my Good News whisper never went out' reports, each cast of an ability Good News tracks records UNIT_SPELLCAST_SENT, naming who you cast at, then UNIT_SPELLCAST_SUCCEEDED once it goes off, and off WoW Forever each revive of yours records RESURRECT, which a Jumper Cables whisper waits for; every other cast is only counted, at the end."
 
 --[[
     How many emotes a list has picked, out of how many this client offers, and
@@ -723,6 +743,189 @@ function ns:BuildWaveContextReport()
 end
 
 --------------------------------------------------------------------------------
+-- Good News Context
+--------------------------------------------------------------------------------
+
+-- Absent where the client lacks it; the API Endpoints rows say which.
+local IsPlayerSpell = _G.IsPlayerSpell
+
+--[[
+    A Good News row's name as the Tracked Abilities panel labels it: its
+    labelItem or first item, else its first spell. An item the client hasn't
+    loaded yet reads as its spell, as on the panel.
+]]
+local function GoodNewsRowName(info)
+	local itemId = info.row.labelItem or info.itemIds[1]
+	local name = itemId and C_Item.GetItemNameByID(itemId)
+	return name or C_Spell.GetSpellName(info.spellIds[1]) or tostring(info.spellIds[1])
+end
+
+--[[
+    One line per row this client can cast: ticked or not, its class (Items for
+    a row with none), how it confirms the cast, and its cast ids. A row of
+    your class also lists which of those ids you know: knowing the ability under none
+    of them means your rank's cast id is missing from the data, so your cast is
+    never matched. An item row says how many of its items the client has
+    loaded; one not loaded yet is named by its spell in the whisper.
+]]
+local function GoodNewsRowLines(lines, rows)
+	local _, playerClass = UnitClass("player")
+	for _, info in ipairs(rows) do
+		local row = info.row
+		local detail
+		if row.class and row.class ~= playerClass then
+			detail = "(not your class)"
+		elseif row.class then
+			local known = {}
+			for _, spellId in ipairs(info.spellIds) do
+				if IsPlayerSpell and IsPlayerSpell(spellId) then
+					known[#known + 1] = tostring(spellId)
+				end
+			end
+			detail = string.format(
+				"known=%s",
+				not IsPlayerSpell and "unreadable" or (#known > 0 and table.concat(known, ",") or "none")
+			)
+		else
+			local loaded = 0
+			for _, itemId in ipairs(info.itemIds) do
+				if C_Item.GetItemNameByID(itemId) then
+					loaded = loaded + 1
+				end
+			end
+			detail = string.format("itemsLoaded=%d/%d", loaded, #info.itemIds)
+		end
+		lines[#lines + 1] = string.format(
+			"  [%s] %s (%s, %s%s): casts=%s %s",
+			ns.IsGoodNewsWatched(info.watchedIds[1]) and "ticked" or "UNTICKED",
+			GoodNewsRowName(info),
+			row.class or "Items",
+			tostring(row.detect),
+			row.noDuration and ", no duration" or "",
+			table.concat(info.spellIds, ","),
+			detail
+		)
+	end
+end
+
+--[[
+    How Good News reads the current target as a cast's recipient, the checks
+    OnUnitSpellcastSent makes in order: identity readable (WoW Forever hides
+    it in combat), a player and not you, a readable name, and, under the
+    group-only scope, in your party or raid.
+]]
+local function GoodNewsTargetLine(scope)
+	local unit = "target"
+	if not UnitExists(unit) then
+		return "Current target: none (target the player you cast on, then run this again)"
+	end
+	if ns.IsUnitIdentitySecret(unit) then
+		return "Current target: identity secret (Good News sends nothing to them)"
+	end
+	local guid = UnitGUID(unit)
+	local isPlayer = ns.IsPlain(guid) and guid ~= nil and guid:sub(1, 7) == "Player-"
+	local isSelf = isPlayer and ns.UnitHasGUID("player", guid)
+	local name = GetUnitName(unit, true)
+	local nameReadable = ns.IsPlain(name) and name ~= nil and name ~= ""
+	local inParty, inRaid = UnitInParty(unit), UnitInRaid(unit)
+	local inGroup = (ns.IsPlain(inParty) and inParty and true) or (ns.IsPlain(inRaid) and inRaid ~= nil) or false
+	local verdict = "yes"
+	if not isPlayer then
+		verdict = "no, not a player"
+	elseif isSelf then
+		verdict = "no, that's you"
+	elseif not nameReadable then
+		verdict = "no, name unreadable"
+	elseif scope ~= "ALWAYS" and not inGroup then
+		verdict = "no, outside your group"
+	end
+	return string.format(
+		"Current target: player=%s self=%s nameReadable=%s inGroup=%s  Would be whispered: %s",
+		tostring(isPlayer),
+		tostring(isSelf),
+		tostring(nameReadable),
+		tostring(inGroup),
+		verdict
+	)
+end
+
+--[[
+    The state behind a "my Good News whisper never went out" report: the
+    switch, who it whispers and the text it sends, whether the post-loading-
+    screen pause it shares with Give Thanks is over, what WoW Forever is hiding
+    right now, whether the game is holding add-on chat back, your pet (whose
+    casts count too), whether this flavor's abilities file loaded, every row
+    this client can cast, and how the current target reads as a recipient.
+    Repeat whispers within a few seconds of each other are held back in the
+    feature's memory and not shown here.
+]]
+function ns:BuildGoodNewsContextReport()
+	local lines = { GetClientHeader(), "" }
+	local settings = ns.db and ns.db.profile.goodNews
+	if not settings then
+		lines[#lines + 1] = "Saved variables not initialized."
+		return table.concat(lines, "\n")
+	end
+	if not ns.GetGoodNewsRows then
+		lines[#lines + 1] = "Good News is not loaded on this client."
+		return table.concat(lines, "\n")
+	end
+
+	lines[#lines + 1] = string.format(
+		"Good News: enabled=%s scope=%s whisperText=%s messageLanguage=%s",
+		tostring(settings.enabled),
+		tostring(settings.scope),
+		WhisperLength(settings.whisperMessage),
+		ns.GetMessageLanguage()
+	)
+	lines[#lines + 1] = string.format(
+		"Ready (past the post-loading-screen pause): %s  InCombat=%s  Grouped: party=%s raid=%s",
+		tostring(ns.IsBuffTrackingReady and ns.IsBuffTrackingReady()),
+		tostring(InCombatLockdown() and true or false),
+		tostring(IsInGroup() and true or false),
+		tostring(IsInRaid() and true or false)
+	)
+	lines[#lines + 1] =
+		string.format("Auras secret now: %s (the whisper then leaves out the duration)", tostring(ns.AreAurasSecret()))
+	local lockdown = "no such call on this client"
+	if C_ChatInfo.InChatMessagingLockdown then
+		local locked = C_ChatInfo.InChatMessagingLockdown()
+		lockdown = ns.IsPlain(locked) and tostring(locked and true or false) or "<secret>"
+	end
+	lines[#lines + 1] = string.format("Add-on chat held back now: %s (a whisper due then is dropped)", lockdown)
+	lines[#lines + 1] =
+		string.format("Pet: %s (its casts count as yours)", UnitExists("pet") and PlainText(UnitName("pet")) or "none")
+
+	local rows = ns.GetGoodNewsRows()
+	local ticked = 0
+	for _, info in ipairs(rows) do
+		if ns.IsGoodNewsWatched(info.watchedIds[1]) then
+			ticked = ticked + 1
+		end
+	end
+	lines[#lines + 1] = ""
+	-- Every row is dropped when this flavor's abilities file never loaded, so nothing can be tracked.
+	lines[#lines + 1] = string.format(
+		"Abilities data (%s/Good-News-Abilities-%s.lua): %s",
+		tostring(ns.DATA_FOLDER),
+		tostring(ns.DATA_FOLDER),
+		type(ns.GOOD_NEWS_ABILITIES) == "table" and "loaded" or "MISSING"
+	)
+	lines[#lines + 1] = string.format(
+		"Tracked abilities: %d rows this client can cast, %d ticked (%d data rows dropped as not on this client)",
+		#rows,
+		ticked,
+		#(ns.GOOD_NEWS_ABILITIES or {}) - #rows
+	)
+	GoodNewsRowLines(lines, rows)
+
+	lines[#lines + 1] = ""
+	lines[#lines + 1] = GoodNewsTargetLine(settings.scope)
+
+	return table.concat(lines, "\n")
+end
+
+--------------------------------------------------------------------------------
 -- Emote Extract
 --------------------------------------------------------------------------------
 
@@ -878,6 +1081,32 @@ function ns:LogAuraUpdate(verdict, aura)
 	ns:LogEventNow("UNIT_AURA", "ADDED", verdict, spellID, name or "?", aura.sourceUnit, caster, duration)
 end
 
+--[[
+    Good News' Jumper Cables case. The jolt logs as UNIT_SPELLCAST_SENT and
+    SUCCEEDED, but its whisper waits for the combat log's SPELL_RESURRECT,
+    which the COMBAT_LOG_EVENT_UNFILTERED exclusion keeps out of the log. The
+    buff engine hands every revive of yours to ns.ClaimGoodNewsResurrect, so
+    that hand-off is wrapped here to record it first (labeled RESURRECT): the
+    spell and the GUID of who got up. A jolt that SUCCEEDED with no RESURRECT
+    after it revived nobody, so no whisper was due. Never called on WoW
+    Forever, which has no combat log.
+]]
+local ClaimGoodNewsResurrect = ns.ClaimGoodNewsResurrect
+if ClaimGoodNewsResurrect then
+	function ns.ClaimGoodNewsResurrect(destGUID, spellID)
+		if ns.diagnostics.logging then
+			ns:LogEventNow(
+				"COMBAT_LOG_EVENT_UNFILTERED",
+				"RESURRECT",
+				spellID,
+				C_Spell.GetSpellName(spellID) or "?",
+				destGUID
+			)
+		end
+		return ClaimGoodNewsResurrect(destGUID, spellID)
+	end
+end
+
 --------------------------------------------------------------------------------
 -- Name Lookups
 --------------------------------------------------------------------------------
@@ -907,9 +1136,14 @@ end
     - every curated emote token the Give Thanks and Thank You panels pick
       from, then the ones Wave to Friends starts its lists on, each named by
       the command this client gives it (NIL means the client has no such
-      emote, so a pick of it never plays).
-
-    TFTB names no item by constant.
+      emote, so a pick of it never plays);
+    - every Good News row, by the record the Tracked Abilities panel labels it
+      with (its labelItem or first item through C_Item.GetItemNameByID, else
+      its first spell through C_Spell.GetSpellName), then every other item a
+      row casts, since the whisper names the very item used; a spell row's
+      ranks share its first spell's name, so that one stands for them all;
+    - the class name over each class's rows, from LOCALIZED_CLASS_NAMES_MALE
+      as the panel reads it.
 ]]
 ns.DIAGNOSTIC_NAME_LOOKUPS = {}
 
@@ -980,6 +1214,69 @@ do
 			end,
 		}
 	end
+
+	local function AddItem(constant, itemId)
+		rows[#rows + 1] = {
+			constant = constant,
+			kind = "item",
+			id = itemId,
+			lookup = function()
+				return C_Item.GetItemNameByID(itemId)
+			end,
+			request = function()
+				C_Item.RequestLoadItemDataByID(itemId)
+			end,
+		}
+	end
+
+	local classes, classSeen = {}, {}
+	for index, ability in ipairs(ns.GOOD_NEWS_ABILITIES or {}) do
+		local constant = string.format("GOOD_NEWS_ABILITIES[%d]", index)
+		local triggers = ability.triggers or {}
+		local labelItem = ability.labelItem
+		for _, trigger in ipairs(triggers) do
+			labelItem = labelItem or trigger.item
+		end
+		local named = {}
+		if labelItem then
+			named[labelItem] = true
+			AddItem(constant, labelItem)
+		elseif triggers[1] then
+			local spellId = triggers[1].spell
+			rows[#rows + 1] = {
+				constant = constant,
+				kind = "spell",
+				id = spellId,
+				lookup = function()
+					return C_Spell.GetSpellName(spellId)
+				end,
+				request = function()
+					C_Spell.RequestLoadSpellData(spellId)
+				end,
+			}
+		end
+		for _, trigger in ipairs(triggers) do
+			if trigger.item and not named[trigger.item] then
+				named[trigger.item] = true
+				AddItem(constant, trigger.item)
+			end
+		end
+		if ability.class and not classSeen[ability.class] then
+			classSeen[ability.class] = true
+			classes[#classes + 1] = ability.class
+		end
+	end
+	table.sort(classes)
+	for _, class in ipairs(classes) do
+		rows[#rows + 1] = {
+			constant = "LOCALIZED_CLASS_NAMES_MALE",
+			kind = "globalString",
+			id = class,
+			lookup = function()
+				return LOCALIZED_CLASS_NAMES_MALE and LOCALIZED_CLASS_NAMES_MALE[class]
+			end,
+		}
+	end
 end
 
 --------------------------------------------------------------------------------
@@ -988,6 +1285,34 @@ end
 
 -- A macro body's ceiling, measured in bytes with #body, as the Style Guide's Message Length rule asks.
 local MACRO_MAX_LENGTH = 255
+
+-- The longest duration a Good News whisper names: it says one only under a minute.
+local GOOD_NEWS_LONGEST_SECONDS = 59
+
+--[[
+    The longest link a Good News whisper can carry on this client, and the
+    ability it belongs to: over every row this client can cast, each cast's
+    spell link (ns.GetBuffLink) and each item's link where the client has the
+    item loaded, the two links the whisper picks between.
+]]
+local function LongestGoodNewsLink()
+	local link, label = "", nil
+	local function Consider(candidate, name)
+		if candidate and #candidate > #link then
+			link, label = candidate, name
+		end
+	end
+	for _, info in ipairs(ns.GetGoodNewsRows and ns.GetGoodNewsRows() or {}) do
+		for _, spellId in ipairs(info.spellIds) do
+			Consider(ns.GetBuffLink(spellId), C_Spell.GetSpellName(spellId) or spellId)
+		end
+		for _, itemId in ipairs(info.itemIds) do
+			local name, itemLink = C_Item.GetItemInfo(itemId)
+			Consider(itemLink, name or itemId)
+		end
+	end
+	return link, label
+end
 
 --[[
     Every whisper and macro TFTB sends or writes, for the Localization tab's
@@ -1001,7 +1326,10 @@ local MACRO_MAX_LENGTH = 255
     sample spell (ns.GAME_IDS.SAMPLE_BUFF_SPELL_ID) and a note says how long
     any buff's link can run before the whisper goes over. A whisper that runs
     over is sent as the default text instead, so the row never reads OVER, and
-    a second note says when the player's own text fell back. Each Thank You
+    a second note says when the player's own text fell back. The Good News
+    whisper's abilities are bounded by this client's rows, so it is built at
+    its longest: the longest link any tracked ability carries and the longest
+    duration the whisper names, with the same fallback note. Each Thank You
     button's whisper is the player's own text, shown only when set, and each
     macro body is its button's command.
 ]]
@@ -1032,6 +1360,37 @@ ns.DIAGNOSTIC_MESSAGES = function()
 	then
 		notes[#notes + 1] =
 			"Your own whisper text runs past the limit with this buff, so the default text is shown and sent instead; a buff with a shorter link may still send yours."
+	end
+
+	local goodNews = ns.db and ns.db.profile.goodNews
+	local goodNewsTemplate = goodNews and goodNews.whisperMessage or ns.GetDefaultGoodNewsWhisper()
+	if goodNewsTemplate == "" then
+		notes[#notes + 1] = "The Good News whisper text is empty, so Good News sends nothing."
+	else
+		local link, label = LongestGoodNewsLink()
+		local longest, typedOver = "", false
+		for count = 0, GOOD_NEWS_LONGEST_SECONDS do
+			local seconds = count > 0 and count or nil
+			local message = ns:BuildGoodNewsWhisper(goodNewsTemplate, link, sampleName, seconds) or ""
+			if #message > #longest then
+				longest = message
+			end
+			typedOver = typedOver
+				or #ns.FillGoodNewsWhisper(goodNewsTemplate, link, sampleName, seconds) > ns.CHAT_MESSAGE_MAX_LENGTH
+		end
+		rows[#rows + 1] = {
+			label = "Good News whisper",
+			ceiling = ns.CHAT_MESSAGE_MAX_LENGTH,
+			text = longest,
+		}
+		notes[#notes + 1] = string.format(
+			"The Good News whisper is shown with the longest link of any ability this client tracks (%s) and its longest duration, so every other one is shorter.",
+			tostring(label or "none on this client")
+		)
+		if typedOver and goodNewsTemplate ~= ns.GetDefaultGoodNewsWhisper() then
+			notes[#notes + 1] =
+				"Your own Good News text runs past the limit with that ability, so the default text is shown and sent instead; a shorter ability may still send yours."
+		end
 	end
 
 	local profile = ns.db and ns.db.profile
@@ -1071,6 +1430,66 @@ end
     { header, getter(key, row) }, so the export sets what the file says beside
     what the client says.
 ]]
+
+--[[
+    Every id a Good News row names, of one kind: "spell" for each trigger's
+    cast and, where it differs, the aura it leaves; "item" for each trigger's
+    item and the row's labelItem. Each id appears once per row, keyed by the
+    row's position, with the part of the row it came from.
+]]
+local function CollectAbilityIds(abilities, kind)
+	local found = {}
+	for index, row in ipairs(abilities) do
+		local seen = {}
+		local function Add(id, role)
+			if type(id) == "number" and not seen[id] then
+				seen[id] = true
+				found[#found + 1] = { id = id, key = index, row = { ability = row, role = role } }
+			end
+		end
+		if kind == "item" then
+			Add(row.labelItem, "label")
+		end
+		for _, trigger in ipairs(row.triggers or {}) do
+			if kind == "spell" then
+				Add(trigger.spell, "cast")
+				Add(trigger.aura, "aura")
+			else
+				Add(trigger.item, "item")
+			end
+		end
+	end
+	return found
+end
+
+-- A Good News row's position, class (blank for an item row), detect type and the part of the row the id came from.
+local ABILITY_DATA_COLUMNS = {
+	{
+		"DATA_ROW",
+		function(key)
+			return key
+		end,
+	},
+	{
+		"DATA_CLASS",
+		function(_, entry)
+			return entry.ability.class or ""
+		end,
+	},
+	{
+		"DATA_DETECT",
+		function(_, entry)
+			return entry.ability.detect
+		end,
+	},
+	{
+		"DATA_ROLE",
+		function(_, entry)
+			return entry.role
+		end,
+	},
+}
+
 ns.DIAGNOSTIC_DATA_SOURCES = {
 	-- { label, sources = { { table, kind, collect, dataColumns } } }
 	{
@@ -1104,6 +1523,27 @@ ns.DIAGNOSTIC_DATA_SOURCES = {
 		sources = {
 			-- Emote tokens, which no client API looks up by ID, so the report counts them.
 			{ table = "EMOTE_GROUP_BY_TOKEN", kind = "other" },
+		},
+	},
+	{
+		label = "Good-News-Abilities",
+		sources = {
+			{
+				table = "GOOD_NEWS_ABILITIES",
+				kind = "spell",
+				collect = function(abilities)
+					return CollectAbilityIds(abilities, "spell")
+				end,
+				dataColumns = ABILITY_DATA_COLUMNS,
+			},
+			{
+				table = "GOOD_NEWS_ABILITIES",
+				kind = "item",
+				collect = function(abilities)
+					return CollectAbilityIds(abilities, "item")
+				end,
+				dataColumns = ABILITY_DATA_COLUMNS,
+			},
 		},
 	},
 }

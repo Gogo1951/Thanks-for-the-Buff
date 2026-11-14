@@ -173,14 +173,13 @@ local MAIN_HAND_SLOT = INVSLOT_MAINHAND or 16
 local WEAPON_CLASS = (Enum and Enum.ItemClass and Enum.ItemClass.Weapon) or 2
 local FISHING_POLE_SUBCLASS = (Enum and Enum.ItemWeaponSubclass and Enum.ItemWeaponSubclass.Fishingpole) or 20
 
+local function IsCastReturn(read)
+	local spell = read and read("player")
+	return not ns.IsPlain(spell) or spell ~= nil
+end
+
 local function IsBusyCasting()
-	for _, read in ipairs({ UnitCastingInfo, UnitChannelInfo }) do
-		local spell = read and read("player")
-		if not ns.IsPlain(spell) or spell ~= nil then
-			return true
-		end
-	end
-	return false
+	return IsCastReturn(UnitCastingInfo) or IsCastReturn(UnitChannelInfo)
 end
 
 function ns.IsFishingPoleEquipped()

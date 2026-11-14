@@ -50,6 +50,21 @@ function ns.RegisterOptionsPanels()
 		ns.PrepareIgnoredBuffsTree(ignoredPanel)
 	end
 
+	--[[
+	    Good News, then its Tracked Abilities child, nested by the captured
+	    category ID for the same reason as Give Thanks' children. Tracked
+	    Abilities registers as the builder, so every repaint names items the
+	    client has loaded since.
+	]]
+	if ns.BuildGoodNewsOptions then
+		AceConfig:RegisterOptionsTable(registry.GoodNews, ns.BuildGoodNewsOptions())
+		local _, goodNewsID = AceConfigDialog:AddToBlizOptions(registry.GoodNews, L["TAB_GOOD_NEWS"], parent)
+		if ns.BuildGoodNewsAbilitiesOptions then
+			AceConfig:RegisterOptionsTable(registry.GoodNewsAbilities, ns.BuildGoodNewsAbilitiesOptions)
+			AceConfigDialog:AddToBlizOptions(registry.GoodNewsAbilities, L["TAB_GOOD_NEWS_ABILITIES"], goodNewsID)
+		end
+	end
+
 	if ns.BuildThankYouButtonOptions then
 		AceConfig:RegisterOptionsTable(registry.ThankYouButton, ns.BuildThankYouButtonOptions())
 		AceConfigDialog:AddToBlizOptions(registry.ThankYouButton, L["TAB_THANK_YOU_BUTTON"], parent)

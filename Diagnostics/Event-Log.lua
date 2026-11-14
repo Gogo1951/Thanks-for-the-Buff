@@ -18,7 +18,9 @@ local EVENT_LOG_MAX_ARG_LENGTH = 255
 
     - COMBAT_LOG_EVENT_UNFILTERED, registered on every flavor but Forever: raw
       combat-log traffic would bury the signal, so every aura landing on you is
-      logged in full instead (see ns:LogAuraApplied).
+      logged in full instead (see ns:LogAuraApplied), and every revive of
+      yours, which Good News' Jumper Cables whisper waits for (see the
+      ns.ClaimGoodNewsResurrect wrapper in Manifests.lua).
     - UNIT_AURA, registered on Forever for the player only: its update table
       can't be logged as text, so each added aura on you is logged with the
       gate that decided it instead (see ns:LogAuraUpdate).
@@ -31,31 +33,68 @@ ns.DIAGNOSTIC_EVENT_EXCLUDE = {
 --[[
     Events that carry a message id, and the argument position it arrives in,
     for ns:SuppressUncorrelatedMessage to classify per firing rather than drop
-    wholesale. Deliberately empty: TFTB registers no message-id firehose such
-    as UNIT_SPELLCAST_SUCCEEDED or UI_ERROR_MESSAGE. One that is registered
-    later goes here, and the ids the add-on correlates join the allowlist check
-    in the filter.
+    wholesale. Good News' two spellcast events fire for every cast you and your
+    pet make (an imp's Firebolt, a hunter's Auto Shot), and their id is the
+    spell: UNIT_SPELLCAST_SENT is (unit, target, castGUID, spellID) and
+    UNIT_SPELLCAST_SUCCEEDED is (unit, castGUID, spellID).
 ]]
-ns.MESSAGE_ID_FILTERED_EVENTS = {}
+ns.MESSAGE_ID_FILTERED_EVENTS = {
+	UNIT_SPELLCAST_SENT = 4,
+	UNIT_SPELLCAST_SUCCEEDED = 3,
+}
 
--- The counter id a secret id (WoW Forever) folds into, since a secret can't key a table.
+--[[
+    The spell ids Good News acts on: every cast id of every row this client can
+    cast, read from the same rows its lookup is built from (ns.GetGoodNewsRows),
+    so the filter can't drift from what the feature matches. The rows are built
+    once per session, so the set is too, and rebuilt only if they ever change.
+]]
+local correlatedRows, correlatedSpells
+
+local function IsCorrelatedSpell(spellID)
+	if not ns.GetGoodNewsRows then
+		return false
+	end
+	local rows = ns.GetGoodNewsRows()
+	if rows ~= correlatedRows then
+		correlatedRows, correlatedSpells = rows, {}
+		for _, info in ipairs(rows or {}) do
+			for _, id in ipairs(info.spellIds) do
+				correlatedSpells[id] = true
+			end
+		end
+	end
+	return correlatedSpells[spellID] == true
+end
+
+--[[
+    A secret value (WoW Forever) errors when compared, concatenated or used as
+    a table key, so the log never turns one into text. Clients without secret
+    values have no issecretvalue, and every value there is plain.
+]]
+local IsSecretValue = rawget(_G, "issecretvalue")
+
+local function IsPlain(value)
+	return not (IsSecretValue and IsSecretValue(value))
+end
+
+-- The counter id a secret message id folds into, since a secret can't key a table.
 local SECRET_ID = 0
 
 --[[
     Folds one uncorrelated firing into its counter: the first-seen text plus a
-    count, rendered as one block at the end of the report. Counters are keyed
-    by event, then id, so one id arriving on two events stays two rows. A
-    secret id counts under SECRET_ID with the text <secret>. Counts only while
-    logging, like ns:LogEventNow.
+    count. Counters are keyed by event, then id, so one id arriving on two
+    events stays two rows. A secret id counts under SECRET_ID with the text
+    <secret>.
 ]]
 local function CountUncorrelated(event, id, text)
 	local suppressed = ns.diagnostics.suppressed
-	if not suppressed or not ns.diagnostics.logging then
+	if not suppressed then
 		return
 	end
-	if not ns.IsPlain(id) then
+	if not IsPlain(id) then
 		id, text = SECRET_ID, "<secret>"
-	elseif not ns.IsPlain(text) then
+	elseif not IsPlain(text) then
 		text = "<secret>"
 	end
 	local counters = suppressed[event]
@@ -73,13 +112,14 @@ local function CountUncorrelated(event, id, text)
 end
 
 --[[
-    Per-firing filter for the events above. A firing whose id the add-on does
-    not correlate folds into its counter, so firehose traffic can't evict the
-    entries the log exists to carry. A secret id counts too. A plain firing
-    carrying no numeric id in the filtered position is unclassifiable, and
-    unclassifiable is signal: it logs verbatim. With no correlated ids yet,
-    every classifiable firing is counted. The counter's text is the argument
-    after the id, or blank when none follows.
+    Per-firing filter for the events above. A firing whose id the add-on
+    correlates (a spell Good News acts on) logs in full; one whose id it does
+    not correlate folds into its counter, rendered as one block at the end of
+    the report, so firehose traffic can't evict the entries the log exists to
+    carry. A secret id counts too. A plain firing carrying no numeric id in the
+    filtered position is unclassifiable, and unclassifiable is signal: it logs
+    verbatim. With no correlated ids yet, every classifiable firing is counted.
+    The counter's text is the argument after the id, or blank when none follows.
 
     Returns true when the firing was counted and must not reach the buffer.
 ]]
@@ -89,7 +129,7 @@ function ns:SuppressUncorrelatedMessage(event, ...)
 		return false
 	end
 	local messageID = select(idPosition, ...)
-	if ns.IsPlain(messageID) and type(messageID) ~= "number" then
+	if IsPlain(messageID) and (type(messageID) ~= "number" or IsCorrelatedSpell(messageID)) then
 		return false
 	end
 	local text
@@ -134,7 +174,7 @@ local function AppendEntry(event, ...)
 			break
 		end
 		local value = select(index, ...)
-		if ns.IsPlain(value) then
+		if IsPlain(value) then
 			local raw = string.sub(tostring(value), 1, EVENT_LOG_MAX_ARG_LENGTH)
 			parts[index] = (raw:gsub("|", "||"))
 		else

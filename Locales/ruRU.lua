@@ -42,7 +42,7 @@ L["OPTIONS_WELCOME_TOGGLE"] = "Включить приветственное с�
 L["OPTIONS_WELCOME_DESCRIPTION"] =
 	"Выводит сообщение, которое видите только вы, при входе в игру."
 L["OPTIONS_DESCRIPTION"] =
-	"Автоматически благодарите эмоцией или шепотом игроков, которые накладывают на вас баффы, приветствуйте друзей и согильдийцев взмахом руки, проходя мимо, и благодарите любого, кто у вас в цели, одним щелчком по макросам благодарности."
+	"Автоматически благодарите эмоцией или шепотом игроков, которые накладывают на вас баффы, сообщайте игрокам, что вы только что на них применили, приветствуйте друзей и согильдийцев взмахом руки, проходя мимо, и благодарите любого, кто у вас в цели, одним щелчком по макросам благодарности."
 L["OPTIONS_FEATURES_HEADER"] = "Функции"
 L["OPTIONS_FEATURES_DESCRIPTION"] =
 	"Включайте и отключайте каждую функцию здесь или на ее собственной панели."
@@ -115,9 +115,9 @@ L["PRAISE_DELAY_DESCRIPTION"] =
 L["PRAISE_DELAY_LENGTH_DESCRIPTION"] =
 	"Задает время ожидания перед отправкой шепота и эмоции."
 
--- Thank-You Whispers
-L["WHISPERS_HEADER"] = "Благодарственный шепот"
-L["PRAISE_WHISPER_ENABLE"] = "Включить благодарственный шепот"
+-- Give Thanks Whisper
+L["GIVE_THANKS_WHISPER_HEADER"] = "Шепот благодарности"
+L["GIVE_THANKS_WHISPER_ENABLE"] = "Включить шепот благодарности"
 L["PRAISE_WHISPER_DESCRIPTION"] =
 	"Шепчет благодарность игроку, который дал вам бафф."
 -- TRANSLATORS: keep {spell} and {name} exactly as written; they are the tokens players type into the whisper.
@@ -138,12 +138,43 @@ L["NOTIFICATIONS_SOUND_PREVIEW_DESCRIPTION"] =
 	"Воспроизводит звук, чтобы вы могли услышать его до включения."
 
 --------------------------------------------------------------------------------
+-- Options: Good News
+--------------------------------------------------------------------------------
+
+L["TAB_GOOD_NEWS"] = "Хорошие новости"
+L["GOOD_NEWS_ENABLE"] = "Включить хорошие новости"
+L["GOOD_NEWS_ENABLE_DESCRIPTION"] =
+	"Включает шепот, сообщающий игрокам, что вы только что на них применили."
+L["GOOD_NEWS_DESCRIPTION"] =
+	"Сообщайте игрокам, что вы только что на них применили, а для коротких баффов и сколько это длится, чтобы они использовали это по максимуму."
+L["GOOD_NEWS_SCOPE"] = "Кто получает"
+L["GOOD_NEWS_SCOPE_DESCRIPTION"] =
+	"Задает, кто получает шепот функции Хорошие новости: любой, на кого вы применили отслеживаемую способность, или только ваша группа или рейд."
+L["GOOD_NEWS_SCOPE_ALWAYS"] = "Любой"
+L["GOOD_NEWS_SCOPE_GROUP"] = "Только участники группы"
+L["GOOD_NEWS_WHISPER_HEADER"] = "Шепот хороших новостей"
+L["GOOD_NEWS_WHISPER_DESCRIPTION"] =
+	"Что получает игрок, на которого вы применяете способность. Шепот отправляют только способности, отмеченные в разделе Отслеживаемые способности."
+-- TRANSLATORS: keep {spell} and {name} exactly as written; they are the tokens players type into the whisper.
+L["GOOD_NEWS_MESSAGE_DESCRIPTION"] =
+	"Задает, что TFTB шепчет игроку, на которого вы применяете способность. {spell} заменяется на то, что вы применили, вместе с длительностью, если она меньше минуты, а {name} на имя игрока. Оставьте поле пустым, чтобы ничего не шептать."
+-- TRANSLATORS: each %s is a token, {spell} then {name}, drawn in blue.
+L["GOOD_NEWS_TOKENS"] = "Подстановки: %s что вы применили, %s кто это получил"
+
+-- Tracked Abilities
+L["TAB_GOOD_NEWS_ABILITIES"] = "Отслеживаемые способности"
+L["GOOD_NEWS_ABILITIES_DESCRIPTION"] =
+	"Функция Хорошие новости шепчет о способностях, отмеченных здесь, когда вы применяете их на другого игрока."
+-- The heading over the rows no class owns: scrolls, and abilities cast by a trinket's pet.
+L["GOOD_NEWS_ITEMS"] = "Предметы"
+
+--------------------------------------------------------------------------------
 -- Options: Emotes List
 --------------------------------------------------------------------------------
 
 L["TAB_EMOTES_LIST"] = "Список эмоций"
 L["EMOTES_GRID_DESCRIPTION"] =
-	"Отметьте эмоции, из которых функция Благодарности может выбирать, когда игрок вне вашей группы дает вам бафф; она использует одну наугад. Во время боя эмоции откладываются."
+	"Отметьте эмоции, из которых функция Благодарности может выбирать, когда игрок вне вашей группы дает вам бафф; она использует одну наугад. Эмоции откладываются, пока вы в бою, произносите заклинание или рыбачите."
 
 --[[
     The emote checklist, shared by this panel and Wave to Friends' Friends and
@@ -171,9 +202,11 @@ L["EMOTES_RESET_CONFIRM"] = "Сбросить список эмоций к зн�
 L["TAB_IGNORED_BUFFS"] = "Игнорируемые баффы"
 L["IGNORED_BUFFS_DESCRIPTION"] =
 	"За баффы из этого списка благодарность не отправляется, кто бы их ни наложил. Текстовое сообщение и звук вы по-прежнему получаете."
-L["IGNORED_BUFFS_ADD_CURRENT"] = "Игнорировать текущий бафф"
-L["IGNORED_BUFFS_ADD_CURRENT_DESCRIPTION"] =
-	"Добавляет один из баффов, которые сейчас на вас."
+L["IGNORED_BUFFS_ADD_RECENT"] = "Игнорировать недавний бафф"
+L["IGNORED_BUFFS_ADD_RECENT_DESCRIPTION"] =
+	"Добавляет бафф, который сейчас на вас, или тот, что другой игрок дал вам с момента входа в игру."
+-- The first %s is the buff's icon and name, the second the player who cast it.
+L["IGNORED_BUFFS_RECENT_FROM"] = "%s, от %s"
 L["IGNORED_BUFFS_ADD"] = "Добавить бафф"
 L["IGNORED_BUFFS_ADD_DESCRIPTION"] =
 	"Введите ID заклинания или вставьте в поле ссылку на бафф с помощью Shift-клика, затем нажмите Enter."
@@ -225,7 +258,8 @@ L["WAVE_ENABLE_DESCRIPTION"] =
 	"Включает эмоцию для друзей и согильдийцев, когда вы наводите на них курсор."
 L["WAVE_DESCRIPTION"] =
 	"Приветствуйте друзей и согильдийцев эмоцией, когда наводите на них курсор в открытом мире."
-L["WAVE_RULES"] = "Никогда для вашей группы или рейда и никогда в бою."
+L["WAVE_RULES"] =
+	"Никогда для вашей группы или рейда и никогда, пока вы в бою, произносите заклинание или рыбачите."
 L["WAVE_RESTING_ENABLE"] = "Только во время отдыха"
 L["WAVE_RESTING_ENABLE_DESCRIPTION"] =
 	"Приветствует только во время отдыха, в городе или таверне."
@@ -289,12 +323,12 @@ L["WAVE_GUILDS_EMOTES_DESCRIPTION"] =
 -- Options: Whisper Message Row
 --------------------------------------------------------------------------------
 
--- The caption and Reset button beside every whisper box, on Give Thanks and each Thank You Button.
+-- The caption and Reset button beside every whisper box, on Give Thanks, Good News and each Thank You Button.
 L["WHISPER_MESSAGE"] = "Текст шепота"
 L["WHISPER_MESSAGE_RESET"] = "Сбросить"
 L["WHISPER_MESSAGE_RESET_DESCRIPTION"] = "Возвращает текст шепота к стандартному."
 
--- The whisper composer around the Give Thanks message box.
+-- The whisper composer around every editable whisper's box, on Give Thanks and Good News.
 L["SEND_MESSAGES_IN"] = "Язык сообщений"
 L["SEND_MESSAGES_IN_DESCRIPTION"] =
 	"Задает язык, на котором TFTB пишет другим игрокам. При выборе другого языка подставляется его стандартный текст, если вы не написали свой."
@@ -312,5 +346,5 @@ L["WHISPER_TEST_DESCRIPTION"] =
 -- Defaults
 --------------------------------------------------------------------------------
 
--- The Thank You Button whisper's default, in the client's own language; Give Thanks' defaults live in Data/Message-Languages.lua.
+-- The Thank You Button whisper's default, in the client's own language; Give Thanks' and Good News' defaults live in Data/Message-Languages.lua.
 L["DEFAULT_WHISPER"] = "Спасибо, ты супер! (="

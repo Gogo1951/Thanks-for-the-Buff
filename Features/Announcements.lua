@@ -231,7 +231,7 @@ end
     Praise Delay can hold it back.
 
     FillThanksWhisper builds it as typed, however long, so the options panel
-    can measure how much room is left. BuildThanksWhisper is what gets sent:
+    can tell when it runs past the chat ceiling. BuildThanksWhisper is what gets sent:
     nil for an empty message, which sends no whisper, and the default text of
     the language messages go out in (ns.GetDefaultThanksWhisper) when the
     player's own runs past the chat ceiling, rather than being rejected.
@@ -366,3 +366,115 @@ local function FormatDuration(seconds, forceSeconds)
 	return ResolvePlurals(template:format(count))
 end
 ns.FormatDuration = FormatDuration
+
+--------------------------------------------------------------------------------
+-- Good News
+--------------------------------------------------------------------------------
+
+--[[
+    The Good News whisper: the player's own message with "{spell}" swapped for
+    the ability and "{name}" for the recipient's short name, signed off like
+    every sent message.
+
+    {spell} carries the whole ability phrase: "[Power Infusion] for 15 Seconds"
+    when the buff has a short, readable timer, plain "[Rebirth]" when it has
+    none. Folding the duration in is what lets one message cover both, with no
+    "for" left dangling after a one-shot cast. Only a short duration is worth
+    saying: "for 15 Seconds" tells the recipient to spend it now, "for 30
+    Minutes" is a number nobody acts on. The clause comes from the language
+    messages go out in (ns.GetGoodNewsDurationClause), so it matches the rest
+    of the whisper rather than the sender's client.
+
+    FillGoodNewsWhisper builds it as typed, however long, so the options panel
+    can measure it. BuildGoodNewsWhisper is what gets sent: nil for an empty
+    message, and the default text of the language messages go out in when the
+    player's own runs past the chat ceiling.
+]]
+local GOOD_NEWS_MAX_SECONDS = 60
+
+local function GoodNewsAbility(link, seconds)
+	local ability = link or ""
+	if seconds then
+		-- Rounded first, so 59.7 is tested as the 60 it would print as.
+		local whole = math.floor(seconds + 0.5)
+		if whole > 0 and whole < GOOD_NEWS_MAX_SECONDS then
+			ability = ability .. " " .. ResolvePlurals(ns.GetGoodNewsDurationClause(whole))
+		end
+	end
+	return ability
+end
+
+function ns.FillGoodNewsWhisper(template, link, name, seconds)
+	local ability = GoodNewsAbility(link, seconds)
+	local body = template:gsub("{spell}", function()
+		return ability
+	end)
+	body = body:gsub("{name}", function()
+		return ShortName(name)
+	end)
+	return SignOff(body)
+end
+
+function ns:BuildGoodNewsWhisper(template, link, name, seconds)
+	if not template or template == "" then
+		return nil
+	end
+	local message = ns.FillGoodNewsWhisper(template, link, name, seconds)
+	if #message > ns.CHAT_MESSAGE_MAX_LENGTH then
+		message = ns.FillGoodNewsWhisper(ns.GetDefaultGoodNewsWhisper(), link, name, seconds)
+	end
+	return message
+end
+
+--[[
+    Good News whispers go out a little apart rather than all at once: casting
+    on several players in a row (scrolls handed round a raid) would otherwise
+    send a burst the server's chat squelch can catch. An empty queue sends at
+    once, so the usual single whisper feels instant.
+
+    C_ChatInfo.InChatMessagingLockdown, where a client has it, says the game is
+    holding add-on chat back right now (a boss fight on newer clients). A
+    whisper due then is dropped rather than sent into a block.
+]]
+local WHISPER_GAP = 0.35
+local nextWhisperAt = 0
+
+local function SendWhisper(target, message)
+	local lockdown = C_ChatInfo.InChatMessagingLockdown
+	if lockdown then
+		local locked = lockdown()
+		if not ns.IsPlain(locked) or locked then
+			return
+		end
+	end
+	C_ChatInfo.SendChatMessage(message, "WHISPER", nil, target)
+end
+
+local function QueueWhisper(target, message)
+	local now = GetTime()
+	local delay = math.max(nextWhisperAt - now, 0)
+	nextWhisperAt = now + delay + WHISPER_GAP
+	if delay == 0 then
+		SendWhisper(target, message)
+	else
+		C_Timer.After(delay, function()
+			SendWhisper(target, message)
+		end)
+	end
+end
+
+function ns:WhisperGoodNews(target, link, seconds)
+	local message = ns:BuildGoodNewsWhisper(ns.db.profile.goodNews.whisperMessage, link, target, seconds)
+	if message then
+		QueueWhisper(target, message)
+	end
+end
+
+-- The options panel's Send Test to Me, as ns:WhisperThanksTest is for Give Thanks.
+function ns:WhisperGoodNewsTest(template, link, name, seconds)
+	local message = ns:BuildGoodNewsWhisper(template, link, name, seconds)
+	local me = GetUnitName("player", true)
+	if message and me then
+		C_ChatInfo.SendChatMessage(message, "WHISPER", nil, me)
+	end
+end

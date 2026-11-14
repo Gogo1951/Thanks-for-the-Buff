@@ -1,5 +1,5 @@
 ## Title: Thanks for the Buff (TFTB)
-## Notes: Auto thank players who buff you with an emote or whisper, greet friends and guildmates with a wave as you pass them, and thank anyone you target with one click of your Thank You macros.
+## Notes: Auto thank players who buff you with an emote or whisper, tell players what you just cast on them, greet friends and guildmates with a wave as you pass them, and thank anyone you target with one click of your Thank You macros.
 ## Author: Gogo1951
 
 ## IconTexture: Interface/AddOns/TFTB/Includes/Images/Thanks-for-the-Buff.tga
@@ -55,8 +55,10 @@ Data/Flavor.lua
 Data/Data.lua
 Data/Vanilla/Game-IDs-Vanilla.lua
 Data/Vanilla/Emote-Groups-Vanilla.lua
+Data/Vanilla/Good-News-Abilities-Vanilla.lua
 Data/Discovery/Game-IDs-Discovery.lua
 Data/Discovery/Emote-Groups-Discovery.lua
+Data/Discovery/Good-News-Abilities-Discovery.lua
 Data/Message-Languages.lua
 Data/Default-Settings.lua
 
@@ -67,6 +69,7 @@ Features/Announcements.lua
 Features/Ignored-Buffs.lua
 Features/Praise.lua
 Features/Buff-Tracking.lua
+Features/Good-News.lua
 Features/Thank-You-Button.lua
 Features/Wave-To-Friends.lua
 
@@ -87,6 +90,8 @@ Options/Options-Emote-Grid.lua
 Options/Options-Give-Thanks.lua
 Options/Options-Emotes-List.lua
 Options/Options-Ignored-Buffs.lua
+Options/Options-Good-News.lua
+Options/Options-Good-News-Abilities.lua
 Options/Options-Thank-You-Button.lua
 Options/Options-Wave-To-Friends.lua
 Options/Options-Profiles.lua

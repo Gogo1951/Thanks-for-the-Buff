@@ -3,6 +3,7 @@ local _, ns = ...
 -- [constant] = spell id, -- Spell Name
 ns.GAME_IDS = {
 	SAMPLE_BUFF_SPELL_ID = 1459, -- Arcane Intellect
+	SAMPLE_GOOD_NEWS_SPELL_ID = 10060, -- Power Infusion
 }
 
 -- { texture file ID, button it starts on }, -- Icon File Name
@@ -33,7 +34,7 @@ ns.THANK_YOU_MACRO_ICONS = {
 How We Got the Data
 
 Last Validated
-	2026-11-08, WoW Forever 1.60.1.70862
+	2026-11-14, WoW Forever 1.60.1.70938
 
 Notes
 	- Spell IDs that feature code needs by name rather than from a list: the sample spells the options panels use for their preview messages.
@@ -46,8 +47,8 @@ Wowhead
 	None.
 
 wago.tools
-	https://wago.tools/db2/ManifestInterfaceData?build=1.60.1.70862
-	https://wago.tools/db2/SpellName?build=1.60.1.70862
+	https://wago.tools/db2/ManifestInterfaceData?build=1.60.1.70938
+	https://wago.tools/db2/SpellName?build=1.60.1.70938
 
 QuestieDB
 	None.

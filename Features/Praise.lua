@@ -214,6 +214,9 @@ local function HandleStrangersBuff(sourceGUID, sourceName, spellID)
 		ns.PlayBuffSound()
 	end
 
+	-- Remembered for the Ignored Buffs picker, which can then offer it after it wears off.
+	ns.RecordRecentBuff(sourceGUID, sourceName, spellID)
+
 	-- An ignored buff still notifies you; it just never thanks anyone.
 	if ns.IsBuffIgnored(spellID) then
 		return

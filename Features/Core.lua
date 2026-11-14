@@ -141,6 +141,19 @@ local function InitializeDatabase()
 	ns.db.sv.messageLanguageMigrated = true
 	-- MIGRATION (remove after 2026-12-09): drops the retired settingsReset stamp.
 	ns.db.sv.settingsReset = nil
+	--[[
+	    MIGRATION (remove after 2026-12-14): a profile saved by an earlier TFTB
+	    that had Good News still holds its old switch and its old message,
+	    written with a %a token this version doesn't read. Both go. Its scope and
+	    ticked abilities use today's keys, so they carry over as they are.
+	]]
+	for _, profile in pairs(ns.db.profiles) do
+		local goodNews = type(profile) == "table" and profile.goodNews
+		if type(goodNews) == "table" then
+			goodNews.whisperEnabled = nil
+			goodNews.message = nil
+		end
+	end
 	-- Saved every login so the Ignored Buffs tree can color any character by class.
 	local _, classToken = UnitClass("player")
 	ns.db.char.classToken = classToken or false
@@ -166,6 +179,13 @@ ns.EVENT_NAMES = {
 	"LOADING_SCREEN_DISABLED",
 	-- Wave to Friends: mousing over a character.
 	"UPDATE_MOUSEOVER_UNIT",
+	--[[
+	    Good News: your own casts, and your pet's. These are what let it run on
+	    WoW Forever, where the combat log is closed to add-ons: SENT names who
+	    you cast at and SUCCEEDED confirms the cast went off.
+	]]
+	"UNIT_SPELLCAST_SENT",
+	"UNIT_SPELLCAST_SUCCEEDED",
 }
 
 --[[
@@ -186,6 +206,8 @@ end
 ]]
 ns.EVENT_UNITS = {
 	UNIT_AURA = { "player" },
+	UNIT_SPELLCAST_SENT = { "player", "pet" },
+	UNIT_SPELLCAST_SUCCEEDED = { "player", "pet" },
 }
 
 --[[
@@ -238,6 +260,10 @@ local function OnPlayerLogin()
 
 	if ns.SetupBuffTracking then
 		ns.SetupBuffTracking()
+	end
+
+	if ns.SetupGoodNews then
+		ns.SetupGoodNews()
 	end
 
 	if ns.CreateAutoMacro then

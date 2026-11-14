@@ -166,3 +166,43 @@ function ns.GetPlayerBuffIds()
 	end
 	return ids
 end
+
+--------------------------------------------------------------------------------
+-- Recent Buffs
+--------------------------------------------------------------------------------
+
+--[[
+    The buffs strangers gave you since you logged in, so the Ignored Buffs
+    picker can still offer one after it wears off: you usually decide to ignore
+    a buff right after its thank-you, by when a short one is gone. Kept in
+    memory only, newest first, one entry per spell (the latest caster wins),
+    capped at RECENT_BUFFS_MAX.
+]]
+local RECENT_BUFFS_MAX = 20
+local recentBuffs = {}
+
+function ns.RecordRecentBuff(sourceGUID, sourceName, spellId)
+	if not (ns.IsPlain(sourceGUID) and ns.IsPlain(sourceName) and ns.IsPlain(spellId)) then
+		return
+	end
+	if not (sourceGUID and sourceName and sourceName ~= "" and spellId) then
+		return
+	end
+	for i = #recentBuffs, 1, -1 do
+		if recentBuffs[i].spellId == spellId then
+			table.remove(recentBuffs, i)
+		end
+	end
+	local _, classToken = GetPlayerInfoByGUID(sourceGUID)
+	table.insert(recentBuffs, 1, {
+		spellId = spellId,
+		name = Ambiguate(sourceName, "short"),
+		classToken = ns.IsPlain(classToken) and classToken or nil,
+	})
+	recentBuffs[RECENT_BUFFS_MAX + 1] = nil
+end
+
+-- Newest first: { spellId, name, classToken }.
+function ns.GetRecentBuffs()
+	return recentBuffs
+end

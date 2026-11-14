@@ -40,7 +40,7 @@ L["SAMPLE_EXAMPLE"] = "Exemplo: %s"
 L["OPTIONS_WELCOME_TOGGLE"] = "Habilitar mensagem de boas-vindas"
 L["OPTIONS_WELCOME_DESCRIPTION"] = "Exibe uma mensagem que só você vê quando entra no jogo."
 L["OPTIONS_DESCRIPTION"] =
-	"Agradeça automaticamente com uma expressão ou um sussurro aos jogadores que derem um buff em você, acene para amigos e colegas de guilda quando passar por eles, e agradeça a quem estiver no seu alvo com um clique nas suas macros de agradecimento."
+	"Agradeça automaticamente com uma expressão ou um sussurro aos jogadores que derem um buff em você, conte aos jogadores o que você acabou de lançar neles, acene para amigos e colegas de guilda quando passar por eles, e agradeça a quem estiver no seu alvo com um clique nas suas macros de agradecimento."
 L["OPTIONS_FEATURES_HEADER"] = "Recursos"
 L["OPTIONS_FEATURES_DESCRIPTION"] = "Ative ou desative cada recurso aqui ou no painel dele."
 L["OPTIONS_COMMANDS_HEADER"] = "/Commands"
@@ -108,9 +108,9 @@ L["PRAISE_DELAY_DESCRIPTION"] =
 	"Espera um momento antes do sussurro e da expressão, para que seu agradecimento não chegue no mesmo instante que o buff. As notificações não são afetadas."
 L["PRAISE_DELAY_LENGTH_DESCRIPTION"] = "Define quanto tempo esperar antes de enviar o sussurro e a expressão."
 
--- Thank-You Whispers
-L["WHISPERS_HEADER"] = "Sussurros de agradecimento"
-L["PRAISE_WHISPER_ENABLE"] = "Habilitar sussurros de agradecimento"
+-- Give Thanks Whisper
+L["GIVE_THANKS_WHISPER_HEADER"] = "Sussurro de agradecimento"
+L["GIVE_THANKS_WHISPER_ENABLE"] = "Habilitar sussurro de agradecimento"
 L["PRAISE_WHISPER_DESCRIPTION"] = "Sussurra um agradecimento ao jogador que buffou você."
 -- TRANSLATORS: keep {spell} and {name} exactly as written; they are the tokens players type into the whisper.
 L["PRAISE_WHISPER_MESSAGE_DESCRIPTION"] =
@@ -126,12 +126,42 @@ L["NOTIFICATIONS_SOUND_DESCRIPTION"] = "Toca um som quando você recebe um buff.
 L["NOTIFICATIONS_SOUND_PREVIEW_DESCRIPTION"] = "Toca o som para você ouvi-lo antes de ativá-lo."
 
 --------------------------------------------------------------------------------
+-- Options: Good News
+--------------------------------------------------------------------------------
+
+L["TAB_GOOD_NEWS"] = "Boas notícias"
+L["GOOD_NEWS_ENABLE"] = "Habilitar boas notícias"
+L["GOOD_NEWS_ENABLE_DESCRIPTION"] = "Ativa um sussurro que conta aos jogadores o que você acabou de lançar neles."
+L["GOOD_NEWS_DESCRIPTION"] =
+	"Avise os jogadores do que você acabou de lançar neles e, nos buffs curtos, de quanto tempo dura, para que aproveitem ao máximo."
+L["GOOD_NEWS_SCOPE"] = "Quem recebe"
+L["GOOD_NEWS_SCOPE_DESCRIPTION"] =
+	"Define quem recebe um sussurro de Boas notícias: qualquer um em quem você lançar uma habilidade monitorada, ou só o seu grupo ou raide."
+L["GOOD_NEWS_SCOPE_ALWAYS"] = "Qualquer um"
+L["GOOD_NEWS_SCOPE_GROUP"] = "Apenas membros do grupo"
+L["GOOD_NEWS_WHISPER_HEADER"] = "Sussurro de boas notícias"
+L["GOOD_NEWS_WHISPER_DESCRIPTION"] =
+	"O que recebe o jogador em quem você lança. Só as habilidades marcadas em Habilidades monitoradas enviam um."
+-- TRANSLATORS: keep {spell} and {name} exactly as written; they are the tokens players type into the whisper.
+L["GOOD_NEWS_MESSAGE_DESCRIPTION"] =
+	"Define o que o TFTB sussurra para o jogador em quem você lança. {spell} vira o que você lançou, mais quanto tempo dura quando for menos de um minuto, e {name} o nome dele. Deixe em branco para não enviar sussurro."
+-- TRANSLATORS: each %s is a token, {spell} then {name}, drawn in blue.
+L["GOOD_NEWS_TOKENS"] = "Marcadores: %s o que você lançou, %s quem recebeu"
+
+-- Tracked Abilities
+L["TAB_GOOD_NEWS_ABILITIES"] = "Habilidades monitoradas"
+L["GOOD_NEWS_ABILITIES_DESCRIPTION"] =
+	"Boas notícias sussurra sobre as habilidades marcadas aqui quando você as lança em outro jogador."
+-- The heading over the rows no class owns: scrolls, and abilities cast by a trinket's pet.
+L["GOOD_NEWS_ITEMS"] = "Itens"
+
+--------------------------------------------------------------------------------
 -- Options: Emotes List
 --------------------------------------------------------------------------------
 
 L["TAB_EMOTES_LIST"] = "Lista de expressões"
 L["EMOTES_GRID_DESCRIPTION"] =
-	"Marque as expressões que a função Agradecimentos pode escolher quando um jogador de fora do seu grupo buffa você; ela usa uma ao acaso. As expressões ficam retidas enquanto você está em combate."
+	"Marque as expressões que a função Agradecimentos pode escolher quando um jogador de fora do seu grupo buffa você; ela usa uma ao acaso. As expressões ficam retidas enquanto você está em combate, conjurando ou pescando."
 
 --[[
     The emote checklist, shared by this panel and Wave to Friends' Friends and
@@ -158,8 +188,11 @@ L["EMOTES_RESET_CONFIRM"] = "Redefinir a lista de expressões para o padrão?"
 L["TAB_IGNORED_BUFFS"] = "Buffs ignorados"
 L["IGNORED_BUFFS_DESCRIPTION"] =
 	"Os buffs desta lista nunca recebem agradecimento, não importa quem os lance. Você continua recebendo seu aviso de texto e seu som."
-L["IGNORED_BUFFS_ADD_CURRENT"] = "Ignorar buff atual"
-L["IGNORED_BUFFS_ADD_CURRENT_DESCRIPTION"] = "Adiciona um dos buffs que estão em você agora."
+L["IGNORED_BUFFS_ADD_RECENT"] = "Ignorar buff recente"
+L["IGNORED_BUFFS_ADD_RECENT_DESCRIPTION"] =
+	"Adiciona um buff que está em você agora, ou um que outro jogador te deu desde que você entrou no jogo."
+-- The first %s is the buff's icon and name, the second the player who cast it.
+L["IGNORED_BUFFS_RECENT_FROM"] = "%s, de %s"
 L["IGNORED_BUFFS_ADD"] = "Adicionar buff"
 L["IGNORED_BUFFS_ADD_DESCRIPTION"] =
 	"Digite um ID de feitiço, ou clique com Shift no link de um buff para colocá-lo na caixa, e depois pressione Enter."
@@ -210,7 +243,7 @@ L["WAVE_ENABLE_DESCRIPTION"] =
 	"Ativa uma expressão para amigos e colegas de guilda quando você passa o mouse sobre eles."
 L["WAVE_DESCRIPTION"] =
 	"Cumprimente amigos e colegas de guilda com uma expressão quando passar o mouse sobre eles pelo mundo."
-L["WAVE_RULES"] = "Nunca o seu grupo ou raide, e nunca em combate."
+L["WAVE_RULES"] = "Nunca o seu grupo ou raide, e nunca enquanto você está em combate, conjurando ou pescando."
 L["WAVE_RESTING_ENABLE"] = "Somente descansando"
 L["WAVE_RESTING_ENABLE_DESCRIPTION"] = "Acena somente enquanto você está descansando, em uma cidade ou estalagem."
 L["WAVE_COOLDOWN"] = "Recarga para o mesmo jogador"
@@ -267,12 +300,12 @@ L["WAVE_GUILDS_EMOTES_DESCRIPTION"] =
 -- Options: Whisper Message Row
 --------------------------------------------------------------------------------
 
--- The caption and Reset button beside every whisper box, on Give Thanks and each Thank You Button.
+-- The caption and Reset button beside every whisper box, on Give Thanks, Good News and each Thank You Button.
 L["WHISPER_MESSAGE"] = "Mensagem de sussurro"
 L["WHISPER_MESSAGE_RESET"] = "Redefinir"
 L["WHISPER_MESSAGE_RESET_DESCRIPTION"] = "Redefine a mensagem de sussurro para o texto padrão."
 
--- The whisper composer around the Give Thanks message box.
+-- The whisper composer around every editable whisper's box, on Give Thanks and Good News.
 L["SEND_MESSAGES_IN"] = "Enviar mensagens em"
 L["SEND_MESSAGES_IN_DESCRIPTION"] =
 	"Define o idioma em que o TFTB escreve para outros jogadores. Escolher outro idioma usa o texto padrão dele, a menos que você tenha escrito o seu."
@@ -288,5 +321,5 @@ L["WHISPER_TEST_DESCRIPTION"] = "Sussurra o exemplo para você, para ver exatame
 -- Defaults
 --------------------------------------------------------------------------------
 
--- The Thank You Button whisper's default, in the client's own language; Give Thanks' defaults live in Data/Message-Languages.lua.
+-- The Thank You Button whisper's default, in the client's own language; Give Thanks' and Good News' defaults live in Data/Message-Languages.lua.
 L["DEFAULT_WHISPER"] = "Valeu, você é demais! (="

@@ -46,12 +46,6 @@
 - **Instead:** A Thank You Button whisper keeps a plain box with Reset and an Example line, and its default text comes from the client's own locale.
 - **Why:** The player types it and sends it with their own key press, so it is written in whatever language they choose, not one the add-on picks.
 
-### Give Thanks has a Reset Emotes button
-
-- **Departs from:** SAVED VARIABLES → Reset, "no control resets settings Reset Profile can reach".
-- **Instead:** A confirmed Reset Emotes button on Give Thanks puts the emote checklist back to the default praise emotes.
-- **Why:** The checklist holds every emote the client has, so rebuilding the defaults by hand takes real effort, as with an item list's Restore Defaults.
-
 ### Ignored Buffs match one spell ID
 
 - **Departs from:** COMPATIBILITY → Game Mechanics, "a check for a buff matches every rank's ID".

@@ -40,7 +40,7 @@ L["SAMPLE_EXAMPLE"] = "示例：%s"
 L["OPTIONS_WELCOME_TOGGLE"] = "启用欢迎消息"
 L["OPTIONS_WELCOME_DESCRIPTION"] = "登录时显示一条只有你能看到的消息。"
 L["OPTIONS_DESCRIPTION"] =
-	"自动用表情或密语感谢为你施加增益的玩家，路过好友和公会成员时向他们挥手问候，点一下感谢宏就能感谢你选中的任何人。"
+	"自动用表情或密语感谢为你施加增益的玩家，告诉玩家你刚刚对他们施放了什么，路过好友和公会成员时向他们挥手问候，点一下感谢宏就能感谢你选中的任何人。"
 L["OPTIONS_FEATURES_HEADER"] = "功能"
 L["OPTIONS_FEATURES_DESCRIPTION"] = "在此处或各功能自己的面板中开启或关闭每项功能。"
 L["OPTIONS_COMMANDS_HEADER"] = "/Commands"
@@ -106,9 +106,9 @@ L["PRAISE_DELAY_DESCRIPTION"] =
 	"在发送密语和表情前稍作等待，避免你的感谢与增益在同一瞬间出现。通知不受影响。"
 L["PRAISE_DELAY_LENGTH_DESCRIPTION"] = "设置发送密语和表情前的等待时长。"
 
--- Thank-You Whispers
-L["WHISPERS_HEADER"] = "感谢密语"
-L["PRAISE_WHISPER_ENABLE"] = "启用感谢密语"
+-- Give Thanks Whisper
+L["GIVE_THANKS_WHISPER_HEADER"] = "致谢密语"
+L["GIVE_THANKS_WHISPER_ENABLE"] = "启用致谢密语"
 L["PRAISE_WHISPER_DESCRIPTION"] = "向为你施加增益的玩家密语致谢。"
 -- TRANSLATORS: keep {spell} and {name} exactly as written; they are the tokens players type into the whisper.
 L["PRAISE_WHISPER_MESSAGE_DESCRIPTION"] =
@@ -124,12 +124,42 @@ L["NOTIFICATIONS_SOUND_DESCRIPTION"] = "获得增益时播放音效。只有你�
 L["NOTIFICATIONS_SOUND_PREVIEW_DESCRIPTION"] = "播放该音效，让你在开启前先试听。"
 
 --------------------------------------------------------------------------------
+-- Options: Good News
+--------------------------------------------------------------------------------
+
+L["TAB_GOOD_NEWS"] = "好消息"
+L["GOOD_NEWS_ENABLE"] = "启用好消息"
+L["GOOD_NEWS_ENABLE_DESCRIPTION"] = "开启一条密语，告诉玩家你刚刚对他们施放了什么。"
+L["GOOD_NEWS_DESCRIPTION"] =
+	"告诉玩家你刚刚对他们施放了什么，短时增益还会告知持续多久，让他们充分利用。"
+L["GOOD_NEWS_SCOPE"] = "接收者"
+L["GOOD_NEWS_SCOPE_DESCRIPTION"] =
+	"设置谁会收到好消息密语：你对其施放追踪技能的任何人，或仅限你的小队或团队。"
+L["GOOD_NEWS_SCOPE_ALWAYS"] = "任何人"
+L["GOOD_NEWS_SCOPE_GROUP"] = "仅小队或团队成员"
+L["GOOD_NEWS_WHISPER_HEADER"] = "好消息密语"
+L["GOOD_NEWS_WHISPER_DESCRIPTION"] =
+	"你的施放对象收到的内容。只有在追踪的技能中勾选的技能才会发送密语。"
+-- TRANSLATORS: keep {spell} and {name} exactly as written; they are the tokens players type into the whisper.
+L["GOOD_NEWS_MESSAGE_DESCRIPTION"] =
+	"设置 TFTB 向你的施放对象发送的密语。{spell} 会替换为你施放的内容，持续时间不足一分钟时还会附上持续时间，{name} 会替换为该玩家的名字。留空则不发送密语。"
+-- TRANSLATORS: each %s is a token, {spell} then {name}, drawn in blue.
+L["GOOD_NEWS_TOKENS"] = "占位符：%s 你施放的内容，%s 接收者"
+
+-- Tracked Abilities
+L["TAB_GOOD_NEWS_ABILITIES"] = "追踪的技能"
+L["GOOD_NEWS_ABILITIES_DESCRIPTION"] =
+	"当你对其他玩家施放此处勾选的技能时，好消息会发送密语告知。"
+-- The heading over the rows no class owns: scrolls, and abilities cast by a trinket's pet.
+L["GOOD_NEWS_ITEMS"] = "物品"
+
+--------------------------------------------------------------------------------
 -- Options: Emotes List
 --------------------------------------------------------------------------------
 
 L["TAB_EMOTES_LIST"] = "表情列表"
 L["EMOTES_GRID_DESCRIPTION"] =
-	"勾选队伍外玩家为你施加增益时致谢功能可以使用的表情，它会随机选用一个。战斗中会暂缓发送表情。"
+	"勾选队伍外玩家为你施加增益时致谢功能可以使用的表情，它会随机选用一个。战斗中、施法或钓鱼时会暂缓发送表情。"
 
 --[[
     The emote checklist, shared by this panel and Wave to Friends' Friends and
@@ -156,8 +186,11 @@ L["EMOTES_RESET_CONFIRM"] = "将表情列表重置为默认值？"
 L["TAB_IGNORED_BUFFS"] = "忽略的增益"
 L["IGNORED_BUFFS_DESCRIPTION"] =
 	"此列表中的增益无论由谁施放，都不会发送感谢。你仍会收到文字提示和音效。"
-L["IGNORED_BUFFS_ADD_CURRENT"] = "忽略当前增益"
-L["IGNORED_BUFFS_ADD_CURRENT_DESCRIPTION"] = "添加你身上当前的一个增益。"
+L["IGNORED_BUFFS_ADD_RECENT"] = "忽略近期增益"
+L["IGNORED_BUFFS_ADD_RECENT_DESCRIPTION"] =
+	"添加你身上当前的一个增益，或你登录后其他玩家给你的一个增益。"
+-- The first %s is the buff's icon and name, the second the player who cast it.
+L["IGNORED_BUFFS_RECENT_FROM"] = "%s，来自 %s"
 L["IGNORED_BUFFS_ADD"] = "添加增益"
 L["IGNORED_BUFFS_ADD_DESCRIPTION"] =
 	"输入法术 ID，或按住 Shift 点击增益链接将其放入输入框，然后按回车键。"
@@ -202,7 +235,7 @@ L["TAB_WAVE_TO_FRIENDS"] = "好友问候"
 L["WAVE_ENABLE"] = "启用好友问候"
 L["WAVE_ENABLE_DESCRIPTION"] = "鼠标指向好友和公会成员时，对其使用表情。"
 L["WAVE_DESCRIPTION"] = "在野外鼠标指向好友和公会成员时，用表情向他们问候。"
-L["WAVE_RULES"] = "不会对你的小队或团队成员使用，战斗中也不会使用。"
+L["WAVE_RULES"] = "不会对你的小队或团队成员使用，战斗中、施法或钓鱼时也不会使用。"
 L["WAVE_RESTING_ENABLE"] = "仅在休息时"
 L["WAVE_RESTING_ENABLE_DESCRIPTION"] = "仅在你于城镇或旅店中休息时挥手。"
 L["WAVE_COOLDOWN"] = "同一玩家冷却时间"
@@ -254,12 +287,12 @@ L["WAVE_GUILDS_EMOTES_DESCRIPTION"] = "勾选对公会成员可用的表情，�
 -- Options: Whisper Message Row
 --------------------------------------------------------------------------------
 
--- The caption and Reset button beside every whisper box, on Give Thanks and each Thank You Button.
+-- The caption and Reset button beside every whisper box, on Give Thanks, Good News and each Thank You Button.
 L["WHISPER_MESSAGE"] = "密语消息"
 L["WHISPER_MESSAGE_RESET"] = "重置"
 L["WHISPER_MESSAGE_RESET_DESCRIPTION"] = "将密语消息恢复为默认文本。"
 
--- The whisper composer around the Give Thanks message box.
+-- The whisper composer around every editable whisper's box, on Give Thanks and Good News.
 L["SEND_MESSAGES_IN"] = "消息语言"
 L["SEND_MESSAGES_IN_DESCRIPTION"] =
 	"设置 TFTB 向其他玩家发送消息时使用的语言。切换语言时，如果你没有自己写过，会换成该语言的默认文本。"
@@ -275,5 +308,5 @@ L["WHISPER_TEST_DESCRIPTION"] = "把示例密语发给你自己，让你看到�
 -- Defaults
 --------------------------------------------------------------------------------
 
--- The Thank You Button whisper's default, in the client's own language; Give Thanks' defaults live in Data/Message-Languages.lua.
+-- The Thank You Button whisper's default, in the client's own language; Give Thanks' and Good News' defaults live in Data/Message-Languages.lua.
 L["DEFAULT_WHISPER"] = "谢谢，你最棒了！(="
