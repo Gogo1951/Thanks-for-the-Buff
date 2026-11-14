@@ -40,7 +40,7 @@ L["SAMPLE_EXAMPLE"] = "Exemple : %s"
 L["OPTIONS_WELCOME_TOGGLE"] = "Activer le message de bienvenue"
 L["OPTIONS_WELCOME_DESCRIPTION"] = "Affiche un message que vous seul pouvez voir lorsque vous vous connectez."
 L["OPTIONS_DESCRIPTION"] =
-	"Remerciez automatiquement d'une emote ou d'un chuchotement les joueurs qui vous améliorent, saluez de la main vos amis et membres de guilde en passant près d'eux, et remerciez qui vous ciblez d'un clic sur vos macros de remerciement."
+	"Remerciez automatiquement d'une emote ou d'un chuchotement les joueurs qui vous améliorent, dites aux joueurs ce que vous venez de leur lancer, saluez de la main vos amis et membres de guilde en passant près d'eux, et remerciez qui vous ciblez d'un clic sur vos macros de remerciement."
 L["OPTIONS_FEATURES_HEADER"] = "Fonctionnalités"
 L["OPTIONS_FEATURES_DESCRIPTION"] = "Activez ou désactivez chaque fonctionnalité ici, ou dans son propre panneau."
 L["OPTIONS_COMMANDS_HEADER"] = "/Commands"
@@ -108,9 +108,9 @@ L["PRAISE_DELAY_DESCRIPTION"] =
 	"Attend un instant avant le chuchotement et l'emote, afin que vos remerciements n'arrivent pas au même moment que l'amélioration. Les notifications ne sont pas affectées."
 L["PRAISE_DELAY_LENGTH_DESCRIPTION"] = "Définit le temps d'attente avant l'envoi du chuchotement et de l'emote."
 
--- Thank-You Whispers
-L["WHISPERS_HEADER"] = "Chuchotements de remerciement"
-L["PRAISE_WHISPER_ENABLE"] = "Activer les chuchotements de remerciement"
+-- Give Thanks Whisper
+L["GIVE_THANKS_WHISPER_HEADER"] = "Chuchotement de remerciement"
+L["GIVE_THANKS_WHISPER_ENABLE"] = "Activer le chuchotement de remerciement"
 L["PRAISE_WHISPER_DESCRIPTION"] = "Chuchote un remerciement au joueur qui vous a amélioré."
 -- TRANSLATORS: keep {spell} and {name} exactly as written; they are the tokens players type into the whisper.
 L["PRAISE_WHISPER_MESSAGE_DESCRIPTION"] =
@@ -128,12 +128,42 @@ L["NOTIFICATIONS_SOUND_DESCRIPTION"] =
 L["NOTIFICATIONS_SOUND_PREVIEW_DESCRIPTION"] = "Joue le son pour que vous puissiez l'écouter avant de l'activer."
 
 --------------------------------------------------------------------------------
+-- Options: Good News
+--------------------------------------------------------------------------------
+
+L["TAB_GOOD_NEWS"] = "Bonnes nouvelles"
+L["GOOD_NEWS_ENABLE"] = "Activer les bonnes nouvelles"
+L["GOOD_NEWS_ENABLE_DESCRIPTION"] = "Active un chuchotement qui indique aux joueurs ce que vous venez de leur lancer."
+L["GOOD_NEWS_DESCRIPTION"] =
+	"Faites savoir aux joueurs ce que vous venez de leur lancer et, pour les améliorations courtes, combien de temps cela dure, pour qu'ils en tirent le meilleur parti."
+L["GOOD_NEWS_SCOPE"] = "Destinataires"
+L["GOOD_NEWS_SCOPE_DESCRIPTION"] =
+	"Définit qui reçoit un chuchotement Bonnes nouvelles : toute personne sur qui vous lancez une technique suivie, ou seulement votre groupe ou votre raid."
+L["GOOD_NEWS_SCOPE_ALWAYS"] = "Tout le monde"
+L["GOOD_NEWS_SCOPE_GROUP"] = "Membres du groupe uniquement"
+L["GOOD_NEWS_WHISPER_HEADER"] = "Chuchotement de bonne nouvelle"
+L["GOOD_NEWS_WHISPER_DESCRIPTION"] =
+	"Ce que reçoit le joueur sur qui vous lancez. Seules les techniques cochées dans Techniques suivies en envoient un."
+-- TRANSLATORS: keep {spell} and {name} exactly as written; they are the tokens players type into the whisper.
+L["GOOD_NEWS_MESSAGE_DESCRIPTION"] =
+	"Définit ce que TFTB chuchote au joueur sur qui vous lancez. {spell} est remplacé par ce que vous avez lancé, avec sa durée quand elle est inférieure à une minute, et {name} par son nom. Laissez vide pour n'envoyer aucun chuchotement."
+-- TRANSLATORS: each %s is a token, {spell} then {name}, drawn in blue.
+L["GOOD_NEWS_TOKENS"] = "Balises : %s ce que vous lancez, %s qui l'a reçu"
+
+-- Tracked Abilities
+L["TAB_GOOD_NEWS_ABILITIES"] = "Techniques suivies"
+L["GOOD_NEWS_ABILITIES_DESCRIPTION"] =
+	"Bonnes nouvelles chuchote au sujet des techniques cochées ici quand vous les lancez sur un autre joueur."
+-- The heading over the rows no class owns: scrolls, and abilities cast by a trinket's pet.
+L["GOOD_NEWS_ITEMS"] = "Objets"
+
+--------------------------------------------------------------------------------
 -- Options: Emotes List
 --------------------------------------------------------------------------------
 
 L["TAB_EMOTES_LIST"] = "Liste des emotes"
 L["EMOTES_GRID_DESCRIPTION"] =
-	"Cochez les emotes parmi lesquelles la fonction Remerciements peut choisir quand un joueur hors de votre groupe vous améliore ; elle en utilise une au hasard. Les emotes sont différées tant que vous êtes en combat."
+	"Cochez les emotes parmi lesquelles la fonction Remerciements peut choisir quand un joueur hors de votre groupe vous améliore ; elle en utilise une au hasard. Les emotes sont différées tant que vous êtes en combat, en train d'incanter ou de pêcher."
 
 --[[
     The emote checklist, shared by this panel and Wave to Friends' Friends and
@@ -160,8 +190,11 @@ L["EMOTES_RESET_CONFIRM"] = "Réinitialiser la liste des emotes aux valeurs par 
 L["TAB_IGNORED_BUFFS"] = "Améliorations ignorées"
 L["IGNORED_BUFFS_DESCRIPTION"] =
 	"Les améliorations de cette liste ne reçoivent jamais de remerciement, quel que soit le lanceur. Vous recevez toujours votre message texte et votre son."
-L["IGNORED_BUFFS_ADD_CURRENT"] = "Ignorer une amélioration active"
-L["IGNORED_BUFFS_ADD_CURRENT_DESCRIPTION"] = "Ajoute l'une des améliorations actives sur vous en ce moment."
+L["IGNORED_BUFFS_ADD_RECENT"] = "Ignorer une amélioration récente"
+L["IGNORED_BUFFS_ADD_RECENT_DESCRIPTION"] =
+	"Ajoute une amélioration active sur vous en ce moment, ou une qu'un autre joueur vous a donnée depuis votre connexion."
+-- The first %s is the buff's icon and name, the second the player who cast it.
+L["IGNORED_BUFFS_RECENT_FROM"] = "%s, de %s"
 L["IGNORED_BUFFS_ADD"] = "Ajouter une amélioration"
 L["IGNORED_BUFFS_ADD_DESCRIPTION"] =
 	"Saisissez un ID de sort, ou faites Maj-clic sur le lien d'une amélioration pour l'insérer dans le champ, puis appuyez sur Entrée."
@@ -212,7 +245,8 @@ L["WAVE_ENABLE_DESCRIPTION"] =
 	"Active une emote pour vos amis et membres de guilde quand vous les survolez avec la souris."
 L["WAVE_DESCRIPTION"] =
 	"Saluez vos amis et membres de guilde d'une emote quand vous les survolez avec la souris en parcourant le monde."
-L["WAVE_RULES"] = "Jamais votre groupe ou votre raid, et jamais en combat."
+L["WAVE_RULES"] =
+	"Jamais votre groupe ou votre raid, et jamais quand vous êtes en combat, en train d'incanter ou de pêcher."
 L["WAVE_RESTING_ENABLE"] = "Uniquement au repos"
 L["WAVE_RESTING_ENABLE_DESCRIPTION"] = "Ne salue que lorsque vous êtes au repos, dans une ville ou une auberge."
 L["WAVE_COOLDOWN"] = "Délai pour un même joueur"
@@ -268,12 +302,12 @@ L["WAVE_GUILDS_EMOTES_DESCRIPTION"] =
 -- Options: Whisper Message Row
 --------------------------------------------------------------------------------
 
--- The caption and Reset button beside every whisper box, on Give Thanks and each Thank You Button.
+-- The caption and Reset button beside every whisper box, on Give Thanks, Good News and each Thank You Button.
 L["WHISPER_MESSAGE"] = "Message chuchoté"
 L["WHISPER_MESSAGE_RESET"] = "Réinitialiser"
 L["WHISPER_MESSAGE_RESET_DESCRIPTION"] = "Rétablit le texte par défaut du message chuchoté."
 
--- The whisper composer around the Give Thanks message box.
+-- The whisper composer around every editable whisper's box, on Give Thanks and Good News.
 L["SEND_MESSAGES_IN"] = "Envoyer les messages en"
 L["SEND_MESSAGES_IN_DESCRIPTION"] =
 	"Définit la langue dans laquelle TFTB écrit aux autres joueurs. Choisir une autre langue utilise son texte par défaut, sauf si vous avez écrit le vôtre."
@@ -290,5 +324,5 @@ L["WHISPER_TEST_DESCRIPTION"] =
 -- Defaults
 --------------------------------------------------------------------------------
 
--- The Thank You Button whisper's default, in the client's own language; Give Thanks' defaults live in Data/Message-Languages.lua.
+-- The Thank You Button whisper's default, in the client's own language; Give Thanks' and Good News' defaults live in Data/Message-Languages.lua.
 L["DEFAULT_WHISPER"] = "Merci, t'es au top ! (="

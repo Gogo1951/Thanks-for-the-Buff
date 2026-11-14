@@ -112,7 +112,7 @@ ns.EMOTE_GROUP_BY_TOKEN = {
 How We Got the Data
 
 Last Validated
-	2026-11-08, WoW Forever 1.60.1.70862
+	2026-11-14, WoW Forever 1.60.1.70938
 
 Notes
 	- Sorts every emote that does more than print a line into the group the Give Thanks emote grid shows it under (ns.GetEmoteGroup in Features/Utilities.lua). An emote this client offers that isn't listed is a Text emote: it prints its line and does nothing else.
@@ -131,9 +131,9 @@ Wowhead
 	None.
 
 wago.tools
-	https://wago.tools/db2/EmotesText?build=1.60.1.70862
-	https://wago.tools/db2/Emotes?build=1.60.1.70862
-	https://wago.tools/db2/EmotesTextSound?build=1.60.1.70862
+	https://wago.tools/db2/EmotesText?build=1.60.1.70938
+	https://wago.tools/db2/Emotes?build=1.60.1.70938
+	https://wago.tools/db2/EmotesTextSound?build=1.60.1.70938
 
 QuestieDB
 	None.

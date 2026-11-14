@@ -119,7 +119,7 @@ ns.DiagnosticsStrings = {
 		.. TITLE
 		.. " relies on is present on this client.",
 	CODE_RUN_ALL = "Run All Code Reports",
-	DATA_INTRO = "Checks every spell the add-on ships against this client. Paste a result into a spreadsheet and sort by STATUS to find what needs pruning.",
+	DATA_INTRO = "Checks every spell and item the add-on ships against this client. Paste a result into a spreadsheet and sort by STATUS to find what needs pruning.",
 	DATA_RUN_ALL = "Validate All Data Files",
 	LOCALIZATION_INTRO = "Playing in a language other than English and a name or prompt reads wrong? These show what your client calls everything "
 		.. TITLE
@@ -137,6 +137,8 @@ ns.DiagnosticsStrings = {
 	CONTEXT_DESCRIPTION = "Shows your character and profile, how buffs are detected and whether that is ready right now, Give Thanks' switches, whisper text, picked emotes, ignored buffs and cooldowns, how this client's emotes sort into the panel's groups, your current target, sound settings, and each Thank You button's command, macro and its icon, whisper and emotes.",
 	WAVE_TITLE = "Wave to Friends Context",
 	WAVE_DESCRIPTION = "Shows every switch and rule that can stop a wave, the Custom List, guilds and picked emotes, and how Wave to Friends reads your current target: friend, Battle.net friend, guild, Custom List entry, and which list would greet them.",
+	GOOD_NEWS_TITLE = "Good News Context",
+	GOOD_NEWS_DESCRIPTION = "Shows every switch and gate that can stop a Good News whisper: who it whispers, its text, the post-loading-screen pause, hidden auras and held-back chat, your pet, every ability this client can track with whether it is ticked and which ranks you know, and how your current target reads as a recipient.",
 	EMOTES_TITLE = "Emote Extract",
 	EMOTES_DESCRIPTION = "Lists every emote this client can perform, read from the client itself, as tab-separated text: index, token, slash commands, whether it plays a voice line, and the checklist group it sorts into.",
 	VALIDATE_TITLE = "Validate Data: %s",

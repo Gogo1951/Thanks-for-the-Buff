@@ -162,6 +162,17 @@ local function OnCombatLogEventUnfiltered()
 		CombatLogGetCurrentEventInfo()
 
 	--[[
+	    Good News: a revive of yours, which only a Jumper Cables jolt that worked
+	    produces. It releases the whisper the cast left parked.
+	]]
+	if subEvent == "SPELL_RESURRECT" then
+		if sourceGUID == playerGUID and ns.ClaimGoodNewsResurrect then
+			ns.ClaimGoodNewsResurrect(destGUID, spellID)
+		end
+		return
+	end
+
+	--[[
 	    REFRESH counts as an aura landing: recasting a buff the target already has
 	    emits SPELL_AURA_REFRESH, not APPLIED, and a rebuff earns the same thanks.
 	    Ordered cheapest first, so an aura landing on anyone but you stops at a

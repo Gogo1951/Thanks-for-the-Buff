@@ -80,6 +80,22 @@ ns.DATABASE_DEFAULTS = {
 			emotes = GetDefaultEmoteSettings(true),
 		},
 		--[[
+		    Good News: a whisper telling a player what you just cast on them. Off
+		    by default: it whispers people on its own, so a player opts in.
+		    `scope` is one of Data.GOOD_NEWS_SCOPES; anything else reads as GROUP,
+		    the side that whispers fewer people. `whisperMessage` takes "{spell}"
+		    (the link, plus "for 15 Seconds" when the buff runs under a minute) and
+		    "{name}" (who got it). `watched` holds each row's checkbox from
+		    Data/<Flavor>/Good-News-Abilities-<Flavor>.lua, under every ID the row
+		    watches; a row with no saved choice is ticked.
+		]]
+		goodNews = {
+			enabled = false,
+			scope = "ALWAYS",
+			whisperMessage = ns.GetDefaultGoodNewsWhisper(Data.DEFAULT_MESSAGE_LANGUAGE),
+			watched = {},
+		},
+		--[[
 		    Wave to Friends. Off by default: it emotes at people on its own, so a
 		    player opts in. Friends and Guilds each pick at random from their own
 		    token set; a Custom List entry is { name = as typed, emote = one token,

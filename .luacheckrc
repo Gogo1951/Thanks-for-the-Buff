@@ -64,6 +64,7 @@ read_globals = {
 	"IsResting",
 	"issecretvalue",
 	"LibStub",
+	"LOCALIZED_CLASS_NAMES_MALE",
 	"MAXEMOTEINDEX",
 	"PlaySound",
 	"PlaySoundFile",

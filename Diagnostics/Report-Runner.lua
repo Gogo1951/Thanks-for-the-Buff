@@ -75,6 +75,13 @@ ns.DIAGNOSTIC_REPORTS = {
 			return ns:BuildWaveContextReport()
 		end,
 	},
+	goodNews = {
+		title = D.GOOD_NEWS_TITLE,
+		description = D.GOOD_NEWS_DESCRIPTION,
+		build = function()
+			return ns:BuildGoodNewsContextReport()
+		end,
+	},
 	emotes = {
 		title = D.EMOTES_TITLE,
 		description = D.EMOTES_DESCRIPTION,
@@ -149,7 +156,7 @@ ns.DIAGNOSTIC_SECTIONS = {
 	{
 		key = "settings",
 		label = D.SECTION_SETTINGS,
-		reports = { "context", "wave", "emotes", "saved", "addons" },
+		reports = { "context", "wave", "goodNews", "emotes", "saved", "addons" },
 	},
 	{ key = "code", label = D.SECTION_CODE, reports = { "events", "api", "libs" } },
 	{ key = "data", label = D.SECTION_DATA, reports = {} },

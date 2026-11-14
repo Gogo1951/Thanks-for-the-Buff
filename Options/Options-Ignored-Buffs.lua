@@ -73,28 +73,52 @@ local function BuildScopeArgs(scopeKey)
 		return false
 	end
 
+	--[[
+	    The picker's choices and their order: the buffs on you now, then the ones
+	    strangers gave you this session that have since worn off, newest first,
+	    each naming who cast it in their class color.
+	]]
+	local function RecentChoices()
+		local values, order = {}, {}
+		local function Offer(spellId, label)
+			if label and not values[spellId] and not AlreadyCovered(spellId) then
+				values[spellId] = label
+				order[#order + 1] = spellId
+			end
+		end
+		for _, spellId in ipairs(ns.GetPlayerBuffIds()) do
+			Offer(spellId, (SpellLabel(spellId)))
+		end
+		for _, recent in ipairs(ns.GetRecentBuffs()) do
+			local label = SpellLabel(recent.spellId)
+			if label then
+				local hex = recent.classToken and ns.Data.CLASS_COLORS[recent.classToken]
+				local caster = hex and ("|cff" .. hex .. recent.name .. "|r") or recent.name
+				Offer(recent.spellId, L["IGNORED_BUFFS_RECENT_FROM"]:format(label, caster))
+			end
+		end
+		return values, order
+	end
+
 	local args = {
-		addCurrentLabel = ns.OptionsRowLabel(
-			L["IGNORED_BUFFS_ADD_CURRENT"],
+		addRecentLabel = ns.OptionsRowLabel(
+			L["IGNORED_BUFFS_ADD_RECENT"],
 			3,
 			labelWidth,
 			nil,
-			L["IGNORED_BUFFS_ADD_CURRENT_DESCRIPTION"]
+			L["IGNORED_BUFFS_ADD_RECENT_DESCRIPTION"]
 		),
-		addCurrent = {
+		addRecent = {
 			type = "select",
 			name = "",
-			desc = L["IGNORED_BUFFS_ADD_CURRENT_DESCRIPTION"],
+			desc = L["IGNORED_BUFFS_ADD_RECENT_DESCRIPTION"],
 			width = ns.OPTIONS_CONTROL_WIDTH,
 			order = 3.1,
 			values = function()
-				local values = {}
-				for _, spellId in ipairs(ns.GetPlayerBuffIds()) do
-					if not AlreadyCovered(spellId) then
-						values[spellId] = SpellLabel(spellId)
-					end
-				end
-				return values
+				return (RecentChoices())
+			end,
+			sorting = function()
+				return select(2, RecentChoices())
 			end,
 			get = function()
 				return nil
