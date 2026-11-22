@@ -22,11 +22,15 @@ Auto thank players who buff you with an emote or whisper, buff them back with on
 
 ### Return Buff
 
+<img width="800" alt="README-Infographic-Return-Buff" src="https://github.com/user-attachments/assets/e8e8fddf-fd9d-4a5d-a817-9ab93dda1481" />
+
 * **Return the Favor** // A stranger buffs you, and one press of your Return Buff macro casts your buff right back on them, no targeting needed.
 * **Your Buff, Your Pick** // Arcane Intellect, Mark of the Wild, Fortitude, a Blessing, even Power Infusion: choose which one goes back.
 * **Off Until You Want It** // Starts off. Turn it on in the options whenever you're ready.
 
 ### Good News
+
+<img width="800" alt="README-Infographic-Good-News" src="https://github.com/user-attachments/assets/26213df0-9506-4e4d-88dc-2e7eff2f9c84" />
 
 * **No Big Buff Goes to Waste** // Cast Power Infusion, Innervate, or Blessing of Protection on someone, and they get a whisper saying so, with the time left on short buffs.
 * **Covers the Big Ones** // Soulstones, Fear Ward, Rebirth, Lay on Hands, scrolls, and more.
