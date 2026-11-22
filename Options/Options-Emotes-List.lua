@@ -1,5 +1,6 @@
 local _, ns = ...
 local L = ns.L
+local Kit = ns.OptionsKit
 
 --[[
     "Emotes List", a sub-panel of Give Thanks: the emote checklist Give Thanks
@@ -14,9 +15,17 @@ function ns.BuildEmotesListOptions()
 	end
 
 	local options = {
-		name = L["TAB_EMOTES_LIST"],
+		name = Kit.SubPanelTitle(L["TAB_GIVE_THANKS"], L["TAB_EMOTES_LIST"]),
 		type = "group",
-		args = {},
+		args = {
+			-- With Give Thanks off, the checklist still looks live, so say what it waits on.
+			status = Kit.StatusLine(function()
+				if settings().enabled then
+					return nil
+				end
+				return L["GIVE_THANKS_LIST_OFF"]:format(L["TAB_GIVE_THANKS"], L["GIVE_THANKS_ENABLE"])
+			end, 0.5),
+		},
 	}
 
 	-- Orders 1 through 1.1 belong to the emote checklist.

@@ -1,6 +1,7 @@
 local _, ns = ...
 local Data = ns.Data
 local L = ns.L
+local Kit = ns.OptionsKit
 
 local GetColor = ns.GetColor
 
@@ -18,19 +19,15 @@ local REMOVE_ICON = "Interface/Buttons/UI-GroupLoot-Pass-Up"
 
 --[[
     A tab's border eats into the pane, so rows inside one spend a slightly
-    shorter budget than ns.OPTIONS_ROW_WIDTH or their last cell wraps.
+    shorter budget than Kit.ROW_WIDTH or their last cell wraps.
 ]]
-local TAB_ROW_WIDTH = ns.OPTIONS_ROW_WIDTH - 0.2
-local TAB_LABEL_WIDTH = TAB_ROW_WIDTH - ns.OPTIONS_CONTROL_WIDTH
+local TAB_ROW_WIDTH = Kit.ROW_WIDTH - 0.2
+local TAB_LABEL_WIDTH = TAB_ROW_WIDTH - Kit.CONTROL_WIDTH
 local CUSTOM_EMOTE_WIDTH = 1.1
-local CUSTOM_NAME_WIDTH = TAB_ROW_WIDTH - CUSTOM_EMOTE_WIDTH - ns.OPTIONS_REMOVE_ICON_WIDTH
+local CUSTOM_NAME_WIDTH = TAB_ROW_WIDTH - CUSTOM_EMOTE_WIDTH - Kit.REMOVE_ICON_WIDTH
 
 local function Settings()
 	return ns.db.profile.wave
-end
-
-local function Refresh()
-	LibStub("AceConfigRegistry-3.0"):NotifyChange(ns.OPTIONS_REGISTRY.WaveToFriends)
 end
 
 local function Toggle(key, name, desc, order, width)
@@ -40,32 +37,16 @@ local function Toggle(key, name, desc, order, width)
 		desc = desc,
 		width = width or "full",
 		order = order,
-		get = function()
-			return Settings()[key]
-		end,
-		set = function(_, value)
-			Settings()[key] = value
-		end,
+		get = Kit.Get("profile", "wave." .. key),
+		set = Kit.Set("profile", "wave." .. key),
 	}
 end
 
---[[
-    A sub-option row (Build Reference: Sub-Option Rows): an unnamed inline group
-    that pins one row, led by a blank cell that indents the control. `hidden`
-    sits on the group so the indent collapses with it.
-]]
-local function SubRow(order, hidden, controls)
-	local args = {
-		indent = { type = "description", name = "", width = ns.OPTIONS_SUB_INDENT_WIDTH, order = 0 },
-	}
-	for key, control in pairs(controls) do
-		args[key] = control
-	end
-	return { type = "group", name = "", inline = true, order = order, hidden = hidden, args = args }
-end
-
-local function SubLabel(text)
-	return GetColor("HELP") .. text .. "|r"
+-- A caption and its control inside a tab, on the tab's shorter budget.
+local function TabLabelRow(order, caption, control)
+	control.name = ""
+	control.width = Kit.CONTROL_WIDTH
+	return Kit.Row(order, nil, { Kit.Label(caption, nil, TAB_LABEL_WIDTH, control.desc), control })
 end
 
 -- Several entries in one box: commas, semicolons or new lines split them.
@@ -120,7 +101,7 @@ local function RemoveCell(desc, order, func)
 		image = REMOVE_ICON,
 		imageWidth = 16,
 		imageHeight = 16,
-		width = ns.OPTIONS_REMOVE_ICON_WIDTH,
+		width = Kit.REMOVE_ICON_WIDTH,
 		order = order,
 		func = func,
 	}
@@ -137,21 +118,17 @@ local function BuildCustomTab()
 	local namesText = REALM_FREE and L["WAVE_CUSTOM_NAMES_FOREVER"] or L["WAVE_CUSTOM_NAMES_REALM"]
 	local addDescription = REALM_FREE and L["WAVE_CUSTOM_ADD_DESCRIPTION_FOREVER"] or L["WAVE_CUSTOM_ADD_DESCRIPTION"]
 	local args = {
-		desc = ns.OptionsDesc(L["WAVE_CUSTOM_DESCRIPTION"] .. " " .. namesText, 1),
-		space1 = ns.OptionsSpacer(2),
+		desc = Kit.Desc(L["WAVE_CUSTOM_DESCRIPTION"] .. " " .. namesText, 1),
+		space1 = Kit.Spacer(2),
 		enable = Toggle("customEnabled", L["WAVE_CUSTOM_ENABLE"], L["WAVE_CUSTOM_ENABLE_DESCRIPTION"], 3),
 		-- A list switched off looks exactly like a list that never matches, so say so.
-		offWarning = ns.OptionsDesc(GetColor("OFF") .. L["WAVE_CUSTOM_OFF_WARNING"] .. "|r", 3.5, function()
-			return Settings().customEnabled
-		end),
-		space2 = ns.OptionsSpacer(4),
-		addLabel = ns.OptionsRowLabel(L["WAVE_CUSTOM_ADD"], 5, TAB_LABEL_WIDTH, nil, addDescription),
-		add = {
+		offWarning = Kit.StatusLine(function()
+			return not Settings().customEnabled and L["WAVE_CUSTOM_OFF_WARNING"] or nil
+		end, 3.5),
+		space2 = Kit.Spacer(4),
+		add = TabLabelRow(5, L["WAVE_CUSTOM_ADD"], {
 			type = "input",
-			name = "",
 			desc = addDescription,
-			width = ns.OPTIONS_CONTROL_WIDTH,
-			order = 5.1,
 			get = function()
 				return ""
 			end,
@@ -164,10 +141,10 @@ local function BuildCustomTab()
 						players[key] = { name = name, emote = emote }
 					end
 				end
-				Refresh()
+				ns.RefreshSettings()
 			end,
-		},
-		space3 = ns.OptionsSpacer(6),
+		}),
+		space3 = Kit.Spacer(6),
 	}
 
 	local players = Settings().players
@@ -176,7 +153,7 @@ local function BuildCustomTab()
 	end)
 
 	if #rows == 0 then
-		args.empty = ns.OptionsDesc(GetColor("HELP") .. L["WAVE_CUSTOM_EMPTY"] .. "|r", 10)
+		args.empty = Kit.Desc(Kit.Color("HELP", L["WAVE_CUSTOM_EMPTY"]), 10)
 	end
 
 	local values, sorting = ns.GetEmoteSelectChoices()
@@ -211,11 +188,12 @@ local function BuildCustomTab()
 						if type(players[row.key]) == "table" then
 							players[row.key].emote = token
 						end
+						ns.RefreshSettings()
 					end,
 				},
 				remove = RemoveCell(L["WAVE_CUSTOM_REMOVE"], 3, function()
 					players[row.key] = nil
-					Refresh()
+					ns.RefreshSettings()
 				end),
 			},
 		}
@@ -236,16 +214,16 @@ end
 local function BuildFriendsTab()
 	local args = {
 		enable = Toggle("friendsEnabled", L["WAVE_FRIENDS_ENABLE"], L["WAVE_FRIENDS_ENABLE_DESCRIPTION"], 3),
-		bnet = SubRow(4, nil, {
-			bnet = Toggle(
+		bnet = Kit.SubRow(4, nil, {
+			Toggle(
 				"bnetFriends",
-				SubLabel(L["WAVE_BNET_ENABLE"]),
+				Kit.SubLabel(L["WAVE_BNET_ENABLE"]),
 				L["WAVE_BNET_ENABLE_DESCRIPTION"],
-				1,
-				TAB_ROW_WIDTH - ns.OPTIONS_SUB_INDENT_WIDTH
+				nil,
+				TAB_ROW_WIDTH - Kit.SUB_INDENT_WIDTH
 			),
 		}),
-		space2 = ns.OptionsSpacer(5),
+		space2 = Kit.Spacer(5),
 	}
 	ns.DefineEmoteGrid(args, Settings, 10, {
 		id = "waveFriends",
@@ -253,13 +231,12 @@ local function BuildFriendsTab()
 		defaults = ns.DATABASE_DEFAULTS.profile.wave.friendEmotes,
 		description = L["WAVE_FRIENDS_EMOTES_DESCRIPTION"],
 		resetDescription = ResetDescription(ns.DATABASE_DEFAULTS.profile.wave.friendEmotes),
-		registry = ns.OPTIONS_REGISTRY.WaveToFriends,
 		width = TAB_ROW_WIDTH,
 	})
 	-- Battle.net Friends and the checklist only matter while Wave at Friends is on; the switch itself stays.
-	ns.HideAllExcept(args, function()
+	Kit.HideAllExcept(args, function()
 		return not Settings().friendsEnabled
-	end, { enable = true })
+	end, { "enable" })
 	return {
 		type = "group",
 		name = L["WAVE_TAB_FRIENDS"],
@@ -275,14 +252,10 @@ end
 local function BuildGuildsTab()
 	local args = {
 		myGuild = Toggle("myGuildEnabled", L["WAVE_MY_GUILD_ENABLE"], L["WAVE_MY_GUILD_ENABLE_DESCRIPTION"], 3),
-		space2 = ns.OptionsSpacer(4),
-		addLabel = ns.OptionsRowLabel(L["WAVE_GUILD_ADD"], 5, TAB_LABEL_WIDTH, nil, L["WAVE_GUILD_ADD_DESCRIPTION"]),
-		add = {
+		space2 = Kit.Spacer(4),
+		add = TabLabelRow(5, L["WAVE_GUILD_ADD"], {
 			type = "input",
-			name = "",
 			desc = L["WAVE_GUILD_ADD_DESCRIPTION"],
-			width = ns.OPTIONS_CONTROL_WIDTH,
-			order = 5.1,
 			get = function()
 				return ""
 			end,
@@ -294,10 +267,10 @@ local function BuildGuildsTab()
 						guilds[key] = (name:gsub("%s+", " "))
 					end
 				end
-				Refresh()
+				ns.RefreshSettings()
 			end,
-		},
-		space3 = ns.OptionsSpacer(6),
+		}),
+		space3 = Kit.Spacer(6),
 	}
 
 	local guilds = Settings().guilds
@@ -306,7 +279,7 @@ local function BuildGuildsTab()
 	end)
 
 	if #rows == 0 then
-		args.empty = ns.OptionsDesc(GetColor("HELP") .. L["WAVE_GUILDS_EMPTY"] .. "|r", 10)
+		args.empty = Kit.Desc(Kit.Color("HELP", L["WAVE_GUILDS_EMPTY"]), 10)
 	end
 
 	for index, row in ipairs(rows) do
@@ -320,25 +293,24 @@ local function BuildGuildsTab()
 					type = "description",
 					name = GetColor("TEXT") .. "<" .. row.label .. ">|r",
 					fontSize = "medium",
-					width = TAB_ROW_WIDTH - ns.OPTIONS_REMOVE_ICON_WIDTH,
+					width = TAB_ROW_WIDTH - Kit.REMOVE_ICON_WIDTH,
 					order = 1,
 				},
 				remove = RemoveCell(L["WAVE_GUILD_REMOVE"], 2, function()
 					guilds[row.key] = nil
-					Refresh()
+					ns.RefreshSettings()
 				end),
 			},
 		}
 	end
 
-	args.space4 = ns.OptionsSpacer(19)
+	args.space4 = Kit.Spacer(19)
 	ns.DefineEmoteGrid(args, Settings, 20, {
 		id = "waveGuilds",
 		key = "guildEmotes",
 		defaults = ns.DATABASE_DEFAULTS.profile.wave.guildEmotes,
 		description = L["WAVE_GUILDS_EMOTES_DESCRIPTION"],
 		resetDescription = ResetDescription(ns.DATABASE_DEFAULTS.profile.wave.guildEmotes),
-		registry = ns.OPTIONS_REGISTRY.WaveToFriends,
 		width = TAB_ROW_WIDTH,
 	})
 	return {
@@ -353,13 +325,10 @@ end
 -- Options Table
 --------------------------------------------------------------------------------
 
-local function DefineCooldownSelect(order)
+local function DefineCooldownSelect()
 	return {
 		type = "select",
-		name = "",
 		desc = L["WAVE_COOLDOWN_DESCRIPTION"],
-		width = ns.OPTIONS_CONTROL_WIDTH,
-		order = order,
 		sorting = Data.WAVE_COOLDOWN_CHOICES,
 		values = function()
 			local values = {}
@@ -384,9 +353,7 @@ local function DefineCooldownSelect(order)
 			end
 			return best
 		end,
-		set = function(_, value)
-			Settings().cooldown = value
-		end,
+		set = Kit.Set("profile", "wave.cooldown"),
 	}
 end
 
@@ -396,25 +363,24 @@ function ns.BuildWaveToFriendsOptions()
 		type = "group",
 		childGroups = "tab",
 		args = {
-			descIntro = ns.OptionsDesc(L["WAVE_DESCRIPTION"], 1),
-			space0 = ns.OptionsSpacer(2),
-			enable = ns.OptionsFeatureToggle(ns.GetFeatureSwitch("wave"), 2.5),
-			enableSpacer = ns.OptionsSpacer(2.6),
+			descIntro = Kit.Desc(L["WAVE_DESCRIPTION"], 1),
+			space0 = Kit.Spacer(2),
+			enable = Kit.FeatureSwitch("wave.enabled", 2.5),
+			enableSpacer = Kit.Spacer(2.6),
 
-			descRules = ns.OptionsDesc(GetColor("HELP") .. L["WAVE_RULES"] .. "|r", 3),
-			space1 = ns.OptionsSpacer(4),
+			descRules = Kit.Desc(Kit.Color("HELP", L["WAVE_RULES"]), 3),
+			space1 = Kit.Spacer(4),
 			restingOnly = Toggle("restingOnly", L["WAVE_RESTING_ENABLE"], L["WAVE_RESTING_ENABLE_DESCRIPTION"], 5),
-			space2 = ns.OptionsSpacer(6),
-			cooldownLabel = ns.OptionsRowLabel(L["WAVE_COOLDOWN"], 7, nil, nil, L["WAVE_COOLDOWN_DESCRIPTION"]),
-			cooldown = DefineCooldownSelect(7.1),
-			space3 = ns.OptionsSpacer(8),
+			space2 = Kit.Spacer(6),
+			cooldown = Kit.LabelRow(7, nil, L["WAVE_COOLDOWN"], DefineCooldownSelect()),
+			space3 = Kit.Spacer(8),
 		},
 	}
 
 	-- Intro text and the switch itself stay; everything else follows the switch.
-	ns.HideAllExcept(options.args, function()
+	Kit.HideAllExcept(options.args, function()
 		return not Settings().enabled
-	end, { descIntro = true, space0 = true, enable = true })
+	end, { "descIntro", "space0", "enable" })
 
 	--[[
 	    The tabs are left out while the feature is off, not hidden: AceConfigDialog

@@ -82,6 +82,13 @@ ns.DIAGNOSTIC_REPORTS = {
 			return ns:BuildGoodNewsContextReport()
 		end,
 	},
+	buffBack = {
+		title = D.BUFF_BACK_TITLE,
+		description = D.BUFF_BACK_DESCRIPTION,
+		build = function()
+			return ns:BuildBuffBackContextReport()
+		end,
+	},
 	emotes = {
 		title = D.EMOTES_TITLE,
 		description = D.EMOTES_DESCRIPTION,
@@ -94,6 +101,13 @@ ns.DIAGNOSTIC_REPORTS = {
 		description = D.SAVED_DESCRIPTION,
 		build = function()
 			return ns:BuildSavedVariablesReport()
+		end,
+	},
+	display = {
+		title = D.DISPLAY_TITLE,
+		description = D.DISPLAY_DESCRIPTION,
+		build = function()
+			return ns:BuildDisplayContextReport()
 		end,
 	},
 	addons = {
@@ -156,7 +170,7 @@ ns.DIAGNOSTIC_SECTIONS = {
 	{
 		key = "settings",
 		label = D.SECTION_SETTINGS,
-		reports = { "context", "wave", "goodNews", "emotes", "saved", "addons" },
+		reports = { "context", "wave", "goodNews", "buffBack", "emotes", "saved", "display", "addons" },
 	},
 	{ key = "code", label = D.SECTION_CODE, reports = { "events", "api", "libs" } },
 	{ key = "data", label = D.SECTION_DATA, reports = {} },

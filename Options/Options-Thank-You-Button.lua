@@ -1,47 +1,52 @@
 local _, ns = ...
 local Data = ns.Data
 local L = ns.L
+local Kit = ns.OptionsKit
 
 local GetColor = ns.GetColor
 
 --[[
-    The whisper row: a caption-sized label, the message box and the Reset button,
-    together one row, so a full sentence stays readable while it is being edited.
-    The emote and icon rows have no button, so their dropdowns take the rest of
-    the row.
+    The whisper, emote and icon rows: a caption-sized label and the control
+    taking the rest of the row, so a full sentence stays readable while it is
+    being edited. Reset sits on its own row under the box.
 ]]
-local WHISPER_LABEL_WIDTH = 0.9
-local RESET_WIDTH = 0.5
-local WHISPER_INPUT_WIDTH = ns.OPTIONS_ROW_WIDTH - WHISPER_LABEL_WIDTH - RESET_WIDTH
-local EMOTE_SELECT_WIDTH = ns.OPTIONS_ROW_WIDTH - WHISPER_LABEL_WIDTH
+local CAPTION_WIDTH = 0.9
+local CONTROL_WIDTH = Kit.ROW_WIDTH - CAPTION_WIDTH
 
---------------------------------------------------------------------------------
--- Whisper Length
---------------------------------------------------------------------------------
+-- The player the Thank You Examples thank: the house Priest.
+local SAMPLE_TARGET = ns.SAMPLE_NAMES.PRIEST
 
 --[[
-    Cut to a byte budget without splitting a multi-byte character. The cap is
-    counted in bytes, not characters, because what it really protects is the
-    chat line: WoW measures that in bytes too. For English the two are the same
-    number.
-
-    A cut landing mid-character would leave a broken tail byte that renders as a
-    replacement glyph, so step back off any UTF-8 continuation byte (0x80-0xBF)
-    sitting at the cut.
+    A macro's switch with Pick Up Macro beside it while the macro exists: it
+    puts the macro on the cursor to drop on an action bar, so nobody has to dig
+    through the macro window for it. Gray in combat, when the game won't let a
+    macro be picked up and placed.
 ]]
-local function TrimToBytes(text, maxBytes)
-	if #text <= maxBytes then
-		return text
-	end
-	local cut = maxBytes
-	while cut > 0 do
-		local b = text:byte(cut + 1)
-		if not b or b < 128 or b >= 192 then
-			break
-		end
-		cut = cut - 1
-	end
-	return text:sub(1, cut)
+function ns.MacroToggleRow(order, toggle, macroName)
+	local pickUp = {
+		type = "execute",
+		desc = L["BUTTON_PICKUP_DESCRIPTION"]:format(Kit.Color("TITLE", macroName)),
+		disabled = function()
+			return InCombatLockdown() or GetMacroIndexByName(macroName) == 0
+		end,
+		func = function()
+			local macroIndex = GetMacroIndexByName(macroName)
+			if macroIndex > 0 and not InCombatLockdown() then
+				PickupMacro(macroIndex)
+			end
+		end,
+	}
+	local row = Kit.ToggleRow(order, toggle, { control = pickUp })
+	-- ToggleRow blanks a control's caption; a button keeps its own.
+	pickUp.name = L["BUTTON_PICKUP"]
+	return row
+end
+
+-- A caption and its control, the control taking the rest of the row.
+local function CaptionRow(order, hidden, caption, control)
+	control.name = ""
+	control.width = CONTROL_WIDTH
+	return Kit.Row(order, hidden, { Kit.Label(caption, nil, CAPTION_WIDTH, control.desc), control })
 end
 
 --------------------------------------------------------------------------------
@@ -105,11 +110,11 @@ local function AddButtonSection(args, button, index)
 	    first control, above it keeps the rule off the previous section's emote box
 	    (and, for button 1, off the panel description).
 	]]
-	args["space_top" .. index] = ns.OptionsSpacer(base)
-	args["header" .. index] = ns.OptionsHeader(string.format(L["BUTTON_SECTION"], index), base + 1)
-	args["space_a" .. index] = ns.OptionsSpacer(base + 2)
+	args["space_top" .. index] = Kit.Spacer(base)
+	args["header" .. index] = Kit.Header(string.format(L["BUTTON_SECTION"], index), base + 1)
+	args["space_a" .. index] = Kit.Spacer(base + 2)
 
-	args["createMacro" .. index] = {
+	args["createMacro" .. index] = ns.MacroToggleRow(base + 3, {
 		type = "toggle",
 		--[[
 		    The macro's name is in the label, not just the tooltip: with five of
@@ -117,8 +122,6 @@ local function AddButtonSection(args, button, index)
 		]]
 		name = string.format(L["BUTTON_MACRO_ENABLE"], button.macroName),
 		desc = string.format(L["BUTTON_MACRO_ENABLE_DESCRIPTION"], GetColor("TITLE") .. button.macroName .. "|r"),
-		width = "full",
-		order = base + 3,
 		get = function()
 			return config().createMacro
 		end,
@@ -137,71 +140,63 @@ local function AddButtonSection(args, button, index)
 			elseif ns.DeleteAutoMacro then
 				ns:DeleteAutoMacro(button)
 			end
+			ns.RefreshSettings()
 		end,
-	}
+	}, button.macroName)
 
-	args["space_b" .. index] = ns.OptionsSpacer(base + 4, sectionHidden)
-	args["whisperLabel" .. index] = ns.OptionsRowLabel(
-		L["WHISPER_MESSAGE"],
-		base + 5,
-		WHISPER_LABEL_WIDTH,
-		sectionHidden,
-		L["BUTTON_WHISPER_DESCRIPTION"]
-	)
-	args["whisperMsg" .. index] = {
+	args["space_b" .. index] = Kit.Spacer(base + 4, sectionHidden)
+	args["whisperMsg" .. index] = CaptionRow(base + 5, sectionHidden, L["WHISPER_MESSAGE"], {
 		type = "input",
-		name = "",
 		desc = L["BUTTON_WHISPER_DESCRIPTION"],
-		width = WHISPER_INPUT_WIDTH,
-		order = base + 6,
-		hidden = sectionHidden,
 		get = function()
 			return config().message
 		end,
 		set = function(_, value)
-			config().message = TrimToBytes(value or "", ns.CHAT_MESSAGE_MAX_LENGTH)
+			config().message = ns.TrimToBytes(value or "", ns.CHAT_MESSAGE_MAX_LENGTH)
+			ns.RefreshSettings()
 		end,
-	}
-	args["resetMsg" .. index] = {
-		type = "execute",
-		name = L["WHISPER_MESSAGE_RESET"],
-		desc = L["WHISPER_MESSAGE_RESET_DESCRIPTION"],
-		width = RESET_WIDTH,
-		order = base + 7,
-		hidden = sectionHidden,
-		func = function()
-			config().message = ns.DATABASE_DEFAULTS.profile[key].message
-		end,
-	}
-
-	-- The whisper as your target receives it; RunThankYou sends the text as typed.
-	local function exampleHidden()
-		return sectionHidden() or (config().message or "") == ""
+	})
+	-- What the box understands, under it.
+	args["whisperTokens" .. index] = Kit.Row(base + 5.5, sectionHidden, {
+		Kit.Label(" ", nil, CAPTION_WIDTH),
+		Kit.Label(
+			Kit.Color("HELP", L["BUTTON_TOKENS"]:format(GetColor("INFO") .. "{name}" .. GetColor("HELP"))),
+			nil,
+			CONTROL_WIDTH
+		),
+	})
+	-- Reset, on its own row under the box, gray while the box holds this button's default.
+	local function defaultMessage()
+		return ns.DATABASE_DEFAULTS.profile[key].message
 	end
-	args["space_example" .. index] = ns.OptionsSpacer(base + 7.3, exampleHidden)
-	args["whisperExample" .. index] = ns.OptionsExample(function()
-		return ns.SampleWhisper(config().message or "")
-	end, base + 7.6, exampleHidden)
+	args["resetMsg" .. index] = Kit.ResetRow(
+		base + 6,
+		sectionHidden,
+		" ",
+		L["WHISPER_MESSAGE_RESET_DESCRIPTION"],
+		function()
+			return config().message == defaultMessage()
+		end,
+		function()
+			config().message = defaultMessage()
+		end
+	)
 
-	args["space_c" .. index] = ns.OptionsSpacer(base + 8, sectionHidden)
+	-- The whisper as your target receives it, on its own line, built as RunThankYou sends it.
+	args["whisperExample" .. index] = Kit.Example(base + 7, function()
+		return sectionHidden() or (config().message or "") == ""
+	end, function()
+		return ns.SampleWhisper(ns.FillThankYouWhisper(config().message or "", SAMPLE_TARGET))
+	end)
+
+	args["space_c" .. index] = Kit.Spacer(base + 8, sectionHidden)
 
 	-- The icon row closes the section, under the emote row or grid.
-	args["space_d" .. index] = ns.OptionsSpacer(base + 11, sectionHidden)
-	args["iconLabel" .. index] = ns.OptionsRowLabel(
-		L["BUTTON_ICON"],
-		base + 12,
-		WHISPER_LABEL_WIDTH,
-		sectionHidden,
-		L["BUTTON_ICON_DESCRIPTION"]
-	)
+	args["space_d" .. index] = Kit.Spacer(base + 11, sectionHidden)
 	local choices, choiceOrder = IconChoices()
-	args["iconSelect" .. index] = {
+	args["iconSelect" .. index] = CaptionRow(base + 12, sectionHidden, L["BUTTON_ICON"], {
 		type = "select",
-		name = "",
 		desc = L["BUTTON_ICON_DESCRIPTION"],
-		width = EMOTE_SELECT_WIDTH,
-		order = base + 13,
-		hidden = sectionHidden,
 		values = choices,
 		sorting = choiceOrder,
 		get = function()
@@ -211,8 +206,9 @@ local function AddButtonSection(args, button, index)
 		set = function(_, value)
 			config().macroIcon = value
 			ns.ReconcileMacros()
+			ns.RefreshSettings()
 		end,
-	}
+	})
 
 	--[[
 	    A single-emote button gets one dropdown instead of the checklist: there is
@@ -221,20 +217,9 @@ local function AddButtonSection(args, button, index)
 	]]
 	if button.singleEmote then
 		local values, sorting = ns.GetEmoteSelectChoices()
-		args["emoteLabel" .. index] = ns.OptionsRowLabel(
-			L["BUTTON_EMOTE"],
-			base + 9,
-			WHISPER_LABEL_WIDTH,
-			sectionHidden,
-			L["BUTTON_EMOTE_DESCRIPTION"]
-		)
-		args["emoteSelect" .. index] = {
+		args["emoteSelect" .. index] = CaptionRow(base + 9, sectionHidden, L["BUTTON_EMOTE"], {
 			type = "select",
-			name = "",
 			desc = L["BUTTON_EMOTE_DESCRIPTION"],
-			width = EMOTE_SELECT_WIDTH,
-			order = base + 10,
-			hidden = sectionHidden,
 			values = values,
 			sorting = sorting,
 			get = function()
@@ -249,8 +234,9 @@ local function AddButtonSection(args, button, index)
 			end,
 			set = function(_, value)
 				config().emote = value
+				ns.RefreshSettings()
 			end,
-		}
+		})
 		return
 	end
 
@@ -265,7 +251,7 @@ function ns.BuildThankYouButtonOptions()
 		name = L["TAB_THANK_YOU_BUTTON"],
 		type = "group",
 		args = {
-			descIntro = ns.OptionsDesc(L["BUTTON_DESCRIPTION"], 1),
+			descIntro = Kit.Desc(L["BUTTON_DESCRIPTION"], 1),
 		},
 	}
 

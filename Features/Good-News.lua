@@ -10,113 +10,17 @@ local DETECT = Data.GOOD_NEWS_DETECT
 --[[
     A whisper telling a player what you just cast on them: "Good News! You
     have [Power Infusion] for 15 Seconds // TFTB". Only abilities
-    ticked on the Tracked Abilities panel count, from Data/<Flavor>/Good-News-Abilities-<Flavor>.lua.
+    ticked on the Tracked Abilities panel count, from Data/<Flavor>/Good-News-Abilities-<Flavor>.lua
+    (looked up in Good-News-Abilities.lua).
 
     Driven by your own UNIT_SPELLCAST_SENT and UNIT_SPELLCAST_SUCCEEDED, never
-    by the combat log, which is what lets it run on WoW Forever: add-ons can't
-    register Forever's combat log at all. SENT is the only event that names who
-    you cast at; SUCCEEDED confirms the cast went off, so an interrupted one
-    stays silent.
+    by the combat log. SENT is the only event that names who you cast at;
+    SUCCEEDED confirms the cast went off, so an interrupted one stays silent.
 
-    WoW Forever hides unit identity and auras in combat (C_Secrets). A cast at
-    a player whose identity is hidden can't be matched to anyone, so it sends
-    nothing; one whose auras are hidden still sends, without the duration.
+    Left out of WoW Forever: its TOC doesn't load this file or the Good News
+    panels. Forever hides who you cast at while you're in combat, so the casts
+    Good News is for would send nothing.
 ]]
-
---------------------------------------------------------------------------------
--- Ability Lookup
---------------------------------------------------------------------------------
-
---[[
-    Built once, at login (ns.SetupGoodNews). castLookup is keyed by
-    the CAST id, which is what the spellcast events carry; that differs from the
-    aura id for a row like Misdirection, so each record also carries the ids the
-    checkbox is saved under (watchedIds) and the aura to read the duration from
-    (auraId). Rows reads the same data for the Tracked Abilities panel.
-
-    Every item a row names is requested here, so the client has its name by
-    the time the panel labels a scroll with it rather than with its spell.
-
-    A RESURRECT row needs the combat log to confirm the revive, so it is left out
-    on WoW Forever, where that never arrives. Its data lists none anyway.
-]]
-local castLookup, rows
-
-local function WatchedId(row, trigger)
-	if row.detect == DETECT.AURA then
-		return trigger.aura or trigger.spell
-	end
-	return trigger.spell
-end
-
-local function RequestItem(itemId)
-	if itemId and not C_Item.GetItemNameByID(itemId) then
-		C_Item.RequestLoadItemDataByID(itemId)
-	end
-end
-
-local function BuildLookup()
-	castLookup, rows = {}, {}
-	local DoesSpellExist = C_Spell.DoesSpellExist
-	for _, row in ipairs(ns.GOOD_NEWS_ABILITIES or {}) do
-		RequestItem(row.labelItem)
-		local usable = not (row.detect == DETECT.RESURRECT and ns.FLAVOR == "Camelot")
-		local info = { row = row, watchedIds = {}, spellIds = {}, itemIds = {} }
-		for _, trigger in ipairs(usable and row.triggers or {}) do
-			local watched = WatchedId(row, trigger)
-			-- A rank or variant this client lacks is dropped; a row with none left is skipped.
-			if DoesSpellExist(trigger.spell) or DoesSpellExist(watched) then
-				info.watchedIds[#info.watchedIds + 1] = watched
-				info.spellIds[#info.spellIds + 1] = trigger.spell
-				if trigger.item then
-					info.itemIds[#info.itemIds + 1] = trigger.item
-					RequestItem(trigger.item)
-				end
-				castLookup[trigger.spell] = {
-					info = info,
-					watchedId = watched,
-					itemId = trigger.item,
-					--[[
-					    Nothing to read for a cast that leaves no aura, or for a
-					    buff spent by an event rather than by time (noDuration):
-					    no auraId is what leaves the duration out of the whisper.
-					]]
-					auraId = (row.detect == DETECT.AURA and not row.noDuration) and watched or nil,
-				}
-			end
-		end
-		if #info.watchedIds > 0 then
-			rows[#rows + 1] = info
-		end
-	end
-end
-
--- Run once from Core's login sequence.
-function ns.SetupGoodNews()
-	if not castLookup then
-		BuildLookup()
-	end
-end
-
--- Every row this client can cast, for the Tracked Abilities panel.
-function ns.GetGoodNewsRows()
-	if not rows then
-		BuildLookup()
-	end
-	return rows
-end
-
-local function GetCastRecord(spellID)
-	if not castLookup then
-		BuildLookup()
-	end
-	return castLookup[spellID]
-end
-
--- A row with no saved choice is ticked.
-function ns.IsGoodNewsWatched(watchedId)
-	return ns.db.profile.goodNews.watched[watchedId] ~= false
-end
 
 --------------------------------------------------------------------------------
 -- Recipient
@@ -260,7 +164,7 @@ local function OnUnitSpellcastSent(_, target, castGUID, spellID)
 		return
 	end
 
-	local record = GetCastRecord(spellID)
+	local record = ns.GetGoodNewsCastRecord(spellID)
 	if not record or not ns.IsGoodNewsWatched(record.watchedId) then
 		return
 	end

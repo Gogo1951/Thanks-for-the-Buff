@@ -1,6 +1,7 @@
 local _, ns = ...
 local Data = ns.Data
 local L = ns.L
+local Kit = ns.OptionsKit
 
 local GetColor = ns.GetColor
 
@@ -10,6 +11,16 @@ local GetColor = ns.GetColor
     whisper's composer. Which abilities count is a child panel of its own,
     Tracked Abilities (Options-Good-News-Abilities.lua).
 ]]
+
+-- Good News's switch, between Give Thanks and Wave to Friends. WoW Forever doesn't load this file, so it has none.
+table.insert(ns.FEATURES, 2, {
+	store = "profile",
+	setting = "goodNews.enabled",
+	name = "TAB_GOOD_NEWS",
+	caption = "GOOD_NEWS_ENABLE",
+	desc = "GOOD_NEWS_ENABLE_DESCRIPTION",
+	block = true,
+})
 
 --------------------------------------------------------------------------------
 -- Example Lines
@@ -44,25 +55,21 @@ function ns.BuildGoodNewsOptions()
 		name = L["TAB_GOOD_NEWS"],
 		type = "group",
 		args = {
-			descIntro = ns.OptionsDesc(L["GOOD_NEWS_DESCRIPTION"], 1),
-			space0 = ns.OptionsSpacer(2),
+			descIntro = Kit.Desc(L["GOOD_NEWS_DESCRIPTION"], 1),
+			space0 = Kit.Spacer(2),
 
 			--[[
 			    Master switch: everything below it hides when off, and the feature
 			    itself stops -- see the `enabled` gate in Features/Good-News.lua.
 			    Its twin sits in the General panel's Features section.
 			]]
-			enable = ns.OptionsFeatureToggle(ns.GetFeatureSwitch("goodNews"), 3),
-			enableSpacer = ns.OptionsSpacer(4),
+			enable = Kit.FeatureSwitch("goodNews.enabled", 3),
+			enableSpacer = Kit.Spacer(4),
 
 			-- Who gets it, on its own label-beside-control row.
-			scopeLabel = ns.OptionsRowLabel(L["GOOD_NEWS_SCOPE"], 5, nil, nil, L["GOOD_NEWS_SCOPE_DESCRIPTION"]),
-			scope = {
+			scope = Kit.LabelRow(5, nil, L["GOOD_NEWS_SCOPE"], {
 				type = "select",
-				name = "",
 				desc = L["GOOD_NEWS_SCOPE_DESCRIPTION"],
-				width = ns.OPTIONS_CONTROL_WIDTH,
-				order = 5.1,
 				values = {
 					ALWAYS = L["GOOD_NEWS_SCOPE_ALWAYS"],
 					GROUP = L["GOOD_NEWS_SCOPE_GROUP"],
@@ -72,18 +79,16 @@ function ns.BuildGoodNewsOptions()
 					-- Anything but ALWAYS reads as GROUP, as the feature does, so a stale value never shows blank.
 					return settings().scope == "ALWAYS" and "ALWAYS" or "GROUP"
 				end,
-				set = function(_, value)
-					settings().scope = value
-				end,
-			},
-			scopeSpacer = ns.OptionsSpacer(6),
+				set = Kit.Set("profile", "goodNews.scope"),
+			}),
+			scopeSpacer = Kit.Spacer(6),
 
-			headerWhisper = ns.OptionsHeader(L["GOOD_NEWS_WHISPER_HEADER"], 10),
-			spaceWhisper = ns.OptionsSpacer(10.5),
-			descWhisper = ns.OptionsDesc(L["GOOD_NEWS_WHISPER_DESCRIPTION"], 10.6),
-			spaceWhisperDesc = ns.OptionsSpacer(10.8),
+			headerWhisper = Kit.Header(L["GOOD_NEWS_WHISPER_HEADER"], 10),
+			spaceWhisper = Kit.Spacer(10.5),
+			descWhisper = Kit.Desc(L["GOOD_NEWS_WHISPER_DESCRIPTION"], 10.6),
+			spaceWhisperDesc = Kit.Spacer(10.8),
 			-- 11 through 11.36 belong to the whisper composer, added below.
-			spaceAfterWhisper = ns.OptionsSpacer(12),
+			spaceAfterWhisper = Kit.Spacer(12),
 		},
 	}
 
@@ -110,9 +115,9 @@ function ns.BuildGoodNewsOptions()
 	}, 11)
 
 	-- Intro text and the switch itself stay; everything else follows the switch.
-	ns.HideAllExcept(options.args, function()
+	Kit.HideAllExcept(options.args, function()
 		return not settings().enabled
-	end, { descIntro = true, space0 = true, enable = true })
+	end, { "descIntro", "space0", "enable" })
 
 	return options
 end

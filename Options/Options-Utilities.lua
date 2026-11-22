@@ -1,131 +1,25 @@
-local ADDON_NAME, ns = ...
+local _, ns = ...
 local Data = ns.Data
 local L = ns.L
+local Kit = ns.OptionsKit
 
 local GetColor = ns.GetColor
 
 --------------------------------------------------------------------------------
--- Shared Options Helpers
+-- Options-Kit Strings
 --------------------------------------------------------------------------------
 
---[[
-    Every section header in the add-on is a real AceConfig "header" -- the ruled
-    line with the title set into it -- and no panel draws its own out of a colored
-    description. `hidden` is optional (a function or a boolean) here and on
-    OptionsDesc and OptionsSpacer, for the panels whose whole section collapses
-    behind a master switch.
-]]
-function ns.OptionsHeader(text, order, hidden)
-	return { type = "header", name = GetColor("TITLE") .. text .. "|r", order = order, hidden = hidden }
-end
-
-function ns.OptionsDesc(text, order, hidden)
-	return { type = "description", name = text, fontSize = "medium", order = order, hidden = hidden }
-end
-
-function ns.OptionsSpacer(order, hidden)
-	return { type = "description", name = " ", order = order, hidden = hidden }
-end
-
---[[
-    A row label that explains itself on hover. AceConfig gives a description no
-    tooltip, so a label-beside-control row read as a bare caption and only its
-    control answered the mouse. This is the stock Label with mouse scripts that
-    fire AceGUI's OnEnter and OnLeave, which AceConfigDialog already answers with
-    the option's name and desc, so the label shows the control's tooltip under
-    its own caption.
-]]
-local AceGUI = LibStub("AceGUI-3.0")
-local ROW_LABEL_WIDGET, ROW_LABEL_VERSION = ADDON_NAME .. "_RowLabel", 1
-
-AceGUI:RegisterWidgetType(ROW_LABEL_WIDGET, function()
-	local widget = AceGUI.WidgetRegistry["Label"]()
-	widget.type = ROW_LABEL_WIDGET
-	widget.frame:EnableMouse(true)
-	widget.frame:SetScript("OnEnter", function()
-		widget:Fire("OnEnter")
-	end)
-	widget.frame:SetScript("OnLeave", function()
-		widget:Fire("OnLeave")
-	end)
-	return widget
-end, ROW_LABEL_VERSION)
-
---[[
-    The left half of a label-beside-control row: the control that follows carries
-    name = "" and ns.OPTIONS_CONTROL_WIDTH, so the two total one row and flow onto
-    the same line. A row whose control needs more room passes its own width here.
-    `desc` is the control's own tooltip text: given, hovering the label shows it
-    too, titled with the label.
-]]
-function ns.OptionsRowLabel(text, order, width, hidden, desc)
-	return {
-		type = "description",
-		name = text,
-		desc = desc,
-		dialogControl = desc and ROW_LABEL_WIDGET or nil,
-		fontSize = "medium",
-		width = width or ns.OPTIONS_LABEL_WIDTH,
-		order = order,
-		--[[
-		    A label has no state of its own, so nothing hides it unless it is told
-		    to: on a panel behind a master switch, one left out is the caption that
-		    stays floating after everything it described has gone.
-		]]
-		hidden = hidden,
-	}
-end
-
---[[
-    A copyable link: a short caption beside a read-only box holding the full URL.
-    The caption is one short word, so it takes less than the usual label width
-    and the box the rest of the row. Fills `order` and `order + 1`.
-]]
-local LINK_LABEL_WIDTH = 0.6
-
-function ns.OptionsLinkRow(args, key, caption, url, order)
-	args["label" .. key] = ns.OptionsRowLabel(GetColor("TITLE") .. caption .. "|r", order, LINK_LABEL_WIDTH)
-	args["url" .. key] = {
-		type = "input",
-		name = "",
-		order = order + 1,
-		width = ns.OPTIONS_ROW_WIDTH - LINK_LABEL_WIDTH,
-		get = function()
-			return url
-		end,
-		set = function() end,
-	}
-end
+-- Every string the kit draws, handed over once (Options-Kit.md → Strings).
+Kit.SetText({
+	example = L["SAMPLE_EXAMPLE"],
+	soundPreview = L["OPTIONS_SOUND_PREVIEW_DESCRIPTION"],
+	inCombat = L["CHAT_OPTIONS_IN_COMBAT"],
+	reset = L["OPTIONS_RESET"],
+})
 
 --------------------------------------------------------------------------------
--- Example Lines
+-- Sample Lines
 --------------------------------------------------------------------------------
-
---[[
-    A panel falls back to white after a link's closing |r, where a chat frame
-    falls back to the line's color, so the color is opened again after every |r.
-]]
-function ns.TintText(color, text)
-	return color .. (text:gsub("|r", "|r" .. color)) .. "|r"
-end
-
---[[
-    A silver "Example:" line showing the exact string a feature prints or
-    sends. getText returns the finished line in its own colors; a function so
-    the line redraws as settings change. Silver opens again after the line, for
-    a locale whose label runs on past it.
-]]
-function ns.OptionsExample(getText, order, hidden)
-	return {
-		type = "description",
-		name = function()
-			return GetColor("HELP") .. L["SAMPLE_EXAMPLE"]:format(getText() .. GetColor("HELP")) .. "|r"
-		end,
-		fontSize = "medium",
-		order = order,
-		hidden = hidden,
-	}
-end
 
 local WHISPER_FALLBACK_COLOR = "FF80FF"
 
@@ -133,10 +27,10 @@ local WHISPER_FALLBACK_COLOR = "FF80FF"
 local function WhisperColor()
 	local info = ChatTypeInfo and ChatTypeInfo.WHISPER
 	if not info then
-		return "|cff" .. WHISPER_FALLBACK_COLOR
+		return WHISPER_FALLBACK_COLOR
 	end
 	return string.format(
-		"|cff%02x%02x%02x",
+		"%02x%02x%02x",
 		math.floor(info.r * 255 + 0.5),
 		math.floor(info.g * 255 + 0.5),
 		math.floor(info.b * 255 + 0.5)
@@ -157,7 +51,7 @@ end
 -- A whisper as the player receiving it sees it: "[You] whispers: message", in the whisper color.
 function ns.SampleWhisper(message)
 	local prefix = (CHAT_WHISPER_GET or "%s whispers: "):format(SampleSender())
-	return ns.TintText(WhisperColor(), prefix .. message)
+	return Kit.Tint(WhisperColor(), prefix .. message)
 end
 
 -- Chat draws the {rt1} marker as the Star icon; panel text needs the texture itself.
@@ -179,15 +73,19 @@ end
       the whole profile, so picking another swaps in that language's default
       in every composer still holding the old language's default, and nobody's
       own words are ever replaced.
-    - The message row: the Star marker, the box, the "// TFTB" sign-off and
-      Reset. The marker and sign-off are captions, not part of the box: SignOff
-      adds them to whatever is typed, so they can't be deleted, and showing them
-      either side makes that plain before anything is sent.
-    - The tokens under the box: what the box understands. Once the filled
-      message passes the chat ceiling (in bytes, so Cyrillic, Korean and Chinese
-      get there sooner), a line says the default will go instead. There is no
+    - The message row: the Star marker, the box and the "// TFTB" sign-off. The
+      marker and sign-off are captions, not part of the box: SignOff adds them
+      to whatever is typed, so they can't be deleted, and showing them either
+      side makes that plain before anything is sent. A composer with extra
+      boxes repeats the row under the first, with no caption.
+    - The tokens under the box: what the box understands. Once a filled message
+      passes the chat ceiling (in bytes, so Cyrillic, Korean and Chinese get
+      there sooner), a red line says the default will go instead. There is no
       live count: the panel only redraws on save, so one would lag the typing.
-    - The Example line and Send Test to Me, built by the same code that sends.
+    - Reset, on its own row under the box, gray while the first box holds the
+      default.
+    - The Example line and Send Test to Me, built by the same code that sends,
+      from the first box.
 
     `spec` says what the composer edits:
     - settings(): the profile table holding `whisperMessage`.
@@ -198,19 +96,15 @@ end
     - test(text): sends build's message to the player's own character.
     - tokens: the tokens line, drawn after "Tokens:" in silver.
     - description: the box's tooltip.
+    - extraFields: optional; more settings fields, each a box of its own under
+      the first, and labelCaption / tokensSuffix to caption them.
 ]]
 local WHISPER_LABEL_WIDTH = 0.9
 local WHISPER_MARKER_WIDTH = 0.15
 local WHISPER_SIGN_OFF_WIDTH = 0.35
-local WHISPER_RESET_WIDTH = 0.5
-local WHISPER_INPUT_WIDTH = ns.OPTIONS_ROW_WIDTH
-	- WHISPER_LABEL_WIDTH
-	- WHISPER_MARKER_WIDTH
-	- WHISPER_SIGN_OFF_WIDTH
-	- WHISPER_RESET_WIDTH
--- The hint row's first cell spans the label and the marker, so its second starts under the box.
+local WHISPER_INPUT_WIDTH = Kit.ROW_WIDTH - WHISPER_LABEL_WIDTH - WHISPER_MARKER_WIDTH - WHISPER_SIGN_OFF_WIDTH
+-- The hint rows' first cell spans the label and the marker, so their second starts under the box.
 local WHISPER_HINT_INDENT = WHISPER_LABEL_WIDTH + WHISPER_MARKER_WIDTH
-local WHISPER_LANGUAGE_WIDTH = ns.OPTIONS_ROW_WIDTH - WHISPER_LABEL_WIDTH
 local WHISPER_TEST_WIDTH = 1.0
 
 local languageValues, languageSorting
@@ -226,127 +120,160 @@ local function LanguageChoices()
 	return languageValues, languageSorting
 end
 
--- Every composer built, so a language change reaches each message, whichever panel it was made on.
-local composers = {}
+--[[
+    Every message with a language default: its profile table and its default.
+    A language change swaps the new default into each one still holding the old
+    language's, from the panel or the menu alike.
+]]
+local LANGUAGE_DEFAULTS = {
+	{
+		settings = function()
+			return ns.db.profile.strangers
+		end,
+		default = function(locale)
+			return ns.GetDefaultThanksWhisper(locale)
+		end,
+	},
+	{
+		settings = function()
+			return ns.db.profile.goodNews
+		end,
+		default = function(locale)
+			return ns.GetDefaultGoodNewsWhisper(locale)
+		end,
+	},
+}
 
-local function SetMessageLanguage(value)
+function ns.SetMessageLanguage(value)
 	local current = ns.GetMessageLanguage()
-	for _, spec in ipairs(composers) do
-		local settings = spec.settings()
-		if settings.whisperMessage == spec.default(current) then
-			settings.whisperMessage = spec.default(value)
+	for _, message in ipairs(LANGUAGE_DEFAULTS) do
+		local settings = message.settings()
+		if settings.whisperMessage == message.default(current) then
+			settings.whisperMessage = message.default(value)
 		end
 	end
 	ns.db.profile.messageLanguage = value
+	ns.RefreshSettings()
+end
+
+-- The Send Messages In choices, locale → name, and their order.
+ns.GetMessageLanguageChoices = LanguageChoices
+
+local function Trim(value)
+	return (value or ""):match("^%s*(.-)%s*$")
+end
+
+-- One message row: caption, marker, box, sign-off. Totals the row.
+local function MessageRow(order, hidden, spec, field, caption)
+	return Kit.Row(order, hidden, {
+		Kit.Label(caption, nil, WHISPER_LABEL_WIDTH, caption ~= " " and spec.description or nil),
+		Kit.Label(ns.MARKER_TEXTURE, nil, WHISPER_MARKER_WIDTH, L["WHISPER_SIGN_OFF_DESCRIPTION"]),
+		{
+			type = "input",
+			name = "",
+			desc = spec.description,
+			width = WHISPER_INPUT_WIDTH,
+			get = function()
+				return spec.settings()[field]
+			end,
+			set = function(_, value)
+				spec.settings()[field] = Trim(value)
+				ns.RefreshSettings()
+			end,
+		},
+		Kit.Label(
+			GetColor("SEPARATOR") .. "// " .. L["ADDON_SHORT_NAME"] .. "|r",
+			nil,
+			WHISPER_SIGN_OFF_WIDTH,
+			L["WHISPER_SIGN_OFF_DESCRIPTION"]
+		),
+	})
+end
+
+-- A line under the box, held clear of the label column.
+local function HintRow(order, hidden, line)
+	line.width = Kit.ROW_WIDTH - WHISPER_HINT_INDENT
+	return Kit.Row(order, hidden, { Kit.Label(" ", nil, WHISPER_HINT_INDENT), line })
 end
 
 -- Fills `order` through `order + 0.36`.
 function ns.DefineWhisperComposer(args, spec, order)
-	composers[#composers + 1] = spec
 	local hidden = spec.hidden
+	local fields = { "whisperMessage" }
+	for _, field in ipairs(spec.extraFields or {}) do
+		fields[#fields + 1] = field
+	end
 	local function messageHidden()
 		return hidden() or (spec.settings().whisperMessage or "") == ""
 	end
 
 	-- Send Messages In
-	args.messageLanguageLabel =
-		ns.OptionsRowLabel(L["SEND_MESSAGES_IN"], order, WHISPER_LABEL_WIDTH, hidden, L["SEND_MESSAGES_IN_DESCRIPTION"])
-	args.messageLanguage = {
+	local values, sorting = LanguageChoices()
+	args.messageLanguage = Kit.LabelRow(order, hidden, L["SEND_MESSAGES_IN"], {
 		type = "select",
-		name = "",
 		desc = L["SEND_MESSAGES_IN_DESCRIPTION"],
-		width = WHISPER_LANGUAGE_WIDTH,
-		order = order + 0.01,
-		hidden = hidden,
-		values = function()
-			return (LanguageChoices())
-		end,
-		sorting = select(2, LanguageChoices()),
+		values = values,
+		sorting = sorting,
 		get = function()
 			return ns.GetMessageLanguage()
 		end,
 		set = function(_, value)
-			SetMessageLanguage(value)
+			ns.SetMessageLanguage(value)
 		end,
-	}
-	args.messageLanguageSpacer = ns.OptionsSpacer(order + 0.05, hidden)
+	})
+	args.messageLanguageSpacer = Kit.Spacer(order + 0.05, hidden)
 
-	-- The message row: label, marker, box, sign-off, Reset.
-	args.whisperMessageLabel =
-		ns.OptionsRowLabel(L["WHISPER_MESSAGE"], order + 0.1, WHISPER_LABEL_WIDTH, hidden, spec.description)
-	args.whisperMarker = ns.OptionsRowLabel(
-		ns.MARKER_TEXTURE,
-		order + 0.11,
-		WHISPER_MARKER_WIDTH,
-		hidden,
-		L["WHISPER_SIGN_OFF_DESCRIPTION"]
-	)
-	args.whisperMessage = {
-		type = "input",
-		name = "",
-		desc = spec.description,
-		width = WHISPER_INPUT_WIDTH,
-		order = order + 0.12,
-		hidden = hidden,
-		get = function()
-			return spec.settings().whisperMessage
-		end,
-		set = function(_, value)
-			spec.settings().whisperMessage = (value or ""):match("^%s*(.-)%s*$")
-		end,
-	}
-	args.whisperSignOff = ns.OptionsRowLabel(
-		GetColor("SEPARATOR") .. "// " .. L["ADDON_SHORT_NAME"] .. "|r",
-		order + 0.13,
-		WHISPER_SIGN_OFF_WIDTH,
-		hidden,
-		L["WHISPER_SIGN_OFF_DESCRIPTION"]
-	)
-	args.whisperMessageReset = {
-		type = "execute",
-		name = L["WHISPER_MESSAGE_RESET"],
-		desc = L["WHISPER_MESSAGE_RESET_DESCRIPTION"],
-		width = WHISPER_RESET_WIDTH,
-		order = order + 0.14,
-		hidden = hidden,
-		func = function()
-			spec.settings().whisperMessage = spec.default()
-		end,
-	}
+	-- The message rows: the first captioned, any extra boxes under it.
+	for index, field in ipairs(fields) do
+		local caption = index == 1 and (spec.labelCaption or L["WHISPER_MESSAGE"]) or " "
+		args["whisperMessageRow" .. index] = MessageRow(order + 0.1 + index * 0.001, hidden, spec, field, caption)
+	end
 
-	-- The tokens line under the box, a blank cell holding it clear of the label column.
-	args.whisperTokensIndent = ns.OptionsRowLabel(" ", order + 0.2, WHISPER_HINT_INDENT, hidden)
-	args.whisperTokens = {
+	-- The tokens line under the boxes.
+	args.whisperTokens = HintRow(order + 0.2, hidden, {
 		type = "description",
 		name = function()
-			return GetColor("HELP") .. spec.tokens() .. "|r"
+			return GetColor("HELP") .. spec.tokens() .. (spec.tokensSuffix or "") .. "|r"
 		end,
-		width = ns.OPTIONS_ROW_WIDTH - WHISPER_HINT_INDENT,
 		fontSize = "medium",
-		order = order + 0.21,
-		hidden = hidden,
-	}
+	})
 
 	-- Past the ceiling: say what will happen instead.
-	local function fitsHidden()
-		return messageHidden() or #spec.fill(spec.settings().whisperMessage or "") <= ns.CHAT_MESSAGE_MAX_LENGTH
+	local function tooLong()
+		if hidden() then
+			return false
+		end
+		for _, field in ipairs(fields) do
+			local text = spec.settings()[field] or ""
+			if text ~= "" and #spec.fill(text) > ns.CHAT_MESSAGE_MAX_LENGTH then
+				return true
+			end
+		end
+		return false
 	end
-	args.whisperTooLongIndent = ns.OptionsRowLabel(" ", order + 0.25, WHISPER_HINT_INDENT, fitsHidden)
-	args.whisperTooLong = {
-		type = "description",
-		name = GetColor("OFF") .. L["WHISPER_TOO_LONG"] .. "|r",
-		width = ns.OPTIONS_ROW_WIDTH - WHISPER_HINT_INDENT,
-		fontSize = "medium",
-		order = order + 0.26,
-		hidden = fitsHidden,
-	}
+	args.whisperTooLong = HintRow(order + 0.25, function()
+		return not tooLong()
+	end, Kit.WarningLine(L["WHISPER_TOO_LONG"], tooLong))
 
-	-- The Example line: the whisper as the recipient gets it, "[You] whispers: ...". Then Send Test to Me.
-	args.whisperExampleSpacer = ns.OptionsSpacer(order + 0.3, messageHidden)
-	args.whisperExample = ns.OptionsExample(function()
+	-- Reset, on its own row under the box.
+	args.whisperMessageReset = Kit.ResetRow(
+		order + 0.27,
+		hidden,
+		" ",
+		L["WHISPER_MESSAGE_RESET_DESCRIPTION"],
+		function()
+			return spec.settings().whisperMessage == spec.default()
+		end,
+		function()
+			spec.settings().whisperMessage = spec.default()
+		end
+	)
+
+	-- The Example: the whisper as the recipient gets it, "[You] whispers: ...". Then Send Test to Me.
+	args.whisperExample = Kit.Example(order + 0.31, messageHidden, function()
 		return ns.SampleWhisper(ns.MarkerAsTexture(spec.build(spec.settings().whisperMessage) or ""))
-	end, order + 0.31, messageHidden)
-	args.whisperTestSpacer = ns.OptionsSpacer(order + 0.35, messageHidden)
+	end)
+	args.whisperTestSpacer = Kit.Spacer(order + 0.35, messageHidden)
 	args.whisperTest = {
 		type = "execute",
 		name = L["WHISPER_TEST"],
@@ -361,134 +288,34 @@ function ns.DefineWhisperComposer(args, spec, order)
 end
 
 --------------------------------------------------------------------------------
--- Feature Switches
+-- Features
 --------------------------------------------------------------------------------
 
 --[[
-    Every feature's on/off switch, built once here and placed twice: at the top
-    of the feature's own panel and in the General panel's Features section. Both
-    copies bind the same setting and carry the same caption and tooltip, and
-    flipping either repaints every panel so the other copy and the settings it
-    hides follow at once.
+    Every feature's on/off switch, in menu order. The root panel's Features
+    section, each feature panel's Enable switch and the mini-map menu all build
+    from this one list (Options-Kit.md → Features), so every copy shares its
+    caption, tooltip and setter, and flipping any one repaints the rest.
 ]]
-ns.FEATURE_SWITCHES = {
-	--[[
-	    key: the profile subtable, setting: its on/off field, name/desc: locale keys,
-	    onChange: present only for a feature that must react the moment either copy flips.
-	]]
-	{ key = "strangers", setting = "enabled", name = "GIVE_THANKS_ENABLE", desc = "GIVE_THANKS_ENABLE_DESCRIPTION" },
-	{ key = "goodNews", setting = "enabled", name = "GOOD_NEWS_ENABLE", desc = "GOOD_NEWS_ENABLE_DESCRIPTION" },
-	{ key = "wave", setting = "enabled", name = "WAVE_ENABLE", desc = "WAVE_ENABLE_DESCRIPTION" },
+ns.FEATURES = {
+	{
+		store = "profile",
+		setting = "strangers.enabled",
+		name = "TAB_GIVE_THANKS",
+		caption = "GIVE_THANKS_ENABLE",
+		desc = "GIVE_THANKS_ENABLE_DESCRIPTION",
+		block = true,
+	},
+	{
+		store = "profile",
+		setting = "wave.enabled",
+		name = "TAB_WAVE_TO_FRIENDS",
+		caption = "WAVE_ENABLE",
+		desc = "WAVE_ENABLE_DESCRIPTION",
+		block = true,
+	},
 }
-
-local function NotifyAllPanels()
-	local registry = LibStub("AceConfigRegistry-3.0")
-	for _, name in pairs(ns.OPTIONS_REGISTRY) do
-		registry:NotifyChange(name)
-	end
-end
-
-function ns.OptionsFeatureToggle(feature, order, width)
-	return {
-		type = "toggle",
-		name = L[feature.name],
-		desc = L[feature.desc],
-		width = width or "full",
-		order = order,
-		get = function()
-			return ns.db.profile[feature.key][feature.setting]
-		end,
-		set = function(_, value)
-			ns.SetFeatureSwitch(feature.key, value)
-		end,
-	}
-end
-
-function ns.GetFeatureSwitch(key)
-	for _, feature in ipairs(ns.FEATURE_SWITCHES) do
-		if feature.key == key then
-			return feature
-		end
-	end
-	return nil
-end
-
---[[
-    Flips a feature from either copy of its toggle, so each one reacts and
-    every open panel repaints the same way.
-]]
-function ns.SetFeatureSwitch(key, value)
-	local feature = ns.GetFeatureSwitch(key)
-	ns.db.profile[key][feature.setting] = value
-	if feature.onChange then
-		feature.onChange()
-	end
-	NotifyAllPanels()
-end
-
---[[
-    Lays toggles out two to a line, each pair in its own unnamed inline group so
-    every pair pins its own row. The widths leave slack under
-    ns.OPTIONS_ROW_WIDTH: a row summing exactly to the pane sits on the wrap
-    boundary and can drop its second toggle onto a line of its own.
-]]
-local TOGGLE_PAIR_WIDTH = (ns.OPTIONS_ROW_WIDTH - 0.2) / 2
-
-function ns.OptionsTogglePairs(args, keyPrefix, startOrder, toggles)
-	for index = 1, #toggles, 2 do
-		local pair = {}
-		for offset = 0, 1 do
-			local toggle = toggles[index + offset]
-			if toggle then
-				toggle.width = TOGGLE_PAIR_WIDTH
-				toggle.order = offset + 1
-				pair["toggle" .. (offset + 1)] = toggle
-			end
-		end
-		args[keyPrefix .. index] = {
-			type = "group",
-			name = "",
-			inline = true,
-			order = startOrder + index,
-			args = pair,
-		}
-	end
-end
-
---------------------------------------------------------------------------------
--- Master Switch
---------------------------------------------------------------------------------
-
---[[
-    Hides every arg not named in `keep` while isHidden() is true.
-
-    Applied to the finished args table rather than threaded through every
-    Define* builder, so a control added later is covered automatically.
-
-    An arg's own `hidden` is COMPOSED, not replaced, so a control that hides for
-    its own reason (the whisper Example follows its toggle) still does while
-    the switch is on.
-]]
-function ns.HideAllExcept(args, isHidden, keep)
-	for key, option in pairs(args) do
-		if not keep[key] then
-			local own = option.hidden
-			if own == nil then
-				option.hidden = isHidden
-			else
-				option.hidden = function(info)
-					if isHidden(info) then
-						return true
-					end
-					if type(own) == "function" then
-						return own(info)
-					end
-					return own
-				end
-			end
-		end
-	end
-end
+-- Good News adds itself between the two (Options-Good-News.lua), except on WoW Forever, which doesn't load it.
 
 --------------------------------------------------------------------------------
 -- Emote Picker

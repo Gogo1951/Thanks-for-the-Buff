@@ -32,7 +32,7 @@ L["MESSAGE_CANT_THANK_SELF"] = "Вы не можете благодарить с
 --------------------------------------------------------------------------------
 
 L["UNKNOWN_SPELL"] = "Неизвестное заклинание"
-L["SAMPLE_EXAMPLE"] = "Пример: %s"
+L["SAMPLE_EXAMPLE"] = "Пример"
 
 --------------------------------------------------------------------------------
 -- Options: Main Panel
@@ -41,11 +41,12 @@ L["SAMPLE_EXAMPLE"] = "Пример: %s"
 L["OPTIONS_WELCOME_TOGGLE"] = "Включить приветственное сообщение"
 L["OPTIONS_WELCOME_DESCRIPTION"] =
 	"Выводит сообщение, которое видите только вы, при входе в игру."
+L["OPTIONS_ENABLE_MINIMAP"] = "Включить кнопку у миникарты"
+L["OPTIONS_ENABLE_MINIMAP_DESCRIPTION"] =
+	"Показывает кнопку TFTB у миникарты. При наведении курсора открывается меню со всеми функциями кнопки."
 L["OPTIONS_DESCRIPTION"] =
-	"Автоматически благодарите эмоцией или шепотом игроков, которые накладывают на вас баффы, сообщайте игрокам, что вы только что на них применили, приветствуйте друзей и согильдийцев взмахом руки, проходя мимо, и благодарите любого, кто у вас в цели, одним щелчком по макросам благодарности."
+	"Автоматически благодарите эмоцией или шепотом игроков, которые накладывают на вас баффы, возвращайте им бафф одним нажатием, сообщайте игрокам, что вы только что на них применили, приветствуйте друзей и согильдийцев взмахом руки и благодарите любого, кто у вас в цели, одним щелчком."
 L["OPTIONS_FEATURES_HEADER"] = "Функции"
-L["OPTIONS_FEATURES_DESCRIPTION"] =
-	"Включайте и отключайте каждую функцию здесь или на ее собственной панели."
 L["OPTIONS_COMMANDS_HEADER"] = "/Commands"
 L["OPTIONS_COMMAND"] = "/tftb"
 L["OPTIONS_COMMAND_DESCRIPTION"] = "Открывает окно настроек этого аддона."
@@ -94,6 +95,9 @@ L["GIVE_THANKS_ENABLE_DESCRIPTION"] =
 	"Включает благодарности за баффы от игроков вне вашей группы."
 L["GIVE_THANKS_DESCRIPTION"] =
 	"Благодарите игроков вне вашей группы, когда они накладывают на вас баффы в открытом мире."
+-- Shown on the Emotes List and Ignored Buffs pages while Give Thanks is off.
+L["GIVE_THANKS_LIST_OFF"] =
+	'Функция "%s" выключена, поэтому этот список не используется. Включите "%s", чтобы использовать его.'
 
 -- Praise Limits
 L["PRAISE_HEADER"] = "Ограничения благодарностей"
@@ -134,8 +138,8 @@ L["NOTIFICATIONS_PRINT_DESCRIPTION"] =
 L["NOTIFICATIONS_SOUND_ENABLE"] = "Включить звуковые эффекты"
 L["NOTIFICATIONS_SOUND_DESCRIPTION"] =
 	"Воспроизводит звук при получении баффа. Слышите его только вы."
-L["NOTIFICATIONS_SOUND_PREVIEW_DESCRIPTION"] =
-	"Воспроизводит звук, чтобы вы могли услышать его до включения."
+L["OPTIONS_SOUND_PREVIEW_DESCRIPTION"] =
+	"Проиграть этот звук сейчас, включён звук или нет."
 
 --------------------------------------------------------------------------------
 -- Options: Good News
@@ -165,6 +169,8 @@ L["GOOD_NEWS_TOKENS"] = "Подстановки: %s что вы применил
 L["TAB_GOOD_NEWS_ABILITIES"] = "Отслеживаемые способности"
 L["GOOD_NEWS_ABILITIES_DESCRIPTION"] =
 	"Функция Хорошие новости шепчет о способностях, отмеченных здесь, когда вы применяете их на другого игрока."
+L["GOOD_NEWS_ABILITIES_OFF"] =
+	'Функция "%s" выключена, поэтому пока ничего не отправляется шёпотом. Включите "%s", чтобы отправлять.'
 -- The heading over the rows no class owns: scrolls, and abilities cast by a trinket's pet.
 L["GOOD_NEWS_ITEMS"] = "Предметы"
 
@@ -190,7 +196,6 @@ L["EMOTE_GROUP_VOICE"] = "Голос"
 L["EMOTE_GROUP_VOICE_DESCRIPTION"] = "Проигрывает голосовую реплику."
 L["EMOTE_GROUP_POSE"] = "Поза"
 L["EMOTE_GROUP_POSE_DESCRIPTION"] = "Держится, пока вы не двинетесь."
-L["EMOTES_RESET"] = "Сбросить эмоции"
 L["EMOTES_RESET_DESCRIPTION"] =
 	"Возвращает в списке благодарственные эмоции по умолчанию."
 L["EMOTES_RESET_CONFIRM"] = "Сбросить список эмоций к значениям по умолчанию?"
@@ -245,8 +250,34 @@ L["BUTTON_ICON_DEFAULT"] = "По умолчанию"
 L["BUTTON_MACRO_ENABLE"] = 'Включить макрос "%s"'
 L["BUTTON_MACRO_ENABLE_DESCRIPTION"] =
 	"Создает макрос с именем %s и снова удаляет его, когда вы отключаете этот параметр."
+L["BUTTON_PICKUP"] = "Взять макрос"
+L["BUTTON_PICKUP_DESCRIPTION"] =
+	"Берёт макрос %s на курсор, чтобы вы могли положить его на панель команд."
 L["BUTTON_WHISPER_DESCRIPTION"] =
-	"Задает, что эта кнопка шепчет вашей цели. Оставьте поле пустым, чтобы ничего не шептать."
+	"Задает, что эта кнопка шепчет вашей цели. {name} заменяется её именем. Оставьте поле пустым, чтобы ничего не шептать."
+L["BUTTON_TOKENS"] = "Подстановки: %s кого вы благодарите"
+
+-- Return Buff
+L["TAB_RETURN_BUFF"] = "Ответный бафф"
+L["RETURN_BUFF_DESCRIPTION"] =
+	"Отплати добром. Каждый раз, когда игрок не из твоей группы накладывает на тебя бафф, макрос %s нацеливается на него, и одно нажатие возвращает ему твой бафф."
+L["RETURN_BUFF_ENABLE_DESCRIPTION"] =
+	"Создает макрос %s, который накладывает твой бафф на последнего игрока не из твоей группы, наложившего бафф на тебя, и удаляет его, когда ты выключаешь эту настройку."
+L["RETURN_BUFF_SPELL"] = "Накладываемый бафф"
+L["RETURN_BUFF_SPELL_DESCRIPTION"] =
+	"Задаёт, какой из ваших баффов накладывает макрос."
+L["RETURN_BUFF_EXAMPLE"] =
+	"Последним вас баффнул %s, поэтому макрос наложит на него %s."
+L["RETURN_BUFF_EXAMPLE_LEVEL"] =
+	"Последним вас баффнул %s (уровень %d), поэтому макрос наложит на него %s."
+L["RETURN_BUFF_NONE"] =
+	"Этот персонаж пока не знает баффов, которые можно наложить на других игроков."
+L["RETURN_BUFF_MACROS_FULL"] =
+	"Общие макросы учетной записи заполнены (%d). Удали один, чтобы освободить место для %s."
+L["RETURN_BUFF_HELP"] =
+	"Пока никто не наложил на тебя бафф, макрос применяется к твоей цели. Игра не дает аддонам менять макросы в бою, поэтому бафф, полученный посреди боя, перенацелит макрос после окончания боя."
+L["RETURN_BUFF_RANK_HELP"] =
+	"Макрос применяет наивысший ранг, доступный для уровня этого игрока. Если TFTB не увидел его уровень, применяется твой наивысший ранг."
 
 --------------------------------------------------------------------------------
 -- Options: Wave to Friends
@@ -260,7 +291,7 @@ L["WAVE_DESCRIPTION"] =
 	"Приветствуйте друзей и согильдийцев эмоцией, когда наводите на них курсор в открытом мире."
 L["WAVE_RULES"] =
 	"Никогда для вашей группы или рейда и никогда, пока вы в бою, произносите заклинание или рыбачите."
-L["WAVE_RESTING_ENABLE"] = "Только во время отдыха"
+L["WAVE_RESTING_ENABLE"] = "Только в городе"
 L["WAVE_RESTING_ENABLE_DESCRIPTION"] =
 	"Приветствует только во время отдыха, в городе или таверне."
 L["WAVE_COOLDOWN"] = "Задержка для того же игрока"
@@ -323,9 +354,13 @@ L["WAVE_GUILDS_EMOTES_DESCRIPTION"] =
 -- Options: Whisper Message Row
 --------------------------------------------------------------------------------
 
--- The caption and Reset button beside every whisper box, on Give Thanks, Good News and each Thank You Button.
+-- The caption beside every whisper box, on Give Thanks, Good News and each Thank You Button; Give Thanks has several boxes, so its caption is plural.
 L["WHISPER_MESSAGE"] = "Текст шепота"
-L["WHISPER_MESSAGE_RESET"] = "Сбросить"
+L["WHISPER_MESSAGES"] = "Тексты шепота"
+L["WHISPER_RANDOM"] =
+	"Выбирается случайный текст; пустое поле пропускается."
+-- Every Reset row's button, a whisper box's included.
+L["OPTIONS_RESET"] = "Сбросить"
 L["WHISPER_MESSAGE_RESET_DESCRIPTION"] = "Возвращает текст шепота к стандартному."
 
 -- The whisper composer around every editable whisper's box, on Give Thanks and Good News.
@@ -341,6 +376,48 @@ L["WHISPER_TOO_LONG"] =
 L["WHISPER_TEST"] = "Отправить тест себе"
 L["WHISPER_TEST_DESCRIPTION"] =
 	"Шепчет пример вам, чтобы вы увидели его так же, как другие игроки."
+
+--------------------------------------------------------------------------------
+-- Mini-map Menu
+--------------------------------------------------------------------------------
+
+-- The words every feature's state and every switch show.
+L["MENU_ON"] = "Вкл."
+L["MENU_OFF"] = "Выкл."
+L["MENU_TOGGLE"] = "Переключить"
+
+-- %d is how many more buffs the list leaves out.
+L["MENU_MORE"] = "Ещё %d"
+
+-- The button click that does what a menu row does, gray at the row's right.
+L["MENU_CLICK_RIGHT"] = "Правый клик"
+L["MENU_CLICK_MIDDLE"] = "Средний клик"
+L["MENU_CLICK_SHIFT_MIDDLE"] = "Shift + Средний клик"
+-- The menu's Options row.
+L["MENU_OPTIONS"] = "Настройки TFTB"
+
+-- Give Thanks: the switches, named without their Enable.
+L["MENU_PRAISE_DELAY"] = "Задержка благодарности"
+L["MENU_WHISPER"] = "Шепот благодарности"
+L["MENU_PRINT"] = "Текстовые сообщения"
+L["MENU_SOUND"] = "Звуковые эффекты"
+
+-- %d is how many emotes the Emotes List has ticked.
+L["MENU_CHECKED"] = "Отмечено: %d"
+L["MENU_CHOOSE_EMOTES"] = "Выбрать эмоции"
+L["MENU_RECENT"] = "Недавние баффы"
+L["MENU_RECENT_NOTE"] = "Нажмите на бафф, чтобы игнорировать его."
+L["MENU_RECENT_EMPTY"] = "Пока нет баффов от других игроков."
+L["MENU_IGNORED_NOTE"] = "Нажмите на бафф, чтобы перестать его игнорировать."
+L["MENU_IGNORED_EMPTY"] = "Пока нет игнорируемых баффов."
+
+-- %s is the buff's link.
+L["MENU_IGNORED_PRINT"] = "Добавлено в игнорируемые баффы: %s."
+L["MENU_UNIGNORED_PRINT"] = "Удалено из игнорируемых баффов: %s."
+
+-- Wave to Friends.
+L["MENU_WHO_WAVES"] = "Кого приветствовать"
+L["MENU_EDIT_CUSTOM"] = "Изменить свой список"
 
 --------------------------------------------------------------------------------
 -- Defaults

@@ -174,16 +174,14 @@ AceGUI:RegisterWidgetType(WIDGET_TYPE, Constructor, WIDGET_VERSION)
       key         the field in settings() holding the token set ("emotes")
       defaults    tokens a Reset puts back, and that an untick stores as false (Data.EMOTES)
       description the line above the grid (EMOTES_GRID_DESCRIPTION)
-      registry    the panel a Reset repaints (EmotesList)
       width       the width units the grid spreads across (ns.OPTIONS_ROW_WIDTH)
-      resetDescription  the Reset button's tooltip (EMOTES_RESET_DESCRIPTION)
+      resetDescription  the Reset row's tooltip (EMOTES_RESET_DESCRIPTION)
 ]]
 function ns.DefineEmoteGrid(args, settings, order, opts)
 	opts = opts or {}
 	local gridId = opts.id or DEFAULT_GRID_ID
 	local key = opts.key or "emotes"
 	local defaults = opts.defaults or DEFAULT_EMOTES
-	local registry = opts.registry or ns.OPTIONS_REGISTRY.EmotesList
 
 	-- Each group's emotes, in the catalog's slash-command order.
 	local byGroup = {}
@@ -244,8 +242,8 @@ function ns.DefineEmoteGrid(args, settings, order, opts)
 		end
 	end
 
-	args.emoteGridDesc = ns.OptionsDesc(opts.description or L["EMOTES_GRID_DESCRIPTION"], order)
-	args.emoteGridDescSpacer = ns.OptionsSpacer(order + 0.01)
+	args.emoteGridDesc = ns.OptionsKit.Desc(opts.description or L["EMOTES_GRID_DESCRIPTION"], order)
+	args.emoteGridDescSpacer = ns.OptionsKit.Spacer(order + 0.01)
 
 	for index, group in ipairs(Data.EMOTE_GROUPS) do
 		args["emoteGrid_" .. group] = {
@@ -259,20 +257,42 @@ function ns.DefineEmoteGrid(args, settings, order, opts)
 		}
 	end
 
-	args.emoteGridReset = {
-		type = "execute",
-		name = L["EMOTES_RESET"],
-		desc = opts.resetDescription or L["EMOTES_RESET_DESCRIPTION"],
-		order = order + 0.1,
-		confirm = true,
-		confirmText = L["EMOTES_RESET_CONFIRM"],
-		func = function()
+	--[[
+	    Reset, on its own row under the grid, gray while the checklist already
+	    holds exactly the defaults. It discards every pick at once, so it asks first.
+	]]
+	local function isDefault()
+		local emotes = Emotes()
+		for token in pairs(defaults) do
+			if not emotes[token] then
+				return false
+			end
+		end
+		for token, picked in pairs(emotes) do
+			if picked and not defaults[token] then
+				return false
+			end
+		end
+		return true
+	end
+	local reset = ns.OptionsKit.ResetRow(
+		order + 0.1,
+		nil,
+		" ",
+		opts.resetDescription or L["EMOTES_RESET_DESCRIPTION"],
+		isDefault,
+		function()
 			local emotes = {}
 			for token in pairs(defaults) do
 				emotes[token] = true
 			end
 			settings()[key] = emotes
-			LibStub("AceConfigRegistry-3.0"):NotifyChange(registry)
 		end,
-	}
+		L["EMOTES_RESET_CONFIRM"]
+	)
+	-- Inside a tab the row has a shorter budget: the caption cell gives up the difference, so the button never wraps.
+	if opts.width then
+		reset.args.cell1.width = opts.width - ns.OptionsKit.CONTROL_WIDTH
+	end
+	args.emoteGridReset = reset
 end

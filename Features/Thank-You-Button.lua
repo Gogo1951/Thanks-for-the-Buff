@@ -71,6 +71,10 @@ function ns.ReconcileMacros()
 			ns:DeleteAutoMacro(button)
 		end
 	end
+
+	if ns.ReconcileBuffBack then
+		ns.ReconcileBuffBack()
+	end
 end
 
 --[[
@@ -106,6 +110,18 @@ end
 --------------------------------------------------------------------------------
 -- Thank You Command
 --------------------------------------------------------------------------------
+
+--[[
+    A Thank You whisper as sent: the player's own words with "{name}" swapped
+    for the target's short name, and nothing else added. Cut to the chat
+    ceiling, since a long name can carry a message that fit as typed past it.
+]]
+function ns.FillThankYouWhisper(template, name)
+	local body = template:gsub("{name}", function()
+		return (name and name ~= "") and Ambiguate(name, "short") or ""
+	end)
+	return ns.TrimToBytes(body, ns.CHAT_MESSAGE_MAX_LENGTH)
+end
 
 --[[
     Body of the /thankyou commands; the registration lives in Options/Options.lua,
@@ -148,6 +164,7 @@ function ns.RunThankYou(button)
 		and db.message
 		and db.message ~= ""
 	then
-		ns:Whisper(GetUnitName("target", true), db.message)
+		local target = GetUnitName("target", true)
+		ns:Whisper(target, ns.FillThankYouWhisper(db.message, target))
 	end
 end

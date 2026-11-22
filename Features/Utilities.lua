@@ -230,6 +230,35 @@ else
 end
 
 --------------------------------------------------------------------------------
+-- Whisper Length
+--------------------------------------------------------------------------------
+
+--[[
+    Cut to a byte budget without splitting a multi-byte character. The cap is
+    counted in bytes, not characters, because what it really protects is the
+    chat line: WoW measures that in bytes too. For English the two are the same
+    number.
+
+    A cut landing mid-character would leave a broken tail byte that renders as a
+    replacement glyph, so step back off any UTF-8 continuation byte (0x80-0xBF)
+    sitting at the cut.
+]]
+function ns.TrimToBytes(text, maxBytes)
+	if #text <= maxBytes then
+		return text
+	end
+	local cut = maxBytes
+	while cut > 0 do
+		local b = text:byte(cut + 1)
+		if not b or b < 128 or b >= 192 then
+			break
+		end
+		cut = cut - 1
+	end
+	return text:sub(1, cut)
+end
+
+--------------------------------------------------------------------------------
 -- Spell Links
 --------------------------------------------------------------------------------
 
