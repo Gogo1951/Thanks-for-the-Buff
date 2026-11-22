@@ -26,15 +26,7 @@ Auto thank players who buff you with an emote or whisper, buff them back with on
 
 * **Return the Favor** // A stranger buffs you, and one press of your Return Buff macro casts your buff right back on them, no targeting needed.
 * **Your Buff, Your Pick** // Arcane Intellect, Mark of the Wild, Fortitude, a Blessing, even Power Infusion: choose which one goes back.
-* **Off Until You Want It** // Starts off. Turn it on in the options whenever you're ready.
-
-### Good News
-
-<img width="800" alt="README-Infographic-Good-News" src="https://github.com/user-attachments/assets/26213df0-9506-4e4d-88dc-2e7eff2f9c84" />
-
-* **No Big Buff Goes to Waste** // Cast Power Infusion, Innervate, or Blessing of Protection on someone, and they get a whisper saying so, with the time left on short buffs.
-* **Covers the Big Ones** // Soulstones, Fear Ward, Rebirth, Lay on Hands, scrolls, and more.
-* **Your Rules** // Choose which abilities send a whisper, who gets one, and what it says.
+* **Buff Button** // The macro also works as a buff button for your chosen buff, and it will automatically scale down the spell rank if you are trying to buff a lowbie who is still leveling.
 * **Off Until You Want It** // Starts off. Turn it on in the options whenever you're ready.
 
 ### Wave to Friends
@@ -44,6 +36,16 @@ Auto thank players who buff you with an emote or whisper, buff them back with on
 * **Say Hi Without Stopping** // Mouse over a friend or guildmate out in the world and they get a wave, no typing required.
 * **You Pick Who Counts** // Your friends list, your Battle.net friends' characters, your own guild, and any other guilds you name.
 * **A Custom List for Your Regulars** // Give a favorite player their own emote, shoo away your rival, or skip someone entirely.
+* **Off Until You Want It** // Starts off. Turn it on in the options whenever you're ready.
+
+### Good News
+
+<img width="800" alt="README-Infographic-Good-News" src="https://github.com/user-attachments/assets/26213df0-9506-4e4d-88dc-2e7eff2f9c84" />
+
+* ⚠️ This feature does not work in Forever.
+* **No Big Buff Goes to Waste** // Cast Power Infusion, Innervate, or Blessing of Protection on someone, and they get a whisper saying so, with the time left on short buffs.
+* **Covers the Big Ones** // Soulstones, Fear Ward, Rebirth, Lay on Hands, scrolls, and more.
+* **Your Rules** // Choose which abilities send a whisper, who gets one, and what it says.
 * **Off Until You Want It** // Starts off. Turn it on in the options whenever you're ready.
 
 ### Thank You Button
