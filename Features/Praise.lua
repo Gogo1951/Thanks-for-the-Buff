@@ -148,6 +148,27 @@ end
 --------------------------------------------------------------------------------
 
 --[[
+    The Give Thanks whisper boxes, in order. Each whisper picks one of the
+    filled ones at random, so the same line every time doesn't read like a bot;
+    an empty box is skipped. Nil when all are empty.
+]]
+local WHISPER_FIELDS = { "whisperMessage", "whisperMessage2", "whisperMessage3" }
+
+local function PickWhisper(db)
+	local filled = {}
+	for _, field in ipairs(WHISPER_FIELDS) do
+		local message = db[field]
+		if message and message ~= "" then
+			filled[#filled + 1] = message
+		end
+	end
+	if #filled == 0 then
+		return nil
+	end
+	return filled[math.random(#filled)]
+end
+
+--[[
     Send the praise: the thank-you whisper, the emote, or both. Every gate -- the
     toggles, the cooldowns, the whisper throttle, the combat check -- is settled
     by the caller before the timer is armed, so the Praise Delay holds back
@@ -168,7 +189,7 @@ end
 local function DeliverPraise(db, guid, name, link, whisperAllowed, emoteAllowed)
 	local function Praise()
 		if whisperAllowed then
-			ns:WhisperThanks(name, link, db.whisperMessage)
+			ns:WhisperThanks(name, link, PickWhisper(db))
 		end
 		if emoteAllowed and not ns.GetEmoteBlocker() then
 			ns:DoRandomEmote(db.emotes, ResolveEmoteTarget(guid, name))
@@ -184,6 +205,9 @@ local function DeliverPraise(db, guid, name, link, whisperAllowed, emoteAllowed)
 end
 
 local function HandleStrangersBuff(sourceGUID, sourceName, spellID)
+	-- Return Buff aims at whoever this was, at their level, whether or not Give Thanks is on.
+	ns.SetBuffBackTarget(sourceName, sourceGUID)
+
 	local db = ns.db.profile.strangers
 	if not db.enabled then
 		return
@@ -238,10 +262,7 @@ local function HandleStrangersBuff(sourceGUID, sourceName, spellID)
 		return
 	end
 
-	local whisperAllowed = db.whisperEnabled
-		and db.whisperMessage
-		and db.whisperMessage ~= ""
-		and TryWhisperCooldown(sourceGUID)
+	local whisperAllowed = db.whisperEnabled and PickWhisper(db) and TryWhisperCooldown(sourceGUID)
 	local emoteAllowed = #ns.GetPickableEmotes(db.emotes) > 0 and not ns.GetEmoteBlocker()
 	if not whisperAllowed and not emoteAllowed then
 		return

@@ -1,7 +1,6 @@
 local _, ns = ...
 local L = ns.L
-
-local GetColor = ns.GetColor
+local Kit = ns.OptionsKit
 
 --------------------------------------------------------------------------------
 -- Feedback & Support Panel
@@ -32,28 +31,28 @@ function ns.BuildFeedbackSupportOptions()
 
 	for index, key in ipairs(PARAGRAPHS) do
 		if index > 1 then
-			args["space" .. key] = ns.OptionsSpacer(order)
+			args["space" .. key] = Kit.Spacer(order)
 			order = order + 1
 		end
-		args[key] = ns.OptionsDesc(L[key], order)
+		args[key] = Kit.Desc(L[key], order)
 		order = order + 1
 	end
 
-	args.spaceLinks0 = ns.OptionsSpacer(order)
-	args.headerLinks = ns.OptionsHeader(L["OPTIONS_FEEDBACK_LINKS_HEADER"], order + 1)
+	args.spaceLinks0 = Kit.Spacer(order)
+	args.headerLinks = Kit.Header(L["OPTIONS_FEEDBACK_LINKS_HEADER"], order + 1)
 	order = order + 2
 
 	-- A spacer before every row, so the boxes don't sit flush against each other.
 	for _, link in ipairs(LINKS) do
 		local captionKey, linkKey = link[1], link[2]
-		args["space" .. linkKey] = ns.OptionsSpacer(order)
+		args["space" .. linkKey] = Kit.Spacer(order)
 		order = order + 1
-		ns.OptionsLinkRow(args, linkKey, L[captionKey], ns.LINKS[linkKey], order)
+		args["link" .. linkKey] = Kit.LinkRow(order, L[captionKey], ns.LINKS[linkKey])
 		order = order + 2
 	end
 
-	args.spaceCopyLink = ns.OptionsSpacer(order)
-	args.copyCaption = ns.OptionsDesc(GetColor("HELP") .. L["OPTIONS_COPY_LINK"] .. "|r", order + 1)
+	args.spaceCopyLink = Kit.Spacer(order)
+	args.copyCaption = Kit.Desc(Kit.Color("HELP", L["OPTIONS_COPY_LINK"]), order + 1)
 
 	args.spaceVersion = {
 		type = "description",
@@ -63,7 +62,7 @@ function ns.BuildFeedbackSupportOptions()
 	}
 	args.versionLine = {
 		type = "description",
-		name = GetColor("INFO") .. L["OPTIONS_VERSION"]:format(ns.Version) .. "|r",
+		name = Kit.Color("INFO", L["OPTIONS_VERSION"]:format(ns.Version)),
 		fontSize = "medium",
 		order = 999,
 	}

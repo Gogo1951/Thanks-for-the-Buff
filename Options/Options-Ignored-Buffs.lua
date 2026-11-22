@@ -1,7 +1,6 @@
 local _, ns = ...
 local L = ns.L
-
-local GetColor = ns.GetColor
+local Kit = ns.OptionsKit
 
 --[[
     "Ignored Buffs", a sub-panel of Give Thanks: the buffs that never get a
@@ -20,10 +19,6 @@ local GetColor = ns.GetColor
 ]]
 
 local REMOVE_ICON = "Interface/Buttons/UI-GroupLoot-Pass-Up"
-
-local function Refresh()
-	LibStub("AceConfigRegistry-3.0"):NotifyChange(ns.OPTIONS_REGISTRY.IgnoredBuffs)
-end
 
 -- "|T icon:16|t Name" in the spell-link blue, or nil for an ID this client doesn't have.
 local function SpellLabel(spellId)
@@ -46,8 +41,14 @@ end
 local function BuildScopeArgs(scopeKey)
 	local isGlobalScope = scopeKey == ns.LIST_SCOPE_GLOBAL
 	-- The tree sidebar takes its share first, so a pane spends the shorter tree budget.
-	local rowWidth = ns.OPTIONS_TREE_ROW_WIDTH
-	local labelWidth = rowWidth - ns.OPTIONS_CONTROL_WIDTH
+	local rowWidth = Kit.TREE_ROW_WIDTH
+
+	-- A caption and its control, in the tree pane's columns.
+	local function PaneRow(order, caption, control)
+		control.name = ""
+		control.width = Kit.TREE_CONTROL_WIDTH
+		return Kit.Row(order, nil, { Kit.Label(caption, nil, Kit.TREE_LABEL_WIDTH, control.desc), control })
+	end
 
 	local function List()
 		return ns.GetIgnoredBuffsForScope(scopeKey) or {}
@@ -67,7 +68,7 @@ local function BuildScopeArgs(scopeKey)
 			if not AlreadyCovered(spellId) then
 				ns.SetBuffIgnoredInScope(scopeKey, spellId, true)
 			end
-			Refresh()
+			ns.RefreshSettings()
 			return true
 		end
 		return false
@@ -101,19 +102,9 @@ local function BuildScopeArgs(scopeKey)
 	end
 
 	local args = {
-		addRecentLabel = ns.OptionsRowLabel(
-			L["IGNORED_BUFFS_ADD_RECENT"],
-			3,
-			labelWidth,
-			nil,
-			L["IGNORED_BUFFS_ADD_RECENT_DESCRIPTION"]
-		),
-		addRecent = {
+		addRecent = PaneRow(3, L["IGNORED_BUFFS_ADD_RECENT"], {
 			type = "select",
-			name = "",
 			desc = L["IGNORED_BUFFS_ADD_RECENT_DESCRIPTION"],
-			width = ns.OPTIONS_CONTROL_WIDTH,
-			order = 3.1,
 			values = function()
 				return (RecentChoices())
 			end,
@@ -126,15 +117,11 @@ local function BuildScopeArgs(scopeKey)
 			set = function(_, spellId)
 				Add(spellId)
 			end,
-		},
+		}),
 
-		addLabel = ns.OptionsRowLabel(L["IGNORED_BUFFS_ADD"], 5, labelWidth, nil, L["IGNORED_BUFFS_ADD_DESCRIPTION"]),
-		add = {
+		add = PaneRow(5, L["IGNORED_BUFFS_ADD"], {
 			type = "input",
-			name = "",
 			desc = L["IGNORED_BUFFS_ADD_DESCRIPTION"],
-			width = ns.OPTIONS_CONTROL_WIDTH,
-			order = 5.1,
 			-- Returns "" so the box clears itself after each add.
 			get = function()
 				return ""
@@ -147,8 +134,8 @@ local function BuildScopeArgs(scopeKey)
 					ns:PrintMessage(L["IGNORED_BUFFS_NOT_FOUND"]:format(value))
 				end
 			end,
-		},
-		space2 = ns.OptionsSpacer(6),
+		}),
+		space2 = Kit.Spacer(6),
 	}
 
 	-- One row per ignored buff, by name: a list ordered by ID reads as random.
@@ -162,14 +149,14 @@ local function BuildScopeArgs(scopeKey)
 	end)
 
 	if #rows == 0 then
-		args.empty = ns.OptionsDesc(GetColor("HELP") .. L["IGNORED_BUFFS_EMPTY"] .. "|r", 10)
+		args.empty = Kit.Desc(Kit.Color("HELP", L["IGNORED_BUFFS_EMPTY"]), 10)
 	end
 
 	--[[
 	    The All Characters pane has nowhere to promote to, so its spell cell
 	    absorbs that column and the remove icon stays put as scopes are picked.
 	]]
-	local spellWidth = rowWidth - ns.OPTIONS_REMOVE_ICON_WIDTH
+	local spellWidth = rowWidth - Kit.REMOVE_ICON_WIDTH
 	if not isGlobalScope then
 		spellWidth = spellWidth - ns.OPTIONS_PROMOTE_WIDTH
 	end
@@ -190,11 +177,11 @@ local function BuildScopeArgs(scopeKey)
 				image = REMOVE_ICON,
 				imageWidth = 16,
 				imageHeight = 16,
-				width = ns.OPTIONS_REMOVE_ICON_WIDTH,
+				width = Kit.REMOVE_ICON_WIDTH,
 				order = 3,
 				func = function()
 					ns.SetBuffIgnoredInScope(scopeKey, row.id, false)
-					Refresh()
+					ns.RefreshSettings()
 				end,
 			},
 		}
@@ -212,7 +199,7 @@ local function BuildScopeArgs(scopeKey)
 				order = 2,
 				func = function()
 					ns.SetBuffIgnoredInScope(ns.LIST_SCOPE_GLOBAL, row.id, true)
-					Refresh()
+					ns.RefreshSettings()
 				end,
 			}
 		end
@@ -225,7 +212,7 @@ local function BuildScopeArgs(scopeKey)
 		}
 	end
 
-	args.spacerTop = ns.OptionsSpacer(2)
+	args.spacerTop = Kit.Spacer(2)
 
 	return args
 end
@@ -250,8 +237,15 @@ function ns.BuildIgnoredBuffsOptions()
 	end
 
 	local args = {
-		descIntro = ns.OptionsDesc(L["IGNORED_BUFFS_DESCRIPTION"], 1),
-		spacerIntro = ns.OptionsSpacer(2),
+		-- The list only matters while Give Thanks is on, so say so while it is off.
+		status = Kit.StatusLine(function()
+			if ns.db.profile.strangers.enabled then
+				return nil
+			end
+			return L["GIVE_THANKS_LIST_OFF"]:format(L["TAB_GIVE_THANKS"], L["GIVE_THANKS_ENABLE"])
+		end, 0.5),
+		descIntro = Kit.Desc(L["IGNORED_BUFFS_DESCRIPTION"], 1),
+		spacerIntro = Kit.Spacer(2),
 	}
 
 	args[ns.LIST_SCOPE_GLOBAL] = ScopeGroup(L["IGNORED_BUFFS_ALL_CHARACTERS"], 3, ns.LIST_SCOPE_GLOBAL)
@@ -283,28 +277,9 @@ function ns.BuildIgnoredBuffsOptions()
 	end
 
 	return {
-		name = L["TAB_IGNORED_BUFFS"],
+		name = Kit.SubPanelTitle(L["TAB_GIVE_THANKS"], L["TAB_IGNORED_BUFFS"]),
 		type = "group",
 		childGroups = "tree",
 		args = args,
 	}
-end
-
---[[
-    Seeds the tree's status before it is first drawn: treewidth sizes the tree
-    (AceGUI fills it in only when absent, so this wins, while a drag on the
-    splitter still overwrites it), and selected opens it on the character being
-    played -- set again every time the panel hides, so each visit starts there.
-]]
-function ns.PrepareIgnoredBuffsTree(panel)
-	local status = LibStub("AceConfigDialog-3.0"):GetStatusTable(ns.OPTIONS_REGISTRY.IgnoredBuffs)
-	status.groups = status.groups or {}
-	status.groups.treewidth = ns.OPTIONS_TREE_WIDTH
-	status.groups.selected = ns.db.keys.char
-
-	if panel then
-		panel:HookScript("OnHide", function()
-			status.groups.selected = ns.db.keys.char
-		end)
-	end
 end

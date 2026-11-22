@@ -1,5 +1,5 @@
 ## Title: Thanks for the Buff (TFTB)
-## Notes: Auto thank players who buff you with an emote or whisper, tell players what you just cast on them, greet friends and guildmates with a wave as you pass them, and thank anyone you target with one click of your Thank You macros.
+## Notes: Auto thank players who buff you with an emote or whisper, buff them back with one press, tell players what you just cast on them, greet friends and guildmates with a wave, and thank anyone you target with one click.
 ## Author: Gogo1951
 
 ## IconTexture: Interface/AddOns/TFTB/Includes/Images/Thanks-for-the-Buff.tga
@@ -36,6 +36,8 @@ Includes/Libraries/AceConfig-3.0/AceConfigCmd-3.0/AceConfigCmd-3.0.lua
 Includes/Libraries/AceConfig-3.0/AceConfigDialog-3.0/AceConfigDialog-3.0.lua
 Includes/Libraries/AceConfig-3.0/AceConfig-3.0.lua
 Includes/Libraries/AceDBOptions-3.0/AceDBOptions-3.0.lua
+Includes/Libraries/LibDataBroker-1.1/LibDataBroker-1.1.lua
+Includes/Libraries/LibDBIcon-1.0/LibDBIcon-1.0.lua
 
 # Localization
 Locales/enUS.lua
@@ -66,9 +68,13 @@ Features/Announcements.lua
 Features/Ignored-Buffs.lua
 Features/Praise.lua
 Features/Buff-Tracking.lua
-Features/Good-News.lua
+Features/Good-News-Abilities.lua
 Features/Thank-You-Button.lua
+Features/Buff-Back.lua
 Features/Wave-To-Friends.lua
+Features/Menu-Kit.lua
+Features/Minimap-Menu.lua
+Features/Minimap-Button.lua
 
 # Diagnostics
 Diagnostics/Diagnostics-Core.lua
@@ -81,14 +87,14 @@ Diagnostics/Localization-Reports.lua
 Diagnostics/Report-Runner.lua
 
 # Options
+Options/Options-Kit.lua
 Options/Options-Utilities.lua
 Options/Options-General.lua
 Options/Options-Emote-Grid.lua
 Options/Options-Give-Thanks.lua
 Options/Options-Emotes-List.lua
 Options/Options-Ignored-Buffs.lua
-Options/Options-Good-News.lua
-Options/Options-Good-News-Abilities.lua
+Options/Options-Return-Buff.lua
 Options/Options-Thank-You-Button.lua
 Options/Options-Wave-To-Friends.lua
 Options/Options-Profiles.lua

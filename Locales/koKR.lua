@@ -31,7 +31,7 @@ L["MESSAGE_CANT_THANK_SELF"] = "자신에게는 감사할 수 없습니다!"
 --------------------------------------------------------------------------------
 
 L["UNKNOWN_SPELL"] = "알 수 없는 주문"
-L["SAMPLE_EXAMPLE"] = "예시: %s"
+L["SAMPLE_EXAMPLE"] = "예시"
 
 --------------------------------------------------------------------------------
 -- Options: Main Panel
@@ -39,11 +39,12 @@ L["SAMPLE_EXAMPLE"] = "예시: %s"
 
 L["OPTIONS_WELCOME_TOGGLE"] = "환영 메시지 활성화"
 L["OPTIONS_WELCOME_DESCRIPTION"] = "접속할 때 자신만 볼 수 있는 메시지를 출력합니다."
+L["OPTIONS_ENABLE_MINIMAP"] = "미니맵 버튼 활성화"
+L["OPTIONS_ENABLE_MINIMAP_DESCRIPTION"] =
+	"미니맵에 TFTB 버튼을 표시합니다. 마우스를 올리면 버튼의 모든 기능이 담긴 메뉴가 열립니다."
 L["OPTIONS_DESCRIPTION"] =
-	"버프를 준 플레이어에게 감정 표현이나 귓속말로 자동으로 감사를 표하고, 방금 시전한 것을 플레이어에게 알려 주며, 지나치는 친구와 길드원에게 손을 흔들어 인사하고, 감사 매크로를 한 번 클릭해 대상으로 잡은 누구에게나 감사하세요."
+	"버프를 준 플레이어에게 감정 표현이나 귓속말로 자동으로 감사를 표하고, 한 번 눌러 버프를 되돌려 주며, 방금 시전한 것을 플레이어에게 알려 주고, 친구와 길드원에게 손을 흔들어 인사하고, 대상으로 잡은 누구에게나 한 번 클릭으로 감사하세요."
 L["OPTIONS_FEATURES_HEADER"] = "기능"
-L["OPTIONS_FEATURES_DESCRIPTION"] =
-	"각 기능은 여기서 또는 해당 기능의 패널에서 켜거나 끌 수 있습니다."
 L["OPTIONS_COMMANDS_HEADER"] = "/Commands"
 L["OPTIONS_COMMAND"] = "/tftb"
 L["OPTIONS_COMMAND_DESCRIPTION"] = "이 애드온의 설정 인터페이스를 엽니다."
@@ -90,6 +91,9 @@ L["GIVE_THANKS_ENABLE"] = "감사하기 활성화"
 L["GIVE_THANKS_ENABLE_DESCRIPTION"] =
 	"파티 외부의 플레이어가 준 버프에 대한 감사 표시를 켭니다."
 L["GIVE_THANKS_DESCRIPTION"] = "야외에서 파티 외부의 플레이어가 버프를 주면 감사를 표합니다."
+-- Shown on the Emotes List and Ignored Buffs pages while Give Thanks is off.
+L["GIVE_THANKS_LIST_OFF"] =
+	"%s 기능이 꺼져 있어 이 목록은 사용되지 않습니다. 사용하려면 %s 옵션을 켜세요."
 
 -- Praise Limits
 L["PRAISE_HEADER"] = "감사 표시 제한"
@@ -127,8 +131,8 @@ L["NOTIFICATIONS_PRINT_DESCRIPTION"] = "버프를 받을 때 자신만 볼 수 �
 L["NOTIFICATIONS_SOUND_ENABLE"] = "효과음 활성화"
 L["NOTIFICATIONS_SOUND_DESCRIPTION"] =
 	"버프를 받을 때 효과음을 재생합니다. 자신에게만 들립니다."
-L["NOTIFICATIONS_SOUND_PREVIEW_DESCRIPTION"] =
-	"켜기 전에 미리 들어 볼 수 있도록 효과음을 재생합니다."
+L["OPTIONS_SOUND_PREVIEW_DESCRIPTION"] =
+	"효과음이 켜져 있든 꺼져 있든 지금 이 소리를 재생합니다."
 
 --------------------------------------------------------------------------------
 -- Options: Good News
@@ -157,6 +161,8 @@ L["GOOD_NEWS_TOKENS"] = "토큰: %s 시전한 것, %s 받은 대상"
 L["TAB_GOOD_NEWS_ABILITIES"] = "추적 중인 능력"
 L["GOOD_NEWS_ABILITIES_DESCRIPTION"] =
 	"여기서 선택한 능력을 다른 플레이어에게 시전하면 좋은 소식이 귓속말로 알려 줍니다."
+L["GOOD_NEWS_ABILITIES_OFF"] =
+	"%s 기능이 꺼져 있어 아직 귓속말을 보내지 않습니다. 보내려면 %s 옵션을 켜세요."
 -- The heading over the rows no class owns: scrolls, and abilities cast by a trinket's pet.
 L["GOOD_NEWS_ITEMS"] = "아이템"
 
@@ -182,7 +188,6 @@ L["EMOTE_GROUP_VOICE"] = "음성"
 L["EMOTE_GROUP_VOICE_DESCRIPTION"] = "음성 대사를 재생합니다."
 L["EMOTE_GROUP_POSE"] = "자세"
 L["EMOTE_GROUP_POSE_DESCRIPTION"] = "움직일 때까지 유지됩니다."
-L["EMOTES_RESET"] = "감정 표현 초기화"
 L["EMOTES_RESET_DESCRIPTION"] = "목록을 기본 감사 감정 표현으로 되돌립니다."
 L["EMOTES_RESET_CONFIRM"] = "감정 표현 목록을 기본값으로 초기화할까요?"
 
@@ -236,8 +241,31 @@ L["BUTTON_ICON_DEFAULT"] = "기본값"
 L["BUTTON_MACRO_ENABLE"] = '매크로 "%s" 활성화'
 L["BUTTON_MACRO_ENABLE_DESCRIPTION"] =
 	"%s(이)라는 이름의 매크로를 만들고, 이 설정을 끄면 다시 삭제합니다."
+L["BUTTON_PICKUP"] = "매크로 집기"
+L["BUTTON_PICKUP_DESCRIPTION"] = "%s 매크로를 커서에 올려 행동 단축바에 놓을 수 있게 합니다."
 L["BUTTON_WHISPER_DESCRIPTION"] =
-	"이 버튼이 대상에게 보낼 귓속말을 설정합니다. 비워 두면 귓속말을 보내지 않습니다."
+	"이 버튼이 대상에게 보낼 귓속말을 설정합니다. {name}은 대상의 이름으로 바뀝니다. 비워 두면 귓속말을 보내지 않습니다."
+L["BUTTON_TOKENS"] = "토큰: %s 감사할 대상"
+
+-- Return Buff
+L["TAB_RETURN_BUFF"] = "버프 답례"
+L["RETURN_BUFF_DESCRIPTION"] =
+	"받은 호의를 돌려주세요. 파티 밖의 플레이어가 버프를 걸어 줄 때마다 %s 매크로가 그 플레이어를 대상으로 삼으므로, 한 번 누르면 내 버프를 돌려줄 수 있습니다."
+L["RETURN_BUFF_ENABLE_DESCRIPTION"] =
+	"나에게 마지막으로 버프를 걸어 준 파티 밖 플레이어에게 내 버프를 시전하는 %s 매크로를 만들고, 이 옵션을 끄면 다시 삭제합니다."
+L["RETURN_BUFF_SPELL"] = "시전할 버프"
+L["RETURN_BUFF_SPELL_DESCRIPTION"] = "매크로가 시전할 내 버프를 설정합니다."
+L["RETURN_BUFF_EXAMPLE"] =
+	"마지막으로 %s님이 버프를 줬으므로 매크로가 그 플레이어에게 %s을(를) 겁니다."
+L["RETURN_BUFF_EXAMPLE_LEVEL"] =
+	"마지막으로 %s님(%d레벨)이 버프를 줬으므로 매크로가 그 플레이어에게 %s을(를) 겁니다."
+L["RETURN_BUFF_NONE"] = "이 캐릭터는 아직 다른 플레이어에게 시전할 수 있는 버프를 모릅니다."
+L["RETURN_BUFF_MACROS_FULL"] =
+	"계정 공용 매크로 칸이 가득 찼습니다(%d개). %s 매크로를 위해 하나를 삭제하세요."
+L["RETURN_BUFF_HELP"] =
+	"누군가 버프를 걸어 주기 전까지 매크로는 현재 대상에게 시전합니다. 게임이 전투 중 애드온의 매크로 변경을 막기 때문에, 전투 중에 받은 버프는 전투가 끝난 뒤 매크로에 반영됩니다."
+L["RETURN_BUFF_RANK_HELP"] =
+	"그 플레이어의 레벨이 받을 수 있는 가장 높은 등급을 시전합니다. TFTB가 레벨을 확인하지 못했다면 내 최고 등급을 시전합니다."
 
 --------------------------------------------------------------------------------
 -- Options: Wave to Friends
@@ -250,7 +278,7 @@ L["WAVE_DESCRIPTION"] =
 	"야외에서 친구와 길드원에게 마우스를 올리면 감정 표현으로 인사합니다."
 L["WAVE_RULES"] =
 	"파티원이나 공격대원에게는 하지 않으며, 전투 중이거나 시전 또는 낚시 중에도 하지 않습니다."
-L["WAVE_RESTING_ENABLE"] = "휴식 중에만"
+L["WAVE_RESTING_ENABLE"] = "마을에서만"
 L["WAVE_RESTING_ENABLE_DESCRIPTION"] = "도시나 여관에서 휴식 중일 때만 인사합니다."
 L["WAVE_COOLDOWN"] = "같은 플레이어 대기시간"
 L["WAVE_COOLDOWN_DESCRIPTION"] = "같은 플레이어에게 다시 인사하기까지의 시간을 설정합니다."
@@ -306,9 +334,12 @@ L["WAVE_GUILDS_EMOTES_DESCRIPTION"] =
 -- Options: Whisper Message Row
 --------------------------------------------------------------------------------
 
--- The caption and Reset button beside every whisper box, on Give Thanks, Good News and each Thank You Button.
+-- The caption beside every whisper box, on Give Thanks, Good News and each Thank You Button; Give Thanks has several boxes, so its caption is plural.
 L["WHISPER_MESSAGE"] = "귓속말 메시지"
-L["WHISPER_MESSAGE_RESET"] = "초기화"
+L["WHISPER_MESSAGES"] = "귓속말 메시지"
+L["WHISPER_RANDOM"] = "하나가 무작위로 선택되며, 빈 칸은 건너뜁니다."
+-- Every Reset row's button, a whisper box's included.
+L["OPTIONS_RESET"] = "초기화"
 L["WHISPER_MESSAGE_RESET_DESCRIPTION"] = "귓속말 메시지를 기본 문구로 되돌립니다."
 
 -- The whisper composer around every editable whisper's box, on Give Thanks and Good News.
@@ -323,6 +354,48 @@ L["WHISPER_TOO_LONG"] = "너무 길어서 대신 기본 문구를 보냅니다."
 L["WHISPER_TEST"] = "나에게 테스트 보내기"
 L["WHISPER_TEST_DESCRIPTION"] =
 	"예시를 나에게 귓속말로 보내, 다른 플레이어가 보는 그대로 확인할 수 있습니다."
+
+--------------------------------------------------------------------------------
+-- Mini-map Menu
+--------------------------------------------------------------------------------
+
+-- The words every feature's state and every switch show.
+L["MENU_ON"] = "켜짐"
+L["MENU_OFF"] = "꺼짐"
+L["MENU_TOGGLE"] = "전환"
+
+-- %d is how many more buffs the list leaves out.
+L["MENU_MORE"] = "외 %d개"
+
+-- The button click that does what a menu row does, gray at the row's right.
+L["MENU_CLICK_RIGHT"] = "우클릭"
+L["MENU_CLICK_MIDDLE"] = "휠클릭"
+L["MENU_CLICK_SHIFT_MIDDLE"] = "Shift + 휠클릭"
+-- The menu's Options row.
+L["MENU_OPTIONS"] = "TFTB 옵션"
+
+-- Give Thanks: the switches, named without their Enable.
+L["MENU_PRAISE_DELAY"] = "감사 표시 지연"
+L["MENU_WHISPER"] = "감사하기 귓속말"
+L["MENU_PRINT"] = "텍스트 알림"
+L["MENU_SOUND"] = "효과음"
+
+-- %d is how many emotes the Emotes List has ticked.
+L["MENU_CHECKED"] = "%d개 선택됨"
+L["MENU_CHOOSE_EMOTES"] = "감정 표현 선택"
+L["MENU_RECENT"] = "최근 버프"
+L["MENU_RECENT_NOTE"] = "버프를 클릭하면 무시합니다."
+L["MENU_RECENT_EMPTY"] = "아직 다른 플레이어에게 받은 버프가 없습니다."
+L["MENU_IGNORED_NOTE"] = "버프를 클릭하면 더 이상 무시하지 않습니다."
+L["MENU_IGNORED_EMPTY"] = "아직 무시하는 버프가 없습니다."
+
+-- %s is the buff's link.
+L["MENU_IGNORED_PRINT"] = "무시할 버프에 추가됨: %s"
+L["MENU_UNIGNORED_PRINT"] = "무시할 버프에서 제거됨: %s"
+
+-- Wave to Friends.
+L["MENU_WHO_WAVES"] = "인사할 대상"
+L["MENU_EDIT_CUSTOM"] = "사용자 목록 편집"
 
 --------------------------------------------------------------------------------
 -- Defaults

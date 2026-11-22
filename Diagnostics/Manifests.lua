@@ -97,6 +97,8 @@ ns.DIAGNOSTIC_API_CHECKS = {
 	{ "GetMacroIndexByName", HasGlobalFunction("GetMacroIndexByName") },
 	{ "GetNumMacros", HasGlobalFunction("GetNumMacros") },
 	{ "GetMacroInfo", HasGlobalFunction("GetMacroInfo") },
+	-- Buff Back rewrites its macro only when the body it reads differs.
+	{ "GetMacroBody", HasGlobalFunction("GetMacroBody") },
 	{ "PlaySoundFile", HasGlobalFunction("PlaySoundFile") },
 	-- Wave to Friends: who counts, and the resting rule.
 	{ "C_FriendList.IsFriend", HasFunction("C_FriendList", "IsFriend") },
@@ -140,7 +142,9 @@ ns.DIAGNOSTIC_API_CHECKS = {
 	},
 	{ "C_XMLUtil.GetTemplateInfo", HasFunction("C_XMLUtil", "GetTemplateInfo") },
 	{ "GameTooltipTemplate", HasTemplate("GameTooltipTemplate") },
-	-- The context report's sound reads, and the taintLog button.
+	-- Display Context's screen size read.
+	{ "GetPhysicalScreenSize", HasGlobalFunction("GetPhysicalScreenSize") },
+	-- The context reports' sound and UI scale reads, and the taintLog button.
 	{ "GetCVar", HasGlobalFunction("GetCVar") },
 	{ "SetCVar", HasGlobalFunction("SetCVar") },
 }
@@ -197,7 +201,7 @@ end
 
 -- The add-on's own example reports, appended to the shared Event Log intro.
 ns.DiagnosticsStrings.EVENT_LOG_EXAMPLES =
-	"Best for 'nobody got thanked' reports. It records each buff that lands on you, decoded: the spell, who cast it, how long it lasts, and, off WoW Forever, whether the combat log calls them a friendly player outside your group. On WoW Forever it records each buff added to you with the gate, if any, that kept TFTB from reading it, and who cast each one it read. For 'nobody got waved at' reports, each time you mouse over someone records UPDATE_MOUSEOVER_UNIT; with none, the game never told TFTB. For 'my Good News whisper never went out' reports, each cast of an ability Good News tracks records UNIT_SPELLCAST_SENT, naming who you cast at, then UNIT_SPELLCAST_SUCCEEDED once it goes off, and off WoW Forever each revive of yours records RESURRECT, which a Jumper Cables whisper waits for; every other cast is only counted, at the end."
+	"Best for 'nobody got thanked' reports. It records each buff that lands on you, decoded: the spell, who cast it, how long it lasts, and, off WoW Forever, whether the combat log calls them a friendly player outside your group. On WoW Forever it records each buff added to you with the gate, if any, that kept TFTB from reading it, and who cast each one it read. For 'nobody got waved at' reports, each time you mouse over someone records UPDATE_MOUSEOVER_UNIT; with none, the game never told TFTB. For 'my Good News whisper never went out' reports (Good News isn't on WoW Forever), each cast of an ability Good News tracks records UNIT_SPELLCAST_SENT, naming who you cast at, then UNIT_SPELLCAST_SUCCEEDED once it goes off, and each revive of yours records RESURRECT, which a Jumper Cables whisper waits for; every other cast is only counted, at the end. For 'my Buff Back macro still aims at the old player' reports, PLAYER_REGEN_ENABLED records each time combat ends, when a macro edit combat held back goes through."
 
 --[[
     How many emotes a list has picked, out of how many this client offers, and
@@ -408,11 +412,14 @@ function ns:BuildContextReport()
 	if db then
 		local strangers = db.strangers or {}
 		lines[#lines + 1] = string.format(
-			"Give Thanks: enabled=%s print=%s whisper=%s whisperText=%s messageLanguage=%s emotesPicked=%s sound=%s  praiseDelay=%s/%s praiseCooldown=%s minDuration=%s cooldown=%s",
+			"Give Thanks: enabled=%s print=%s whisper=%s whisperTexts=%s/%s/%s messageLanguage=%s emotesPicked=%s sound=%s  praiseDelay=%s/%s praiseCooldown=%s minDuration=%s cooldown=%s",
 			tostring(strangers.enabled),
 			tostring(strangers.printEnabled),
 			tostring(strangers.whisperEnabled),
+			-- Each whisper picks one filled box at random; with all three empty, none is sent.
 			WhisperLength(strangers.whisperMessage),
+			WhisperLength(strangers.whisperMessage2),
+			WhisperLength(strangers.whisperMessage3),
 			ns.GetMessageLanguage(),
 			EmotesPicked(strangers.emotes),
 			tostring(strangers.soundEnabled),
@@ -866,7 +873,8 @@ function ns:BuildGoodNewsContextReport()
 		lines[#lines + 1] = "Saved variables not initialized."
 		return table.concat(lines, "\n")
 	end
-	if not ns.GetGoodNewsRows then
+	-- WoW Forever's TOC leaves Good-News.lua out, though Buff Back still loads its abilities.
+	if not ns.ClaimGoodNewsResurrect then
 		lines[#lines + 1] = "Good News is not loaded on this client."
 		return table.concat(lines, "\n")
 	end
@@ -921,6 +929,104 @@ function ns:BuildGoodNewsContextReport()
 
 	lines[#lines + 1] = ""
 	lines[#lines + 1] = GoodNewsTargetLine(settings.scope)
+
+	return table.concat(lines, "\n")
+end
+
+--------------------------------------------------------------------------------
+-- Buff Back Context
+--------------------------------------------------------------------------------
+
+-- A macro body as copyable text: pipes escaped, line breaks shown as " // ".
+local function MacroText(body)
+	return (tostring(body):gsub("|", "||"):gsub("\r?\n", " // "))
+end
+
+--[[
+    The state behind a "my Buff Back macro is missing / casts nothing / aims at
+    the wrong player" report: the switch, the buff this character picked and
+    whether it is among the buffs on offer (this class's Good News rows that
+    leave a buff and that this character knows), who the macro aims at, combat
+    (which holds a macro edit back until it ends), the character macro cap,
+    and the macro as the game holds it. Read only: the macro is looked up by
+    name, never created, edited or deleted here.
+]]
+function ns:BuildBuffBackContextReport()
+	local lines = { GetClientHeader(), "" }
+	local settings = ns.db and ns.db.profile.buffBack
+	if not settings then
+		lines[#lines + 1] = "Saved variables not initialized."
+		return table.concat(lines, "\n")
+	end
+	if not ns.GetBuffBackChoices then
+		lines[#lines + 1] = "Buff Back is not loaded on this client."
+		return table.concat(lines, "\n")
+	end
+
+	local _, class = UnitClass("player")
+	lines[#lines + 1] = string.format(
+		"Buff Back: enabled=%s  Class: %s  InCombat=%s (a macro edit waits for combat to end)",
+		tostring(settings.enabled),
+		tostring(class),
+		tostring(InCombatLockdown() and true or false)
+	)
+	-- Praise names the target as each stranger's buff is read, so buff tracking has to be running.
+	lines[#lines + 1] = string.format(
+		"Buff tracking ready (past the post-loading-screen pause): %s",
+		tostring(ns.IsBuffTrackingReady and ns.IsBuffTrackingReady())
+	)
+	lines[#lines + 1] = string.format(
+		"Abilities data (%s/Good-News-Abilities-%s.lua): %s",
+		tostring(ns.DATA_FOLDER),
+		tostring(ns.DATA_FOLDER),
+		type(ns.GOOD_NEWS_ABILITIES) == "table" and "loaded" or "MISSING"
+	)
+
+	local values, sorting = ns.GetBuffBackChoices()
+	lines[#lines + 1] = ""
+	lines[#lines + 1] = string.format("Buffs on offer to this character: %d", #sorting)
+	for _, spellId in ipairs(sorting) do
+		lines[#lines + 1] = string.format("  %d %s", spellId, tostring(C_Spell.GetSpellName(spellId)))
+	end
+	local picked = ns.db.char.buffBackSpell
+	local pickedText = "none (no macro until one is picked)"
+	if picked then
+		pickedText = string.format(
+			"%s %s onOffer=%s",
+			tostring(picked),
+			tostring(C_Spell.GetSpellName(picked) or "NOT ON CLIENT"),
+			tostring(values[picked] ~= nil)
+		)
+	end
+	lines[#lines + 1] = "Picked buff: " .. pickedText
+	local target = ns.GetBuffBackTarget()
+	lines[#lines + 1] = string.format(
+		"Target: %s",
+		target and PlainText(target)
+			or "none yet (the macro casts on your target until a player outside your group buffs you)"
+	)
+
+	lines[#lines + 1] = ""
+	local _, perCharacter = GetNumMacros()
+	lines[#lines + 1] = string.format(
+		"Character macros: %s / %d (Buff Back creates its macro only while under the cap)",
+		tostring(perCharacter),
+		ns.Data.MAX_CHARACTER_MACROS
+	)
+	local index = GetMacroIndexByName(ns.Data.BUFF_BACK_MACRO) or 0
+	if index == 0 then
+		lines[#lines + 1] = string.format("Macro (%s): missing", ns.Data.BUFF_BACK_MACRO)
+	else
+		local body = GetMacroBody(index) or ""
+		local spellName = picked and C_Spell.GetSpellName(picked)
+		lines[#lines + 1] = string.format(
+			"Macro (%s): present  castsPick=%s aimsAtTarget=%s",
+			ns.Data.BUFF_BACK_MACRO,
+			tostring(spellName ~= nil and body:find(spellName, 1, true) ~= nil),
+			target and tostring(body:find("[target=" .. target .. "]", 1, true) ~= nil) or "no target yet"
+		)
+		lines[#lines + 1] = "  " .. MacroText(body)
+	end
 
 	return table.concat(lines, "\n")
 end
@@ -1321,17 +1427,20 @@ end
     ceiling is in bytes, so the overflow canary is the widest-encoding locale,
     usually ruRU.
 
-    The Give Thanks thank-you whisper, in the player's own words, carries the link of whatever buff
-    landed, and no list of buffs bounds that, so it is built with the panels'
-    sample spell (ns.GAME_IDS.SAMPLE_BUFF_SPELL_ID) and a note says how long
-    any buff's link can run before the whisper goes over. A whisper that runs
-    over is sent as the default text instead, so the row never reads OVER, and
-    a second note says when the player's own text fell back. The Good News
-    whisper's abilities are bounded by this client's rows, so it is built at
-    its longest: the longest link any tracked ability carries and the longest
-    duration the whisper names, with the same fallback note. Each Thank You
-    button's whisper is the player's own text, shown only when set, and each
-    macro body is its button's command.
+    Each Give Thanks whisper box, in the player's own words, carries the link
+    of whatever buff landed, and no list of buffs bounds that, so each filled
+    box is built with the panels' sample spell
+    (ns.GAME_IDS.SAMPLE_BUFF_SPELL_ID) and a note says how long any buff's
+    link can run before it goes over. A whisper that runs over is sent as the
+    default text instead, so the row never reads OVER, and a second note says
+    when the player's own text fell back. The Good News whisper, sent only
+    where Good-News.lua loads, is bounded by this client's rows, so it is
+    built at its longest: the longest link any tracked ability carries and the
+    longest duration the whisper names, with the same fallback note. Each
+    Thank You button's whisper is the player's own text, shown only when set,
+    filled with the sample name and cut to the limit as sent, with a note when
+    the cut bites; each Thank You macro body is its button's command; and the
+    Buff Back macro is built at its longest for this character.
 ]]
 ns.DIAGNOSTIC_MESSAGES = function()
 	local rows, notes = {}, {}
@@ -1339,32 +1448,43 @@ ns.DIAGNOSTIC_MESSAGES = function()
 	local sampleID = ns.GAME_IDS and ns.GAME_IDS.SAMPLE_BUFF_SPELL_ID
 	local sampleLink = sampleID and ns.GetBuffLink(sampleID) or ""
 	local strangers = ns.db and ns.db.profile.strangers
-	local defaultTemplate = ns.GetDefaultThanksWhisper()
-	local template = strangers and strangers.whisperMessage or defaultTemplate
 	local sampleName = ns.SAMPLE_NAMES.MAGE
-	local whisper = ns:BuildThanksWhisper(template, sampleLink, sampleName) or ""
-	rows[#rows + 1] = {
-		label = "Thank-you whisper",
-		ceiling = ns.CHAT_MESSAGE_MAX_LENGTH,
-		text = whisper,
-	}
-	notes[#notes + 1] = string.format(
-		"The thank-you whisper is shown with %s; it fits any buff whose link runs %d bytes or less.",
-		tostring(sampleID and C_Spell.GetSpellName(sampleID) or sampleID),
-		ns.CHAT_MESSAGE_MAX_LENGTH - (#whisper - #sampleLink)
-	)
-	if
-		template ~= defaultTemplate
-		and whisper ~= ""
-		and whisper == (ns:BuildThanksWhisper(defaultTemplate, sampleLink, sampleName) or "")
-	then
-		notes[#notes + 1] =
-			"Your own whisper text runs past the limit with this buff, so the default text is shown and sent instead; a buff with a shorter link may still send yours."
+	local defaultTemplate = ns.GetDefaultThanksWhisper()
+	local defaultWhisper = ns:BuildThanksWhisper(defaultTemplate, sampleLink, sampleName) or ""
+	-- Box 1 always, read as the default before any profile exists; boxes 2 and 3 only once filled in.
+	for box, field in ipairs({ "whisperMessage", "whisperMessage2", "whisperMessage3" }) do
+		local template = strangers and strangers[field]
+		if box == 1 then
+			template = template or defaultTemplate
+		end
+		if type(template) == "string" and template ~= "" then
+			local whisper = ns:BuildThanksWhisper(template, sampleLink, sampleName) or ""
+			rows[#rows + 1] = {
+				label = "Thank-you whisper " .. box,
+				ceiling = ns.CHAT_MESSAGE_MAX_LENGTH,
+				text = whisper,
+			}
+			notes[#notes + 1] = string.format(
+				"Thank-you whisper %d is shown with %s; it fits any buff whose link runs %d bytes or less.",
+				box,
+				tostring(sampleID and C_Spell.GetSpellName(sampleID) or sampleID),
+				ns.CHAT_MESSAGE_MAX_LENGTH - (#whisper - #sampleLink)
+			)
+			if template ~= defaultTemplate and whisper ~= "" and whisper == defaultWhisper then
+				notes[#notes + 1] = string.format(
+					"Your own text in whisper box %d runs past the limit with this buff, so the default text is shown and sent instead; a buff with a shorter link may still send yours.",
+					box
+				)
+			end
+		end
 	end
 
 	local goodNews = ns.db and ns.db.profile.goodNews
 	local goodNewsTemplate = goodNews and goodNews.whisperMessage or ns.GetDefaultGoodNewsWhisper()
-	if goodNewsTemplate == "" then
+	-- WoW Forever's TOC leaves Good-News.lua out, so it sends no Good News whisper there.
+	if not ns.ClaimGoodNewsResurrect then
+		notes[#notes + 1] = "Good News isn't on this client, so it sends no whisper."
+	elseif goodNewsTemplate == "" then
 		notes[#notes + 1] = "The Good News whisper text is empty, so Good News sends nothing."
 	else
 		local link, label = LongestGoodNewsLink()
@@ -1398,11 +1518,22 @@ ns.DIAGNOSTIC_MESSAGES = function()
 		local config = profile and profile[button.profileKey]
 		local message = config and config.message
 		if type(message) == "string" and message ~= "" then
+			-- Filled as sent, with {name} as the sample name; the builder cuts it to the limit.
+			local sent = ns.FillThankYouWhisper(message, sampleName)
 			rows[#rows + 1] = {
 				label = "Thank You whisper (" .. button.command .. ")",
 				ceiling = ns.CHAT_MESSAGE_MAX_LENGTH,
-				text = message,
+				text = sent,
 			}
+			local typed = message:gsub("{name}", function()
+				return sampleName
+			end)
+			if #typed > #sent then
+				notes[#notes + 1] = string.format(
+					"The %s whisper runs past the limit with this name, so its end is cut off when sent.",
+					button.command
+				)
+			end
 		end
 	end
 	for _, button in ipairs(ns.Data.THANK_YOU_BUTTONS) do
@@ -1411,6 +1542,33 @@ ns.DIAGNOSTIC_MESSAGES = function()
 			ceiling = MACRO_MAX_LENGTH,
 			text = button.command,
 		}
+	end
+
+	--[[
+	    The Buff Back macro, in the shape Features/Buff-Back.lua writes it
+	    ("/cast [target=Name] Buff"), at its longest for this character: the
+	    longest-named buff on offer, aimed at the saved target, or the sample
+	    name before anyone has buffed this character.
+	]]
+	if ns.GetBuffBackChoices then
+		local _, sorting = ns.GetBuffBackChoices()
+		local longest = ""
+		for _, spellId in ipairs(sorting) do
+			local name = C_Spell.GetSpellName(spellId) or ""
+			if #name > #longest then
+				longest = name
+			end
+		end
+		if longest == "" then
+			notes[#notes + 1] = "This character knows no buff Buff Back offers, so it writes no macro."
+		else
+			local target = ns.GetBuffBackTarget() or sampleName
+			rows[#rows + 1] = {
+				label = "Buff Back macro (" .. ns.Data.BUFF_BACK_MACRO .. ")",
+				ceiling = MACRO_MAX_LENGTH,
+				text = "/cast [target=" .. target .. "] " .. longest,
+			}
+		end
 	end
 
 	return rows, notes

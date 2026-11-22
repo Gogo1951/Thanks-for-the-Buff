@@ -1,6 +1,6 @@
 # Thanks for the Buff (TFTB)
 
-Auto thank players who buff you with an emote or whisper, tell players what you just cast on them, greet friends and guildmates with a wave as you pass them, and thank anyone you target with one click of your Thank You macros.
+Auto thank players who buff you with an emote or whisper, buff them back with one press, tell players what you just cast on them, greet friends and guildmates with a wave, and thank anyone you target with one click.
 
 **TL;DR:** Be the friendly face in Azeroth without breaking stride. Every buff gets noticed, every big cooldown gets used, and every friend gets a hello.
 
@@ -19,6 +19,12 @@ Auto thank players who buff you with an emote or whisper, tell players what you 
 > **Stranger Buffs You, Self:** TFTB // Katz buffed you with [Power Word: Fortitude]!
 
 > **Stranger Buffs You, Message To Katz:** Thanks for the [Power Word: Fortitude] // TFTB
+
+### Return Buff
+
+* **Return the Favor** // A stranger buffs you, and one press of your Return Buff macro casts your buff right back on them, no targeting needed.
+* **Your Buff, Your Pick** // Arcane Intellect, Mark of the Wild, Fortitude, a Blessing, even Power Infusion: choose which one goes back.
+* **Off Until You Want It** // Starts off. Turn it on in the options whenever you're ready.
 
 ### Good News
 
@@ -50,13 +56,21 @@ Auto thank players who buff you with an emote or whisper, tell players what you 
 ## Setup
 
 1. Install the add-on, ideally using [CurseForge](https://www.curseforge.com/wow/addons/thanks-for-the-buff-revisited) or [Wago](https://addons.wago.io/addons/thanks-for-the-buff).
-2. Type `/tftb` to open the Options Interface.
+2. Type `/tftb`, or pick TFTB Options in the mini-map menu, to open the Options Interface.
 3. Under Give Thanks, pick your emotes from the Emotes List, and turn on the Give Thanks Whisper if you'd like to whisper too.
-4. Turn on Good News and Wave to Friends if you'd like them.
-5. Open your Macros window and drag `- Thank` onto your action bar.
+4. Turn on Return Buff, Good News, and Wave to Friends if you'd like them.
+5. Open your Macros window and drag `- Thank`, and `- Return Buff` if you turned it on, onto your action bar.
 6. _"Manners maketh the raid."_
 
 ## Tips & Tricks
+
+### Mini-map Button
+
+| Action | Result |
+|---|---|
+| Hover or Left-Click | Opens the mini-map menu |
+
+The menu switches Give Thanks and Wave to Friends on or off, picks your emotes, and ignores a recent buff in one click, without opening the options.
 
 ### Good to Know
 
@@ -97,12 +111,6 @@ Auto thank players who buff you with an emote or whisper, tell players what you 
 
 ### 🟢 Pairs With
 
+* Gogo1951's [Good to Go](https://www.curseforge.com/wow/addons/good-to-go)
 * Gogo1951's [Play It Forward](https://www.curseforge.com/wow/addons/play-it-forward)
 * Gogo1951's [Water Dispenser](https://www.curseforge.com/wow/addons/water-dispenser-revisited)
-
-### 🟡 Overlaps
-
-* Gogo1951's [Good to Go](https://www.curseforge.com/wow/addons/good-to-go)
-* g00v3R's [GuildGreet Extended](https://www.curseforge.com/wow/addons/guild-greet-extended)
-* fpsacha's [Manners](https://www.curseforge.com/wow/addons/manners)
-* stryker2k2's [Stryk's Emote Wheel](https://www.curseforge.com/wow/addons/stryks-emote-wheel)

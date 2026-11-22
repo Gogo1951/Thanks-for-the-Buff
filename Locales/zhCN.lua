@@ -31,7 +31,7 @@ L["MESSAGE_CANT_THANK_SELF"] = "你不能感谢自己！"
 --------------------------------------------------------------------------------
 
 L["UNKNOWN_SPELL"] = "未知法术"
-L["SAMPLE_EXAMPLE"] = "示例：%s"
+L["SAMPLE_EXAMPLE"] = "示例"
 
 --------------------------------------------------------------------------------
 -- Options: Main Panel
@@ -39,10 +39,12 @@ L["SAMPLE_EXAMPLE"] = "示例：%s"
 
 L["OPTIONS_WELCOME_TOGGLE"] = "启用欢迎消息"
 L["OPTIONS_WELCOME_DESCRIPTION"] = "登录时显示一条只有你能看到的消息。"
+L["OPTIONS_ENABLE_MINIMAP"] = "启用小地图按钮"
+L["OPTIONS_ENABLE_MINIMAP_DESCRIPTION"] =
+	"在小地图上显示 TFTB 按钮。鼠标悬停时会打开一个菜单，包含按钮的全部功能。"
 L["OPTIONS_DESCRIPTION"] =
-	"自动用表情或密语感谢为你施加增益的玩家，告诉玩家你刚刚对他们施放了什么，路过好友和公会成员时向他们挥手问候，点一下感谢宏就能感谢你选中的任何人。"
+	"自动用表情或密语感谢为你施加增益的玩家，一键为他们回赠增益，告诉玩家你刚刚对他们施放了什么，向好友和公会成员挥手问候，点一下就能感谢你选中的任何人。"
 L["OPTIONS_FEATURES_HEADER"] = "功能"
-L["OPTIONS_FEATURES_DESCRIPTION"] = "在此处或各功能自己的面板中开启或关闭每项功能。"
 L["OPTIONS_COMMANDS_HEADER"] = "/Commands"
 L["OPTIONS_COMMAND"] = "/tftb"
 L["OPTIONS_COMMAND_DESCRIPTION"] = "打开此插件的选项界面。"
@@ -87,6 +89,8 @@ L["TAB_GIVE_THANKS"] = "致谢"
 L["GIVE_THANKS_ENABLE"] = "启用致谢"
 L["GIVE_THANKS_ENABLE_DESCRIPTION"] = "开启对队伍外玩家所施增益的感谢。"
 L["GIVE_THANKS_DESCRIPTION"] = "在开放世界中，感谢队伍外的玩家为你施放的增益。"
+-- Shown on the Emotes List and Ignored Buffs pages while Give Thanks is off.
+L["GIVE_THANKS_LIST_OFF"] = '%s已关闭，因此不会使用此列表。开启"%s"即可使用。'
 
 -- Praise Limits
 L["PRAISE_HEADER"] = "感谢限制"
@@ -121,7 +125,7 @@ L["NOTIFICATIONS_PRINT_ENABLE"] = "启用文字提示"
 L["NOTIFICATIONS_PRINT_DESCRIPTION"] = "获得增益时，显示一条只有你能看到的消息。"
 L["NOTIFICATIONS_SOUND_ENABLE"] = "启用音效"
 L["NOTIFICATIONS_SOUND_DESCRIPTION"] = "获得增益时播放音效。只有你能听到。"
-L["NOTIFICATIONS_SOUND_PREVIEW_DESCRIPTION"] = "播放该音效，让你在开启前先试听。"
+L["OPTIONS_SOUND_PREVIEW_DESCRIPTION"] = "立即播放此音效，无论音效是否开启。"
 
 --------------------------------------------------------------------------------
 -- Options: Good News
@@ -150,6 +154,7 @@ L["GOOD_NEWS_TOKENS"] = "占位符：%s 你施放的内容，%s 接收者"
 L["TAB_GOOD_NEWS_ABILITIES"] = "追踪的技能"
 L["GOOD_NEWS_ABILITIES_DESCRIPTION"] =
 	"当你对其他玩家施放此处勾选的技能时，好消息会发送密语告知。"
+L["GOOD_NEWS_ABILITIES_OFF"] = '%s已关闭，因此暂不发送任何密语。开启"%s"即可发送。'
 -- The heading over the rows no class owns: scrolls, and abilities cast by a trinket's pet.
 L["GOOD_NEWS_ITEMS"] = "物品"
 
@@ -175,7 +180,6 @@ L["EMOTE_GROUP_VOICE"] = "语音"
 L["EMOTE_GROUP_VOICE_DESCRIPTION"] = "播放一句语音。"
 L["EMOTE_GROUP_POSE"] = "姿态"
 L["EMOTE_GROUP_POSE_DESCRIPTION"] = "持续到你移动为止。"
-L["EMOTES_RESET"] = "重置表情"
 L["EMOTES_RESET_DESCRIPTION"] = "将列表恢复为默认的感谢表情。"
 L["EMOTES_RESET_CONFIRM"] = "将表情列表重置为默认值？"
 
@@ -225,7 +229,28 @@ L["BUTTON_ICON_DEFAULT"] = "默认"
 ]]
 L["BUTTON_MACRO_ENABLE"] = '启用宏 "%s"'
 L["BUTTON_MACRO_ENABLE_DESCRIPTION"] = "创建一个名为 %s 的宏，关闭此项时会将其删除。"
-L["BUTTON_WHISPER_DESCRIPTION"] = "设置此按钮向你的目标发送的密语。留空则不发送密语。"
+L["BUTTON_PICKUP"] = "拾取宏"
+L["BUTTON_PICKUP_DESCRIPTION"] = "将宏 %s 放到鼠标指针上，方便你拖到动作条上。"
+L["BUTTON_WHISPER_DESCRIPTION"] =
+	"设置此按钮向你的目标发送的密语。{name} 会替换为对方的名字。留空则不发送密语。"
+L["BUTTON_TOKENS"] = "占位符：%s 你要感谢的人"
+
+-- Return Buff
+L["TAB_RETURN_BUFF"] = "回赠增益"
+L["RETURN_BUFF_DESCRIPTION"] =
+	"投桃报李。每当队伍外的玩家为你施加增益时，%s 宏就会以其为目标，按一下即可把你的增益回赠给对方。"
+L["RETURN_BUFF_ENABLE_DESCRIPTION"] =
+	"创建名为 %s 的宏，对最后一个为你施加增益的队伍外玩家施放你的增益；关闭此选项时会再次删除它。"
+L["RETURN_BUFF_SPELL"] = "要施放的增益"
+L["RETURN_BUFF_SPELL_DESCRIPTION"] = "设置宏施放你的哪个增益。"
+L["RETURN_BUFF_EXAMPLE"] = "最后为你施加增益的是%s，所以宏会对其施放%s。"
+L["RETURN_BUFF_EXAMPLE_LEVEL"] = "最后为你施加增益的是%s（%d级），所以宏会对其施放%s。"
+L["RETURN_BUFF_NONE"] = "这个角色还不会可以对其他玩家施放的增益。"
+L["RETURN_BUFF_MACROS_FULL"] = "你的通用宏已满（%d个）。删除一个，为 %s 腾出位置。"
+L["RETURN_BUFF_HELP"] =
+	"在有人为你施加增益之前，宏会对你的当前目标施放。游戏不允许插件在战斗中修改宏，因此战斗中获得的增益会在战斗结束后才更新宏。"
+L["RETURN_BUFF_RANK_HELP"] =
+	"宏会施放该玩家等级可接受的最高等级。如果 TFTB 无法看到其等级，则施放你的最高等级。"
 
 --------------------------------------------------------------------------------
 -- Options: Wave to Friends
@@ -236,7 +261,7 @@ L["WAVE_ENABLE"] = "启用好友问候"
 L["WAVE_ENABLE_DESCRIPTION"] = "鼠标指向好友和公会成员时，对其使用表情。"
 L["WAVE_DESCRIPTION"] = "在野外鼠标指向好友和公会成员时，用表情向他们问候。"
 L["WAVE_RULES"] = "不会对你的小队或团队成员使用，战斗中、施法或钓鱼时也不会使用。"
-L["WAVE_RESTING_ENABLE"] = "仅在休息时"
+L["WAVE_RESTING_ENABLE"] = "仅在城镇中"
 L["WAVE_RESTING_ENABLE_DESCRIPTION"] = "仅在你于城镇或旅店中休息时挥手。"
 L["WAVE_COOLDOWN"] = "同一玩家冷却时间"
 L["WAVE_COOLDOWN_DESCRIPTION"] = "设置同一名玩家要隔多久才能再次被问候。"
@@ -287,9 +312,12 @@ L["WAVE_GUILDS_EMOTES_DESCRIPTION"] = "勾选对公会成员可用的表情，�
 -- Options: Whisper Message Row
 --------------------------------------------------------------------------------
 
--- The caption and Reset button beside every whisper box, on Give Thanks, Good News and each Thank You Button.
+-- The caption beside every whisper box, on Give Thanks, Good News and each Thank You Button; Give Thanks has several boxes, so its caption is plural.
 L["WHISPER_MESSAGE"] = "密语消息"
-L["WHISPER_MESSAGE_RESET"] = "重置"
+L["WHISPER_MESSAGES"] = "密语消息"
+L["WHISPER_RANDOM"] = "随机选用其中一条；空白框会被跳过。"
+-- Every Reset row's button, a whisper box's included.
+L["OPTIONS_RESET"] = "重置"
 L["WHISPER_MESSAGE_RESET_DESCRIPTION"] = "将密语消息恢复为默认文本。"
 
 -- The whisper composer around every editable whisper's box, on Give Thanks and Good News.
@@ -303,6 +331,48 @@ L["WHISPER_TOKENS"] = "占位符：%s 增益，%s 施法者"
 L["WHISPER_TOO_LONG"] = "太长了，因此会改为发送默认文本。"
 L["WHISPER_TEST"] = "发送测试给我"
 L["WHISPER_TEST_DESCRIPTION"] = "把示例密语发给你自己，让你看到和其他玩家完全一样的效果。"
+
+--------------------------------------------------------------------------------
+-- Mini-map Menu
+--------------------------------------------------------------------------------
+
+-- The words every feature's state and every switch show.
+L["MENU_ON"] = "开启"
+L["MENU_OFF"] = "关闭"
+L["MENU_TOGGLE"] = "切换"
+
+-- %d is how many more buffs the list leaves out.
+L["MENU_MORE"] = "还有 %d 件"
+
+-- The button click that does what a menu row does, gray at the row's right.
+L["MENU_CLICK_RIGHT"] = "右键点击"
+L["MENU_CLICK_MIDDLE"] = "中键点击"
+L["MENU_CLICK_SHIFT_MIDDLE"] = "Shift + 中键点击"
+-- The menu's Options row.
+L["MENU_OPTIONS"] = "TFTB 选项"
+
+-- Give Thanks: the switches, named without their Enable.
+L["MENU_PRAISE_DELAY"] = "感谢延迟"
+L["MENU_WHISPER"] = "致谢密语"
+L["MENU_PRINT"] = "文字提示"
+L["MENU_SOUND"] = "音效"
+
+-- %d is how many emotes the Emotes List has ticked.
+L["MENU_CHECKED"] = "已勾选 %d 个"
+L["MENU_CHOOSE_EMOTES"] = "选择表情"
+L["MENU_RECENT"] = "最近的增益"
+L["MENU_RECENT_NOTE"] = "点击增益即可忽略它。"
+L["MENU_RECENT_EMPTY"] = "还没有来自其他玩家的增益。"
+L["MENU_IGNORED_NOTE"] = "点击增益即可取消忽略。"
+L["MENU_IGNORED_EMPTY"] = "还没有忽略的增益。"
+
+-- %s is the buff's link.
+L["MENU_IGNORED_PRINT"] = "已将 %s 加入忽略的增益。"
+L["MENU_UNIGNORED_PRINT"] = "已将 %s 移出忽略的增益。"
+
+-- Wave to Friends.
+L["MENU_WHO_WAVES"] = "向谁挥手"
+L["MENU_EDIT_CUSTOM"] = "编辑自定义列表"
 
 --------------------------------------------------------------------------------
 -- Defaults

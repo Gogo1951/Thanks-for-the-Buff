@@ -1,6 +1,7 @@
 local _, ns = ...
 local Data = ns.Data
 local L = ns.L
+local Kit = ns.OptionsKit
 
 local GetColor = ns.GetColor
 
@@ -46,19 +47,10 @@ end
     the closest real option; the stored number is left alone until they choose,
     so nobody's setting is silently rewritten by opening the panel.
 ]]
-local function DefineSecondsSelect(settings, key, order, desc)
+local function DefineSecondsSelect(settings, key, desc)
 	return {
 		type = "select",
 		desc = desc,
-		--[[
-		    The right half of a label-beside-control row: the caller pairs this with
-		    ns.OptionsRowLabel, the same way every other dropdown in the add-on is
-		    built. A select carrying its own `name` stacks the label above itself in
-		    header gold, which is not how this UI reads a setting.
-		]]
-		name = "",
-		width = ns.OPTIONS_CONTROL_WIDTH,
-		order = order,
 		sorting = Data.SECONDS_CHOICES,
 		values = function()
 			local values = {}
@@ -72,6 +64,7 @@ local function DefineSecondsSelect(settings, key, order, desc)
 		end,
 		set = function(_, value)
 			settings()[key] = value
+			ns.RefreshSettings()
 		end,
 	}
 end
@@ -82,26 +75,6 @@ end
 
 -- The class whose spell the sample names (Arcane Intellect), so the buffer's name and color agree with it.
 local SAMPLE_CLASS = "MAGE"
-
---[[
-    The Example line under the print toggle, hidden with it. build
-    gets the sample player's class and name and returns the message body, made
-    by the same builder the real print uses.
-]]
-local function DefinePrintExample(settings, order, build)
-	return ns.OptionsExample(
-		function()
-			return ns.TintText(
-				GetColor("TEXT"),
-				ns.GetPrintPrefix() .. build(SAMPLE_CLASS, ns.SAMPLE_NAMES[SAMPLE_CLASS])
-			)
-		end,
-		order,
-		function()
-			return not settings().printEnabled
-		end
-	)
-end
 
 --[[
     The whisper section's sample: the buff the panels always show (Arcane
@@ -138,14 +111,11 @@ local function DefineWhisperComposer(args, settings, order)
 			return L["WHISPER_TOKENS"]:format(info .. "{spell}" .. help, info .. "{name}" .. help)
 		end,
 		description = L["PRAISE_WHISPER_MESSAGE_DESCRIPTION"],
+		-- Up to three boxes; each whisper picks one of the filled ones at random.
+		extraFields = { "whisperMessage2", "whisperMessage3" },
+		labelCaption = L["WHISPER_MESSAGES"],
+		tokensSuffix = "\n" .. L["WHISPER_RANDOM"],
 	}, order)
-end
-
--- The blank line above an Example, hidden whenever the Example is.
-local function DefineExampleSpacer(settings, key, order)
-	return ns.OptionsSpacer(order, function()
-		return not settings()[key]
-	end)
 end
 
 --------------------------------------------------------------------------------
@@ -153,123 +123,32 @@ end
 --------------------------------------------------------------------------------
 
 --[[
-    The reaction toggles, one factory each: the whisper, praise the other player
-    sees, and the print and the sound only you get. The emotes are a checklist
-    of their own (Options/Options-Emote-Grid.lua). Every factory takes a
-    `settings` accessor returning ns.db.profile.strangers.
+    The reaction switches: the whisper, praise the other player sees, and the
+    print and the sound only you get. The emotes are a checklist of their own
+    (Options/Options-Emote-Grid.lua). Every switch reads and writes
+    ns.db.profile.strangers.
 ]]
-local function DefineWhisperToggle(settings, order)
+local function Switch(setting, name, desc)
 	return {
 		type = "toggle",
-		name = L["GIVE_THANKS_WHISPER_ENABLE"],
-		desc = L["PRAISE_WHISPER_DESCRIPTION"],
+		name = name,
+		desc = desc,
 		width = "full",
-		order = order,
-		get = function()
-			return settings().whisperEnabled
-		end,
-		set = function(_, value)
-			settings().whisperEnabled = value
-		end,
-	}
-end
-
-local function DefinePrintToggle(settings, order)
-	return {
-		type = "toggle",
-		name = L["NOTIFICATIONS_PRINT_ENABLE"],
-		desc = L["NOTIFICATIONS_PRINT_DESCRIPTION"],
-		width = "full",
-		order = order,
-		get = function()
-			return settings().printEnabled
-		end,
-		set = function(_, value)
-			settings().printEnabled = value
-		end,
+		get = Kit.Get("profile", "strangers." .. setting),
+		set = Kit.Set("profile", "strangers." .. setting),
 	}
 end
 
 --[[
-    The "Enable Sound Effects" toggle. NOT
-    full-width: its DefineSoundPreview speaker shares the row, and full-width
-    would push the speaker onto its own line.
+    Praise Delay's length. Its labels come from the client's own duration
+    strings (ns.FormatDuration), so "2 seconds" reads correctly in every
+    language without TFTB shipping a string per length.
+    Data.PRAISE_DELAY_CHOICES doubles as the display order.
 ]]
-local function DefineSoundToggle(settings, order)
-	return {
-		type = "toggle",
-		name = L["NOTIFICATIONS_SOUND_ENABLE"],
-		desc = L["NOTIFICATIONS_SOUND_DESCRIPTION"],
-		order = order,
-		get = function()
-			return settings().soundEnabled
-		end,
-		set = function(_, value)
-			settings().soundEnabled = value
-		end,
-	}
-end
-
---[[
-    The speaker icon that previews the sound effect, placed on the same row
-    right after its "Enable Sound Effects" toggle. It plays regardless of the
-    toggle's state -- hearing the sound BEFORE enabling it is the point. The
-    texture is the client's own voice-chat speaker, so it matches the UI in
-    every locale without shipping art.
-]]
-local function DefineSoundPreview(playSound, order)
-	return {
-		type = "execute",
-		name = "",
-		desc = L["NOTIFICATIONS_SOUND_PREVIEW_DESCRIPTION"],
-		image = "Interface\\Common\\VoiceChat-Speaker",
-		imageWidth = 16,
-		imageHeight = 16,
-		width = 0.15,
-		order = order,
-		func = playSound,
-	}
-end
-
---[[
-    "Enable Praise Delay" and the dropdown that sets its length. The delay holds
-    back the whisper and the emote only: the print and the sound are your own
-    heads-up and stay instant. The toggle takes the label half of the row and
-    the dropdown the other half, so the two total one row and the dropdown sits
-    clear of the caption.
-]]
-local function DefinePraiseDelayToggle(settings, order)
-	return {
-		type = "toggle",
-		name = L["PRAISE_DELAY_ENABLE"],
-		desc = L["PRAISE_DELAY_DESCRIPTION"],
-		width = ns.OPTIONS_LABEL_WIDTH,
-		order = order,
-		get = function()
-			return settings().praiseDelayEnabled
-		end,
-		set = function(_, value)
-			settings().praiseDelayEnabled = value
-		end,
-	}
-end
-
---[[
-    Nothing to set while the delay is off, so the dropdown only appears with it.
-    Its labels come from the client's own duration strings (ns.FormatDuration), so
-    "2 seconds" reads correctly in every language without TFTB shipping a string
-    per length. Data.PRAISE_DELAY_CHOICES doubles as the display order.
-]]
-local function DefinePraiseDelaySelect(settings, order)
+local function DefinePraiseDelaySelect()
 	return {
 		type = "select",
-		name = "",
 		desc = L["PRAISE_DELAY_LENGTH_DESCRIPTION"],
-		width = ns.OPTIONS_CONTROL_WIDTH,
-		order = order,
-		hidden = function()
-			return not settings().praiseDelayEnabled
-		end,
 		sorting = Data.PRAISE_DELAY_CHOICES,
 		values = function()
 			local values = {}
@@ -278,12 +157,8 @@ local function DefinePraiseDelaySelect(settings, order)
 			end
 			return values
 		end,
-		get = function()
-			return settings().praiseDelay
-		end,
-		set = function(_, value)
-			settings().praiseDelay = value
-		end,
+		get = Kit.Get("profile", "strangers.praiseDelay"),
+		set = Kit.Set("profile", "strangers.praiseDelay"),
 	}
 end
 
@@ -296,104 +171,96 @@ function ns.BuildGiveThanksOptions()
 		return ns.db.profile.strangers
 	end
 
+	-- A Praise Limits row: caption and a seconds dropdown.
+	local function LimitRow(order, captionKey, key)
+		local desc = L[captionKey .. "_DESCRIPTION"]
+		return Kit.LabelRow(order, nil, L[captionKey], DefineSecondsSelect(settings, key, desc))
+	end
+
 	local options = {
 		name = L["TAB_GIVE_THANKS"],
 		type = "group",
 		args = {
-			descIntro = ns.OptionsDesc(L["GIVE_THANKS_DESCRIPTION"], 1),
-			space0 = ns.OptionsSpacer(2),
+			descIntro = Kit.Desc(L["GIVE_THANKS_DESCRIPTION"], 1),
+			space0 = Kit.Spacer(2),
 
 			--[[
 			    Master switch: everything below it hides when off, and the feature
 			    itself stops -- see the `enabled` gate in Praise. Its twin sits in
-			    the General panel's Features section. Fractional orders keep it above
-			    the first header without renumbering the panel.
+			    the General panel's Features section.
 			]]
-			enable = ns.OptionsFeatureToggle(ns.GetFeatureSwitch("strangers"), 2.5),
-			enableSpacer = ns.OptionsSpacer(2.6),
+			enable = Kit.FeatureSwitch("strangers.enabled", 2.5),
+			enableSpacer = Kit.Spacer(2.6),
 
-			headerPraise = ns.OptionsHeader(L["PRAISE_HEADER"], 3),
-			space1 = ns.OptionsSpacer(4),
-			descPraise = ns.OptionsDesc(L["PRAISE_DESCRIPTION"], 4.3),
-			spacePraise = ns.OptionsSpacer(4.6),
+			headerPraise = Kit.Header(L["PRAISE_HEADER"], 3),
+			space1 = Kit.Spacer(4),
+			descPraise = Kit.Desc(L["PRAISE_DESCRIPTION"], 4.3),
+			spacePraise = Kit.Spacer(4.6),
 			-- The limits come first, as dropdowns over Data.SECONDS_CHOICES: they hold back the emote and the whisper alike.
-			praiseCooldownStrangersLabel = ns.OptionsRowLabel(
-				L["GIVE_THANKS_OVERALL_COOLDOWN"],
-				11,
-				nil,
-				nil,
-				L["GIVE_THANKS_OVERALL_COOLDOWN_DESCRIPTION"]
+			praiseCooldownStrangers = LimitRow(11, "GIVE_THANKS_OVERALL_COOLDOWN", "praiseCooldown"),
+			space4 = Kit.Spacer(12),
+			cooldownStrangers = LimitRow(13, "GIVE_THANKS_SOURCE_COOLDOWN", "cooldown"),
+			space5 = Kit.Spacer(14),
+			minDurationStrangers = LimitRow(15, "GIVE_THANKS_MIN_DURATION", "minBuffDuration"),
+			space6 = Kit.Spacer(16),
+			--[[
+			    Praise Delay closes the section, its length beside it while it is on.
+			    The delay holds back the whisper and the emote only: the print and the
+			    sound are your own heads-up and stay instant.
+			]]
+			praiseDelayStrangers = Kit.ToggleRow(
+				17,
+				Switch("praiseDelayEnabled", L["PRAISE_DELAY_ENABLE"], L["PRAISE_DELAY_DESCRIPTION"]),
+				{ control = DefinePraiseDelaySelect() }
 			),
-			praiseCooldownStrangers = DefineSecondsSelect(
-				settings,
-				"praiseCooldown",
-				11.1,
-				L["GIVE_THANKS_OVERALL_COOLDOWN_DESCRIPTION"]
-			),
-			space4 = ns.OptionsSpacer(12),
-			cooldownStrangersLabel = ns.OptionsRowLabel(
-				L["GIVE_THANKS_SOURCE_COOLDOWN"],
-				13,
-				nil,
-				nil,
-				L["GIVE_THANKS_SOURCE_COOLDOWN_DESCRIPTION"]
-			),
-			cooldownStrangers = DefineSecondsSelect(
-				settings,
-				"cooldown",
-				13.1,
-				L["GIVE_THANKS_SOURCE_COOLDOWN_DESCRIPTION"]
-			),
-			space5 = ns.OptionsSpacer(14),
-			minDurationStrangersLabel = ns.OptionsRowLabel(
-				L["GIVE_THANKS_MIN_DURATION"],
-				15,
-				nil,
-				nil,
-				L["GIVE_THANKS_MIN_DURATION_DESCRIPTION"]
-			),
-			minDurationStrangers = DefineSecondsSelect(
-				settings,
-				"minBuffDuration",
-				15.1,
-				L["GIVE_THANKS_MIN_DURATION_DESCRIPTION"]
-			),
-			space6 = ns.OptionsSpacer(16),
-			-- Praise Delay closes the section.
-			praiseDelayStrangers = DefinePraiseDelayToggle(settings, 17),
-			praiseDelayLengthStrangers = DefinePraiseDelaySelect(settings, 18),
-			space7 = ns.OptionsSpacer(19),
+			space7 = Kit.Spacer(19),
 
 			-- The emote checklist has its own child panel, Emotes List.
-			headerWhispers = ns.OptionsHeader(L["GIVE_THANKS_WHISPER_HEADER"], 40),
-			spaceWhispers = ns.OptionsSpacer(40.5),
-			whisperStrangers = DefineWhisperToggle(settings, 41),
-			-- 41.1 through 41.5 belong to the whisper composer, added below.
-			whisperComposerSpacer = DefineExampleSpacer(settings, "whisperEnabled", 41.05),
-			spaceAfterWhispers = ns.OptionsSpacer(42),
-
-			headerNotifications = ns.OptionsHeader(L["NOTIFICATIONS_HEADER"], 50),
-			space8 = ns.OptionsSpacer(51),
-			descNotifications = ns.OptionsDesc(L["NOTIFICATIONS_DESCRIPTION"], 51.3),
-			spaceNotifications = ns.OptionsSpacer(51.6),
-			printStrangers = DefinePrintToggle(settings, 52),
-			printExampleSpacer = DefineExampleSpacer(settings, "printEnabled", 52.3),
-			printExample = DefinePrintExample(settings, 52.6, function(class, name)
-				return ns:BuildStrangerMessage(class, name, ns.GetSpellLink(ns.GAME_IDS.SAMPLE_BUFF_SPELL_ID) or "")
+			headerWhispers = Kit.Header(L["GIVE_THANKS_WHISPER_HEADER"], 40),
+			spaceWhispers = Kit.Spacer(40.5),
+			whisperStrangers = Kit.ToggleRow(
+				41,
+				Switch("whisperEnabled", L["GIVE_THANKS_WHISPER_ENABLE"], L["PRAISE_WHISPER_DESCRIPTION"])
+			),
+			-- 41.1 through 41.46 belong to the whisper composer, added below.
+			whisperComposerSpacer = Kit.Spacer(41.05, function()
+				return not settings().whisperEnabled
 			end),
-			space9 = ns.OptionsSpacer(53),
-			soundStrangers = DefineSoundToggle(settings, 54),
-			soundPreviewStrangers = DefineSoundPreview(ns.PlayBuffSound, 55),
-			spaceAfterNotifications = ns.OptionsSpacer(56),
+			spaceAfterWhispers = Kit.Spacer(42),
+
+			headerNotifications = Kit.Header(L["NOTIFICATIONS_HEADER"], 50),
+			space8 = Kit.Spacer(51),
+			descNotifications = Kit.Desc(L["NOTIFICATIONS_DESCRIPTION"], 51.3),
+			spaceNotifications = Kit.Spacer(51.6),
+			printStrangers = Kit.ToggleRow(
+				52,
+				Switch("printEnabled", L["NOTIFICATIONS_PRINT_ENABLE"], L["NOTIFICATIONS_PRINT_DESCRIPTION"])
+			),
+			printExample = Kit.Example(52.6, function()
+				return not settings().printEnabled
+			end, function()
+				local link = ns.GetSpellLink(ns.GAME_IDS.SAMPLE_BUFF_SPELL_ID) or ""
+				return Kit.PrintedLine(
+					ns.GetPrintPrefix() .. ns:BuildStrangerMessage(SAMPLE_CLASS, ns.SAMPLE_NAMES[SAMPLE_CLASS], link)
+				)
+			end),
+			space9 = Kit.Spacer(53),
+			-- The speaker previews the sound beside its switch.
+			soundStrangers = Kit.ToggleRow(
+				54,
+				Switch("soundEnabled", L["NOTIFICATIONS_SOUND_ENABLE"], L["NOTIFICATIONS_SOUND_DESCRIPTION"]),
+				{ preview = Kit.SoundPreview(ns.PlayBuffSound) }
+			),
+			spaceAfterNotifications = Kit.Spacer(56),
 		},
 	}
 
 	DefineWhisperComposer(options.args, settings, 41.1)
 
 	-- Intro text and the switch itself stay; everything else follows the switch.
-	ns.HideAllExcept(options.args, function()
+	Kit.HideAllExcept(options.args, function()
 		return not settings().enabled
-	end, { descIntro = true, space0 = true, enable = true })
+	end, { "descIntro", "space0", "enable" })
 
 	return options
 end

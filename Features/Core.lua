@@ -30,10 +30,10 @@ function ns:ApplyProfile()
 	if ns.ReconcileMacros then
 		ns.ReconcileMacros()
 	end
-	local registry = LibStub("AceConfigRegistry-3.0")
-	for _, name in pairs(ns.OPTIONS_REGISTRY) do
-		registry:NotifyChange(name)
+	if ns.ApplyMinimapButton then
+		ns:ApplyMinimapButton()
 	end
+	ns.RefreshSettings()
 end
 
 --[[
@@ -179,24 +179,24 @@ ns.EVENT_NAMES = {
 	"LOADING_SCREEN_DISABLED",
 	-- Wave to Friends: mousing over a character.
 	"UPDATE_MOUSEOVER_UNIT",
-	--[[
-	    Good News: your own casts, and your pet's. These are what let it run on
-	    WoW Forever, where the combat log is closed to add-ons: SENT names who
-	    you cast at and SUCCEEDED confirms the cast went off.
-	]]
-	"UNIT_SPELLCAST_SENT",
-	"UNIT_SPELLCAST_SUCCEEDED",
+	-- Buff Back: a macro edit held back by combat goes through once it ends.
+	"PLAYER_REGEN_ENABLED",
 }
 
 --[[
     Add-ons can't register WoW Forever's combat log: COMBAT_LOG_EVENT_UNFILTERED
     there raises ADDON_ACTION_FORBIDDEN, which pcall can't catch, so Forever
     reads buffs on you from UNIT_AURA instead.
+
+    Good News, which Forever leaves out, needs your own casts and your pet's:
+    SENT names who you cast at and SUCCEEDED confirms the cast went off.
 ]]
 if ns.FLAVOR == "Camelot" then
 	table.insert(ns.EVENT_NAMES, "UNIT_AURA")
 else
 	table.insert(ns.EVENT_NAMES, "COMBAT_LOG_EVENT_UNFILTERED")
+	table.insert(ns.EVENT_NAMES, "UNIT_SPELLCAST_SENT")
+	table.insert(ns.EVENT_NAMES, "UNIT_SPELLCAST_SUCCEEDED")
 end
 
 --[[
@@ -256,6 +256,10 @@ local function OnPlayerLogin()
 
 	if ns.RegisterOptionsPanels then
 		ns.RegisterOptionsPanels()
+	end
+
+	if ns.RegisterMinimapButton then
+		ns:RegisterMinimapButton()
 	end
 
 	if ns.SetupBuffTracking then

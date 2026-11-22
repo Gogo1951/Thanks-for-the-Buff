@@ -24,8 +24,8 @@ end
 
 --[[
     The AceDB-3.0 defaults table. Every setting lives on the shared Default
-    profile; the Ignored Buffs lists and classToken sit outside it, in `char`
-    and `global` (below). AceDB applies these itself,
+    profile; the Ignored Buffs lists, Buff Back's buff and target, and
+    classToken sit outside it, in `char` and `global` (below). AceDB applies these itself,
     copying them into the saved table and preserving an explicit false, so there is
     no hand-rolled merge.
 ]]
@@ -61,6 +61,9 @@ ns.DATABASE_DEFAULTS = {
 			    Send Messages In setting a new profile starts on.
 			]]
 			whisperMessage = ns.GetDefaultThanksWhisper(Data.DEFAULT_MESSAGE_LANGUAGE),
+			-- Two more, empty until filled in; each whisper picks one of the filled boxes at random.
+			whisperMessage2 = "",
+			whisperMessage3 = "",
 			praiseDelayEnabled = false,
 			praiseDelay = 2,
 			praiseCooldown = 0,
@@ -104,7 +107,7 @@ ns.DATABASE_DEFAULTS = {
 		]]
 		wave = {
 			enabled = false,
-			restingOnly = true,
+			restingOnly = false,
 			cooldown = 300,
 			friendsEnabled = true,
 			bnetFriends = true,
@@ -122,6 +125,16 @@ ns.DATABASE_DEFAULTS = {
 			message = ns.L["DEFAULT_WHISPER"],
 			emotes = GetDefaultEmoteSettings(true),
 		},
+		--[[
+		    Buff Back: a macro casting one of your own buffs on the last player
+		    outside your group who buffed you. The buff picked and its target are
+		    per character, in `char` below.
+		]]
+		buffBack = {
+			enabled = false,
+		},
+		-- The mini-map button's place and its Enable Mini-map Button switch (`hide`), kept by LibDBIcon.
+		minimap = {},
 	},
 	--[[
 	    Ignored Buffs live outside the profile, the way Magic Eraser's Erase List
@@ -133,6 +146,12 @@ ns.DATABASE_DEFAULTS = {
 	char = {
 		ignoredBuffs = {},
 		classToken = false,
+		-- The spell ID of the buff the Buff Back macro casts, false until one is picked.
+		buffBackSpell = false,
+		-- The last player outside your group who buffed this character, for the Buff Back macro.
+		buffBackTarget = false,
+		-- That player's level when their buff landed, false when TFTB couldn't see it; picks the rank the macro casts.
+		buffBackTargetLevel = false,
 	},
 	global = {
 		ignoredBuffs = {},

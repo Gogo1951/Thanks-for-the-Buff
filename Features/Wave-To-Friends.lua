@@ -10,9 +10,8 @@ local _, ns = ...
 
     Fires only on UPDATE_MOUSEOVER_UNIT with the mouse over the 3D world (a
     character, never a unit frame), never at someone in your party or raid, never
-    in combat, casting or with a fishing pole in hand, only while resting
-    unless you turn that off, and at most once per
-    player per cooldown.
+    in combat, casting or with a fishing pole in hand, only while resting when
+    Only in Town is on, and at most once per player per cooldown.
 ]]
 
 --------------------------------------------------------------------------------

@@ -31,7 +31,7 @@ L["MESSAGE_CANT_THANK_SELF"] = "You can't thank yourself!"
 --------------------------------------------------------------------------------
 
 L["UNKNOWN_SPELL"] = "Unknown Spell"
-L["SAMPLE_EXAMPLE"] = "Example: %s"
+L["SAMPLE_EXAMPLE"] = "Example"
 
 --------------------------------------------------------------------------------
 -- Options: Main Panel
@@ -39,10 +39,12 @@ L["SAMPLE_EXAMPLE"] = "Example: %s"
 
 L["OPTIONS_WELCOME_TOGGLE"] = "Enable Welcome Message"
 L["OPTIONS_WELCOME_DESCRIPTION"] = "Prints a message only you can see when you log in."
+L["OPTIONS_ENABLE_MINIMAP"] = "Enable Mini-map Button"
+L["OPTIONS_ENABLE_MINIMAP_DESCRIPTION"] =
+	"Shows the TFTB button on your mini-map. Hovering it opens a menu with everything the button does."
 L["OPTIONS_DESCRIPTION"] =
-	"Auto thank players who buff you with an emote or whisper, tell players what you just cast on them, greet friends and guildmates with a wave as you pass them, and thank anyone you target with one click of your Thank You macros."
+	"Auto thank players who buff you with an emote or whisper, buff them back with one press, tell players what you just cast on them, greet friends and guildmates with a wave, and thank anyone you target with one click."
 L["OPTIONS_FEATURES_HEADER"] = "Features"
-L["OPTIONS_FEATURES_DESCRIPTION"] = "Turn each feature on or off here, or on its own panel."
 L["OPTIONS_COMMANDS_HEADER"] = "/Commands"
 L["OPTIONS_COMMAND"] = "/tftb"
 L["OPTIONS_COMMAND_DESCRIPTION"] = "Opens the Options Interface for this add-on."
@@ -87,6 +89,8 @@ L["TAB_GIVE_THANKS"] = "Give Thanks"
 L["GIVE_THANKS_ENABLE"] = "Enable Give Thanks"
 L["GIVE_THANKS_ENABLE_DESCRIPTION"] = "Turns on thanks for buffs from players outside your group."
 L["GIVE_THANKS_DESCRIPTION"] = "Thank players outside your group when they buff you out in the open world."
+-- Shown on the Emotes List and Ignored Buffs pages while Give Thanks is off.
+L["GIVE_THANKS_LIST_OFF"] = "%s is off, so this list isn't used. Turn on %s to use it."
 
 -- Praise Limits
 L["PRAISE_HEADER"] = "Praise Limits"
@@ -120,7 +124,7 @@ L["NOTIFICATIONS_PRINT_ENABLE"] = "Enable Print Outs"
 L["NOTIFICATIONS_PRINT_DESCRIPTION"] = "Prints a message only you can see when you receive a buff."
 L["NOTIFICATIONS_SOUND_ENABLE"] = "Enable Sound Effects"
 L["NOTIFICATIONS_SOUND_DESCRIPTION"] = "Plays a sound when you receive a buff. Only you hear it."
-L["NOTIFICATIONS_SOUND_PREVIEW_DESCRIPTION"] = "Plays the sound so you can hear it before turning it on."
+L["OPTIONS_SOUND_PREVIEW_DESCRIPTION"] = "Play this sound now, whether or not the sound is turned on."
 
 --------------------------------------------------------------------------------
 -- Options: Good News
@@ -149,6 +153,7 @@ L["GOOD_NEWS_TOKENS"] = "Tokens: %s what you cast, %s who got it"
 L["TAB_GOOD_NEWS_ABILITIES"] = "Tracked Abilities"
 L["GOOD_NEWS_ABILITIES_DESCRIPTION"] =
 	"Good News whispers about the abilities checked here when you cast them on another player."
+L["GOOD_NEWS_ABILITIES_OFF"] = "%s is off, so nothing is whispered yet. Turn on %s to send it."
 -- The heading over the rows no class owns: scrolls, and abilities cast by a trinket's pet.
 L["GOOD_NEWS_ITEMS"] = "Items"
 
@@ -174,7 +179,6 @@ L["EMOTE_GROUP_VOICE"] = "Voice"
 L["EMOTE_GROUP_VOICE_DESCRIPTION"] = "Plays a voice line."
 L["EMOTE_GROUP_POSE"] = "Pose"
 L["EMOTE_GROUP_POSE_DESCRIPTION"] = "Holds until you move."
-L["EMOTES_RESET"] = "Reset Emotes"
 L["EMOTES_RESET_DESCRIPTION"] = "Puts the checklist back to the default praise emotes."
 L["EMOTES_RESET_CONFIRM"] = "Reset the emote checklist to the defaults?"
 
@@ -223,7 +227,28 @@ L["BUTTON_ICON_DEFAULT"] = "Default"
 ]]
 L["BUTTON_MACRO_ENABLE"] = 'Enable Macro "%s"'
 L["BUTTON_MACRO_ENABLE_DESCRIPTION"] = "Creates a macro named %s and deletes it again when you turn this off."
-L["BUTTON_WHISPER_DESCRIPTION"] = "Sets what this button whispers to your target. Leave it empty to send no whisper."
+L["BUTTON_PICKUP"] = "Pick Up Macro"
+L["BUTTON_PICKUP_DESCRIPTION"] = "Puts the %s macro on your cursor, so you can drop it on an action bar."
+L["BUTTON_WHISPER_DESCRIPTION"] =
+	"Sets what this button whispers to your target. {name} becomes their name. Leave it empty to send no whisper."
+L["BUTTON_TOKENS"] = "Tokens: %s who you're thanking"
+
+-- Return Buff
+L["TAB_RETURN_BUFF"] = "Return Buff"
+L["RETURN_BUFF_DESCRIPTION"] =
+	"Return the favor. Each time a player outside your group buffs you, the %s macro aims at them, so one press casts your buff back on them."
+L["RETURN_BUFF_ENABLE_DESCRIPTION"] =
+	"Creates a macro named %s that casts your buff on the last player outside your group who buffed you, and deletes it again when you turn this off."
+L["RETURN_BUFF_SPELL"] = "Buff to Cast"
+L["RETURN_BUFF_SPELL_DESCRIPTION"] = "Sets which of your buffs the macro casts."
+L["RETURN_BUFF_EXAMPLE"] = "%s buffed you last, so the macro casts %s on them."
+L["RETURN_BUFF_EXAMPLE_LEVEL"] = "%s (level %d) buffed you last, so the macro casts %s on them."
+L["RETURN_BUFF_NONE"] = "This character doesn't know a buff it can cast on other players yet."
+L["RETURN_BUFF_MACROS_FULL"] = "Your account-wide macros are full (%d). Delete one to make room for %s."
+L["RETURN_BUFF_HELP"] =
+	"Until someone buffs you, the macro casts on your target. The game doesn't let add-ons change macros in combat, so a buff that lands mid-fight moves the macro once combat ends."
+L["RETURN_BUFF_RANK_HELP"] =
+	"It casts the highest rank that player's level can take. When TFTB couldn't see their level, it casts your highest rank."
 
 --------------------------------------------------------------------------------
 -- Options: Wave to Friends
@@ -234,7 +259,7 @@ L["WAVE_ENABLE"] = "Enable Wave to Friends"
 L["WAVE_ENABLE_DESCRIPTION"] = "Turns on an emote for friends and guildmates when you mouse over them."
 L["WAVE_DESCRIPTION"] = "Greet friends and guildmates with an emote when you mouse over them out in the world."
 L["WAVE_RULES"] = "Never your party or raid, and never while you're in combat, casting or fishing."
-L["WAVE_RESTING_ENABLE"] = "Only While Resting"
+L["WAVE_RESTING_ENABLE"] = "Only in Town"
 L["WAVE_RESTING_ENABLE_DESCRIPTION"] = "Waves only while you are resting, in a town or an inn."
 L["WAVE_COOLDOWN"] = "Same-Player Cooldown"
 L["WAVE_COOLDOWN_DESCRIPTION"] = "Sets how long before the same player can be greeted again."
@@ -283,9 +308,12 @@ L["WAVE_GUILDS_EMOTES_DESCRIPTION"] = "Check the emotes to pick from for guild m
 -- Options: Whisper Message Row
 --------------------------------------------------------------------------------
 
--- The caption and Reset button beside every whisper box, on Give Thanks, Good News and each Thank You Button.
+-- The caption beside every whisper box, on Give Thanks, Good News and each Thank You Button; Give Thanks has several boxes, so its caption is plural.
 L["WHISPER_MESSAGE"] = "Whisper Message"
-L["WHISPER_MESSAGE_RESET"] = "Reset"
+L["WHISPER_MESSAGES"] = "Whisper Messages"
+L["WHISPER_RANDOM"] = "One is picked at random; an empty box is skipped."
+-- Every Reset row's button, a whisper box's included.
+L["OPTIONS_RESET"] = "Reset"
 L["WHISPER_MESSAGE_RESET_DESCRIPTION"] = "Resets the whisper message to the default text."
 
 -- The whisper composer around every editable whisper's box, on Give Thanks and Good News.
@@ -299,6 +327,49 @@ L["WHISPER_TOKENS"] = "Tokens: %s the buff, %s who cast it"
 L["WHISPER_TOO_LONG"] = "Too long, so the default text goes out instead."
 L["WHISPER_TEST"] = "Send Test to Me"
 L["WHISPER_TEST_DESCRIPTION"] = "Whispers the example to you, so you see it exactly as other players will."
+
+--------------------------------------------------------------------------------
+-- Mini-map Menu
+--------------------------------------------------------------------------------
+
+-- The words every feature's state and every switch show.
+L["MENU_ON"] = "On"
+L["MENU_OFF"] = "Off"
+L["MENU_TOGGLE"] = "Toggle"
+
+-- %d is how many more buffs the list leaves out.
+L["MENU_MORE"] = "%d more"
+
+-- The button click that does what a menu row does, gray at the row's right.
+L["MENU_CLICK_RIGHT"] = "Right-Click"
+L["MENU_CLICK_MIDDLE"] = "Middle-Click"
+L["MENU_CLICK_SHIFT_MIDDLE"] = "Shift + Middle-Click"
+
+-- The menu's Options row.
+L["MENU_OPTIONS"] = "TFTB Options"
+
+-- Give Thanks: the switches, named without their Enable.
+L["MENU_PRAISE_DELAY"] = "Praise Delay"
+L["MENU_WHISPER"] = "Give Thanks Whisper"
+L["MENU_PRINT"] = "Print Outs"
+L["MENU_SOUND"] = "Sound Effects"
+
+-- %d is how many emotes the Emotes List has ticked.
+L["MENU_CHECKED"] = "%d Checked"
+L["MENU_CHOOSE_EMOTES"] = "Choose Emotes"
+L["MENU_RECENT"] = "Recent Buffs"
+L["MENU_RECENT_NOTE"] = "Click a buff to ignore it."
+L["MENU_RECENT_EMPTY"] = "No buffs from other players yet."
+L["MENU_IGNORED_NOTE"] = "Click a buff to stop ignoring it."
+L["MENU_IGNORED_EMPTY"] = "No buffs ignored yet."
+
+-- %s is the buff's link.
+L["MENU_IGNORED_PRINT"] = "%s added to Ignored Buffs."
+L["MENU_UNIGNORED_PRINT"] = "%s removed from Ignored Buffs."
+
+-- Wave to Friends.
+L["MENU_WHO_WAVES"] = "Who Gets a Wave"
+L["MENU_EDIT_CUSTOM"] = "Edit Custom List"
 
 --------------------------------------------------------------------------------
 -- Defaults

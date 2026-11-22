@@ -31,7 +31,7 @@ L["MESSAGE_CANT_THANK_SELF"] = "¡No puedes agradecerte a ti mismo!"
 --------------------------------------------------------------------------------
 
 L["UNKNOWN_SPELL"] = "Hechizo desconocido"
-L["SAMPLE_EXAMPLE"] = "Ejemplo: %s"
+L["SAMPLE_EXAMPLE"] = "Ejemplo"
 
 --------------------------------------------------------------------------------
 -- Options: Main Panel
@@ -39,10 +39,12 @@ L["SAMPLE_EXAMPLE"] = "Ejemplo: %s"
 
 L["OPTIONS_WELCOME_TOGGLE"] = "Habilitar mensaje de bienvenida"
 L["OPTIONS_WELCOME_DESCRIPTION"] = "Muestra un mensaje que solo tú puedes ver al iniciar sesión."
+L["OPTIONS_ENABLE_MINIMAP"] = "Habilitar botón del minimapa"
+L["OPTIONS_ENABLE_MINIMAP_DESCRIPTION"] =
+	"Muestra el botón de TFTB en tu minimapa. Al pasar el cursor por encima se abre un menú con todo lo que hace el botón."
 L["OPTIONS_DESCRIPTION"] =
-	"Agradece automáticamente con una emoción o un susurro a los jugadores que te den un beneficio, cuéntales a los jugadores lo que acabas de lanzarles, saluda con la mano a tus amigos y compañeros de hermandad al pasar a su lado y da las gracias a quien tengas como objetivo con un clic en tus macros de agradecimiento."
+	"Agradece automáticamente con una emoción o un susurro a los jugadores que te den un beneficio, devuélveles el beneficio con una sola pulsación, cuéntales a los jugadores lo que acabas de lanzarles, saluda con la mano a tus amigos y compañeros de hermandad y da las gracias a quien tengas como objetivo con un clic."
 L["OPTIONS_FEATURES_HEADER"] = "Funciones"
-L["OPTIONS_FEATURES_DESCRIPTION"] = "Activa o desactiva cada función aquí o en su propio panel."
 L["OPTIONS_COMMANDS_HEADER"] = "/Commands"
 L["OPTIONS_COMMAND"] = "/tftb"
 L["OPTIONS_COMMAND_DESCRIPTION"] = "Abre la interfaz de opciones de este accesorio."
@@ -87,6 +89,8 @@ L["TAB_GIVE_THANKS"] = "Agradecimientos"
 L["GIVE_THANKS_ENABLE"] = "Habilitar agradecimientos"
 L["GIVE_THANKS_ENABLE_DESCRIPTION"] = "Activa los agradecimientos por beneficios de jugadores de fuera de tu grupo."
 L["GIVE_THANKS_DESCRIPTION"] = "Agradece a los jugadores de fuera de tu grupo cuando te benefician en el mundo abierto."
+-- Shown on the Emotes List and Ignored Buffs pages while Give Thanks is off.
+L["GIVE_THANKS_LIST_OFF"] = "La función %s está desactivada, así que esta lista no se usa. Activa %s para usarla."
 
 -- Praise Limits
 L["PRAISE_HEADER"] = "Límites de elogios"
@@ -122,7 +126,7 @@ L["NOTIFICATIONS_PRINT_ENABLE"] = "Habilitar avisos de texto"
 L["NOTIFICATIONS_PRINT_DESCRIPTION"] = "Muestra un mensaje que solo tú puedes ver cuando recibes un beneficio."
 L["NOTIFICATIONS_SOUND_ENABLE"] = "Habilitar efectos de sonido"
 L["NOTIFICATIONS_SOUND_DESCRIPTION"] = "Reproduce un sonido cuando recibes un beneficio. Solo tú lo oyes."
-L["NOTIFICATIONS_SOUND_PREVIEW_DESCRIPTION"] = "Reproduce el sonido para que puedas oírlo antes de activarlo."
+L["OPTIONS_SOUND_PREVIEW_DESCRIPTION"] = "Reproduce este sonido ahora, esté o no activado el sonido."
 
 --------------------------------------------------------------------------------
 -- Options: Good News
@@ -151,6 +155,8 @@ L["GOOD_NEWS_TOKENS"] = "Comodines: %s lo que lanzaste, %s quien lo recibió"
 L["TAB_GOOD_NEWS_ABILITIES"] = "Habilidades rastreadas"
 L["GOOD_NEWS_ABILITIES_DESCRIPTION"] =
 	"Buenas noticias envía un susurro sobre las habilidades marcadas aquí cuando las lanzas a otro jugador."
+L["GOOD_NEWS_ABILITIES_OFF"] =
+	"La función %s está desactivada, así que todavía no se susurra nada. Activa %s para enviarla."
 -- The heading over the rows no class owns: scrolls, and abilities cast by a trinket's pet.
 L["GOOD_NEWS_ITEMS"] = "Objetos"
 
@@ -176,7 +182,6 @@ L["EMOTE_GROUP_VOICE"] = "Voz"
 L["EMOTE_GROUP_VOICE_DESCRIPTION"] = "Reproduce una frase hablada."
 L["EMOTE_GROUP_POSE"] = "Postura"
 L["EMOTE_GROUP_POSE_DESCRIPTION"] = "Se mantiene hasta que te mueves."
-L["EMOTES_RESET"] = "Restablecer emociones"
 L["EMOTES_RESET_DESCRIPTION"] = "Regresa la lista a las emociones de agradecimiento predeterminadas."
 L["EMOTES_RESET_CONFIRM"] = "¿Restablecer la lista de emociones a los valores predeterminados?"
 
@@ -228,8 +233,28 @@ L["BUTTON_ICON_DEFAULT"] = "Predeterminado"
 ]]
 L["BUTTON_MACRO_ENABLE"] = 'Habilitar macro "%s"'
 L["BUTTON_MACRO_ENABLE_DESCRIPTION"] = "Crea una macro llamada %s y la elimina al desactivar esta opción."
+L["BUTTON_PICKUP"] = "Tomar macro"
+L["BUTTON_PICKUP_DESCRIPTION"] = "Pone la macro %s en tu cursor para que puedas soltarla en una barra de acción."
 L["BUTTON_WHISPER_DESCRIPTION"] =
-	"Establece lo que este botón le susurra a tu objetivo. Déjalo vacío para no enviar ningún susurro."
+	"Establece lo que este botón le susurra a tu objetivo. {name} se sustituye por su nombre. Déjalo vacío para no enviar ningún susurro."
+L["BUTTON_TOKENS"] = "Comodines: %s a quien das las gracias"
+
+-- Return Buff
+L["TAB_RETURN_BUFF"] = "Devolver beneficio"
+L["RETURN_BUFF_DESCRIPTION"] =
+	"Devuelve el favor. Cada vez que un jugador fuera de tu grupo te da un beneficio, la macro %s lo apunta, así que una pulsación le lanza tu beneficio de vuelta."
+L["RETURN_BUFF_ENABLE_DESCRIPTION"] =
+	"Crea una macro llamada %s que lanza tu beneficio al último jugador fuera de tu grupo que te lo dio, y la borra de nuevo al desactivar esto."
+L["RETURN_BUFF_SPELL"] = "Beneficio a lanzar"
+L["RETURN_BUFF_SPELL_DESCRIPTION"] = "Establece cuál de tus beneficios lanza la macro."
+L["RETURN_BUFF_EXAMPLE"] = "%s fue el último en darte un beneficio, así que la macro le lanza %s."
+L["RETURN_BUFF_EXAMPLE_LEVEL"] = "%s (nivel %d) fue el último en darte un beneficio, así que la macro le lanza %s."
+L["RETURN_BUFF_NONE"] = "Este personaje aún no conoce ningún beneficio que pueda lanzar a otros jugadores."
+L["RETURN_BUFF_MACROS_FULL"] = "Tus macros generales de la cuenta están llenas (%d). Borra una para dejar sitio a %s."
+L["RETURN_BUFF_HELP"] =
+	"Hasta que alguien te dé un beneficio, la macro lanza sobre tu objetivo. El juego no deja que los addons cambien macros en combate, así que un beneficio recibido en plena pelea mueve la macro al terminar el combate."
+L["RETURN_BUFF_RANK_HELP"] =
+	"Lanza el rango más alto que admite el nivel de ese jugador. Si TFTB no pudo ver su nivel, lanza tu rango más alto."
 
 --------------------------------------------------------------------------------
 -- Options: Wave to Friends
@@ -242,7 +267,7 @@ L["WAVE_ENABLE_DESCRIPTION"] =
 L["WAVE_DESCRIPTION"] =
 	"Saluda con una emoción a tus amigos y compañeros de hermandad cuando pasas el cursor sobre ellos por el mundo."
 L["WAVE_RULES"] = "Nunca a tu grupo o banda, y nunca mientras estás en combate, lanzando un hechizo o pescando."
-L["WAVE_RESTING_ENABLE"] = "Solo mientras descansas"
+L["WAVE_RESTING_ENABLE"] = "Solo en la ciudad"
 L["WAVE_RESTING_ENABLE_DESCRIPTION"] = "Saluda solo mientras descansas, en una ciudad o una posada."
 L["WAVE_COOLDOWN"] = "Reutilización para el mismo jugador"
 L["WAVE_COOLDOWN_DESCRIPTION"] =
@@ -297,9 +322,12 @@ L["WAVE_GUILDS_EMOTES_DESCRIPTION"] =
 -- Options: Whisper Message Row
 --------------------------------------------------------------------------------
 
--- The caption and Reset button beside every whisper box, on Give Thanks, Good News and each Thank You Button.
+-- The caption beside every whisper box, on Give Thanks, Good News and each Thank You Button; Give Thanks has several boxes, so its caption is plural.
 L["WHISPER_MESSAGE"] = "Mensaje de susurro"
-L["WHISPER_MESSAGE_RESET"] = "Restablecer"
+L["WHISPER_MESSAGES"] = "Mensajes de susurro"
+L["WHISPER_RANDOM"] = "Se elige uno al azar; una casilla vacía se omite."
+-- Every Reset row's button, a whisper box's included.
+L["OPTIONS_RESET"] = "Restablecer"
 L["WHISPER_MESSAGE_RESET_DESCRIPTION"] = "Restablece el mensaje de susurro al texto predeterminado."
 
 -- The whisper composer around every editable whisper's box, on Give Thanks and Good News.
@@ -313,6 +341,48 @@ L["WHISPER_TOKENS"] = "Comodines: %s el beneficio, %s quien lo lanzó"
 L["WHISPER_TOO_LONG"] = "Demasiado largo, así que se enviará el texto predeterminado en su lugar."
 L["WHISPER_TEST"] = "Enviarme una prueba"
 L["WHISPER_TEST_DESCRIPTION"] = "Te susurra el ejemplo para que lo veas tal como lo verán otros jugadores."
+
+--------------------------------------------------------------------------------
+-- Mini-map Menu
+--------------------------------------------------------------------------------
+
+-- The words every feature's state and every switch show.
+L["MENU_ON"] = "Activado"
+L["MENU_OFF"] = "Desactivado"
+L["MENU_TOGGLE"] = "Alternar"
+
+-- %d is how many more buffs the list leaves out.
+L["MENU_MORE"] = "%d más"
+
+-- The button click that does what a menu row does, gray at the row's right.
+L["MENU_CLICK_RIGHT"] = "Clic derecho"
+L["MENU_CLICK_MIDDLE"] = "Clic central"
+L["MENU_CLICK_SHIFT_MIDDLE"] = "Mayús + Clic central"
+-- The menu's Options row.
+L["MENU_OPTIONS"] = "Opciones de TFTB"
+
+-- Give Thanks: the switches, named without their Enable.
+L["MENU_PRAISE_DELAY"] = "Retraso del elogio"
+L["MENU_WHISPER"] = "Susurro de agradecimiento"
+L["MENU_PRINT"] = "Avisos de texto"
+L["MENU_SOUND"] = "Efectos de sonido"
+
+-- %d is how many emotes the Emotes List has ticked.
+L["MENU_CHECKED"] = "%d marcados"
+L["MENU_CHOOSE_EMOTES"] = "Elegir emociones"
+L["MENU_RECENT"] = "Beneficios recientes"
+L["MENU_RECENT_NOTE"] = "Haz clic en un beneficio para ignorarlo."
+L["MENU_RECENT_EMPTY"] = "Aún no hay beneficios de otros jugadores."
+L["MENU_IGNORED_NOTE"] = "Haz clic en un beneficio para dejar de ignorarlo."
+L["MENU_IGNORED_EMPTY"] = "Aún no hay beneficios ignorados."
+
+-- %s is the buff's link.
+L["MENU_IGNORED_PRINT"] = "%s agregado a Beneficios ignorados."
+L["MENU_UNIGNORED_PRINT"] = "%s quitado de Beneficios ignorados."
+
+-- Wave to Friends.
+L["MENU_WHO_WAVES"] = "A quién saludar"
+L["MENU_EDIT_CUSTOM"] = "Editar lista personalizada"
 
 --------------------------------------------------------------------------------
 -- Defaults
