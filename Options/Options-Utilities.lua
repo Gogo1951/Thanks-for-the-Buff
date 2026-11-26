@@ -349,6 +349,7 @@ function ns.DefineEmoteGroup(settings, order)
 			end,
 			set = function(_, value)
 				settings().emotes[emote] = value
+				ns.RefreshSettings()
 			end,
 		}
 	end

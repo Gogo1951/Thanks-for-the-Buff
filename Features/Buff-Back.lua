@@ -5,16 +5,18 @@ local Data = ns.Data
     Return Buff: an account-wide macro, "- Return Buff", that casts one of your
     own buffs on the last player outside your group who buffed you. It sits in
     the account's macros, like the Thank You macros, so it never takes one of a
-    character's 18 slots; whichever character logs in rewrites it with its own
+    character's own slots; whichever character logs in rewrites it with its own
     buff and target (ns.ReconcileMacros runs at login). Praise names
     that player as each stranger's buff lands; the macro is rewritten to aim at
     them, out of combat only, since the game refuses macro edits in combat. An
     edit held back by combat goes through when it ends.
 
-    The buffs on offer are this class's in Data.RETURN_BUFF_SPELLS and its Good
+    The buffs on offer are this class's in ns.RETURN_BUFF_SPELLS and its Good
     News rows that leave a buff, those this character knows. The macro casts by
-    name, so the highest rank known goes out. The options panel is Give Thanks >
-    Return Buff (Options/Options-Return-Buff.lua).
+    name: your highest rank, or, on clients with ranks, the rank the last
+    buffer's level can take (ns.GetBuffBackRank). The options panel is Return
+    the Favor, a panel of its own beside Give Thanks
+    (Options/Options-Return-Buff.lua).
 ]]
 
 local pending = false
@@ -38,7 +40,7 @@ local ranksByChoice = {}
 --[[
     The buffs this character can cast with Return Buff: spell ID → "|T icon|t
     Name", and their order by name. Read fresh each time: a character learns
-    spells as it levels. Data.RETURN_BUFF_SPELLS holds the everyday buffs
+    spells as it levels. ns.RETURN_BUFF_SPELLS holds the everyday buffs
     (Mark of the Wild, Fortitude); the class's Good News buffs add the rest
     (Power Infusion, Fear Ward). One entry per name, since the macro casts by name.
 ]]
@@ -57,7 +59,7 @@ function ns.GetBuffBackChoices()
 	end
 
 	local _, class = UnitClass("player")
-	for _, ranks in ipairs(Data.RETURN_BUFF_SPELLS[class] or {}) do
+	for _, ranks in ipairs(ns.RETURN_BUFF_SPELLS[class] or {}) do
 		local known = {}
 		for _, spellId in ipairs(ranks) do
 			if C_Spell.DoesSpellExist(spellId) and IsPlayerSpell(spellId) then
@@ -181,7 +183,7 @@ function ns.ReconcileBuffBack()
 	pending = false
 
 	local index = GetMacroIndexByName(Data.BUFF_BACK_MACRO)
-	-- An earlier build made it per character; that copy goes, and the account-wide one replaces it.
+	-- A per-character macro with this name is deleted, so only the account-wide one remains.
 	if index > Data.MAX_GLOBAL_MACROS then
 		DeleteMacro(index)
 		index = 0

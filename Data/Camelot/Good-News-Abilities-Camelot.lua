@@ -236,7 +236,7 @@ ns.GOOD_NEWS_ABILITIES = {
 How We Got the Data
 
 Last Validated
-	2026-11-14, WoW Forever 1.60.1.70938
+	2026-11-26, wago.tools, WoW Forever 1.60.1.71139
 
 Notes
 	- The spells and items you cast on another player that Good News can whisper them about (Features/Good-News.lua). One entry is one checkbox on the Tracked Abilities panel. Hand-picked, not queried: each is a buff, cooldown or rescue cast on one other player, where knowing who gave it is worth a whisper.
@@ -258,16 +258,16 @@ Wowhead
 	None.
 
 wago.tools
-	https://wago.tools/db2/SpellName?build=1.60.1.70938
-	https://wago.tools/db2/Spell?build=1.60.1.70938
-	https://wago.tools/db2/SpellEffect?build=1.60.1.70938
-	https://wago.tools/db2/SkillLineAbility?build=1.60.1.70938
-	https://wago.tools/db2/SkillLine?build=1.60.1.70938
-	https://wago.tools/db2/ItemXItemEffect?build=1.60.1.70938
-	https://wago.tools/db2/ItemEffect?build=1.60.1.70938
-	https://wago.tools/db2/Item?build=1.60.1.70938
-	https://wago.tools/db2/ItemSparse?build=1.60.1.70938
-	https://wago.tools/db2/SpellLevels?build=1.60.1.70450
+	https://wago.tools/db2/SpellName?build=1.60.1.71139
+	https://wago.tools/db2/Spell?build=1.60.1.71139
+	https://wago.tools/db2/SpellLevels?build=1.60.1.71139
+	https://wago.tools/db2/SkillLineAbility?build=1.60.1.71139
+	https://wago.tools/db2/SkillLine?build=1.60.1.71139
+	https://wago.tools/db2/SpellEffect?build=1.60.1.71139
+	https://wago.tools/db2/Item?build=1.60.1.71139
+	https://wago.tools/db2/ItemSparse?build=1.60.1.71139
+	https://wago.tools/db2/ItemEffect?build=1.60.1.71139
+	https://wago.tools/db2/ItemXItemEffect?build=1.60.1.71139
 	https://wago.tools/db2/Talent?build=1.60.1.70450
 
 QuestieDB

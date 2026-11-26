@@ -245,7 +245,7 @@ L["BUTTON_WHISPER_DESCRIPTION"] =
 L["BUTTON_TOKENS"] = "Platzhalter: %s wem Ihr dankt"
 
 -- Return Buff
-L["TAB_RETURN_BUFF"] = "Buff zurück"
+L["TAB_RETURN_BUFF"] = "Gefallen erwidern"
 L["RETURN_BUFF_DESCRIPTION"] =
 	"Revanchiert Euch. Jedes Mal, wenn Euch ein Spieler außerhalb Eurer Gruppe bufft, zielt das Makro %s auf ihn, sodass ein Tastendruck Euren Buff zurück auf ihn wirkt."
 L["RETURN_BUFF_ENABLE_DESCRIPTION"] =
@@ -360,8 +360,7 @@ L["MENU_MORE"] = "%d weitere"
 
 -- The button click that does what a menu row does, gray at the row's right.
 L["MENU_CLICK_RIGHT"] = "Rechtsklick"
-L["MENU_CLICK_MIDDLE"] = "Mittelklick"
-L["MENU_CLICK_SHIFT_MIDDLE"] = "Umschalt + Mittelklick"
+
 -- The menu's Options row.
 L["MENU_OPTIONS"] = "TFTB-Optionen"
 

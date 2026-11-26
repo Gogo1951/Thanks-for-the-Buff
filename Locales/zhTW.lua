@@ -236,7 +236,7 @@ L["BUTTON_WHISPER_DESCRIPTION"] =
 L["BUTTON_TOKENS"] = "預留位置：%s 你要感謝的人"
 
 -- Return Buff
-L["TAB_RETURN_BUFF"] = "回贈增益"
+L["TAB_RETURN_BUFF"] = "回報好意"
 L["RETURN_BUFF_DESCRIPTION"] =
 	"投桃報李。每當隊伍外的玩家為你施加增益時，%s 巨集就會以其為目標，按一下即可把你的增益回贈給對方。"
 L["RETURN_BUFF_ENABLE_DESCRIPTION"] =
@@ -347,8 +347,7 @@ L["MENU_MORE"] = "還有 %d 件"
 
 -- The button click that does what a menu row does, gray at the row's right.
 L["MENU_CLICK_RIGHT"] = "右鍵點擊"
-L["MENU_CLICK_MIDDLE"] = "中鍵點擊"
-L["MENU_CLICK_SHIFT_MIDDLE"] = "Shift + 中鍵點擊"
+
 -- The menu's Options row.
 L["MENU_OPTIONS"] = "TFTB 選項"
 

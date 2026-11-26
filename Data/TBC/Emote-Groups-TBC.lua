@@ -110,7 +110,7 @@ ns.EMOTE_GROUP_BY_TOKEN = {
 How We Got the Data
 
 Last Validated
-	2026-11-08, TBC Anniversary 2.5.6.70577
+	2026-11-26, wago.tools, TBC Anniversary 2.5.6.70577
 
 Notes
 	- Sorts every emote that does more than print a line into the group the Give Thanks emote grid shows it under (ns.GetEmoteGroup in Features/Utilities.lua). An emote this client offers that isn't listed is a Text emote: it prints its line and does nothing else.

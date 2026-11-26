@@ -5,8 +5,8 @@ local Kit = ns.MenuKit
 
 --[[
     The mini-map menu, on Menu-Kit v2 (Features/Menu-Kit.lua). One block per
-    feature in BLOCKS, in ns.FEATURES order (Good News has none: it stays on the
-    options panel), each with its Toggle row and a flyout of the
+    feature in BLOCKS, in ns.FEATURES order (Good News only where it loads, so
+    not on WoW Forever), each with its Toggle row and a flyout of the
     settings players change mid-session, then TFTB Options. The options panel
     stays complete; the menu shows only what this character can use.
 ]]
@@ -18,8 +18,6 @@ Kit.SetText({
 	more = L["MENU_MORE"],
 	clicks = {
 		RightButton = L["MENU_CLICK_RIGHT"],
-		MiddleButton = L["MENU_CLICK_MIDDLE"],
-		ShiftMiddleButton = L["MENU_CLICK_SHIFT_MIDDLE"],
 	},
 })
 
@@ -31,14 +29,15 @@ local IGNORED_LIST_MAX = 5
 --------------------------------------------------------------------------------
 
 --[[
-    Each feature's block: its flyout key and the button click its Toggle row
-    names, which the button runs too (Style Guide → MINIMAP MENU → Button
-    Clicks). Left-Click has no job, so it opens and holds the menu, and
-    Shift + Middle-Click opens the options panel.
+    Each feature's block: its flyout key and, for Give Thanks alone, the button
+    click its Toggle row names, which the button runs too (Style Guide →
+    MINIMAP MENU → Button Clicks: one extra click, a Right-Click). Left-Click
+    has no job, so it opens and holds the menu.
 ]]
 local BLOCKS = {
 	["strangers.enabled"] = { key = "giveThanks", click = "RightButton", description = "GIVE_THANKS_DESCRIPTION" },
-	["wave.enabled"] = { key = "wave", click = "MiddleButton", description = "WAVE_DESCRIPTION" },
+	["goodNews.enabled"] = { key = "goodNews", description = "GOOD_NEWS_DESCRIPTION" },
+	["wave.enabled"] = { key = "wave", description = "WAVE_DESCRIPTION" },
 }
 
 --------------------------------------------------------------------------------
@@ -360,6 +359,78 @@ end
 function FLYOUTS.language()
 	local values, sorting = ns.GetMessageLanguageChoices()
 	return Choices(values, sorting, ns.GetMessageLanguage(), ns.SetMessageLanguage)
+end
+
+--[[
+    Good News: who gets it, then this character's class abilities and the
+    items, each a switch for the same saved choice as Tracked Abilities.
+    Defined everywhere, but only reached where Good News adds its feature.
+]]
+function FLYOUTS.goodNews()
+	local settings = Profile().goodNews
+	if not (settings and settings.enabled) then
+		return {}
+	end
+	local entries = {}
+
+	entries[#entries + 1] = Kit.Section(L["GOOD_NEWS_SCOPE"])
+	local scopes = { ALWAYS = L["GOOD_NEWS_SCOPE_ALWAYS"], GROUP = L["GOOD_NEWS_SCOPE_GROUP"] }
+	-- Anything but ALWAYS reads as GROUP, as the options panel shows it.
+	local scope = settings.scope == "ALWAYS" and "ALWAYS" or "GROUP"
+	for _, row in
+		ipairs(Choices(scopes, Data.GOOD_NEWS_SCOPES, scope, function(value)
+			settings.scope = value
+		end))
+	do
+		entries[#entries + 1] = row
+	end
+
+	local _, playerClass = UnitClass("player")
+	local abilities, items = {}, {}
+	for _, info in ipairs(ns.GetGoodNewsRows()) do
+		local rowClass = info.row.class
+		if not rowClass or rowClass == playerClass then
+			local label, sortName = ns.GetGoodNewsRowLabel(info)
+			local ids, spellId = info.watchedIds, info.spellIds[1]
+			local list = rowClass and abilities or items
+			list[#list + 1] = {
+				sortName = sortName,
+				row = {
+					kind = "toggle",
+					-- The panel's 16-point icon, at line height here.
+					left = (label:gsub(":16|t", ":0|t", 1)),
+					on = ns.IsGoodNewsWatched(ids[1]),
+					tooltip = function(tooltip)
+						tooltip:SetSpellByID(spellId)
+					end,
+					-- Every ID the row watches is saved, so each rank or variant answers the same.
+					onClick = function()
+						local value = not ns.IsGoodNewsWatched(ids[1])
+						for _, id in ipairs(ids) do
+							settings.watched[id] = value
+						end
+					end,
+				},
+			}
+		end
+	end
+
+	local function AddGroup(title, list)
+		if #list == 0 then
+			return
+		end
+		table.sort(list, function(a, b)
+			return a.sortName < b.sortName
+		end)
+		entries[#entries + 1] = Kit.Section(title)
+		for _, entry in ipairs(list) do
+			entries[#entries + 1] = entry.row
+		end
+	end
+	AddGroup(L["TAB_GOOD_NEWS_ABILITIES"], abilities)
+	AddGroup(L["GOOD_NEWS_ITEMS"], items)
+
+	return entries
 end
 
 -- Wave to Friends: where and how often, then who gets a wave, with the way to the Custom List.

@@ -96,6 +96,7 @@ ns.GOOD_NEWS_ABILITIES = {
 		detect = AURA,
 		triggers = {
 			{ spell = 407613 },
+			{ spell = 407615 },
 		},
 	}, -- Beacon of Light
 	-- Priest --------------------------------------------------------------------
@@ -239,6 +240,7 @@ ns.GOOD_NEWS_ABILITIES = {
 		triggers = {
 			{ spell = 8342, item = 7148 },
 			{ spell = 22999, item = 18587 },
+			{ spell = 435532, item = 213353 },
 		},
 	}, -- Goblin Jumper Cables
 }
@@ -247,7 +249,7 @@ ns.GOOD_NEWS_ABILITIES = {
 How We Got the Data
 
 Last Validated
-	2026-10-22, Season of Discovery 1.15.9.70003
+	2026-11-26, wago.tools, Classic Era 1.15.9.70576
 
 Notes
 	- The spells and items you cast on another player that Good News can whisper them about (Features/Good-News.lua). One entry is one checkbox on the Tracked Abilities panel. Hand-picked, not queried: each is a buff, cooldown or rescue cast on one other player, where knowing who gave it is worth a whisper.
@@ -257,8 +259,10 @@ Notes
 	- detect is AURA, CAST or RESURRECT, from Data.GOOD_NEWS_DETECT in Data/Data.lua. AURA reads the buff's length off the player you cast it on; CAST is a one-shot with nothing to time (Rebirth, Lay on Hands). RESURRECT is for a cast that can fail: Jumper Cables report a successful cast for every jolt, revived or not, so the whisper waits for the combat log's resurrection event, which only a working jolt produces.
 	- noDuration marks a buff spent by an event rather than by time, so the whisper leaves out its length: Fear Ward lasts until the next fear. It matters most on short buffs, which would otherwise slip under the under-a-minute cap and whisper a countdown that means nothing.
 	- triggers lists the ranks or variants one checkbox covers: a spell alone, a spell with an aura where the aura's ID differs from the cast's (no row here needs one), or an item with the spell it casts, which shows the item's icon and name. UNIT_SPELLCAST_SENT carries the spell ID, so that is what each trigger is matched on.
-	- Jumper Cables takes its label from item 7148's client name (labelItem), because every cable casts a spell named Defibrillate; only the item names differ.
+	- Beacon of Light lists both rune spells this client puts on the paladin skill line (407613, 407615); a paladin casts one or the other.
+	- Jumper Cables takes its label from item 7148's client name (labelItem), because every cable, and the Defibrillating Staff, casts a spell named Defibrillate; only the item names differ. The staff drops in Gnomeregan (QuestieDB: NPC 220007).
 	- Battle Squawk is cast by the Battle Chicken, not by you, so it reaches Good News through your pet's cast events. It carries no item on purpose: item 10725 would label the checkbox as a second Gnomish Battle Chicken.
+	- Not tracked: the stat elixirs that cast the same spells as the scrolls (Elixir of Ogre's Strength, Elixir of Defense, Elixir of Greater Defense, Elixir of Lesser Agility, Elixir of Agility), which buff whoever drinks them.
 	- Every row starts ticked. A player's own choice is saved in goodNews.watched under each ID the row watches (a trigger's aura when it names one, else its spell), and is never overwritten. A save from before Good News moved to Good to Go used the same keys, so it still applies.
 
 SQL (CMaNGOS)
@@ -268,15 +272,17 @@ Wowhead
 	None.
 
 wago.tools
-	https://wago.tools/db2/SpellName?build=1.15.9.70003
-	https://wago.tools/db2/SkillLineAbility?build=1.15.9.70003
-	https://wago.tools/db2/SkillLine?build=1.15.9.70003
-	https://wago.tools/db2/SpellEffect?build=1.15.9.70003
-	https://wago.tools/db2/ItemSparse?build=1.15.9.70003
-	https://wago.tools/db2/ItemEffect?build=1.15.9.70003
-	https://wago.tools/db2/SpellLevels?build=1.15.9.70003
+	https://wago.tools/db2/SpellName?build=1.15.9.70576
+	https://wago.tools/db2/Spell?build=1.15.9.70576
+	https://wago.tools/db2/SpellLevels?build=1.15.9.70576
+	https://wago.tools/db2/SkillLineAbility?build=1.15.9.70576
+	https://wago.tools/db2/SkillLine?build=1.15.9.70576
+	https://wago.tools/db2/SpellEffect?build=1.15.9.70576
+	https://wago.tools/db2/Item?build=1.15.9.70576
+	https://wago.tools/db2/ItemSparse?build=1.15.9.70576
+	https://wago.tools/db2/ItemEffect?build=1.15.9.70576
 	https://wago.tools/db2/Talent?build=1.15.9.70003
 
 QuestieDB
-	None.
+	https://raw.githubusercontent.com/Questie/QuestieDB/master/src/corrections/Sod/sodBaseItems.lua
 ]]

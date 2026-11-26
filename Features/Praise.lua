@@ -113,8 +113,31 @@ local function CanWitnessEmote(unit)
 end
 
 --[[
-    Best emote direction for a buffer: their unit token when we hold one, else
-    their bare character name. The client resolves a name to any player it can
+    The nameplate showing this GUID, or nil. A stranger standing near you who
+    is not your target, focus or mouseover is reachable only through their
+    nameplate, so it is checked before falling back to their name.
+]]
+local MAX_NAMEPLATES = 40
+
+local function GetNameplateByGUID(guid)
+	if not guid then
+		return nil
+	end
+	for i = 1, MAX_NAMEPLATES do
+		local plate = "nameplate" .. i
+		if UnitExists(plate) and ns.UnitHasGUID(plate, guid) then
+			return plate
+		end
+	end
+	return nil
+end
+
+--[[
+    Best emote direction for a buffer: their unit token when we hold one (a
+    group, pointed-at or nameplate token), else their bare character name.
+    The name is the weak path: on WoW Forever a shortened name can fail to
+    resolve and degrade to the undirected emote, so any token wins over it.
+    The client resolves a name to any player it can
     currently see -- but only the bare form, never the combat log's cross-realm
     "Name-Realm", so the realm is stripped. Worst realistic miss is two visible
     same-named players from different realms, which just salutes the wrong twin.
@@ -133,7 +156,7 @@ end
     untargeted -- the add-on's most common thank of all.
 ]]
 local function ResolveEmoteTarget(guid, name)
-	local unit = ns.GetUnitByGUID(guid)
+	local unit = ns.GetUnitByGUID(guid) or GetNameplateByGUID(guid)
 	if unit then
 		return CanWitnessEmote(unit) and unit or nil
 	end

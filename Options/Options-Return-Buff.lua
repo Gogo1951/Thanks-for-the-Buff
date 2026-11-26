@@ -4,11 +4,21 @@ local L = ns.L
 local Kit = ns.OptionsKit
 
 --[[
-    "Return Buff", a sub-panel of Give Thanks: a per-character macro that casts
-    one of your buffs back on the last player outside your group who buffed you
-    (Features/Buff-Back.lua). It follows strangers' buffs whether or not Give
-    Thanks is on, so no status line says it waits on Give Thanks.
+    "Return the Favor", a panel of its own: an account-wide macro, "- Return
+    Buff", that casts one of your buffs back on the last player outside your
+    group who buffed you (Features/Buff-Back.lua). It follows strangers' buffs
+    whether or not Give Thanks is on, so it sits beside Give Thanks, not under
+    it, and no status line says it waits on Give Thanks.
 ]]
+
+-- The switch's tooltip: what it does, then how the macro picks its target and, on clients with spell ranks (Wrath and earlier), its rank.
+local function EnableDescription(macro)
+	local text = L["RETURN_BUFF_ENABLE_DESCRIPTION"]:format(macro) .. "\n\n" .. L["RETURN_BUFF_HELP"]
+	if (ns.EXPANSION or 1) <= 3 then
+		text = text .. "\n\n" .. L["RETURN_BUFF_RANK_HELP"]
+	end
+	return text
+end
 
 -- The Example's stand-in until a stranger has buffed this character.
 local SAMPLE_TARGET = ns.SAMPLE_NAMES.PRIEST
@@ -31,7 +41,7 @@ function ns.BuildReturnBuffOptions()
 	local macro = Kit.Color("TITLE", Data.BUFF_BACK_MACRO)
 
 	local options = {
-		name = Kit.SubPanelTitle(L["TAB_GIVE_THANKS"], L["TAB_RETURN_BUFF"]),
+		name = L["TAB_RETURN_BUFF"],
 		type = "group",
 		args = {
 			descIntro = Kit.Desc(L["RETURN_BUFF_DESCRIPTION"]:format(macro), 1),
@@ -39,7 +49,7 @@ function ns.BuildReturnBuffOptions()
 			enable = ns.MacroToggleRow(3, {
 				type = "toggle",
 				name = string.format(L["BUTTON_MACRO_ENABLE"], Data.BUFF_BACK_MACRO),
-				desc = L["RETURN_BUFF_ENABLE_DESCRIPTION"]:format(macro),
+				desc = EnableDescription(macro),
 				get = function()
 					return settings().enabled
 				end,
@@ -98,12 +108,6 @@ function ns.BuildReturnBuffOptions()
 					return Kit.Tint("TEXT", L["RETURN_BUFF_EXAMPLE_LEVEL"]:format(name, level, link))
 				end
 				return Kit.Tint("TEXT", L["RETURN_BUFF_EXAMPLE"]:format(name, link))
-			end),
-			space2 = Kit.Spacer(8),
-			help = Kit.Desc(Kit.Color("HELP", L["RETURN_BUFF_HELP"]), 9),
-			-- Only clients with spell ranks (Wrath and earlier) pick one by level.
-			rankHelp = Kit.Desc(Kit.Color("HELP", L["RETURN_BUFF_RANK_HELP"]), 10, function()
-				return (ns.EXPANSION or 1) > 3
 			end),
 		},
 	}
