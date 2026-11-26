@@ -248,7 +248,7 @@ L["BUTTON_WHISPER_DESCRIPTION"] =
 L["BUTTON_TOKENS"] = "토큰: %s 감사할 대상"
 
 -- Return Buff
-L["TAB_RETURN_BUFF"] = "버프 답례"
+L["TAB_RETURN_BUFF"] = "은혜 갚기"
 L["RETURN_BUFF_DESCRIPTION"] =
 	"받은 호의를 돌려주세요. 파티 밖의 플레이어가 버프를 걸어 줄 때마다 %s 매크로가 그 플레이어를 대상으로 삼으므로, 한 번 누르면 내 버프를 돌려줄 수 있습니다."
 L["RETURN_BUFF_ENABLE_DESCRIPTION"] =
@@ -369,8 +369,7 @@ L["MENU_MORE"] = "외 %d개"
 
 -- The button click that does what a menu row does, gray at the row's right.
 L["MENU_CLICK_RIGHT"] = "우클릭"
-L["MENU_CLICK_MIDDLE"] = "휠클릭"
-L["MENU_CLICK_SHIFT_MIDDLE"] = "Shift + 휠클릭"
+
 -- The menu's Options row.
 L["MENU_OPTIONS"] = "TFTB 옵션"
 

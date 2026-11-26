@@ -23,9 +23,10 @@ ns.PALETTE = {
 	HELP = "CCCCCC", -- Silver: Pro Tips, Helper Text
 	TEXT = "FFFFFF", -- White: Messages, Values, Spell Names
 	ON = "33CC33", -- Green: On
-	OFF = "CC3333", -- Red: Off
+	OFF = "CC3333", -- Red: Off (menus show Off in MUTED, never red)
 	SEPARATOR = "AAAAAA", -- Gray: Separators, Dividers
 	MUTED = "808080", -- Dark Gray: Meta-data, Version Numbers
+	VALUE = "FFFF99", -- Light Yellow: What a Setting Is Set To, in a Menu
 }
 
 --[[
@@ -169,82 +170,18 @@ Data.THANK_YOU_BUTTONS = {
 
 --[[
     The Return Buff macro: account-wide, like the Thank You macros, so it never
-    takes one of a character's 18 slots; each character rewrites it with its own
+    takes one of a character's own slots; each character rewrites it with its own
     buff and target as it logs in. It wears the Thank You macro's ribbon
     (Data.THANK_YOU_DEFAULT_ICON).
 ]]
 Data.BUFF_BACK_MACRO = "- Return Buff"
 
 --[[
-    Return Buff's buffs: each class's buffs it can cast on another player, each
-    as its ranks' spell IDs, lowest first. One list serves every flavor: only
-    ranks this client has and this character knows are used, beside the class's
-    Good News buffs. The ranks let the macro cast one the player who buffed you
-    can take: a rank lands only on a player no more than RETURN_BUFF_RANK_GAP
-    levels below the level it's learned at (Wrath and earlier).
+    Return Buff casts a rank the player who buffed you can take: a rank lands
+    only on a player no more than RETURN_BUFF_RANK_GAP levels below the level
+    it's learned at (Wrath and earlier).
 ]]
 Data.RETURN_BUFF_RANK_GAP = 10
-Data.RETURN_BUFF_SPELLS = {
-	DRUID = {
-		{ 1126, 5232, 6756, 5234, 8907, 9884, 9885, 26990 }, -- Mark of the Wild
-		{ 21849, 21850, 26991 }, -- Gift of the Wild
-		{ 467, 782, 1075, 8914, 9756, 9910, 26992 }, -- Thorns
-	},
-	MAGE = {
-		{ 1459, 1460, 1461, 10156, 10157, 27126 }, -- Arcane Intellect
-		{ 23028, 27127 }, -- Arcane Brilliance
-		{ 61316 }, -- Dalaran Brilliance
-	},
-	MONK = {
-		{ 115921 }, -- Legacy of the Emperor
-		{ 116781 }, -- Legacy of the White Tiger
-	},
-	PALADIN = {
-		{ 19740, 19834, 19835, 19836, 19837, 19838, 25291, 27140 }, -- Blessing of Might
-		{ 19742, 19850, 19852, 19853, 19854, 25290, 27142 }, -- Blessing of Wisdom
-		{ 20217 }, -- Blessing of Kings
-		{ 1038 }, -- Blessing of Salvation
-		{ 19977, 19978, 19979, 27144 }, -- Blessing of Light
-		{ 20911, 20912, 20913, 20914, 27168 }, -- Blessing of Sanctuary
-		{ 25782, 25916, 27141 }, -- Greater Blessing of Might
-		{ 25894, 25918, 27143 }, -- Greater Blessing of Wisdom
-		{ 25898 }, -- Greater Blessing of Kings
-		{ 25895 }, -- Greater Blessing of Salvation
-		{ 25890, 27145 }, -- Greater Blessing of Light
-		{ 25899, 27169 }, -- Greater Blessing of Sanctuary
-	},
-	PRIEST = {
-		{ 1243, 1244, 1245, 2791, 10937, 10938, 25389 }, -- Power Word: Fortitude
-		{ 21562, 21564, 25392 }, -- Prayer of Fortitude
-		{ 14752, 14818, 14819, 27841, 25312 }, -- Divine Spirit
-		{ 27681, 32999 }, -- Prayer of Spirit
-		{ 976, 10957, 10958, 25433 }, -- Shadow Protection
-		{ 27683, 39374 }, -- Prayer of Shadow Protection
-	},
-	SHAMAN = {
-		{ 974, 32593, 32594 }, -- Earth Shield
-		{ 131 }, -- Water Breathing
-		{ 546 }, -- Water Walking
-	},
-	WARLOCK = {
-		{ 5697 }, -- Unending Breath
-		{ 132 }, -- Detect Lesser Invisibility
-		{ 109773 }, -- Dark Intent
-	},
-}
---[[
-    The macro slot caps, read from the game: Mists' engine keeps them in
-    Constants.MacroConsts, the Classic engine's UIParent sets the
-    MAX_ACCOUNT_MACROS and MAX_CHARACTER_MACROS globals. Every flavor is 120
-    general and 30 per character today, the fallback if neither is there.
-]]
-local MACRO_CONSTS = Constants and Constants.MacroConsts or {}
-
--- The per-character macro cap.
-Data.MAX_CHARACTER_MACROS = MACRO_CONSTS.MAX_CHARACTER_MACROS or MAX_CHARACTER_MACROS or 30
-
--- The account-wide macro cap; TFTB stops creating its macros once the general list holds this many.
-Data.MAX_GLOBAL_MACROS = MACRO_CONSTS.MAX_ACCOUNT_MACROS or MAX_ACCOUNT_MACROS or 120
 
 --[[
     The Thank You macros' own icon, a texture file ID (inv_misc_ribbon_01): the

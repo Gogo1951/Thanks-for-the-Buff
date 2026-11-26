@@ -230,6 +230,24 @@ else
 end
 
 --------------------------------------------------------------------------------
+-- Macro Caps
+--------------------------------------------------------------------------------
+
+--[[
+    The macro slot caps, read from the game: Mists' engine keeps them in
+    Constants.MacroConsts, the Classic engine's UIParent sets the
+    MAX_ACCOUNT_MACROS and MAX_CHARACTER_MACROS globals. Every flavor is 120
+    general and 30 per character today, the fallback if neither is there.
+]]
+local MACRO_CONSTS = Constants and Constants.MacroConsts or {}
+
+-- The per-character macro cap.
+ns.Data.MAX_CHARACTER_MACROS = MACRO_CONSTS.MAX_CHARACTER_MACROS or MAX_CHARACTER_MACROS or 30
+
+-- The account-wide macro cap; TFTB stops creating its macros once the general list holds this many.
+ns.Data.MAX_GLOBAL_MACROS = MACRO_CONSTS.MAX_ACCOUNT_MACROS or MAX_ACCOUNT_MACROS or 120
+
+--------------------------------------------------------------------------------
 -- Whisper Length
 --------------------------------------------------------------------------------
 

@@ -24,7 +24,8 @@ function ns.RegisterOptionsPanels()
 	Kit.PrepareTree("IgnoredBuffs", function()
 		return ns.db.keys.char
 	end)
-	Kit.RegisterPanel("ReturnBuff", ns.BuildReturnBuffOptions, L["TAB_RETURN_BUFF"], "GiveThanks")
+	-- Return the Favor works with Give Thanks on or off, so it has its own line.
+	Kit.RegisterPanel("ReturnBuff", ns.BuildReturnBuffOptions, L["TAB_RETURN_BUFF"])
 
 	Kit.RegisterPanel("WaveToFriends", ns.BuildWaveToFriendsOptions, L["TAB_WAVE_TO_FRIENDS"])
 

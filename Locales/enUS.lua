@@ -215,7 +215,7 @@ L["BUTTON_EMOTE"] = "Emote"
 L["BUTTON_EMOTE_DESCRIPTION"] = "Sets the emote this button performs at your target, or None for no emote."
 L["BUTTON_EMOTE_NONE"] = "None"
 -- Titles Thank You Button 1's emote checklist.
-L["EMOTES_SELECT"] = "Select Emotes"
+L["EMOTES_SELECT"] = "Choose Emotes"
 L["BUTTON_ICON"] = "Icon"
 L["BUTTON_ICON_DESCRIPTION"] = "Sets the icon this button's macro shows in your macro list and on your action bars."
 -- The Icon dropdown's first choice, the macros' own icon; every other choice is a picture alone.
@@ -234,7 +234,7 @@ L["BUTTON_WHISPER_DESCRIPTION"] =
 L["BUTTON_TOKENS"] = "Tokens: %s who you're thanking"
 
 -- Return Buff
-L["TAB_RETURN_BUFF"] = "Return Buff"
+L["TAB_RETURN_BUFF"] = "Return the Favor"
 L["RETURN_BUFF_DESCRIPTION"] =
 	"Return the favor. Each time a player outside your group buffs you, the %s macro aims at them, so one press casts your buff back on them."
 L["RETURN_BUFF_ENABLE_DESCRIPTION"] =
@@ -342,8 +342,6 @@ L["MENU_MORE"] = "%d more"
 
 -- The button click that does what a menu row does, gray at the row's right.
 L["MENU_CLICK_RIGHT"] = "Right-Click"
-L["MENU_CLICK_MIDDLE"] = "Middle-Click"
-L["MENU_CLICK_SHIFT_MIDDLE"] = "Shift + Middle-Click"
 
 -- The menu's Options row.
 L["MENU_OPTIONS"] = "TFTB Options"

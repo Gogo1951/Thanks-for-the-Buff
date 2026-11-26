@@ -5,7 +5,7 @@ local AURA, CAST, RESURRECT = Data.GOOD_NEWS_DETECT.AURA, Data.GOOD_NEWS_DETECT.
 
 -- { class, detect, labelItem, noDuration, triggers = { { spell, aura, item } } }, -- Name
 ns.GOOD_NEWS_ABILITIES = {
-	-- Items ---------------------------------------------------------------------
+	-- Death Knight --------------------------------------------------------------
 	{
 		class = "DEATHKNIGHT",
 		detect = AURA,
@@ -26,12 +26,6 @@ ns.GOOD_NEWS_ABILITIES = {
 		detect = CAST,
 		triggers = {
 			{ spell = 20484 },
-			{ spell = 20739 },
-			{ spell = 20742 },
-			{ spell = 20747 },
-			{ spell = 20748 },
-			{ spell = 26994 },
-			{ spell = 48477 },
 		},
 	}, -- Rebirth
 	-- Hunter --------------------------------------------------------------------
@@ -57,39 +51,6 @@ ns.GOOD_NEWS_ABILITIES = {
 			{ spell = 53480 },
 		},
 	}, -- Roar of Sacrifice
-	-- Mage ----------------------------------------------------------------------
-	{
-		class = "MAGE",
-		detect = AURA,
-		triggers = {
-			{ spell = 1008 },
-			{ spell = 8455 },
-			{ spell = 10169 },
-			{ spell = 10170 },
-			{ spell = 27130 },
-			{ spell = 43017 },
-		},
-	}, -- Amplify Magic
-	{
-		class = "MAGE",
-		detect = AURA,
-		triggers = {
-			{ spell = 604 },
-			{ spell = 8450 },
-			{ spell = 8451 },
-			{ spell = 10173 },
-			{ spell = 10174 },
-			{ spell = 33944 },
-			{ spell = 43015 },
-		},
-	}, -- Dampen Magic
-	{
-		class = "MAGE",
-		detect = AURA,
-		triggers = {
-			{ spell = 54646 },
-		},
-	}, -- Focus Magic
 	-- Paladin -------------------------------------------------------------------
 	{
 		class = "PALADIN",
@@ -102,13 +63,6 @@ ns.GOOD_NEWS_ABILITIES = {
 		class = "PALADIN",
 		detect = AURA,
 		triggers = {
-			{ spell = 19752 },
-		},
-	}, -- Divine Intervention
-	{
-		class = "PALADIN",
-		detect = AURA,
-		triggers = {
 			{ spell = 1044 },
 		},
 	}, -- Hand of Freedom
@@ -117,8 +71,6 @@ ns.GOOD_NEWS_ABILITIES = {
 		detect = AURA,
 		triggers = {
 			{ spell = 1022 },
-			{ spell = 5599 },
-			{ spell = 10278 },
 		},
 	}, -- Hand of Protection
 	{
@@ -126,9 +78,6 @@ ns.GOOD_NEWS_ABILITIES = {
 		detect = AURA,
 		triggers = {
 			{ spell = 6940 },
-			{ spell = 20729 },
-			{ spell = 27147 },
-			{ spell = 27148 },
 		},
 	}, -- Hand of Sacrifice
 	{
@@ -136,10 +85,6 @@ ns.GOOD_NEWS_ABILITIES = {
 		detect = CAST,
 		triggers = {
 			{ spell = 633 },
-			{ spell = 2800 },
-			{ spell = 10310 },
-			{ spell = 27154 },
-			{ spell = 48788 },
 		},
 	}, -- Lay on Hands
 	-- Priest --------------------------------------------------------------------
@@ -200,13 +145,6 @@ ns.GOOD_NEWS_ABILITIES = {
 		class = "SHAMAN",
 		detect = AURA,
 		triggers = {
-			{ spell = 131 },
-		},
-	}, -- Water Breathing
-	{
-		class = "SHAMAN",
-		detect = AURA,
-		triggers = {
 			{ spell = 546 },
 		},
 	}, -- Water Walking
@@ -231,7 +169,8 @@ ns.GOOD_NEWS_ABILITIES = {
 		class = "WARRIOR",
 		detect = AURA,
 		triggers = {
-			{ spell = 50720 },
+			{ spell = 114030 },
+			{ spell = 122710 },
 		},
 	}, -- Vigilance
 	-- Items ---------------------------------------------------------------------
@@ -287,13 +226,8 @@ ns.GOOD_NEWS_ABILITIES = {
 	{
 		class = "WARLOCK",
 		detect = AURA,
-		labelItem = 16893,
 		triggers = {
-			{ spell = 20764, item = 16895 },
-			{ spell = 20762, item = 16892 },
-			{ spell = 20765, item = 16896 },
-			{ spell = 27239, item = 22116 },
-			{ spell = 20763, item = 16893 },
+			{ spell = 20707 },
 		},
 	}, -- Soulstone
 	-- Items ---------------------------------------------------------------------
@@ -309,6 +243,7 @@ ns.GOOD_NEWS_ABILITIES = {
 			{ spell = 43197, item = 33460 },
 			{ spell = 48103, item = 37097 },
 			{ spell = 48104, item = 37098 },
+			{ spell = 89342, item = 63307 },
 		},
 	}, -- Scroll of Spirit
 	{
@@ -323,6 +258,7 @@ ns.GOOD_NEWS_ABILITIES = {
 			{ spell = 43198, item = 33461 },
 			{ spell = 48101, item = 37093 },
 			{ spell = 48102, item = 37094 },
+			{ spell = 89345, item = 63306 },
 		},
 	}, -- Scroll of Stamina
 	{
@@ -337,6 +273,7 @@ ns.GOOD_NEWS_ABILITIES = {
 			{ spell = 43199, item = 33462 },
 			{ spell = 58448, item = 43465 },
 			{ spell = 58449, item = 43466 },
+			{ spell = 89346, item = 63304 },
 		},
 	}, -- Scroll of Strength
 	{
@@ -351,6 +288,7 @@ ns.GOOD_NEWS_ABILITIES = {
 			{ spell = 43196, item = 33459 },
 			{ spell = 58452, item = 43467 },
 			{ spell = 58453, item = 43468 },
+			{ spell = 89344, item = 63308 },
 		},
 	}, -- Scroll of Protection
 	{
@@ -365,6 +303,7 @@ ns.GOOD_NEWS_ABILITIES = {
 			{ spell = 43195, item = 33458 },
 			{ spell = 48099, item = 37091 },
 			{ spell = 48100, item = 37092 },
+			{ spell = 89347, item = 63305 },
 		},
 	}, -- Scroll of Intellect
 	{
@@ -379,6 +318,7 @@ ns.GOOD_NEWS_ABILITIES = {
 			{ spell = 43194, item = 33457 },
 			{ spell = 58450, item = 43463 },
 			{ spell = 58451, item = 43464 },
+			{ spell = 89343, item = 63303 },
 		},
 	}, -- Scroll of Agility
 	{
@@ -394,7 +334,48 @@ ns.GOOD_NEWS_ABILITIES = {
 			{ spell = 8342, item = 7148 },
 			{ spell = 22999, item = 18587 },
 			{ spell = 54732, item = 40772 },
-			{ spell = 164729, item = 114943 },
 		},
-	}, -- Jumper Cables
+	}, -- Goblin Jumper Cables
 }
+
+--[[
+How We Got the Data
+
+Last Validated
+	2026-11-26, wago.tools, MoP Classic 5.5.4.71089
+
+Notes
+	- The spells and items you cast on another player that Good News can whisper them about (Features/Good-News.lua). One entry is one checkbox on the Tracked Abilities panel. Hand-picked, not queried: each is a buff, cooldown or rescue cast on one other player, where knowing who gave it is worth a whisper.
+	- The name after each entry is for people; the panel takes names, icons and tooltips from the game. StyLua spreads long entries over several lines, so find one by the name on its closing brace.
+	- class is the class heading on the Tracked Abilities panel. Without one the row sits in the Items list.
+	- labelItem is an item whose game name labels a group named after one of its own items (the stat scrolls, Jumper Cables), so the label is the game's own in every locale.
+	- detect is AURA, CAST or RESURRECT, from Data.GOOD_NEWS_DETECT in Data/Data.lua. AURA reads the buff's length off the player you cast it on; CAST is a one-shot with nothing to time (Rebirth, Lay on Hands). RESURRECT is for a cast that can fail: Jumper Cables report a successful cast for every jolt, revived or not, so the whisper waits for the combat log's resurrection event, which only a working jolt produces.
+	- noDuration marks a buff spent by an event rather than by time, so the whisper leaves out its length: Fear Ward lasts until the next fear; Misdirection and Tricks of the Trade carry it too. It matters most on short buffs, which would otherwise slip under the under-a-minute cap and whisper a countdown that means nothing.
+	- triggers lists the ranks or variants one checkbox covers: a spell alone, a spell with an aura where the aura's ID differs from the cast's (Misdirection, Tricks of the Trade), or an item with the spell it casts, which shows the item's icon and name. UNIT_SPELLCAST_SENT carries the spell ID, so that is what each trigger is matched on.
+	- This client has no ranks for most class spells, so each class row lists only the IDs its SpellName holds. Vigilance lists both warrior spells of that name cast on a party or raid member (114030, 122710). Soulstone is the warlock's own spell here (20707), cast straight on another player rather than made into an item, so it carries no item or labelItem.
+	- The stat scrolls run from the first rank to IX (63303 to 63308, each made by a spell of its own name, 89368 to 89373), each scroll with the spell it casts.
+	- Jumper Cables takes its label from item 7148's client name (labelItem), because every cable, and the Gnomish Army Knife, casts a spell named Defibrillate; only the item names differ.
+	- Battle Squawk is cast by the Battle Chicken, not by you, so it reaches Good News through your pet's cast events. It carries no item on purpose: item 10725 would label the checkbox as a second Gnomish Battle Chicken.
+	- Not tracked: Amplify Magic, Dampen Magic, Focus Magic, Divine Intervention and the shaman's Water Breathing, which this client doesn't have; the stat elixirs that cast the same spells as the scrolls, which buff whoever drinks them; the drum patterns, which teach a drum rather than beat it; Beacon of Light's 53652, the heal it passes on, never cast; and Gorzeeki's Jumper Cables, which only revive one quest NPC.
+	- Every row starts ticked. A player's own choice is saved in goodNews.watched under each ID the row watches (a trigger's aura when it names one, else its spell), and is never overwritten. A save from before Good News moved to Good to Go used the same keys, so it still applies.
+
+SQL (CMaNGOS)
+	TODO: Add SQL Query
+
+Wowhead
+	None.
+
+wago.tools
+	https://wago.tools/db2/SpellName?build=5.5.4.71089
+	https://wago.tools/db2/Spell?build=5.5.4.71089
+	https://wago.tools/db2/SpellLevels?build=5.5.4.71089
+	https://wago.tools/db2/SkillLineAbility?build=5.5.4.71089
+	https://wago.tools/db2/SkillLine?build=5.5.4.71089
+	https://wago.tools/db2/SpellEffect?build=5.5.4.71089
+	https://wago.tools/db2/Item?build=5.5.4.71089
+	https://wago.tools/db2/ItemSparse?build=5.5.4.71089
+	https://wago.tools/db2/ItemEffect?build=5.5.4.71089
+
+QuestieDB
+	https://raw.githubusercontent.com/Questie/QuestieDB/master/data/MoP/mopItemDB.lua
+]]

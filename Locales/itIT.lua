@@ -223,7 +223,7 @@ L["BUTTON_EMOTE_DESCRIPTION"] =
 	"Imposta l'emote che questo pulsante esegue sul tuo bersaglio, oppure Nessuna per non usare alcuna emote."
 L["BUTTON_EMOTE_NONE"] = "Nessuna"
 -- Titles Thank You Button 1's emote checklist.
-L["EMOTES_SELECT"] = "Seleziona le emote"
+L["EMOTES_SELECT"] = "Scegli le emote"
 L["BUTTON_ICON"] = "Icona"
 L["BUTTON_ICON_DESCRIPTION"] =
 	"Imposta l'icona che la macro di questo pulsante mostra nell'elenco delle macro e sulle barre delle azioni."
@@ -244,7 +244,7 @@ L["BUTTON_WHISPER_DESCRIPTION"] =
 L["BUTTON_TOKENS"] = "Segnaposto: %s chi stai ringraziando"
 
 -- Return Buff
-L["TAB_RETURN_BUFF"] = "Ricambia il potenziamento"
+L["TAB_RETURN_BUFF"] = "Ricambiare il favore"
 L["RETURN_BUFF_DESCRIPTION"] =
 	"Ricambia il favore. Ogni volta che un giocatore fuori dal tuo gruppo ti potenzia, la macro %s punta su di lui, così una pressione gli rilancia il tuo potenziamento."
 L["RETURN_BUFF_ENABLE_DESCRIPTION"] =
@@ -359,8 +359,7 @@ L["MENU_MORE"] = "Altri %d"
 
 -- The button click that does what a menu row does, gray at the row's right.
 L["MENU_CLICK_RIGHT"] = "Clic destro"
-L["MENU_CLICK_MIDDLE"] = "Clic centrale"
-L["MENU_CLICK_SHIFT_MIDDLE"] = "Maiusc + Clic centrale"
+
 -- The menu's Options row.
 L["MENU_OPTIONS"] = "Opzioni di TFTB"
 

@@ -12,8 +12,9 @@ local GetClientHeader = ns.GetDiagnosticClientHeader
     nothing incidental, and nothing the add-on does not use.
 
     Every modern/legacy pair the add-on still picks between is listed as both
-    halves: Wave to Friends' mouse-focus read (GetMouseFoci, or GetMouseFocus)
-    and Validate Data's tooltip-text read (C_TooltipInfo.GetItemByID and
+    halves: Wave to Friends' mouse-focus read (GetMouseFoci, or GetMouseFocus),
+    the macro caps (Constants.MacroConsts, or the two globals) and Validate
+    Data's tooltip-text read (C_TooltipInfo.GetItemByID and
     GetSpellByID, or the hidden scan tooltip). Rows for one flavor's buff
     detection and name reads are added only on that flavor, below.
     The hidden tooltip is probed through the GameTooltip methods it inherits,
@@ -97,8 +98,26 @@ ns.DIAGNOSTIC_API_CHECKS = {
 	{ "GetMacroIndexByName", HasGlobalFunction("GetMacroIndexByName") },
 	{ "GetNumMacros", HasGlobalFunction("GetNumMacros") },
 	{ "GetMacroInfo", HasGlobalFunction("GetMacroInfo") },
-	-- Buff Back rewrites its macro only when the body it reads differs.
+	-- Return Buff rewrites its macro only when the body it reads differs.
 	{ "GetMacroBody", HasGlobalFunction("GetMacroBody") },
+	-- The Pick Up Macro buttons on the Thank You Button and Return the Favor panels.
+	{ "PickupMacro", HasGlobalFunction("PickupMacro") },
+	-- The macro slot caps: Constants.MacroConsts where the client ships it, else the two globals, else 120 and 30.
+	{
+		"Constants.MacroConsts (guarded)",
+		function()
+			return type(Constants) == "table" and type(Constants.MacroConsts) == "table"
+		end,
+	},
+	{
+		"MAX_ACCOUNT_MACROS / MAX_CHARACTER_MACROS (legacy)",
+		function()
+			return type(MAX_ACCOUNT_MACROS) == "number" and type(MAX_CHARACTER_MACROS) == "number"
+		end,
+	},
+	-- Return Buff's rank for the buffer's level: the level each rank is learned at, and the rank text the macro adds.
+	{ "C_Spell.GetSpellLevelLearned (guarded)", HasFunction("C_Spell", "GetSpellLevelLearned") },
+	{ "C_Spell.GetSpellSubtext", HasFunction("C_Spell", "GetSpellSubtext") },
 	{ "PlaySoundFile", HasGlobalFunction("PlaySoundFile") },
 	-- Wave to Friends: who counts, and the resting rule.
 	{ "C_FriendList.IsFriend", HasFunction("C_FriendList", "IsFriend") },
@@ -201,7 +220,7 @@ end
 
 -- The add-on's own example reports, appended to the shared Event Log intro.
 ns.DiagnosticsStrings.EVENT_LOG_EXAMPLES =
-	"Best for 'nobody got thanked' reports. It records each buff that lands on you, decoded: the spell, who cast it, how long it lasts, and, off WoW Forever, whether the combat log calls them a friendly player outside your group. On WoW Forever it records each buff added to you with the gate, if any, that kept TFTB from reading it, and who cast each one it read. For 'nobody got waved at' reports, each time you mouse over someone records UPDATE_MOUSEOVER_UNIT; with none, the game never told TFTB. For 'my Good News whisper never went out' reports (Good News isn't on WoW Forever), each cast of an ability Good News tracks records UNIT_SPELLCAST_SENT, naming who you cast at, then UNIT_SPELLCAST_SUCCEEDED once it goes off, and each revive of yours records RESURRECT, which a Jumper Cables whisper waits for; every other cast is only counted, at the end. For 'my Buff Back macro still aims at the old player' reports, PLAYER_REGEN_ENABLED records each time combat ends, when a macro edit combat held back goes through."
+	"Best for 'nobody got thanked' reports. It records each buff that lands on you, decoded: the spell, who cast it, how long it lasts, and, off WoW Forever, whether the combat log calls them a friendly player outside your group. On WoW Forever it records each buff added to you with the gate, if any, that kept TFTB from reading it, and who cast each one it read. For 'nobody got waved at' reports, each time you mouse over someone records UPDATE_MOUSEOVER_UNIT; with none, the game never told TFTB. For 'my Good News whisper never went out' reports (Good News isn't on WoW Forever), each cast of an ability Good News tracks records UNIT_SPELLCAST_SENT, naming who you cast at, then UNIT_SPELLCAST_SUCCEEDED once it goes off, and each revive of yours records RESURRECT, which a Jumper Cables whisper waits for; every other cast is only counted, at the end. For 'my Return Buff macro still aims at the old player' reports, PLAYER_REGEN_ENABLED records each time combat ends, when a macro edit combat held back goes through."
 
 --[[
     How many emotes a list has picked, out of how many this client offers, and
@@ -934,7 +953,7 @@ function ns:BuildGoodNewsContextReport()
 end
 
 --------------------------------------------------------------------------------
--- Buff Back Context
+-- Return Buff Context
 --------------------------------------------------------------------------------
 
 -- A macro body as copyable text: pipes escaped, line breaks shown as " // ".
@@ -943,13 +962,16 @@ local function MacroText(body)
 end
 
 --[[
-    The state behind a "my Buff Back macro is missing / casts nothing / aims at
-    the wrong player" report: the switch, the buff this character picked and
-    whether it is among the buffs on offer (this class's Good News rows that
-    leave a buff and that this character knows), who the macro aims at, combat
-    (which holds a macro edit back until it ends), the character macro cap,
-    and the macro as the game holds it. Read only: the macro is looked up by
-    name, never created, edited or deleted here.
+    The state behind a "my Return Buff macro is missing / casts nothing / aims
+    at the wrong player / casts the wrong rank" report: the switch, combat
+    (which holds a macro edit back until it ends), the buffs on offer (this
+    class's Return Buff spells and its Good News rows that leave a buff, those
+    this character knows), the buff this character picked and the one the
+    macro casts (the first on offer while the pick isn't), who it aims at and
+    the level their buff was read at, the rank picked for that level, the
+    account macro slots, and the macro as the game holds it, checked against
+    what it should say. Read only: the macro is looked up by name, never
+    created, edited or deleted here, and the pick is never saved.
 ]]
 function ns:BuildBuffBackContextReport()
 	local lines = { GetClientHeader(), "" }
@@ -959,13 +981,13 @@ function ns:BuildBuffBackContextReport()
 		return table.concat(lines, "\n")
 	end
 	if not ns.GetBuffBackChoices then
-		lines[#lines + 1] = "Buff Back is not loaded on this client."
+		lines[#lines + 1] = "Return Buff is not loaded on this client."
 		return table.concat(lines, "\n")
 	end
 
 	local _, class = UnitClass("player")
 	lines[#lines + 1] = string.format(
-		"Buff Back: enabled=%s  Class: %s  InCombat=%s (a macro edit waits for combat to end)",
+		"Return Buff: enabled=%s  Class: %s  InCombat=%s (a macro edit waits for combat to end)",
 		tostring(settings.enabled),
 		tostring(class),
 		tostring(InCombatLockdown() and true or false)
@@ -974,6 +996,14 @@ function ns:BuildBuffBackContextReport()
 	lines[#lines + 1] = string.format(
 		"Buff tracking ready (past the post-loading-screen pause): %s",
 		tostring(ns.IsBuffTrackingReady and ns.IsBuffTrackingReady())
+	)
+	lines[#lines + 1] = string.format(
+		"Return Buff spells (%s/Game-IDs-%s.lua): %s",
+		tostring(ns.DATA_FOLDER),
+		tostring(ns.DATA_FOLDER),
+		type(ns.RETURN_BUFF_SPELLS) == "table"
+				and string.format("loaded, %d buffs for this class", #(ns.RETURN_BUFF_SPELLS[class] or {}))
+			or "MISSING"
 	)
 	lines[#lines + 1] = string.format(
 		"Abilities data (%s/Good-News-Abilities-%s.lua): %s",
@@ -988,8 +1018,11 @@ function ns:BuildBuffBackContextReport()
 	for _, spellId in ipairs(sorting) do
 		lines[#lines + 1] = string.format("  %d %s", spellId, tostring(C_Spell.GetSpellName(spellId)))
 	end
+	if #sorting == 0 then
+		lines[#lines + 1] = "  none, so the macro is left as the last character with a buff wrote it"
+	end
 	local picked = ns.db.char.buffBackSpell
-	local pickedText = "none (no macro until one is picked)"
+	local pickedText = "none"
 	if picked then
 		pickedText = string.format(
 			"%s %s onOffer=%s",
@@ -999,31 +1032,63 @@ function ns:BuildBuffBackContextReport()
 		)
 	end
 	lines[#lines + 1] = "Picked buff: " .. pickedText
-	local target = ns.GetBuffBackTarget()
+	-- A pick that isn't on offer gives way to the first buff on offer, as the macro builds it.
+	local casting = (picked and values[picked]) and picked or sorting[1]
+	local castText
+	if casting then
+		local rankId, rankText = ns.GetBuffBackRank(casting)
+		local name = C_Spell.GetSpellName(casting)
+		castText = rankText and (name .. "(" .. rankText .. ")") or name
+		lines[#lines + 1] = string.format(
+			"Macro casts: %s (spell %s, %s)",
+			tostring(castText),
+			tostring(rankId),
+			rankText and "a lower rank for the target's level" or "your highest rank"
+		)
+	else
+		lines[#lines + 1] = "Macro casts: nothing"
+	end
 	lines[#lines + 1] = string.format(
-		"Target: %s",
+		"Spell ranks on this client: %s  Level-learned read: %s",
+		tostring((ns.EXPANSION or 1) <= 3),
+		C_Spell.GetSpellLevelLearned and "yes" or "MISSING (always your highest rank)"
+	)
+
+	local target = ns.GetBuffBackTarget()
+	local level = ns.GetBuffBackTargetLevel()
+	lines[#lines + 1] = string.format(
+		"Target: %s  Level: %s",
 		target and PlainText(target)
-			or "none yet (the macro casts on your target until a player outside your group buffs you)"
+			or "none yet (the macro casts on your target until a player outside your group buffs you)",
+		target and (level and tostring(level) or "unseen (your highest rank goes out)") or "-"
 	)
 
 	lines[#lines + 1] = ""
-	local _, perCharacter = GetNumMacros()
+	local accountMacros = GetNumMacros()
 	lines[#lines + 1] = string.format(
-		"Character macros: %s / %d (Buff Back creates its macro only while under the cap)",
-		tostring(perCharacter),
-		ns.Data.MAX_CHARACTER_MACROS
+		"Account macros: %s / %d  Held back by full macro slots: %s",
+		tostring(accountMacros),
+		ns.Data.MAX_GLOBAL_MACROS,
+		tostring(ns.IsBuffBackBlockedByMacroCap())
 	)
 	local index = GetMacroIndexByName(ns.Data.BUFF_BACK_MACRO) or 0
 	if index == 0 then
 		lines[#lines + 1] = string.format("Macro (%s): missing", ns.Data.BUFF_BACK_MACRO)
+	elseif index > ns.Data.MAX_GLOBAL_MACROS then
+		lines[#lines + 1] = string.format(
+			"Macro (%s): a per-character copy (index %d), deleted the next time Return Buff updates",
+			ns.Data.BUFF_BACK_MACRO,
+			index
+		)
 	else
 		local body = GetMacroBody(index) or ""
-		local spellName = picked and C_Spell.GetSpellName(picked)
+		-- The macro ends its cast line with a line break, or ends there when it has no target yet.
 		lines[#lines + 1] = string.format(
 			"Macro (%s): present  castsPick=%s aimsAtTarget=%s",
 			ns.Data.BUFF_BACK_MACRO,
-			tostring(spellName ~= nil and body:find(spellName, 1, true) ~= nil),
-			target and tostring(body:find("[target=" .. target .. "]", 1, true) ~= nil) or "no target yet"
+			castText and tostring((body .. "\n"):find("/cast " .. castText .. "\n", 1, true) ~= nil)
+				or "nothing to cast",
+			target and tostring(body:find("/targetexact " .. target .. "\n", 1, true) ~= nil) or "no target yet"
 		)
 		lines[#lines + 1] = "  " .. MacroText(body)
 	end
@@ -1248,6 +1313,8 @@ end
       its first spell through C_Spell.GetSpellName), then every other item a
       row casts, since the whisper names the very item used; a spell row's
       ranks share its first spell's name, so that one stands for them all;
+    - every Return Buff rank list, by its first spell through
+      C_Spell.GetSpellName, as the Return the Favor panel and the macro name it;
     - the class name over each class's rows, from LOCALIZED_CLASS_NAMES_MALE
       as the panel reads it.
 ]]
@@ -1372,6 +1439,25 @@ do
 			classes[#classes + 1] = ability.class
 		end
 	end
+	-- Return Buff's lists: every rank shares the name its first spell has, so the first stands for them all.
+	local returnBuffSpells = ns.RETURN_BUFF_SPELLS or {}
+	for _, class in ipairs(SortedKeys(returnBuffSpells)) do
+		for index, ranks in ipairs(returnBuffSpells[class]) do
+			local spellId = ranks[1]
+			rows[#rows + 1] = {
+				constant = string.format("RETURN_BUFF_SPELLS.%s[%d]", class, index),
+				kind = "spell",
+				id = spellId,
+				lookup = function()
+					return C_Spell.GetSpellName(spellId)
+				end,
+				request = function()
+					C_Spell.RequestLoadSpellData(spellId)
+				end,
+			}
+		end
+	end
+
 	table.sort(classes)
 	for _, class in ipairs(classes) do
 		rows[#rows + 1] = {
@@ -1440,7 +1526,7 @@ end
     Thank You button's whisper is the player's own text, shown only when set,
     filled with the sample name and cut to the limit as sent, with a note when
     the cut bites; each Thank You macro body is its button's command; and the
-    Buff Back macro is built at its longest for this character.
+    Return Buff macro is built at its longest for this character.
 ]]
 ns.DIAGNOSTIC_MESSAGES = function()
 	local rows, notes = {}, {}
@@ -1545,28 +1631,54 @@ ns.DIAGNOSTIC_MESSAGES = function()
 	end
 
 	--[[
-	    The Buff Back macro, in the shape Features/Buff-Back.lua writes it
-	    ("/cast [target=Name] Buff"), at its longest for this character: the
-	    longest-named buff on offer, aimed at the saved target, or the sample
+	    The Return Buff macro, in the shape Features/Buff-Back.lua writes it
+	    ("/targetexact Name", "/cast Buff(Rank N)", "/targetlasttarget"), at its
+	    longest for this character: the longest cast line any buff on offer can
+	    take, with the longest rank text of any rank this character knows of it
+	    where the client has ranks, aimed at the saved target, or the sample
 	    name before anyone has buffed this character.
 	]]
 	if ns.GetBuffBackChoices then
 		local _, sorting = ns.GetBuffBackChoices()
+		local _, class = UnitClass("player")
+		local hasRanks = (ns.EXPANSION or 1) <= 3 and C_Spell.GetSpellLevelLearned ~= nil
+		-- The longest rank text each buff name can carry, over the ranks this character knows.
+		local rankText = {}
+		local function AddRanks(spellIds)
+			for _, spellId in ipairs(spellIds) do
+				local name = IsPlayerSpell and IsPlayerSpell(spellId) and C_Spell.GetSpellName(spellId)
+				local text = name and C_Spell.GetSpellSubtext(spellId)
+				if text and text ~= "" and #text > #(rankText[name] or "") then
+					rankText[name] = text
+				end
+			end
+		end
+		if hasRanks then
+			for _, ranks in ipairs(ns.RETURN_BUFF_SPELLS and ns.RETURN_BUFF_SPELLS[class] or {}) do
+				AddRanks(ranks)
+			end
+			for _, info in ipairs(ns.GetGoodNewsRows()) do
+				if info.row.class == class then
+					AddRanks(info.spellIds)
+				end
+			end
+		end
 		local longest = ""
 		for _, spellId in ipairs(sorting) do
 			local name = C_Spell.GetSpellName(spellId) or ""
-			if #name > #longest then
-				longest = name
+			local castText = rankText[name] and (name .. "(" .. rankText[name] .. ")") or name
+			if #castText > #longest then
+				longest = castText
 			end
 		end
 		if longest == "" then
-			notes[#notes + 1] = "This character knows no buff Buff Back offers, so it writes no macro."
+			notes[#notes + 1] = "This character knows no buff Return Buff offers, so it writes no macro."
 		else
 			local target = ns.GetBuffBackTarget() or sampleName
 			rows[#rows + 1] = {
-				label = "Buff Back macro (" .. ns.Data.BUFF_BACK_MACRO .. ")",
+				label = "Return Buff macro (" .. ns.Data.BUFF_BACK_MACRO .. ")",
 				ceiling = MACRO_MAX_LENGTH,
-				text = "/cast [target=" .. target .. "] " .. longest,
+				text = "/targetexact " .. target .. "\n/cast " .. longest .. "\n/targetlasttarget",
 			}
 		end
 	end
@@ -1648,6 +1760,39 @@ local ABILITY_DATA_COLUMNS = {
 	},
 }
 
+--[[
+    Every spell id in Return Buff's rank lists, keyed by class and the list's
+    position in it, with its rank's position in the list (lowest first).
+    Classes come out sorted, so the export reads in a fixed order.
+]]
+local function CollectReturnBuffIds(spellsByClass)
+	local found = {}
+	for _, class in ipairs(SortedKeys(spellsByClass)) do
+		for index, ranks in ipairs(spellsByClass[class]) do
+			for rank, spellId in ipairs(ranks) do
+				found[#found + 1] = { id = spellId, key = class .. "[" .. index .. "]", row = rank }
+			end
+		end
+	end
+	return found
+end
+
+-- A Return Buff id's class and list position, and its rank's position in that list.
+local RETURN_BUFF_DATA_COLUMNS = {
+	{
+		"DATA_ROW",
+		function(key)
+			return key
+		end,
+	},
+	{
+		"DATA_RANK",
+		function(_, rank)
+			return rank
+		end,
+	},
+}
+
 ns.DIAGNOSTIC_DATA_SOURCES = {
 	-- { label, sources = { { table, kind, collect, dataColumns } } }
 	{
@@ -1674,6 +1819,12 @@ ns.DIAGNOSTIC_DATA_SOURCES = {
 			},
 			-- Texture file IDs, which no client API looks up, so the report counts them.
 			{ table = "THANK_YOU_MACRO_ICONS", kind = "other" },
+			{
+				table = "RETURN_BUFF_SPELLS",
+				kind = "spell",
+				collect = CollectReturnBuffIds,
+				dataColumns = RETURN_BUFF_DATA_COLUMNS,
+			},
 		},
 	},
 	{

@@ -14,8 +14,9 @@ local GetColor = ns.GetColor
     AceConfig rebuilds every widget on the page after each click, and ~255
     toggles made every checkbox freeze the screen for a second. The widget makes
     its checkboxes once and keeps them: AceGUI hands the same widget back on
-    every page build, a redraw only re-reads the checked states, and a click
-    writes straight to the profile without asking AceConfig for a rebuild.
+    every page build, so a redraw only re-reads the checked states. A click
+    writes to the profile and ends in ns.RefreshSettings(), so the Reset row
+    and the menu follow it.
 ]]
 
 local COLUMNS = 4
@@ -89,6 +90,7 @@ local function CreateCheck(widget)
 		PlaySound(checked and 856 or 857)
 		model.SetChecked(self.entry.token, checked)
 		widget.header:SetText(HeaderText(model, widget.group))
+		ns.RefreshSettings()
 	end)
 	return check
 end

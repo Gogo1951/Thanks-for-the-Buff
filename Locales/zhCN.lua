@@ -236,7 +236,7 @@ L["BUTTON_WHISPER_DESCRIPTION"] =
 L["BUTTON_TOKENS"] = "占位符：%s 你要感谢的人"
 
 -- Return Buff
-L["TAB_RETURN_BUFF"] = "回赠增益"
+L["TAB_RETURN_BUFF"] = "回报好意"
 L["RETURN_BUFF_DESCRIPTION"] =
 	"投桃报李。每当队伍外的玩家为你施加增益时，%s 宏就会以其为目标，按一下即可把你的增益回赠给对方。"
 L["RETURN_BUFF_ENABLE_DESCRIPTION"] =
@@ -346,8 +346,7 @@ L["MENU_MORE"] = "还有 %d 件"
 
 -- The button click that does what a menu row does, gray at the row's right.
 L["MENU_CLICK_RIGHT"] = "右键点击"
-L["MENU_CLICK_MIDDLE"] = "中键点击"
-L["MENU_CLICK_SHIFT_MIDDLE"] = "Shift + 中键点击"
+
 -- The menu's Options row.
 L["MENU_OPTIONS"] = "TFTB 选项"
 

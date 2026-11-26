@@ -236,7 +236,7 @@ L["BUTTON_EMOTE_DESCRIPTION"] =
 	"Задает эмоцию, которую эта кнопка адресует вашей цели. Вариант Нет отключает эмоцию."
 L["BUTTON_EMOTE_NONE"] = "Нет"
 -- Titles Thank You Button 1's emote checklist.
-L["EMOTES_SELECT"] = "Выбор эмоций"
+L["EMOTES_SELECT"] = "Выбрать эмоции"
 L["BUTTON_ICON"] = "Значок"
 L["BUTTON_ICON_DESCRIPTION"] =
 	"Задает значок, который макрос этой кнопки показывает в списке макросов и на панелях команд."
@@ -258,7 +258,7 @@ L["BUTTON_WHISPER_DESCRIPTION"] =
 L["BUTTON_TOKENS"] = "Подстановки: %s кого вы благодарите"
 
 -- Return Buff
-L["TAB_RETURN_BUFF"] = "Ответный бафф"
+L["TAB_RETURN_BUFF"] = "Ответная услуга"
 L["RETURN_BUFF_DESCRIPTION"] =
 	"Отплати добром. Каждый раз, когда игрок не из твоей группы накладывает на тебя бафф, макрос %s нацеливается на него, и одно нажатие возвращает ему твой бафф."
 L["RETURN_BUFF_ENABLE_DESCRIPTION"] =
@@ -391,8 +391,7 @@ L["MENU_MORE"] = "Ещё %d"
 
 -- The button click that does what a menu row does, gray at the row's right.
 L["MENU_CLICK_RIGHT"] = "Правый клик"
-L["MENU_CLICK_MIDDLE"] = "Средний клик"
-L["MENU_CLICK_SHIFT_MIDDLE"] = "Shift + Средний клик"
+
 -- The menu's Options row.
 L["MENU_OPTIONS"] = "Настройки TFTB"
 

@@ -114,7 +114,7 @@ ns.EMOTE_GROUP_BY_TOKEN = {
 How We Got the Data
 
 Last Validated
-	2026-11-08, Mists of Pandaria Classic 5.5.4.70631
+	2026-11-26, wago.tools, MoP Classic 5.5.4.71089
 
 Notes
 	- Sorts every emote that does more than print a line into the group the Give Thanks emote grid shows it under (ns.GetEmoteGroup in Features/Utilities.lua). An emote this client offers that isn't listed is a Text emote: it prints its line and does nothing else.
@@ -133,9 +133,9 @@ Wowhead
 	None.
 
 wago.tools
-	https://wago.tools/db2/EmotesText?build=5.5.4.70631
-	https://wago.tools/db2/Emotes?build=5.5.4.70631
-	https://wago.tools/db2/EmotesTextSound?build=5.5.4.70631
+	https://wago.tools/db2/EmotesText?build=5.5.4.71089
+	https://wago.tools/db2/Emotes?build=5.5.4.71089
+	https://wago.tools/db2/EmotesTextSound?build=5.5.4.71089
 
 QuestieDB
 	None.

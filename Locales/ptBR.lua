@@ -221,7 +221,7 @@ L["BUTTON_EMOTE_DESCRIPTION"] =
 	"Define a expressão que este botão faz para o seu alvo, ou Nenhuma para não fazer expressão."
 L["BUTTON_EMOTE_NONE"] = "Nenhuma"
 -- Titles Thank You Button 1's emote checklist.
-L["EMOTES_SELECT"] = "Selecionar expressões"
+L["EMOTES_SELECT"] = "Escolher expressões"
 L["BUTTON_ICON"] = "Ícone"
 L["BUTTON_ICON_DESCRIPTION"] =
 	"Define o ícone que a macro deste botão mostra na sua lista de macros e nas suas barras de ação."
@@ -241,7 +241,7 @@ L["BUTTON_WHISPER_DESCRIPTION"] =
 L["BUTTON_TOKENS"] = "Marcadores: %s quem você está agradecendo"
 
 -- Return Buff
-L["TAB_RETURN_BUFF"] = "Devolver buff"
+L["TAB_RETURN_BUFF"] = "Retribuir o favor"
 L["RETURN_BUFF_DESCRIPTION"] =
 	"Retribua o favor. Sempre que um jogador fora do seu grupo te dá um buff, a macro %s mira nele, então um toque lança seu buff de volta nele."
 L["RETURN_BUFF_ENABLE_DESCRIPTION"] =
@@ -358,8 +358,7 @@ L["MENU_MORE"] = "Mais %d"
 
 -- The button click that does what a menu row does, gray at the row's right.
 L["MENU_CLICK_RIGHT"] = "Clique direito"
-L["MENU_CLICK_MIDDLE"] = "Clique do meio"
-L["MENU_CLICK_SHIFT_MIDDLE"] = "Shift + Clique do meio"
+
 -- The menu's Options row.
 L["MENU_OPTIONS"] = "Opções do TFTB"
 
