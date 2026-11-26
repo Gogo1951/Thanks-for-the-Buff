@@ -57,3 +57,9 @@
 - **Departs from:** SAVED VARIABLES → The Two Models, "an add-on uses Per-Character if and only if it stores something that genuinely differs from character to character".
 - **Instead:** Every setting rides the one shared profile, and only each character's own Ignored Buffs list and Buff Back buff and target are kept per character.
 - **Why:** A player who wants different settings switches profiles, while a buff worth ignoring belongs to the character who keeps receiving it, and each class has its own buffs to cast back.
+
+### Optional macros start off
+
+- **Departs from:** DATA → Default-Settings.lua, "A macro the add-on writes starts on, never off."
+- **Instead:** Only Thank You Button 1's macro starts on; the Return Buff macro and Thank You Buttons 2 to 5 start off until the player turns each one on.
+- **Why:** These macros either need the player's own setup before they do anything or rewrite themselves on their own, so each is made only when the player asks for it.

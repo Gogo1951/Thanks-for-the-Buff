@@ -20,11 +20,11 @@ Auto thank players who buff you with an emote or whisper, buff them back with on
 
 > **Stranger Buffs You, Message To Katz:** Thanks for the [Power Word: Fortitude] // TFTB
 
-### Return Buff
+### Return the Favor
 
 <img width="800" alt="README-Infographic-Return-Buff" src="https://github.com/user-attachments/assets/e8e8fddf-fd9d-4a5d-a817-9ab93dda1481" />
 
-* **Return the Favor** // A stranger buffs you, and one press of your Return Buff macro casts your buff right back on them, no targeting needed.
+* **One Press, Right Back** // A stranger buffs you, and one press of your Return Buff macro casts your buff right back on them, no targeting needed.
 * **Your Buff, Your Pick** // Arcane Intellect, Mark of the Wild, Fortitude, a Blessing, even Power Infusion: choose which one goes back.
 * **Buff Button** // The macro also works as a buff button for your chosen buff, and it will automatically scale down the spell rank if you are trying to buff a lowbie who is still leveling.
 * **Off Until You Want It** // Starts off. Turn it on in the options whenever you're ready.
@@ -64,7 +64,7 @@ Auto thank players who buff you with an emote or whisper, buff them back with on
 1. Install the add-on, ideally using [CurseForge](https://www.curseforge.com/wow/addons/thanks-for-the-buff-revisited) or [Wago](https://addons.wago.io/addons/thanks-for-the-buff).
 2. Type `/tftb`, or pick TFTB Options in the mini-map menu, to open the Options Interface.
 3. Under Give Thanks, pick your emotes from the Emotes List, and turn on the Give Thanks Whisper if you'd like to whisper too.
-4. Turn on Return Buff, Good News, and Wave to Friends if you'd like them.
+4. Turn on Return the Favor, Good News, and Wave to Friends if you'd like them.
 5. Open your Macros window and drag `- Thank`, and `- Return Buff` if you turned it on, onto your action bar.
 6. _"Manners maketh the raid."_
 
@@ -76,7 +76,7 @@ Auto thank players who buff you with an emote or whisper, buff them back with on
 |---|---|
 | Hover or Left-Click | Opens the mini-map menu |
 
-The menu switches Give Thanks and Wave to Friends on or off, picks your emotes, and ignores a recent buff in one click, without opening the options.
+The menu switches Give Thanks, Good News, and Wave to Friends on or off, picks your emotes, and ignores a recent buff in one click, without opening the options. Right-Click the button to turn Give Thanks on or off.
 
 ### Good to Know
 
